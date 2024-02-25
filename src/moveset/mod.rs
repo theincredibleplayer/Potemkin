@@ -16,6 +16,7 @@ use skyline::hooks::{Region,getRegionAddress};
 use crate::FIGHTER_CUTIN_MANAGER_ADDR;
 use crate::FIGHTER_MANAGER;
 
+
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_CHECK_ENEMY: i32 = 0x200000ec;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_GRABBED_ENEMY: i32 = 0x200000ed;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RELEASE_ENEMY: i32 = 0x200000ee;
@@ -25,6 +26,12 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_HPB_GOTTEM: i32 = 0x200000f0;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SELECT_FINAL: i32 = 0x200000f1;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_RELEASE: i32 = 0x200000f2;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SELECT_ATTACK: i32 = 0x200000f1;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_START_NO_DEAD: i32 = 0x200000f3;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SWITCH_TO_FS_JUMP: i32 = 0x200000f4;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_JUMP: i32 = 0x200000f5;
+
+
+
 
 
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_SPECIAL_S_ACCEL: i32 = 0x60;
@@ -44,6 +51,122 @@ pub const FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP: i32 = 0x1fa;
 pub const FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE: i32 = 0x1fb;
 
 
+
+
+
+
+use std::{
+    marker::PhantomData,
+    sync::atomic::{AtomicUsize, Ordering},
+};
+
+pub trait FromArrayAddress {
+    const STRIDE: usize;
+    unsafe fn from_address(addr: usize) -> Self;
+}
+
+pub struct StaticArrayAccessor<T: FromArrayAddress> {
+    text: AtomicUsize,
+    offset: usize,
+    count: usize,
+    _phantom: PhantomData<T>,
+}
+
+impl<T: FromArrayAddress> StaticArrayAccessor<T> {
+    pub const fn new(offset: usize, count: usize) -> Self {
+        Self {
+            text: AtomicUsize::new(0),
+            offset,
+            count,
+            _phantom: PhantomData,
+        }
+    }
+
+    pub fn get(&self, index: usize) -> Option<T> {
+        let mut text = self.text.load(Ordering::Acquire);
+        if text == 0 {
+            let base =
+                unsafe { skyline::hooks::getRegionAddress(skyline::hooks::Region::Text) as usize };
+            self.text.store(base, Ordering::Release);
+            text = base;
+        }
+
+        (index < self.count)
+            .then(|| unsafe { T::from_address(text + self.offset + T::STRIDE * index) })
+    }
+
+    pub fn iter(&self) -> StaticArrayIterator<T> {
+        StaticArrayIterator {
+            accessor: self,
+            current: 0
+        }
+    }
+}
+
+pub struct StaticArrayIterator<'a, T: FromArrayAddress> {
+    accessor: &'a StaticArrayAccessor<T>,
+    current: usize,
+}
+
+impl<'a, T: FromArrayAddress> Iterator for StaticArrayIterator<'a, T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let item = self.accessor.get(self.current)?;
+        self.current += 1;
+        Some(item)
+    }
+}
+
+impl FromArrayAddress for &'static str {
+    const STRIDE: usize = 8;
+
+    unsafe fn from_address(addr: usize) -> Self {
+        let pointer = *(addr as *const *const u8);
+        let mut len = 0;
+        while *pointer.add(len) != 0 {
+            len += 1;
+        }
+
+        std::str::from_utf8_unchecked(std::slice::from_raw_parts(pointer, len))
+    }
+}
+
+macro_rules! primitives {
+    ($($T:ty)*) => {
+        $(
+            impl FromArrayAddress for $T {
+                const STRIDE: usize = std::mem::align_of::<$T>();
+
+                unsafe fn from_address(addr: usize) -> Self {
+                    *(addr as *const $T)
+                }
+            }
+        )*
+    }
+}
+
+primitives![i8 u8 i16 u16 i32 u32 i64 u64 f32 f64];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+pub const LOWERCASE_FIGHTER_NAMES: StaticArrayAccessor<&'static str> =
+    StaticArrayAccessor::new(0x4f7fe20, 118);
 
 
 pub const SITUATION_KIND: i32 = 0x16;
@@ -101,14 +224,33 @@ extern "C" {
 
 pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
     unsafe {
+        //WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
+        //JostleModule::set_status(fighter.module_accessor, false);
         if ControlModule::check_button_trigger(fighter.module_accessor,*CONTROL_PAD_BUTTON_APPEAL_S_L) {
             println!("{}",WorkModule::get_float(fighter.module_accessor,*FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1));
         }
         if StatusModule::status_kind(fighter.module_accessor) != *FIGHTER_STATUS_KIND_FINAL
         && StatusModule::status_kind(fighter.module_accessor) != FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_START
-        && StatusModule::status_kind(fighter.module_accessor) != FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP {
+        && StatusModule::status_kind(fighter.module_accessor) != FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP
+        && StatusModule::status_kind(fighter.module_accessor) != FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE
+        && StatusModule::status_kind(fighter.module_accessor) != FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP  
+        && StatusModule::status_kind(fighter.module_accessor) != FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK {
             WorkModule::on_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SELECT_FINAL);
+            WorkModule::off_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SWITCH_TO_FS_JUMP);
         }
+        /*if StatusModule::status_kind(fighter.module_accessor) == *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK
+        || StatusModule::status_kind(fighter.module_accessor) == *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK_WAIT
+        || StatusModule::status_kind(fighter.module_accessor) == *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ENTRY
+        || StatusModule::status_kind(fighter.module_accessor) == *FIGHTER_KAMUI_STATUS_KIND_FINAL_READY
+        || StatusModule::status_kind(fighter.module_accessor) == *FIGHTER_KAMUI_STATUS_KIND_FINAL_END {
+            let module_accessor = fighter.module_accessor;
+            let enemy_id = WorkModule::get_int(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_HPB_GOTTEM_ID);
+            let enemy = sv_battle_object::module_accessor(enemy_id as u32);
+            WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
+            WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
+            WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD_UP);
+            WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD_UP);
+        }*/
     }
 }
 
@@ -229,12 +371,21 @@ pub fn install() {
     .effect_acmd("effect_attacks4", effect_attack_s4)
     .effect_acmd("effect_attacks4charge", effect_attack_s4_charge)
     .game_acmd("game_final", game_final)
+    .sound_acmd("sound_final", sound_final)
     .effect_acmd("effect_final", effect_final)
+    .game_acmd("game_finalvisualscene01", game_finalvisualscene01)
     .game_acmd("game_finalvisualscene02", game_finalvisualscene02)
+    .game_acmd("game_finalvisualscene03", game_finalvisualscene03)
+    .sound_acmd("sound_finalvisualscene01", sound_finalvisualscene01)
+    .sound_acmd("sound_finalvisualscene02", sound_finalvisualscene02)
+    .sound_acmd("sound_finalvisualscene03", sound_finalvisualscene03)
+    .game_acmd("game_fakefinalvisualscene01", game_fakefinalvisualscene01)
+    .sound_acmd("sound_fakefinalvisualscene01", sound_fakefinalvisualscene01)
+    .effect_acmd("effect_finalvisualscene02", effect_finalvisualscene02)
     .game_acmd("game_attacklw4", game_attacklw4)
     .game_acmd("game_win1a", game_win1a)
 
-
+    
     //special_n
 
 
@@ -242,32 +393,40 @@ pub fn install() {
     //final
     .status(Main, *FIGHTER_STATUS_KIND_FINAL, Final_main)
     //.status(Exit, *FIGHTER_STATUS_KIND_FINAL, Final_exit)
-
     .status(Pre, FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP, finaldashloop_pre)
     .status(Main, FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP, finaldashloop_main)
     .status(Exit, FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP, finaldashloop_exit)
     .status(Init, FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP, finaldashloop_init)
     .status(Exec, FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP, finaldashloop_exec)
+
     .status(Pre, FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK, finaldashattack_pre)
     .status(Main, FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK, finaldashattack_main)
     .status(Exit, FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK, finaldashattack_exit)
     .status(Exec, FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK, finaldashattack_exec)
     .status(Init, FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK, finaldashattack_init)
-    //.status(End, FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK, finaldashattack_end)
-    //.status(Main, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ENTRY, finalsceneenter_main)
+    .status(End, FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK, finaldashattack_end)
+
+    .status(Main, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ENTRY, finalsceneenter_main)
     .status(Main, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK, finalsceneattack_main)
-    //.status(Main, *FIGHTER_KAMUI_STATUS_KIND_FINAL_END, finalsceneexit_main)
+    .status(Main, *FIGHTER_KAMUI_STATUS_KIND_FINAL_END, finalsceneexit_main)
+
     .status(Pre, FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP, finaldashattack_pre)
     .status(Main, FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP, finaljump_main)
     .status(Exit, FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP, finaldashattack_exit)
     .status(Init, FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP, finaldashattack_init)
     .status(Exec, FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP, finaldashattack_exec)
+    .status(Exec, FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP, finaldashattack_end)
+
+
     .status(Pre, FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE, fakefinalsceneenter_pre)
     .status(Main, FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE, fakefinalsceneenter_main)
     .status(Exit, FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE, fakefinalsceneenter_exit)
     .status(Init, FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE, fakefinalsceneenter_init)
     .status(Exec, FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE, fakefinalsceneenter_exec)
     .status(End, FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE, fakefinalsceneenter_end)
+    
+    .status(Exec, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ENTRY, vissceneentry_exec)
+    .status(Exec, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK_WAIT, vissceneattackwait_exec)
 
 
 
@@ -276,7 +435,11 @@ pub fn install() {
     .game_acmd("game_heavenlydashloop", game_finaldash)
     .game_acmd("game_heavenlydashattack", game_finaldashattack)
     .game_acmd("game_finalend", game_finalend)
-    .game_acmd("game_finaairlend", game_finalend)
+    .game_acmd("game_finalairlend", game_finalend)
+    .sound_acmd("sound_finalend", sound_finalend)
+    .sound_acmd("sound_finalairend", sound_finalend)
+    .effect_acmd("effect_finalend", effect_finalend)
+    .effect_acmd("effect_finalairend", effect_finalend)
     .game_acmd("game_heavenlystart", game_heavenlystart)
 
 

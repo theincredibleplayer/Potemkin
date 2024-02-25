@@ -318,7 +318,7 @@ pub unsafe extern "C" fn effect_final(agent: &mut L2CAgentBase) {
         if macros::is_excute(agent) {
             //macros::EFFECT(agent, Hash40::new("kamui_final_energy"), Hash40::new("top"), 0, 0.5, 12, 0, 180, 0, 1, 0, 0, 0, 0, 0, 0, true);
             //macros::EFFECT(agent, Hash40::new("kamui_final_energy"), Hash40::new("top"), 0, 0.5, -12, 0, 180, 0, 1, 0, 0, 0, 0, 0, 0, true);
-            for boi in 1..6 {
+            for boi in 1..12 {
                 macros::EFFECT(agent, Hash40::new("sys_dragoon_a"), Hash40::new("top"), 0, 12, 0, 0, 90, 0, 1.8, 0, 0, 0, 0, 0, 0, true);
             }
         }
@@ -327,7 +327,7 @@ pub unsafe extern "C" fn effect_final(agent: &mut L2CAgentBase) {
         if macros::is_excute(agent) {
             //macros::EFFECT(agent, Hash40::new("kamui_final_energy"), Hash40::new("top"), 0, 0.5, 12, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
             //macros::EFFECT(agent, Hash40::new("kamui_final_energy"), Hash40::new("top"), 0, 0.5, -12, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
-            for boi in 1..6 {
+            for boi in 1..12 {
               macros::EFFECT(agent, Hash40::new("sys_dragoon_a"), Hash40::new("top"), 0, 12, 0, 0, 90, 0, 1.8, 0, 0, 0, 0, 0, 0, true);
             }
         }
@@ -352,25 +352,53 @@ pub unsafe extern "C" fn effect_final(agent: &mut L2CAgentBase) {
     }
 }
 
+pub unsafe extern "C" fn sound_final(agent: &mut L2CAgentBase) {
+    if macros::is_excute(agent) {
+        macros::PLAY_SE(agent, Hash40::new("vc_kamui_final01"));
+        macros::PLAY_SE(agent, Hash40::new("se_kamui_final03"));
+    }
+}
+
 
 pub unsafe extern "C" fn game_finalvisualscene01(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        macros::REQ_FINAL_START_CAMERA_arg3(agent,Hash40::new("d04finalvisualscene01.nuanmb"), false, false);
+        CameraModule::zoom_out(agent.module_accessor, 0);
         ArticleModule::generate_article(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, false, -1);
         ArticleModule::set_visibility_whole(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
         ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, Hash40::new("final_visual_scene_01"), false, -1.0);
     }
-    frame(agent.lua_state_agent, 71.0);
+}
+pub unsafe extern "C" fn sound_finalvisualscene01(agent: &mut L2CAgentBase) {
+}
+
+pub unsafe extern "C" fn game_fakefinalvisualscene01(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        //VisibilityModule::set_whole(agent.module_accessor, false);
-        WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_OFF_EFFECT_SWORD_AURA);
+        //macros::ATTACK(agent, 0, 0, Hash40::new("handr"), 0.0, 80, 100, 180, 0, 30.0, 0.0, 1.0, 12.0, Some(0.0), Some(45.0), Some(12.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
+        ArticleModule::generate_article(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, false, -1);
+        ArticleModule::set_visibility_whole(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+        ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, Hash40::new("final_visual_scene_01"), false, -1.0);
     }
+}
+
+pub unsafe extern "C" fn sound_fakefinalvisualscene01(agent: &mut L2CAgentBase) {
+        if macros::is_excute(agent) {
+            macros::PLAY_SE(agent, Hash40::new("heavenly_1_1"));
+            macros::PLAY_SE(agent, Hash40::new("se_kamui_final01"));
+        }
+        frame(agent.lua_state_agent, 120.0);
+        if macros::is_excute(agent) {
+            macros::PLAY_SE(agent, Hash40::new("heavenly_1_2"));
+        }
+        frame(agent.lua_state_agent, 240.0);
+        if macros::is_excute(agent) {
+            macros::PLAY_SE(agent, Hash40::new("heavenly_1_3"));
+        }
 }
 
 
 pub unsafe extern "C" fn game_finalvisualscene02(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        
+        //JostleModule::set_status(agent.module_accessor, false);
         ArticleModule::generate_article(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, false, -1);
         ArticleModule::set_visibility_whole(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
         ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, Hash40::new("final_visual_scene_02"), false, -1.0);
@@ -380,6 +408,100 @@ pub unsafe extern "C" fn game_finalvisualscene02(agent: &mut L2CAgentBase) {
         //VisibilityModule::set_whole(agent.module_accessor, false);
         WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_OFF_EFFECT_SWORD_AURA);
     }
+}
+
+pub unsafe extern "C" fn sound_finalvisualscene02(agent: &mut L2CAgentBase) {
+    frame(agent.lua_state_agent, 70.0);
+    if macros::is_excute(agent) {
+    let module_accessor = agent.module_accessor;
+    let enemy_id = WorkModule::get_int(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_HPB_GOTTEM_ID);
+    let enemy = sv_battle_object::module_accessor(enemy_id as u32);
+    let enemy_kind = sv_battle_object::kind(enemy_id as u32);
+    let name = LOWERCASE_FIGHTER_NAMES.get(enemy_kind as usize).unwrap();
+    let result = ["vc_",name,"_damage_twinkle"].join("");
+    let dash_sfx_handle = SoundModule::play_se(enemy, Hash40::new(result.as_str()), true, false, false, false, enSEType(0));
+    SoundModule::set_se_vol(enemy, dash_sfx_handle as i32, 2.0, 0);
+
+    }
+    frame(agent.lua_state_agent, 130.0);
+    if macros::is_excute(agent) {
+        macros::PLAY_SE(agent, Hash40::new("heavenly_1_4"));
+    }
+}
+pub unsafe extern "C" fn effect_finalvisualscene02(agent: &mut L2CAgentBase) {
+    frame(agent.lua_state_agent, 35.0);
+    if macros::is_excute(agent) {
+        macros::EFFECT_FOLLOW(agent, Hash40::new("sys_flash"), Hash40::new("hip"), 0, -10, 0, 0.0, 0.0, 0.0, 15, true);
+        macros::LAST_EFFECT_SET_RATE(agent, 0.8);
+        macros::EFFECT_FOLLOW(agent, Hash40::new("sys_flash"), Hash40::new("hip"), 0, -10, 0, 0.0, 0.0, 0.0, 10, true);
+        macros::LAST_EFFECT_SET_RATE(agent, 0.6);
+    }
+}
+
+pub unsafe extern "C" fn game_finalvisualscene03(agent: &mut L2CAgentBase) {
+    if macros::is_excute(agent) {
+        macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_KAMUI_FINAL, 0, 1.5, 361, 80, 1, 0, 0.0, 1.0, *ATTACK_LR_CHECK_POS, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_WATER, *ATTACK_REGION_NONE);
+        AttackModule::set_no_dead_all(agent.module_accessor, true, true);
+    }
+    frame(agent.lua_state_agent, 3.0);
+    if macros::is_excute(agent) {
+        WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_ABS_HIT);
+    }
+    frame(agent.lua_state_agent, 8.0);
+    if macros::is_excute(agent) {
+        WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_ABS_HIT);
+    }
+    frame(agent.lua_state_agent, 14.0);
+    if macros::is_excute(agent) {
+        WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_ABS_HIT);
+    }
+    frame(agent.lua_state_agent, 19.0);
+    if macros::is_excute(agent) {
+        WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_ABS_HIT);
+    }
+    frame(agent.lua_state_agent, 23.0);
+    if macros::is_excute(agent) {
+        WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_ABS_HIT);
+    }
+    frame(agent.lua_state_agent, 29.0);
+    if macros::is_excute(agent) {
+        WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_ABS_HIT);
+    }
+    frame(agent.lua_state_agent, 36.0);
+    if macros::is_excute(agent) {
+        WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_ABS_HIT);
+    }
+    frame(agent.lua_state_agent, 41.0);
+    if macros::is_excute(agent) {
+        WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_ABS_HIT);
+    }
+    frame(agent.lua_state_agent, 45.0);
+    if macros::is_excute(agent) {
+        WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_ABS_HIT);
+    }
+    frame(agent.lua_state_agent, 52.0);
+    if macros::is_excute(agent) {
+        WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_ABS_HIT);
+    }
+    frame(agent.lua_state_agent, 57.0);
+    if macros::is_excute(agent) {
+        WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_ABS_HIT);
+    }
+    frame(agent.lua_state_agent, 62.0);
+    if macros::is_excute(agent) {
+        WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_ABS_HIT);
+    }
+    frame(agent.lua_state_agent, 67.0);
+    if macros::is_excute(agent) {
+        WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_ABS_HIT);
+    }
+    frame(agent.lua_state_agent, 74.0);
+    if macros::is_excute(agent) {
+        WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_ABS_HIT);
+    }
+}
+
+pub unsafe extern "C" fn sound_finalvisualscene03(agent: &mut L2CAgentBase) {
 }
 
 pub unsafe extern "C" fn game_attacklw4(agent: &mut L2CAgentBase) {
@@ -406,9 +528,5 @@ pub unsafe extern "C" fn game_win1a(agent: &mut L2CAgentBase) {
     }
 }
 
-pub unsafe extern "C" fn game_heavenlystart(agent: &mut L2CAgentBase) {
-    if macros::is_excute(agent) {
-        macros::SLOW_OPPONENT(agent, 1000.0, 60.0);
-    }
-}
+
 
