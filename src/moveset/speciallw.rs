@@ -20,7 +20,7 @@ pub unsafe extern "C" fn special_lw_main(fighter: &mut L2CFighterCommon) -> L2CV
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
     if fighter.global_table[0x16].get_i32() != *SITUATION_KIND_GROUND {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
-        MotionModule::change_motion(module_accessor,Hash40::new("special_air_lw"),0.0,1.0,false,0.0,false,false);
+        MotionModule::change_motion(module_accessor,Hash40::new("special_lw"),0.0,1.0,false,0.0,false,false);
     }
     else {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
@@ -46,7 +46,7 @@ unsafe fn special_lw_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     else if fighter.global_table[0x17].get_i32() == *SITUATION_KIND_GROUND
     && fighter.global_table[0x16].get_i32() == *SITUATION_KIND_AIR {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
-        MotionModule::change_motion_inherit_frame(fighter.module_accessor,Hash40::new("special_air_lw"),-1.0,1.0,0.0,false,false);
+        MotionModule::change_motion_inherit_frame(fighter.module_accessor,Hash40::new("special_lw"),-1.0,1.0,0.0,false,false);
         KineticModule::change_kinetic(module_accessor,*FIGHTER_KINETIC_TYPE_AIR_STOP);
     }
     if MotionModule::is_end(fighter.module_accessor) {

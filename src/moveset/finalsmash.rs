@@ -12,6 +12,8 @@ use skyline::nn::ro::LookupSymbol;
 use smash_script::lua_args;
 use smash_script::macros;
 use std::arch::asm;
+use smash_script::{*, macros::*};
+
 use crate::FIGHTER_CUTIN_MANAGER_ADDR;
 use crate::FIGHTER_MANAGER;
 
@@ -75,24 +77,39 @@ pub unsafe extern "C" fn Final_main(fighter: &mut L2CFighterCommon) -> L2CValue 
     let enemy_id = WorkModule::get_int(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_HPB_GOTTEM_ID);
     let enemy = sv_battle_object::module_accessor(enemy_id as u32);
     //StatusModule::set_situation_kind(enemy, smash::app::SituationKind(*SITUATION_KIND_GROUND), false);
-    GroundModule::correct(module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
+    AreaModule::set_whole(fighter.module_accessor, false);
+    AreaModule::set_whole(enemy, false);
     StatusModule::change_status_request(enemy, *FIGHTER_STATUS_KIND_CAPTURE_WAIT, false);
     MotionModule::change_motion(enemy,Hash40::new("down_wait_u"),0.0,1.0,false,0.0,false,false);
-    GroundModule::correct(module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
     LinkModule::remove_model_constraint(enemy,true);
     if LinkModule::is_link(enemy,*LINK_NO_CAPTURE) == false {
         LinkModule::link(enemy,*LINK_NO_CAPTURE,(*(fighter.module_accessor)).battle_object_id);
-        LinkModule::set_model_constraint_pos_ort(enemy,*LINK_NO_CAPTURE,Hash40::new("hip"),Hash40::new("throw"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_OFFSET_SCALE as u32,true);
+        LinkModule::set_model_constraint_pos_ort(enemy,*LINK_NO_CAPTURE,Hash40::new("hip"),Hash40::new("throw"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_DISABLE_RESTRICT_Z as u32,true);
       }
+      HitModule::set_whole(module_accessor, smash::app::HitStatus(*HIT_STATUS_INVINCIBLE), 0);
+      HitModule::set_whole(enemy, smash::app::HitStatus(*HIT_STATUS_INVINCIBLE), 0);
       let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
       AreaModule::set_whole(fighter.module_accessor, false);
       WorkModule::set_flag(fighter.module_accessor, false, *FIGHTER_INSTANCE_WORK_ID_FLAG_NAME_CURSOR);
-      WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD_UP);
-      WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD_UP);
       WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
       WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
       macros::REQ_FINAL_START_CAMERA_arg3(fighter,Hash40::new("d04finalvisualscene01.nuanmb"), false, false);
       MotionModule::change_motion(fighter.module_accessor,Hash40::new("fake_final_visual_scene_01"),0.0,1.0,false,0.0,false,false);
+
+      //let plane_id = ArticleModule::get_active_num(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND);
+      ArticleModule::generate_article(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND,false,-1);
+      ArticleModule::set_visibility_whole(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+      ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, Hash40::new("fake_final_visual_scene_01"), false, -1.0);
+      let plane = ArticleModule::get_article(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND);
+      let plane_boma = *(plane as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
+      LinkModule::remove_model_constraint(plane_boma,true);
+      LinkModule::set_model_constraint_pos_ort(plane_boma,*WEAPON_LINK_NO_CONSTRAINT,Hash40::new("attach"),Hash40::new("top"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_OFFSET_TRANSLATE as u32 | *CONSTRAINT_FLAG_OFFSET_ROT as u32,true);
+      //let offset_rot = Vector3f{x: 0.0, y: 0.0, z: -90.0};
+      //LinkModule::set_constraint_rot_offset(plane_boma,&offset_rot);
+      //let offset_pos = Vector3f{x: 0.0, y: 12.0, z: 0.0};
+      //LinkModule::set_constraint_translate_offset(plane_boma,&offset_pos);
+
+      
     fighter.sub_shift_status_main(L2CValue::Ptr(Final_main_loop as *const () as _))
   }
 }
@@ -136,6 +153,15 @@ pub unsafe extern "C" fn Final_main_loop(fighter: &mut L2CFighterCommon) -> L2CV
   }
   return L2CValue::I32(0) 
   }else{
+    let module_accessor = fighter.module_accessor;
+    let enemy_id = WorkModule::get_int(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_HPB_GOTTEM_ID);
+    let enemy = sv_battle_object::module_accessor(enemy_id as u32);
+    WorkModule::off_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_NAME_CURSOR);
+    WorkModule::off_flag(enemy, *FIGHTER_INSTANCE_WORK_ID_FLAG_NAME_CURSOR);
+    WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
+    WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
+    AreaModule::set_whole(fighter.module_accessor, false);
+    AreaModule::set_whole(enemy, false);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_STOP);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_MOTION);
@@ -143,6 +169,7 @@ pub unsafe extern "C" fn Final_main_loop(fighter: &mut L2CFighterCommon) -> L2CV
     PostureModule::set_pos_2d(fighter.module_accessor,&Vector2f{x: 0.0 , y: 0.0});
     if MotionModule::is_end(fighter.module_accessor) {
       WorkModule::on_flag(fighter.module_accessor,*FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_SUCCESS);
+      ArticleModule::remove_exist(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
       fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_FINAL_READY.into(),false.into());
     }
     return L2CValue::I32(0)
@@ -303,8 +330,9 @@ pub unsafe extern "C" fn finaldashattack_end(fighter: &mut L2CFighterCommon) -> 
 pub unsafe extern "C" fn game_finaldash(agent: &mut L2CAgentBase) {
   if macros::is_excute(agent) {
     JostleModule::set_status(agent.module_accessor, false);
+    HitModule::set_whole(agent.module_accessor, smash::app::HitStatus(*HIT_STATUS_INVINCIBLE), 0);
     ArticleModule::remove_exist(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
-        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 0.0, 0, 0, 0, 0, 15.0, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_LL, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
+        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 0.0, 0, 0, 0, 0, 17.0, 13.0, 8.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_LL, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
         AttackModule::set_no_dead_all(agent.module_accessor, true, false);
         AttackModule::set_force_reaction(agent.module_accessor, 0, true, false);
         AttackModule::set_force_reaction(agent.module_accessor, 1, true, false);
@@ -315,14 +343,15 @@ pub unsafe extern "C" fn game_finaldash(agent: &mut L2CAgentBase) {
 
 pub unsafe extern "C" fn game_finaldashattack(agent: &mut L2CAgentBase) {
   if macros::is_excute(agent) {
-    JostleModule::set_status(agent.module_accessor, true);
+    JostleModule::set_status(agent.module_accessor, false);
     macros::SLOW_OPPONENT(agent, 400.0, 7.0);
+    HitModule::set_whole(agent.module_accessor, smash::app::HitStatus(*HIT_STATUS_INVINCIBLE), 0);
 }
   frame(agent.lua_state_agent, 7.0);
   if macros::is_excute(agent) {
         WorkModule::on_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_HPB_CHECK_ENEMY);
         macros::QUAKE(agent, *CAMERA_QUAKE_KIND_XL);
-        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 7.0, 368, 100, 180, 0, 20.0, 0.0, 0.0, 0.0, None, None, None, 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_NONE);
+        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 7.0, 368, 100, 180, 0, 19.0, 13.0, 8.0, 0.0, None, None, None, 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_NONE);
         AttackModule::set_vec_target_pos(agent.module_accessor, 0, Hash40::new("top"), &Vector2f{x: 30.0, y: 50.0}, 40, false);
         AttackModule::set_no_dead_all(agent.module_accessor, true, false);
         AttackModule::set_force_reaction(agent.module_accessor, 0, true, false);
@@ -348,8 +377,6 @@ pub unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> 
   let enemy = sv_battle_object::module_accessor(enemy_id as u32);
   WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
   WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
-  WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD_UP);
-  WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD_UP);
 
   LinkModule::remove_model_constraint(enemy,true);
   if LinkModule::is_link(enemy,*LINK_NO_CAPTURE) {
@@ -358,14 +385,12 @@ pub unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> 
   macros::REQ_FINAL_START_CAMERA_arg3(fighter,Hash40::new("d04finalvisualscene03.nuanmb"), false,false);
 
   StatusModule::set_situation_kind(enemy, smash::app::SituationKind(*SITUATION_KIND_GROUND), false);
-  GroundModule::correct(module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
   StatusModule::change_status_request(enemy, *FIGHTER_STATUS_KIND_KAMUI_FINAL_TARGET_DAMAGE, false);
   MotionModule::change_motion(enemy,Hash40::new("fall_damage"),0.0,1.0,false,0.0,false,false);
-  GroundModule::correct(module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
   LinkModule::remove_model_constraint(enemy,true);
   if LinkModule::is_link(enemy,*LINK_NO_CAPTURE) == false {
       LinkModule::link(enemy,*LINK_NO_CAPTURE,(*(fighter.module_accessor)).battle_object_id);
-      LinkModule::set_model_constraint_pos_ort(enemy,*LINK_NO_CAPTURE,Hash40::new("hip"),Hash40::new("throw"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_OFFSET_SCALE as u32,true);
+      LinkModule::set_model_constraint_pos_ort(enemy,*LINK_NO_CAPTURE,Hash40::new("hip"),Hash40::new("throw"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_DISABLE_RESTRICT_Z as u32,true);
     }
   PostureModule::set_pos_2d(fighter.module_accessor,&Vector2f{x: 0.0 , y: 0.0});
   return smashline::original_status(Main, fighter, *FIGHTER_KAMUI_STATUS_KIND_FINAL_END)(fighter);
@@ -380,8 +405,7 @@ pub unsafe extern "C" fn finalsceneenter_main(fighter: &mut L2CFighterCommon) ->
 
       WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
       WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
-      WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD_UP);
-      WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD_UP);
+
       
       LinkModule::remove_model_constraint(enemy,true);
       if LinkModule::is_link(enemy,*LINK_NO_CAPTURE) {
@@ -390,14 +414,14 @@ pub unsafe extern "C" fn finalsceneenter_main(fighter: &mut L2CFighterCommon) ->
       let pos = Vector2f{x: 0.0, y: 0.0};
       PostureModule::set_pos_2d(enemy,&pos);    
     //StatusModule::set_situation_kind(enemy, smash::app::SituationKind(*SITUATION_KIND_GROUND), false);
-    GroundModule::correct(module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
     StatusModule::change_status_request(enemy, *FIGHTER_STATUS_KIND_KAMUI_FINAL_TARGET_DAMAGE, false);
-    MotionModule::change_motion(enemy,Hash40::new("fall_damage"),0.0,1.0,false,0.0,false,false);
-    GroundModule::correct(module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
+    MotionModule::change_motion(enemy,Hash40::new("down_wait_u"),0.0,1.0,false,0.0,false,false);
     LinkModule::remove_model_constraint(enemy,true);
     if LinkModule::is_link(enemy,*LINK_NO_CAPTURE) == false {
         LinkModule::link(enemy,*LINK_NO_CAPTURE,(*(fighter.module_accessor)).battle_object_id);
-        LinkModule::set_model_constraint_pos_ort(enemy,*LINK_NO_CAPTURE,Hash40::new("hip"),Hash40::new("throw"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_OFFSET_SCALE as u32,true);
+        LinkModule::set_model_constraint_pos_ort(enemy,*LINK_NO_CAPTURE,Hash40::new("trans"),Hash40::new("throw"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_DISABLE_RESTRICT_Z  as u32 | *CONSTRAINT_FLAG_OFFSET_ROT as u32,true);
+        let offset_rot = Vector3f{x: 0.0, y: -90.0, z: 0.0};
+        LinkModule::set_constraint_rot_offset(enemy,&offset_rot);
       }
       return smashline::original_status(Main, fighter, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ENTRY)(fighter);
 
@@ -407,8 +431,6 @@ pub unsafe extern "C" fn finalsceneattack_main(fighter: &mut L2CFighterCommon) -
     let module_accessor = fighter.module_accessor;
     let enemy_id = WorkModule::get_int(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_HPB_GOTTEM_ID);
     let enemy = sv_battle_object::module_accessor(enemy_id as u32);
-      WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD_UP);
-      WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD_UP);
       WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
       WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
       return smashline::original_status(Main, fighter, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK)(fighter);
@@ -433,13 +455,11 @@ pub unsafe extern "C" fn fakefinalsceneenter_main(fighter: &mut L2CFighterCommon
     LinkModule::remove_model_constraint(enemy,true);
     if LinkModule::is_link(enemy,*LINK_NO_CAPTURE) == false {
         LinkModule::link(enemy,*LINK_NO_CAPTURE,(*(fighter.module_accessor)).battle_object_id);
-        LinkModule::set_model_constraint_pos_ort(enemy,*LINK_NO_CAPTURE,Hash40::new("hip"),Hash40::new("throw"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_OFFSET_SCALE as u32,true);
+        LinkModule::set_model_constraint_pos_ort(enemy,*LINK_NO_CAPTURE,Hash40::new("hip"),Hash40::new("throw"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_DISABLE_RESTRICT_Z as u32,true);
       }
       let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
       AreaModule::set_whole(fighter.module_accessor, false);
       WorkModule::set_flag(fighter.module_accessor, false, *FIGHTER_INSTANCE_WORK_ID_FLAG_NAME_CURSOR);
-      WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD_UP);
-      WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD_UP);
       WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
       WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
       MotionModule::change_motion(fighter.module_accessor,Hash40::new("final_visual_scene_01"),0.0,1.0,false,0.0,false,false);
@@ -489,40 +509,38 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
  if macros::is_excute(agent){
   HitModule::set_whole(module_accessor, smash::app::HitStatus(*HIT_STATUS_INVINCIBLE), 0);
   HitModule::set_whole(enemy, smash::app::HitStatus(*HIT_STATUS_INVINCIBLE), 0);
-  WorkModule::on_flag(agent.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD_UP);
-  WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD_UP);
   WorkModule::on_flag(agent.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
   WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
-  macros::REQ_FINAL_START_CAMERA(agent,Hash40::new("d04finalvisualscene03.nuanmb"), false);
-  WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_END_EXIT);
+  //macros::REQ_FINAL_START_CAMERA(agent,Hash40::new("d04finalvisualscene03.nuanmb"), false);
+  ArticleModule::remove_exist(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
  }
   frame(agent.lua_state_agent, 49.0);
   if macros::is_excute(agent) {
     HitModule::set_whole(module_accessor, smash::app::HitStatus(*HIT_STATUS_NORMAL), 0);
     HitModule::set_whole(enemy, smash::app::HitStatus(*HIT_STATUS_NORMAL), 0);
+    
   }
   frame(agent.lua_state_agent, 53.0);
   if macros::is_excute(agent) {
     macros::ATTACK(agent, 0, 0, Hash40::new("top"), 50.0, 35, 50, 0, 50, 25, 0.0, 10.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 5.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_NONE);
     AttackModule::set_no_dead_all(agent.module_accessor, true, true);
-    WorkModule::off_flag(agent.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD_UP);
-    WorkModule::off_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD_UP);
+    AttackModule::set_add_reaction_frame(agent.module_accessor, 0, 100.0, false);
     WorkModule::off_flag(agent.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
     WorkModule::off_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
-    CameraModule::zoom_out(agent.module_accessor, 20);
-    macros::QUAKE(agent, *CAMERA_QUAKE_KIND_XL);
+    //CameraModule::zoom_out(agent.module_accessor, 0);
+    //macros::QUAKE(agent, *CAMERA_QUAKE_KIND_XL);
     StatusModule::change_status_request(enemy, *FIGHTER_STATUS_KIND_FALL, false);
     MotionModule::change_motion(enemy,Hash40::new("down_wait_d"),0.0,1.0,false,0.0,false,false);
   }
   wait(agent.lua_state_agent, 5.0);
   if macros::is_excute(agent) {
+    //KineticModule::clear_speed_all(enemy);
     AttackModule::clear_all(agent.module_accessor);
   }
   frame(agent.lua_state_agent, 108.0);
   if macros::is_excute(agent) {
     //CameraModule::zoom_out(agent.module_accessor, 0);
   }
-
   frame(agent.lua_state_agent, 127.0);
   if macros::is_excute(agent) {
     StatusModule::change_status_request(enemy, *FIGHTER_STATUS_KIND_FALL, false);
@@ -530,15 +548,23 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
       if LinkModule::is_link(enemy,*LINK_NO_CAPTURE) {
           LinkModule::unlink(enemy,*LINK_NO_CAPTURE);
       }
-      let pos = Vector2f{x: 15.0, y: 10.0};
-      PostureModule::set_pos_2d(enemy,&pos);
-      let rot = Vector3f{x: 0.0, y: 0.0, z: 0.0};
-      PostureModule::set_rot(enemy,&rot,0);
+      if PostureModule::lr(agent.module_accessor) < 0.0{
+        let pos = Vector2f{x: -15.0, y: 10.0};
+        PostureModule::set_pos_2d(enemy,&pos);
+        let rot = Vector3f{x: 0.0, y: 0.0, z: 0.0};
+        PostureModule::set_rot(enemy,&rot,0);
+        PostureModule::set_lr(enemy, -1.0);
+      }else{
+        let pos = Vector2f{x: 15.0, y: 10.0};
+        PostureModule::set_pos_2d(enemy,&pos);
+        let rot = Vector3f{x: 0.0, y: 0.0, z: 0.0};
+        PostureModule::set_rot(enemy,&rot,0);
+      }
     }
   if DamageModule::damage(enemy, 0) > 100.0 {
     wait(agent.lua_state_agent, 1.0);
     if macros::is_excute(agent) {
-      macros::ATTACK(agent, 0, 0, Hash40::new("top"), 20.0, 50, 0, 200, 100, 25, 0.0, 10.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
+      macros::ATTACK(agent, 0, 0, Hash40::new("haver"), 20.0, 50, 0, 200, 100, 25, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
       //AttackModule::set_vec_target_pos(agent.module_accessor, 0, Hash40::new("top"), &Vector2f{x: 50.0, y: 15.0}, 40, false);
       AttackModule::set_no_dead_all(agent.module_accessor, true, false);
       AttackModule::set_add_reaction_frame(agent.module_accessor, 0, 100.0, false);
@@ -550,19 +576,22 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
       AttackModule::clear_all(agent.module_accessor);
     }
-    let speed_mul= 2;
-    for n in 1..20{
+    for n in 1..21{
       if macros::is_excute(agent) {
+        //SlowModule::clear_whole(agent.module_accessor);
+        if n<=3{
         EffectModule::req_follow(enemy, Hash40::new("sys_explosion_sign"), Hash40::new("hip"), &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, 1.0, false, 0, 0, 0, 0, 0, false, false);
-        SlowModule::set_whole(agent.module_accessor, speed_mul, 100);
-      }
-      let speed_mul= speed_mul + 1;
+        macros::LAST_EFFECT_SET_RATE(agent, 3.0);
+        }
+        SlowModule::set_whole(agent.module_accessor, 3, 100);
       wait(agent.lua_state_agent, 1.0);
+      }
     }
-    frame(agent.lua_state_agent, 150.0);
+    frame(agent.lua_state_agent, 152.0);
     if macros::is_excute(agent) {
       macros::FT_MOTION_RATE(agent, 1.0);
       StatusModule::change_status_request_from_script(enemy, FIGHTER_STATUS_KIND_DEAD.into(), false.into());
+      WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_END_EXIT);
     }
     frame(agent.lua_state_agent, 155.0);
     if macros::is_excute(agent) {
@@ -571,7 +600,7 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
   } else {
     wait(agent.lua_state_agent, 1.0);
     if macros::is_excute(agent) {
-      macros::ATTACK(agent, 0, 0, Hash40::new("top"), 20.0, 35, 50, 0, 50, 25, 0.0, 10.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
+      macros::ATTACK(agent, 0, 0, Hash40::new("haver"), 20.0, 35, 50, 0, 50, 25, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
     }
     wait(agent.lua_state_agent, 5.0);
     if macros::is_excute(agent) {
@@ -595,16 +624,22 @@ pub unsafe extern "C" fn effect_finalend(agent: &mut L2CAgentBase) {
   for _ in 0..26 {
     if macros::is_excute(agent) {
         macros::EFFECT_FOLLOW(agent, Hash40::new("sys_soccer"), Hash40::new("haver"), 0, 0, 0, 0.0, 0.0, 0.0, 1, true);
+        macros::LAST_EFFECT_SET_RATE(agent, 0.5);
         macros::EFFECT_FOLLOW(agent, Hash40::new("sys_soccer"), Hash40::new("havel"), 0, 0, 0, 0.0, 0.0, 0.0, 1, true);
+        macros::LAST_EFFECT_SET_RATE(agent, 0.5);
       }
     wait(agent.lua_state_agent, 2.0);
     }
   frame(agent.lua_state_agent, 53.0);
   if macros::is_excute(agent) {
+    macros::EFFECT(agent, Hash40::new("tiki_breath_embers"), Hash40::new("top"), 0, 0, 7, 0, 90, 0, 2.5, 0, 0, 0, 0, 0, 0, false);
+    macros::LAST_EFFECT_SET_RATE(agent, 0.85);
+    macros::EFFECT(agent, Hash40::new("tiki_breath_embers"), Hash40::new("top"), 0, 0, -5, 0, 90, 0, 2.5, 0, 0, 0, 0, 0, 0, false);
+    macros::LAST_EFFECT_SET_RATE(agent, 0.85);
     macros::EFFECT(agent, Hash40::new("sys_bomb_d"), Hash40::new("top"), 0, 0, -20, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, false);
     macros::LAST_EFFECT_SET_RATE(agent, 0.3);
   }
-  wait(agent.lua_state_agent, 10.0);
+  frame(agent.lua_state_agent, 110.0);
   if macros::is_excute(agent) {
     EffectModule::kill_kind(agent.module_accessor, Hash40::new("sys_soccer"), false, true);
   }
@@ -634,10 +669,10 @@ unsafe fn finaljump_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,10.0);
     sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
     fighter.clear_lua_stack();
-    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,*ENERGY_STOP_RESET_TYPE_AIR, 0.0,    2.0   ,0.0,0.0,0.0);
+    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,*ENERGY_STOP_RESET_TYPE_AIR, 0.0,    3.0   ,0.0,0.0,0.0);
     sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
     fighter.clear_lua_stack();
-    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_NONE, 5.0 * PostureModule::lr(module_accessor),0.0,0.0,0.0,0.0);
+    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_AIR, 10.0 * PostureModule::lr(module_accessor),0.0,0.0,0.0,0.0);
     sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
     fighter.clear_lua_stack();
     lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY, 0.0, 0.0);
@@ -667,29 +702,39 @@ pub unsafe extern "C" fn game_heavenlystart(agent: &mut L2CAgentBase) {
   frame(agent.lua_state_agent, 7.0);
   if macros::is_excute(agent) {
       macros::PLAY_SE(agent, Hash40::new("se_kamui_final04"));
-      macros::FT_MOTION_RATE(agent, 3.5);
-      macros::SLOW_OPPONENT(agent, 400.0, 20.0);
-      /*macros::CAM_ZOOM_IN_arg5(
-        agent,
-        /*frames to zoom in totally*/3.0,
-        /*idk best kept 0*/1.0,
-        /*the amt of zoom needed, higher the number lower the zoom*/1.0,
-        /*y_rot*/-40.0,
-        /*x_rot*/50.0
-    );  */
+      macros::FT_MOTION_RATE(agent, 6.0);
+      macros::SLOW_OPPONENT(agent, 400.0, 30.0);
+      //stub_kill_screen();
+      //camera!(agent, *MA_MSC_CMD_CAMERA_CAM_OFFSET, 50, 50);
+      //CameraModule::add_camera_range_offset(agent.module_accessor,&Vector3f{x:30.0,y:30.0,z:5.0}, 0);
+      macros::CAM_ZOOM_IN_arg5(
+      agent,
+      /*frames to zoom in totally*/5.0,
+      /*idk best kept 0*/0,
+      /*the amt of zoom needed, higher the number lower the zoom*/1.5,
+      /*y_rot*/0.0,
+      /*x_rot*/0.0,
+      );
+      //CameraModule::update_force(agent.module_accessor,*MA_MSC_CMD_CAMERA_CAM_OFFSET,&Vector3f{x:30.0,y:30.0,z:5.0},&Vector3f{x:30.0,y:30.0,z:5.0});
+      let pos = Vector2f{
+      x:0.0,
+      y:100.0,
+      };
+      //CameraModule::zoom_in(agent.module_accessor, 1, 1, 1.0,  &pos, true);
+      //CameraModule::set_camera_range_offset(agent.module_accessor,&Vector3f{x:30.0,y:30.0,z:5.0}, 0);
   }
   frame(agent.lua_state_agent, 12.0);
   if macros::is_excute(agent) {
       macros::FT_MOTION_RATE(agent, 1.0);
       SlowModule::clear_whole(agent.module_accessor);
       WorkModule::on_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_JUMP);
-      macros::ATTACK(agent, 0, 0, Hash40::new("top"), 0.0, 0, 0, 0, 0, 15.0, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_LL, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
+      macros::ATTACK(agent, 0, 0, Hash40::new("hip"), 0.0, 0, 0, 0, 0, 15.0, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_LL, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
       AttackModule::set_no_dead_all(agent.module_accessor, true, false);
       AttackModule::set_force_reaction(agent.module_accessor, 0, true, false);
       AttackModule::set_force_reaction(agent.module_accessor, 1, true, false);
       AttackModule::set_force_reaction(agent.module_accessor, 2, true, false);
       AttackModule::set_force_reaction(agent.module_accessor, 3, true, false);
-      CameraModule::zoom_out(agent.module_accessor, 20);
+      CameraModule::zoom_out(agent.module_accessor, 30);
   }
 }
 

@@ -23,14 +23,15 @@ pub unsafe extern "C" fn special_hi_main(fighter: &mut L2CFighterCommon) -> L2CV
     if fighter.global_table[0x16].get_i32() != *SITUATION_KIND_GROUND {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
         MotionModule::change_motion(module_accessor,Hash40::new("special_air_hi"),0.0,1.0,false,0.0,false,false);
+        return smashline::original_status(Main, fighter, *FIGHTER_STATUS_KIND_SPECIAL_HI)(fighter);
     }
     else {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
         MotionModule::change_motion(module_accessor,Hash40::new("special_hi"),0.0,1.0,false,0.0,false,false);
+        KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_STOP);
+        KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
+        fighter.sub_shift_status_main(L2CValue::Ptr(special_hi_main_loop as *const () as _))
     }
-    KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_STOP);
-    KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
-    fighter.sub_shift_status_main(L2CValue::Ptr(special_hi_main_loop as *const () as _))
 }
 
 unsafe fn special_hi_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
@@ -274,8 +275,8 @@ pub unsafe extern "C" fn special_dragon_hi(agent: &mut L2CAgentBase) {
         //WorkModule::on_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_CHECK_ENEMY);
         macros::ATTACK(agent,0,0,Hash40::new("top"),1.0,361,30 ,0,12,15.0,0.0,34.5,20.5,None,None,None,0.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_A,*COLLISION_CATEGORY_MASK_FIGHTER,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_HARISEN,*ATTACK_REGION_NONE);
         macros::ATTACK(agent,1,0,Hash40::new("top"),1.0,361,30 ,0,12,5.0,0.0,34.5,20.5,None,None,None,0.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_G,*COLLISION_CATEGORY_MASK_FIGHTER,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_HARISEN,*ATTACK_REGION_NONE);
-        AttackModule::set_add_reaction_frame(agent.module_accessor, 0, 50.0, false);
-        AttackModule::set_add_reaction_frame(agent.module_accessor, 1, 50.0, false);
+        AttackModule::set_add_reaction_frame(agent.module_accessor, 0, 100.0, false);
+        AttackModule::set_add_reaction_frame(agent.module_accessor, 1, 100.0, false);
     }
     
     sv_animcmd::wait(agent.lua_state_agent, 7.0);

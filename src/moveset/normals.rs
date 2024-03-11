@@ -62,7 +62,7 @@ pub unsafe extern "C" fn effect_attack_lw3(_agent: &mut L2CAgentBase) {}
 pub unsafe extern "C" fn attack_dash(agent: &mut L2CAgentBase) {
     sv_animcmd::frame(agent.lua_state_agent, 6.0);
     if macros::is_excute(agent) {
-        macros::ATTACK(agent,0,0,Hash40::new("top"),15.0,50,110,0,80,9.0,0.0,7.0,10.0,Some(0.0),Some(25.0),Some(10.0),1.5,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,true,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_L,*COLLISION_SOUND_ATTR_HEAVY,*ATTACK_REGION_NONE);
+        macros::ATTACK(agent,0,0,Hash40::new("top"),15.0,50,50,0,80,9.0,0.0,7.0,10.0,Some(0.0),Some(25.0),Some(10.0),1.5,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,true,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_L,*COLLISION_SOUND_ATTR_HEAVY,*ATTACK_REGION_NONE);
     }
     sv_animcmd::wait(agent.lua_state_agent, 11.0);
     if macros::is_excute(agent) {
@@ -249,7 +249,7 @@ pub unsafe extern "C" fn game_final(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         CameraModule::reset_all(agent.module_accessor);
         macros::CHECK_VALID_FINAL_START_CAMERA(agent, 0, 7, 20, 0, 0, 0);
-        macros::SLOW_OPPONENT(agent, 3.0, 60.0);
+        macros::SLOW_OPPONENT(agent, 900.0, 60.0);
         ArticleModule::generate_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
         ArticleModule::change_motion(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("final"),false,-1.0);
     }
@@ -295,7 +295,7 @@ pub unsafe extern "C" fn game_final(agent: &mut L2CAgentBase) {
     wait(agent.lua_state_agent, 3.0);
     if macros::is_excute(agent) {
         AttackModule::clear_all(agent.module_accessor);
-        //WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_CLEAR_ATTACK);
+        WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_CLEAR_ATTACK);
     }
     frame(agent.lua_state_agent, 60.0);
     if macros::is_excute(agent) {
@@ -373,10 +373,22 @@ pub unsafe extern "C" fn sound_finalvisualscene01(agent: &mut L2CAgentBase) {
 
 pub unsafe extern "C" fn game_fakefinalvisualscene01(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        //macros::ATTACK(agent, 0, 0, Hash40::new("handr"), 0.0, 80, 100, 180, 0, 30.0, 0.0, 1.0, 12.0, Some(0.0), Some(45.0), Some(12.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
+        macros::ATTACK(agent, 0, 0, Hash40::new("handr"), 0.0, 80, 100, 180, 0, 30.0, 0.0, 1.0, 12.0, Some(0.0), Some(0.0), Some(0.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
         ArticleModule::generate_article(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, false, -1);
         ArticleModule::set_visibility_whole(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
         ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, Hash40::new("final_visual_scene_01"), false, -1.0);
+    }
+    frame(agent.lua_state_agent, 229.0);
+    if macros::is_excute(agent) {
+        for _ in 0..6 {
+            if macros::is_excute(agent) {
+                macros::EFFECT_FOLLOW(agent, Hash40::new("robot_atk_lw_jet"), Hash40::new("hip"), -10, -2, -15, -90, 90, 0, 0.8, true);
+                macros::LAST_EFFECT_SET_RATE(agent, 0.8);
+                macros::EFFECT_FOLLOW(agent, Hash40::new("robot_atk_lw_jet"), Hash40::new("hip"), -10, -2, 15, -90, 90, 0, 0.8, true);
+                macros::LAST_EFFECT_SET_RATE(agent, 1.0);
+              }
+            wait(agent.lua_state_agent, 7.0);
+        }
     }
 }
 
@@ -402,6 +414,14 @@ pub unsafe extern "C" fn game_finalvisualscene02(agent: &mut L2CAgentBase) {
         ArticleModule::generate_article(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, false, -1);
         ArticleModule::set_visibility_whole(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
         ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, Hash40::new("final_visual_scene_02"), false, -1.0);
+        ArticleModule::generate_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND,false,-1);
+        ArticleModule::set_visibility_whole(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+        ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, Hash40::new("final_visual_scene_02"), false, -1.0);
+        let plane = ArticleModule::get_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND);
+        let plane_boma = *(plane as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
+        LinkModule::remove_model_constraint(plane_boma,true);
+        LinkModule::set_model_constraint_pos_ort(plane_boma,*WEAPON_LINK_NO_CONSTRAINT,Hash40::new("attach"),Hash40::new("top"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_OFFSET_TRANSLATE as u32 | *CONSTRAINT_FLAG_OFFSET_ROT as u32,true); 
+        macros::FT_SET_FINAL_FEAR_FACE(agent, 150); 
     }
     frame(agent.lua_state_agent, 71.0);
     if macros::is_excute(agent) {
@@ -419,8 +439,8 @@ pub unsafe extern "C" fn sound_finalvisualscene02(agent: &mut L2CAgentBase) {
     let enemy_kind = sv_battle_object::kind(enemy_id as u32);
     let name = LOWERCASE_FIGHTER_NAMES.get(enemy_kind as usize).unwrap();
     let result = ["vc_",name,"_damage_twinkle"].join("");
-    let dash_sfx_handle = SoundModule::play_se(enemy, Hash40::new(result.as_str()), true, false, false, false, enSEType(0));
-    SoundModule::set_se_vol(enemy, dash_sfx_handle as i32, 2.0, 0);
+    let scream_handle = SoundModule::play_se(enemy, Hash40::new(result.as_str()), true, false, false, false, enSEType(0));
+    SoundModule::set_se_vol(enemy, scream_handle as i32, 2.0, 0);
 
     }
     frame(agent.lua_state_agent, 130.0);
@@ -429,12 +449,14 @@ pub unsafe extern "C" fn sound_finalvisualscene02(agent: &mut L2CAgentBase) {
     }
 }
 pub unsafe extern "C" fn effect_finalvisualscene02(agent: &mut L2CAgentBase) {
-    frame(agent.lua_state_agent, 35.0);
+    frame(agent.lua_state_agent, 25.0);
     if macros::is_excute(agent) {
         macros::EFFECT_FOLLOW(agent, Hash40::new("sys_flash"), Hash40::new("hip"), 0, -10, 0, 0.0, 0.0, 0.0, 15, true);
-        macros::LAST_EFFECT_SET_RATE(agent, 0.8);
+        macros::LAST_EFFECT_SET_RATE(agent, 0.7);
+        EffectModule::set_alpha_last(agent.module_accessor, 0.5);
         macros::EFFECT_FOLLOW(agent, Hash40::new("sys_flash"), Hash40::new("hip"), 0, -10, 0, 0.0, 0.0, 0.0, 10, true);
-        macros::LAST_EFFECT_SET_RATE(agent, 0.6);
+        macros::LAST_EFFECT_SET_RATE(agent, 0.4);
+        EffectModule::set_alpha_last(agent.module_accessor, 0.5);
     }
 }
 

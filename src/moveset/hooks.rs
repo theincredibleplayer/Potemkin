@@ -40,6 +40,41 @@ pub unsafe extern "C" fn notify_log_event_collision_hit_replace(fighter_manager:
     original!()(fighter_manager, attacker_id, defender_id, move_type, arg5, move_type_again)
 }
 
+#[skyline::hook(offset = 0xb5cd90)]
+pub unsafe extern "C" fn smth_ig(param_1: u8, fighter: smash::app::Fighter){
+    let scale = PostureModule::scale(fighter.battle_object.module_accessor); 
+    if ((PostureModule::lr(fighter.battle_object.module_accessor) < 0.0) && (StatusModule::status_kind(fighter.battle_object.module_accessor) != FIGHTER_STATUS_KIND_TURN))
+    || ((PostureModule::lr(fighter.battle_object.module_accessor) > 0.0) && (StatusModule::status_kind(fighter.battle_object.module_accessor) == FIGHTER_STATUS_KIND_TURN)){
+            ModelModule::set_joint_scale(fighter.battle_object.module_accessor, Hash40::new("top") , &Vector3f{x:-scale,y:scale,z:scale});
+            if ArticleModule::is_exist(fighter.battle_object.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND){
+                let article = ArticleModule::get_article(fighter.battle_object.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND);
+                let article_boma = *(article as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
+                ModelModule::set_joint_scale(article_boma, Hash40::new("hand1") , &Vector3f{x:-scale,y:scale,z:scale});
+            }
+            if ArticleModule::is_exist(fighter.battle_object.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON){
+                let article2 = ArticleModule::get_article(fighter.battle_object.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON);
+                let article_boma2 = *(article2 as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
+                ModelModule::set_joint_scale(article_boma2, Hash40::new("trans") , &Vector3f{x:-scale,y:scale,z:scale});
+            }
+    }else{
+        ModelModule::set_joint_scale(fighter.battle_object.module_accessor, Hash40::new("top") , &Vector3f{x:scale,y:scale,z:scale});
+        if ArticleModule::is_exist(fighter.battle_object.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND){
+            let article = ArticleModule::get_article(fighter.battle_object.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND);
+            let article_boma = *(article as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
+            ModelModule::set_joint_scale(article_boma, Hash40::new("hand1") , &Vector3f{x:scale,y:scale,z:scale});
+        }
+        if ArticleModule::is_exist(fighter.battle_object.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON){
+            let article2 = ArticleModule::get_article(fighter.battle_object.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON);
+            let article_boma2 = *(article2 as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
+            ModelModule::set_joint_scale(article_boma2, Hash40::new("trans") , &Vector3f{x:scale,y:scale,z:scale});
+        }
+    }
+    let motion = MotionModule::motion_kind(fighter.battle_object.module_accessor);
+    let status = StatusModule::status_kind(fighter.battle_object.module_accessor);
+    println!("Status: {:#x}, Motion: {:#x}", status, motion);
+    original!()(param_1,fighter)
+}
+
 pub fn find_subsequence(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     haystack.windows(needle.len()).position(|window| window == needle)
 }
@@ -63,3 +98,9 @@ pub unsafe extern "C" fn motion_hook(unk: u64, unk2: u64) -> u64 {
     println!("filepath: {:#x}",**filepath);
     original!()(unk,unk2)
 }*/
+
+
+#[skyline::hook(offset=0x6a7100)] // unadjusted for 13.0.2?
+pub fn stub_kill_screen() {
+    original!()()
+}

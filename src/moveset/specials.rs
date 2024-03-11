@@ -317,7 +317,7 @@ pub unsafe extern "C" fn side_b_slide_exec(fighter: &mut L2CFighterCommon) -> L2
 
 pub unsafe extern "C" fn game_specialsloop(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 0.0, 35, 0, 0, 0, 15, 0.0, 10.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
+        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 0.0, 35, 0, 0, 0, 16, 0.0, 13.0, 5.0, Some(0.0), Some(0.0), Some(0.0), 0.0, 0.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
     }
 }
 
@@ -340,7 +340,7 @@ pub unsafe extern "C" fn effect_specials(agent: &mut L2CAgentBase) {
 pub unsafe extern "C" fn game_specialsattack(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 9.0);
     if macros::is_excute(agent) {
-        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 50.0, 35, 50, 0, 50, 15, 0.0, 10.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
+        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 20.0, 35, 80, 0, 50, 16, 0.0, 14.0, 6.0, Some(0.0), Some(-2.0), Some(2.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_PUNCH);
     }
     wait(agent.lua_state_agent, 3.0);
     if macros::is_excute(agent) {
@@ -405,7 +405,7 @@ pub unsafe extern "C" fn megafist_f_main(fighter: &mut L2CFighterCommon) -> L2CV
     lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_AIR, 0.8 * PostureModule::lr(module_accessor),0.0,0.0,0.0,0.0);
     sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
     fighter.clear_lua_stack();
-    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY, -0.18, -0.18);
+    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY, -0.2, -0.2);
     sv_kinetic_energy::set_accel(fighter.lua_state_agent);
     //KineticModule::add_speed(module_accessor, &Vector3f{x:30.0,y:30.0,z:0.0});
     fighter.sub_shift_status_main(L2CValue::Ptr(megafist_f_main_loop as *const () as _))
@@ -454,8 +454,10 @@ pub unsafe extern "C" fn game_specialsmff(agent: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(agent.lua_state_agent, 24.0);
     if macros::is_excute(agent) {
-        macros::ATTACK(agent,0,0,Hash40::new("handr"),15.0,75,100,0,40,9.0,0.0,0.0,0.0,None,None,None,1.5,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,true,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_PUNCH,*ATTACK_REGION_NONE);
-        macros::ATTACK(agent,1,0,Hash40::new("handl"),15.0,75,100,0,40,9.0,3.0,0.0,0.0,None,None,None,1.5,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,true,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_PUNCH,*ATTACK_REGION_NONE);
+        macros::ATTACK(agent,0,0,Hash40::new("handr"),15.0,300,80,0,40,6.0,0.0,0.0,0.0,None,None,None,1.5,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,true,*COLLISION_SITUATION_MASK_AIR,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_L,*COLLISION_SOUND_ATTR_PUNCH,*ATTACK_REGION_NONE);
+        macros::ATTACK(agent,1,0,Hash40::new("handl"),15.0,300,80,0,40,6.0,0.0,0.0,0.0,None,None,None,1.5,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,true,*COLLISION_SITUATION_MASK_AIR,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_L,*COLLISION_SOUND_ATTR_PUNCH,*ATTACK_REGION_NONE);
+        macros::ATTACK(agent,2,0,Hash40::new("handr"),15.0,75,80,0,40,9.0,0.0,0.0,0.0,None,None,None,1.5,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,true,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_PUNCH,*ATTACK_REGION_NONE);
+        macros::ATTACK(agent,3,0,Hash40::new("handl"),15.0,75,80,0,40,9.0,0.0,0.0,0.0,None,None,None,1.5,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,true,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_PUNCH,*ATTACK_REGION_NONE);
     }
     sv_animcmd::wait(agent.lua_state_agent, 7.0);
     if macros::is_excute(agent) {

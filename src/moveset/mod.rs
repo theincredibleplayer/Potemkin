@@ -29,6 +29,7 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SELECT_ATTACK: i32 = 0x200000f1;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_START_NO_DEAD: i32 = 0x200000f3;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SWITCH_TO_FS_JUMP: i32 = 0x200000f4;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_JUMP: i32 = 0x200000f5;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SPECIAL_S_COMMAND : i32 = 0x200000f6;
 
 
 
@@ -36,6 +37,8 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_JUMP: i32 = 0x200000f5;
 
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_SPECIAL_S_ACCEL: i32 = 0x60;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FINAL_TIMER: i32 = 0x61;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FLIP_SELECTOR: i32 = 0x62;
+
 
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_GRABBED_ENEMY_ID: i32 = 0x100000c1;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_HPB_GOTTEM_ID: i32 = 0x100000c2;
@@ -50,7 +53,9 @@ pub const FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK: i32 = 0x1f9;
 pub const FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP: i32 = 0x1fa;
 pub const FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE: i32 = 0x1fb;
 
-
+pub const KIND:                     i32 = 0x2;
+pub const CMD_CAT4:                 i32 = 0x23;
+pub const CHECK_SPECIAL_COMMAND:    i32 = 0x3C;
 
 
 
@@ -226,6 +231,34 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
     unsafe {
         //WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
         //JostleModule::set_status(fighter.module_accessor, false);
+        //let scale = PostureModule::scale(fighter.module_accessor); 
+        //if ((PostureModule::lr(fighter.module_accessor) < 0.0) && (StatusModule::status_kind(fighter.module_accessor) != FIGHTER_STATUS_KIND_TURN))
+        //|| ((PostureModule::lr(fighter.module_accessor) > 0.0) && (StatusModule::status_kind(fighter.module_accessor) == FIGHTER_STATUS_KIND_TURN)){
+        //        ModelModule::set_joint_scale(fighter.module_accessor, Hash40::new("top") , &Vector3f{x:-scale,y:scale,z:scale});
+        //        if ArticleModule::is_exist(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND){
+        //            let article = ArticleModule::get_article(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND);
+        //            let article_boma = *(article as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
+        //            ModelModule::set_joint_scale(article_boma, Hash40::new("hand1") , &Vector3f{x:-scale,y:scale,z:scale});
+        //        }
+        //        if ArticleModule::is_exist(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON){
+        //            let article2 = ArticleModule::get_article(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON);
+        //            let article_boma2 = *(article2 as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
+        //            ModelModule::set_joint_scale(article_boma2, Hash40::new("trans") , &Vector3f{x:-scale,y:scale,z:scale});
+        //        }
+        //}else{
+        //    ModelModule::set_joint_scale(fighter.module_accessor, Hash40::new("top") , &Vector3f{x:scale,y:scale,z:scale});
+        //    if ArticleModule::is_exist(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND){
+        //        let article = ArticleModule::get_article(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND);
+        //        let article_boma = *(article as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
+        //        ModelModule::set_joint_scale(article_boma, Hash40::new("hand1") , &Vector3f{x:scale,y:scale,z:scale});
+        //    }
+        //    if ArticleModule::is_exist(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON){
+        //        let article2 = ArticleModule::get_article(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON);
+        //        let article_boma2 = *(article2 as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
+        //        ModelModule::set_joint_scale(article_boma2, Hash40::new("trans") , &Vector3f{x:scale,y:scale,z:scale});
+        //    }
+        //}
+        //WorkModule::off_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_NAME_CURSOR);
         if ControlModule::check_button_trigger(fighter.module_accessor,*CONTROL_PAD_BUTTON_APPEAL_S_L) {
             println!("{}",WorkModule::get_float(fighter.module_accessor,*FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1));
         }
@@ -263,6 +296,42 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
 //    }
 //}
 
+
+
+unsafe extern "C" fn agent_init(fighter: &mut L2CFighterCommon) {
+    unsafe {
+        let fighter_kind = fighter.global_table[KIND].get_i32();
+        if fighter_kind == *FIGHTER_KIND_KAMUI {
+            // Turning this flag on allows a character to do command inputs
+            WorkModule::on_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_CAN_SPECIAL_COMMAND);
+            // Assigning our own defined function to the correct spot in the global_table
+            fighter.global_table[CHECK_SPECIAL_COMMAND].assign(&L2CValue::Ptr(pot_check_special_command as *const () as _));
+        }
+    }
+}
+
+unsafe extern "C" fn pot_check_special_command(fighter: &mut L2CFighterCommon) -> L2CValue {
+    let mut ret = false;
+    let cat4 = fighter.global_table[CMD_CAT4].get_i32();
+    
+    // Side B
+    // If player did a qcf input
+    // A full list of inputs can be found in the other file in the episode45 folder.
+    if !ret && cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_N_COMMAND != 0
+    // If fighter is allowed to transition into side b (ie, not in hitstun, not doing another attack)
+    && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_S_COMMAND) {
+        //WorkModule::on_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SPECIAL_S_COMMAND);
+        fighter.change_status(FIGHTER_STATUS_KIND_SPECIAL_S.into(), false.into());
+        ret = true;
+    }
+    // Return bool
+    ret.into()
+}
+
+
+
+
+
 pub fn install() {
     unsafe {
         LookupSymbol(
@@ -288,6 +357,8 @@ pub fn install() {
     Agent::new("kamui")
     //agent frame
     .on_line(Main, kamui)
+    .on_start(agent_init)
+
 
     //throw
     .game_acmd("game_throwlw", throw_lw)
@@ -415,7 +486,7 @@ pub fn install() {
     .status(Exit, FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP, finaldashattack_exit)
     .status(Init, FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP, finaldashattack_init)
     .status(Exec, FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP, finaldashattack_exec)
-    .status(Exec, FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP, finaldashattack_end)
+    .status(End, FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP, finaldashattack_end)
 
 
     .status(Pre, FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE, fakefinalsceneenter_pre)
@@ -469,6 +540,10 @@ pub fn install() {
     .effect_acmd("effect_attacks4charge", effect_attack_s4_charge_spear)
     .install();
 
-    skyline::install_hooks!(notify_log_event_collision_hit_replace);
+    skyline::install_hooks!(
+        notify_log_event_collision_hit_replace,
+        smth_ig
+    );
+    //skyline::install_hooks!(stub_kill_screen);
     skyline::patching::Patch::in_text(0xb5cca0).nop().expect("Failed to patch 0xb5cca0");
 }
