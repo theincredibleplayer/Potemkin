@@ -194,6 +194,16 @@ pub unsafe extern "C" fn attack_s4(agent: &mut L2CAgentBase) {
     WorkModule::is_flag(agent.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_SMASH_SMASH_HOLD_TO_ATTACK);
     frame(agent.lua_state_agent, 22.0);
     if macros::is_excute(agent) {
+        //let vec2 = Vector2f{x: 6.0, y: 6.0};
+        //let vec3 = Vector3f{x: 0.0, y: 60.0, z: -5.0};
+        //EffectModule::request_post_effect_line_circle(agent.module_accessor,Hash40::new("genesis_get"),Hash40::new("top"),vec2,vec3,true,1.0/*radius*/,0.0);
+        let vec1 = Vector2f{x: 0.0, y: 0.0}; //idk seemingly does nothing
+        let vec2 = Vector2f{x: 0.0, y: 10.0}; // y is the distance which doesnt have the lines (relative to top?) x seems to be the same?
+        let vec3 = Vector2f{x: 30.0 /*duration*/ , y: 10.0 /*fade out*/ }; //duration and fade out
+        let vec4 = Vector2f{x: 0.0, y: 0.0}; //idk seemingly does nothing
+        let speedlines = EffectModule::request_post_effect_line_parallel_2d(agent.module_accessor,Hash40::new("dead_area_out"),vec1,vec2,vec3,vec4,false,0.0 /*idfk*/,0.0 /*idfk too*/);
+        //EffectModule::set_rot(agent.module_accessor, speedlines as u32, &Vector3f{x:50.0,y:0.0,z:30.0});
+        //EffectModule::set_scale(agent.module_accessor, speedlines as u32, &Vector3f{x:0.5,y:0.5,z:0.5});
         macros::ATTACK(agent, 0, 0, Hash40::new("arml"), 20.0, 30, 90, 0, 60, 8.0, 0.0, 0.0, 0.0, Some(7.0), Some(0.0), Some(0.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_OBJECT);
         macros::ATTACK(agent, 1, 0, Hash40::new("shoulderl"), 18.0, 30, 90, 0, 60, 8.0, 0.0, 0.0, 0.0, Some(7.0), Some(0.0), Some(0.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_OBJECT);
         macros::ATTACK(agent, 2, 0, Hash40::new("armr"), 20.0, 30, 90, 0, 60, 8.0, 0.0, 0.0, 0.0, Some(7.0), Some(0.0), Some(0.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_OBJECT);
@@ -249,7 +259,7 @@ pub unsafe extern "C" fn game_final(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         CameraModule::reset_all(agent.module_accessor);
         macros::CHECK_VALID_FINAL_START_CAMERA(agent, 0, 7, 20, 0, 0, 0);
-        macros::SLOW_OPPONENT(agent, 900.0, 60.0);
+        macros::SLOW_OPPONENT(agent, 400.0, 70.0);
         ArticleModule::generate_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
         ArticleModule::change_motion(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("final"),false,-1.0);
     }
@@ -267,7 +277,7 @@ pub unsafe extern "C" fn game_final(agent: &mut L2CAgentBase) {
     }
     frame(agent.lua_state_agent, 16.0);
     if macros::is_excute(agent) {
-        SlowModule::clear_whole(agent.module_accessor);
+        //SlowModule::clear_whole(agent.module_accessor);
     }
     else{
     if macros::is_excute(agent) {
@@ -299,18 +309,25 @@ pub unsafe extern "C" fn game_final(agent: &mut L2CAgentBase) {
     }
     frame(agent.lua_state_agent, 60.0);
     if macros::is_excute(agent) {
-        SlowModule::clear_whole(agent.module_accessor);
+        //SlowModule::clear_whole(agent.module_accessor);
         CameraModule::zoom_out(agent.module_accessor, 30);
     }
     frame(agent.lua_state_agent, 76.0);
     if macros::is_excute(agent) {
+        //SlowModule::clear_whole(agent.module_accessor);
         WorkModule::on_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_CHANGE_TO_FS_DASH);
     }
 }
 
 pub unsafe extern "C" fn effect_final(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        EffectModule::req_screen(agent.module_accessor, Hash40::new("bg_kamui_final"), false, false, false);
+        //EffectModule::req_screen(agent.module_accessor, Hash40::new("kamui_final_bg"), false, false, false);
+        macros::EFFECT(agent, Hash40::new("sys_bg_black"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
+        let eff = EffectModule::req(agent.module_accessor, Hash40::new("sys_bg_vortex"),  &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, 1.0, 0, 0, false,0);
+        //macros::EFFECT(agent, Hash40::new("sys_bg_vortex"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
+        EffectModule::set_rgb(agent.module_accessor, eff as u32, 0.0,0.0,0.3);
+        macros::EFFECT(agent, Hash40::new("sys_bg_lightning"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
+        //EffectModule::req_screen(agent.module_accessor, Hash40::new("sys_genesis_bg"), false, false, false);
         macros::EFFECT_FLW_POS(agent, Hash40::new("kamui_transform_splash_start"), Hash40::new("neck"), 2, 0, 0, 0, 0, 0, 1, true);
     }
     frame(agent.lua_state_agent, 20.0);
@@ -319,7 +336,7 @@ pub unsafe extern "C" fn effect_final(agent: &mut L2CAgentBase) {
             //macros::EFFECT(agent, Hash40::new("kamui_final_energy"), Hash40::new("top"), 0, 0.5, 12, 0, 180, 0, 1, 0, 0, 0, 0, 0, 0, true);
             //macros::EFFECT(agent, Hash40::new("kamui_final_energy"), Hash40::new("top"), 0, 0.5, -12, 0, 180, 0, 1, 0, 0, 0, 0, 0, 0, true);
             for boi in 1..12 {
-                macros::EFFECT(agent, Hash40::new("sys_dragoon_a"), Hash40::new("top"), 0, 12, 0, 0, 90, 0, 1.8, 0, 0, 0, 0, 0, 0, true);
+                macros::EFFECT(agent, Hash40::new("sys_dragoon_a"), Hash40::new("top"), 0, 12, 0, sv_math::rand(hash40("fighter"),180), 90, 0, 1.8, 0, 0, 0, 0, 0, 0, true);
             }
         }
     }
@@ -328,7 +345,7 @@ pub unsafe extern "C" fn effect_final(agent: &mut L2CAgentBase) {
             //macros::EFFECT(agent, Hash40::new("kamui_final_energy"), Hash40::new("top"), 0, 0.5, 12, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
             //macros::EFFECT(agent, Hash40::new("kamui_final_energy"), Hash40::new("top"), 0, 0.5, -12, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
             for boi in 1..12 {
-              macros::EFFECT(agent, Hash40::new("sys_dragoon_a"), Hash40::new("top"), 0, 12, 0, 0, 90, 0, 1.8, 0, 0, 0, 0, 0, 0, true);
+              macros::EFFECT(agent, Hash40::new("sys_dragoon_a"), Hash40::new("top"), 0, 12, 0, sv_math::rand(hash40("fighter"),180), 90, 0, 1.8, 0, 0, 0, 0, 0, 0, true);
             }
         }
     }
@@ -346,9 +363,12 @@ pub unsafe extern "C" fn effect_final(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         //macros::EFFECT_FLW_POS(agent, Hash40::new("kamui_transform_splash_end"), Hash40::new("neck"), 2, 0, 0, 0, 0, 0, 1, true);
     }
-    frame(agent.lua_state_agent, 90.0);
+    frame(agent.lua_state_agent, 75.0);
     if macros::is_excute(agent) {
-        EffectModule::remove_screen(agent.module_accessor, Hash40::new("bg_kamui_final"), -1);
+        EffectModule::remove_screen(agent.module_accessor, Hash40::new("sys_genesis_bg"), -1);
+        EffectModule::kill_kind(agent.module_accessor, Hash40::new("sys_bg_lightning"), false, true);
+        EffectModule::kill_kind(agent.module_accessor, Hash40::new("sys_bg_vortex"), false, true);
+        EffectModule::kill_kind(agent.module_accessor, Hash40::new("sys_bg_black"), false, true);
     }
 }
 

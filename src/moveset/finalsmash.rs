@@ -238,11 +238,11 @@ unsafe fn finaldashloop_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
     
     fighter.clear_lua_stack();
-    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,5.0,0.0);
+    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,7.0,0.0);
     sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
     WorkModule::set_float(fighter.module_accessor, timer + 1.0 ,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FINAL_TIMER);
     fighter.clear_lua_stack();
-    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_NONE,  4.0 * PostureModule::lr(module_accessor),0.0,0.0,0.0,0.0);
+    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_NONE,  5.0 * PostureModule::lr(module_accessor),0.0,0.0,0.0,0.0);
     sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
 
     if CancelModule::is_enable_cancel(fighter.module_accessor)
@@ -258,7 +258,7 @@ unsafe fn finaldashloop_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
         fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK.into(),false.into());
         return L2CValue::I32(0)
     }
-    if (WorkModule::get_float(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FINAL_TIMER) >= 120.0) {
+    if (WorkModule::get_float(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FINAL_TIMER) >= 60.0) {
         fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK.into(),false.into());
         return L2CValue::I32(0)
     }
@@ -329,6 +329,9 @@ pub unsafe extern "C" fn finaldashattack_end(fighter: &mut L2CFighterCommon) -> 
 
 pub unsafe extern "C" fn game_finaldash(agent: &mut L2CAgentBase) {
   if macros::is_excute(agent) {
+    macros::EFFECT(agent, Hash40::new("sys_genesis_bg"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
+
+    //EffectModule::req_screen(agent.module_accessor, Hash40::new("sys_genesis_bg_criticalhit"), false, false, false);
     JostleModule::set_status(agent.module_accessor, false);
     HitModule::set_whole(agent.module_accessor, smash::app::HitStatus(*HIT_STATUS_INVINCIBLE), 0);
     ArticleModule::remove_exist(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
@@ -343,10 +346,12 @@ pub unsafe extern "C" fn game_finaldash(agent: &mut L2CAgentBase) {
 
 pub unsafe extern "C" fn game_finaldashattack(agent: &mut L2CAgentBase) {
   if macros::is_excute(agent) {
+    //EffectModule::kill_kind(agent.module_accessor, Hash40::new("sys_genesis_bg"), false, true);
+    //EffectModule::remove_screen(agent.module_accessor, Hash40::new("sys_genesis_bg_criticalhit"), -1);
     JostleModule::set_status(agent.module_accessor, false);
     macros::SLOW_OPPONENT(agent, 400.0, 7.0);
     HitModule::set_whole(agent.module_accessor, smash::app::HitStatus(*HIT_STATUS_INVINCIBLE), 0);
-}
+  }
   frame(agent.lua_state_agent, 7.0);
   if macros::is_excute(agent) {
         WorkModule::on_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_HPB_CHECK_ENEMY);
@@ -600,7 +605,7 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
   } else {
     wait(agent.lua_state_agent, 1.0);
     if macros::is_excute(agent) {
-      macros::ATTACK(agent, 0, 0, Hash40::new("haver"), 20.0, 35, 50, 0, 50, 25, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
+      macros::ATTACK(agent, 0, 0, Hash40::new("haver"), 8.0, 35, 100, 0, 50, 25, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
     }
     wait(agent.lua_state_agent, 5.0);
     if macros::is_excute(agent) {
@@ -725,6 +730,7 @@ pub unsafe extern "C" fn game_heavenlystart(agent: &mut L2CAgentBase) {
   }
   frame(agent.lua_state_agent, 12.0);
   if macros::is_excute(agent) {
+      EffectModule::kill_kind(agent.module_accessor, Hash40::new("sys_genesis_bg"), false, true);
       macros::FT_MOTION_RATE(agent, 1.0);
       SlowModule::clear_whole(agent.module_accessor);
       WorkModule::on_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_JUMP);
