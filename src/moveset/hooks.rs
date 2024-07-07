@@ -17,7 +17,7 @@ use crate::FIGHTER_MANAGER;
 
 use crate::moveset::*;
 
-pub static mut NOTIFY_LOG_EVENT_COLLISION_HIT_OFFSET : usize = 0x675A20;
+pub static mut NOTIFY_LOG_EVENT_COLLISION_HIT_OFFSET : usize = 0x67a7b0;
 
 #[skyline::hook(offset = NOTIFY_LOG_EVENT_COLLISION_HIT_OFFSET)]
 pub unsafe extern "C" fn notify_log_event_collision_hit_replace(fighter_manager: *mut smash::app::FighterManager, attacker_id: u32, defender_id: u32, move_type: f32, arg5: i32, move_type_again: bool) -> u64 {
@@ -40,7 +40,7 @@ pub unsafe extern "C" fn notify_log_event_collision_hit_replace(fighter_manager:
     original!()(fighter_manager, attacker_id, defender_id, move_type, arg5, move_type_again)
 }
 
-#[skyline::hook(offset = 0xb5cd90)]
+/*#[skyline::hook(offset = 0xd5cd90)]
 pub unsafe extern "C" fn smth_ig(param_1: u8, fighter: smash::app::Fighter){
     let scale = PostureModule::scale(fighter.battle_object.module_accessor); 
     if ((PostureModule::lr(fighter.battle_object.module_accessor) < 0.0) && (StatusModule::status_kind(fighter.battle_object.module_accessor) != FIGHTER_STATUS_KIND_TURN))
@@ -73,7 +73,9 @@ pub unsafe extern "C" fn smth_ig(param_1: u8, fighter: smash::app::Fighter){
     let status = StatusModule::status_kind(fighter.battle_object.module_accessor);
     println!("Status: {:#x}, Motion: {:#x}", status, motion);
     original!()(param_1,fighter)
-}
+}*/
+
+
 
 pub fn find_subsequence(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     haystack.windows(needle.len()).position(|window| window == needle)
@@ -100,7 +102,7 @@ pub unsafe extern "C" fn motion_hook(unk: u64, unk2: u64) -> u64 {
 }*/
 
 
-#[skyline::hook(offset=0x6a7100)] // unadjusted for 13.0.2?
+/*#[skyline::hook(offset=0x6a7100)] // unadjusted for 13.0.2?
 pub fn stub_kill_screen() {
     original!()()
-}
+}*/

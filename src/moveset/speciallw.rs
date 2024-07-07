@@ -69,32 +69,3 @@ pub unsafe extern "C" fn special_lw_end(fighter: &mut L2CFighterCommon) -> L2CVa
     smashline::original_status(End, fighter, *FIGHTER_STATUS_KIND_SPECIAL_LW)(fighter)
 }
 
-pub unsafe extern "C" fn special_lw(agent: &mut L2CAgentBase) {
-    if macros::is_excute(agent) {
-        ArticleModule::generate_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
-        ArticleModule::change_motion(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("special_lw_hit"),false,-1.0);
-        macros::HIT_NODE(agent, Hash40::new("arml"), *HIT_STATUS_XLU);
-    }
-    sv_animcmd::frame(agent.lua_state_agent, 30.0);
-    if macros::is_excute(agent) {
-        macros::ATTACK(agent,0,0,Hash40::new("top"),10.0,60,100,0,0,15.0,0.0,10.0,20.0,None,None,None,3.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,true,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_saving"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_FIRE,*ATTACK_REGION_NONE);
-        AttackModule::set_attack_level(agent.module_accessor,0,*FIGHTER_RYU_SAVING_LV_3 as u8);
-        AttackModule::set_no_finish_camera(agent.module_accessor,0,true,false);
-        macros::EFFECT(agent, Hash40::new("sys_bomb_a"), Hash40::new("top"), 0, 6.5, 20, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
-        macros::PLAY_SE(agent, Hash40::new("se_common_bomb_m"));
-    }
-    sv_animcmd::wait(agent.lua_state_agent, 5.0);
-    if macros::is_excute(agent) {
-        AttackModule::clear_all(agent.module_accessor);
-    }
-}
-
-pub unsafe extern "C" fn effect_special_lw(_agent: &mut L2CAgentBase) {}
-
-pub unsafe extern "C" fn sound_special_lw(_agent: &mut L2CAgentBase) {}
-
-pub unsafe extern "C" fn special_lw_hit(_agent: &mut L2CAgentBase) {}
-
-pub unsafe extern "C" fn effect_special_lw_hit(_agent: &mut L2CAgentBase) {}
-
-pub unsafe extern "C" fn sound_special_lw_hit(_agent: &mut L2CAgentBase) {} 

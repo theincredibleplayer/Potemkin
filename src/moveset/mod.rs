@@ -13,6 +13,16 @@ use smash_script::lua_args;
 use smash_script::macros;
 use std::arch::asm;
 use skyline::hooks::{Region,getRegionAddress};
+use {
+    smash::{
+        lua2cpp::*,
+        phx::*,
+        app::{sv_animcmd::*, lua_bind::*, *},
+        lib::{lua_const::*, L2CAgent},
+    },
+    smash_script::*,
+    smashline::{*, Priority::*}
+};
 use crate::FIGHTER_CUTIN_MANAGER_ADDR;
 use crate::FIGHTER_MANAGER;
 
@@ -30,9 +40,6 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_START_NO_DEAD: i32 = 0x200000f3;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SWITCH_TO_FS_JUMP: i32 = 0x200000f4;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_JUMP: i32 = 0x200000f5;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SPECIAL_S_COMMAND : i32 = 0x200000f6;
-
-
-
 
 
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_SPECIAL_S_ACCEL: i32 = 0x60;
@@ -58,7 +65,18 @@ pub const CMD_CAT4:                 i32 = 0x23;
 pub const CHECK_SPECIAL_COMMAND:    i32 = 0x3C;
 
 
+pub static mut KAMUI_VTABLE_ENTRIES: [usize; 146] = [0; 146];
 
+
+fn patch_vtable_function(offset: usize, function: u64) {
+    // println!("function ptr: {:#x}", function as u64);
+    let low = (function as u64 & 0xFFFFFFFF) as u32;
+    // println!("Low to Big Endian: {:#x} > {:#?}", low, low.to_be_bytes());
+    let high = (function as u64 >> 32) as u32;
+    // println!("High to Big Endian: {:#x} > {:#?}", high, high.to_be_bytes());
+    let _ = skyline::patching::Patch::in_text(offset).data(low);
+    let _ = skyline::patching::Patch::in_text(offset + 0x4).data(high);
+}
 
 use std::{
     marker::PhantomData,
@@ -171,7 +189,7 @@ primitives![i8 u8 i16 u16 i32 u32 i64 u64 f32 f64];
 
 
 pub const LOWERCASE_FIGHTER_NAMES: StaticArrayAccessor<&'static str> =
-    StaticArrayAccessor::new(0x4f7fe20, 118);
+    StaticArrayAccessor::new(0x4f81e20, 118);
 
 
 pub const SITUATION_KIND: i32 = 0x16;
@@ -181,22 +199,34 @@ pub const STICK_Y: i32 = 0x1B;
 
 mod hooks;
 use hooks::*;
+mod hooks_vtable;
+use hooks_vtable::*;
 mod throw;
 use throw::*;
 mod taunt;
 use taunt::*;
 mod speciallw;
 use speciallw::*;
+mod speciallw_acmd;
+use speciallw_acmd::*;
 mod specialhi;
 use specialhi::*;
+mod specialhi_acmd;
+use specialhi_acmd::*;
 mod normals;
 use normals::*;
 mod specials;
 use specials::*;
+mod specials_acmd;
+use specials_acmd::*;
 mod specialn;
 use specialn::*;
 mod finalsmash; 
 use finalsmash::*;
+mod finalsmash_acmd; 
+use finalsmash_acmd::*;
+mod event_structs; 
+use event_structs::*;
 
 extern "C" {
     #[link_name = "\u{1}_ZN3app19FighterCutInManager13is_one_on_oneEv"]
@@ -229,6 +259,30 @@ extern "C" {
 
 pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
     unsafe {
+        /*if fighter.global_table[0x16].get_i32() == *SITUATION_KIND_GROUND{
+            println!("situation is ground");
+        }
+        if fighter.global_table[0x16].get_i32() == *SITUATION_KIND_AIR{
+            println!("situation is air");
+        }
+        if fighter.global_table[0x16].get_i32() == *SITUATION_KIND_CLIFF{
+            println!("situation is cliff");
+        }
+        if fighter.global_table[0x16].get_i32() == *SITUATION_KIND_NONE{
+            println!("situation is none");
+        }
+        if fighter.global_table[0x16].get_i32() == *SITUATION_KIND_OUTFIELD{
+            println!("situation is outfield");
+        }
+        if fighter.global_table[0x16].get_i32() == *SITUATION_KIND_ODD{
+            println!("situation is odd");
+        }
+        if fighter.global_table[0x16].get_i32() == *SITUATION_KIND_TERM{
+            println!("situation is term");
+        }
+        if fighter.global_table[0x16].get_i32() == *SITUATION_KIND_WATER{
+            println!("situation is water");
+        }*/
         //WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
         //JostleModule::set_status(fighter.module_accessor, false);
         //let scale = PostureModule::scale(fighter.module_accessor); 
@@ -297,37 +351,53 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
 //}
 
 
-
-unsafe extern "C" fn agent_init(fighter: &mut L2CFighterCommon) {
-    unsafe {
-        let fighter_kind = fighter.global_table[KIND].get_i32();
-        if fighter_kind == *FIGHTER_KIND_KAMUI {
-            // Turning this flag on allows a character to do command inputs
-            WorkModule::on_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_CAN_SPECIAL_COMMAND);
-            // Assigning our own defined function to the correct spot in the global_table
-            fighter.global_table[CHECK_SPECIAL_COMMAND].assign(&L2CValue::Ptr(pot_check_special_command as *const () as _));
-        }
+/*unsafe extern "C" fn effect_specialnstartedge(agent: &mut L2CAgentBase) {
+    if macros::is_excute(agent) {
+        let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
+        smash::app::lua_bind::FighterManager::set_cursor_whole(fighter_manager,false);
+        macros::EFFECT_FOLLOW(agent, Hash40::new("edge_fire1_hold"), Hash40::new("top"), 0, 15, 0, 0, 0, 0, 0.5, true);
     }
-}
 
-unsafe extern "C" fn pot_check_special_command(fighter: &mut L2CFighterCommon) -> L2CValue {
+frame(agent.lua_state_agent, 31.0);
+    if macros::is_excute(agent) {
+        macros::EFFECT_OFF_KIND(agent, Hash40::new("edge_fire1_hold"), false, true);
+        macros::EFFECT_FOLLOW(agent, Hash40::new("edge_fire2_hold"), Hash40::new("top"), 0, 15, 0, 0, 0, 0, 0.5, true);
+        macros::EFFECT_FOLLOW(agent, Hash40::new("edge_fire2_hold_flash"), Hash40::new("top"), 0, 15, 0, 0, 0, 0, 0.5, true);
+    }
+frame(agent.lua_state_agent, 100.0);
+if macros::is_excute(agent) {
+    //EffectModule::req_screen(agent.module_accessor, Hash40::new("edge_fire3_screen1"), false, false, false);
+    macros::EFFECT_OFF_KIND(agent, Hash40::new("edge_fire2_hold"), false, true);
+    macros::EFFECT_FOLLOW(agent, Hash40::new("edge_fire3_hold_flash"), Hash40::new("top"), 0, 15, 0, 0, 0, 0, 0.5, true);
+}
+}*/
+
+
+pub unsafe extern "C" fn pot_check_special_command(fighter: &mut L2CFighterCommon) -> L2CValue {
     let mut ret = false;
     let cat4 = fighter.global_table[CMD_CAT4].get_i32();
-    
     // Side B
     // If player did a qcf input
     // A full list of inputs can be found in the other file in the episode45 folder.
-    if !ret && cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_N_COMMAND != 0
+    if cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_N_COMMAND != 0
     // If fighter is allowed to transition into side b (ie, not in hitstun, not doing another attack)
     && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_S_COMMAND) {
         //WorkModule::on_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SPECIAL_S_COMMAND);
-        fighter.change_status(FIGHTER_STATUS_KIND_SPECIAL_S.into(), false.into());
+        fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_B.into(), true.into());
         ret = true;
     }
     // Return bool
     ret.into()
 }
 
+
+
+unsafe extern "C" fn agent_init(fighter: &mut L2CFighterCommon) {
+    let fighter_kind = fighter.global_table[KIND].get_i32();
+    if fighter_kind == *FIGHTER_KIND_KAMUI {
+        fighter.global_table[CHECK_SPECIAL_COMMAND].assign(&L2CValue::Ptr(pot_check_special_command as *const () as _));
+    }
+}
 
 
 
@@ -355,7 +425,7 @@ pub fn install() {
     }
 
     Agent::new("kamui")
-    //agent frame
+    //agent frame/opff
     .on_line(Main, kamui)
     .on_start(agent_init)
 
@@ -540,10 +610,27 @@ pub fn install() {
     .effect_acmd("effect_attacks4charge", effect_attack_s4_charge_spear)
     .install();
 
+    /*Agent::new("edge")
+    .effect_acmd("effect_specialnstart", effect_specialnstartedge)
+    .install();*/
+
+
+
     skyline::install_hooks!(
         notify_log_event_collision_hit_replace,
-        smth_ig
+        //smth_ig
     );
+    unsafe {
+        KAMUI_VTABLE_ENTRIES[0] = 0x4fc9b50;
+        for i in 1..146 {
+            KAMUI_VTABLE_ENTRIES[i] = KAMUI_VTABLE_ENTRIES[0] + (0x8 * (i as usize));
+        }
+        patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_FRAME],kamui_on_frame as u64);
+        patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_SEARCH],kamui_on_search as u64);
+        //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::INITIALIZE],cmd_enable as u64);
+    }
+
+
     //skyline::install_hooks!(stub_kill_screen);
     skyline::patching::Patch::in_text(0xb5cca0).nop().expect("Failed to patch 0xb5cca0");
 }

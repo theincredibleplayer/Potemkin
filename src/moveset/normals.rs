@@ -194,14 +194,14 @@ pub unsafe extern "C" fn attack_s4(agent: &mut L2CAgentBase) {
     WorkModule::is_flag(agent.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_SMASH_SMASH_HOLD_TO_ATTACK);
     frame(agent.lua_state_agent, 22.0);
     if macros::is_excute(agent) {
-        //let vec2 = Vector2f{x: 6.0, y: 6.0};
-        //let vec3 = Vector3f{x: 0.0, y: 60.0, z: -5.0};
+        //let vec2 = Vector2f{x: 6.0, y: 6.0}; /*density?*/
+        //let vec3 = Vector3f{x: 0.0, y: 60.0, z: -5.0}; /*x???, y is duration, z???? */
         //EffectModule::request_post_effect_line_circle(agent.module_accessor,Hash40::new("genesis_get"),Hash40::new("top"),vec2,vec3,true,1.0/*radius*/,0.0);
         let vec1 = Vector2f{x: 0.0, y: 0.0}; //idk seemingly does nothing
         let vec2 = Vector2f{x: 0.0, y: 10.0}; // y is the distance which doesnt have the lines (relative to top?) x seems to be the same?
         let vec3 = Vector2f{x: 30.0 /*duration*/ , y: 10.0 /*fade out*/ }; //duration and fade out
-        let vec4 = Vector2f{x: 0.0, y: 0.0}; //idk seemingly does nothing
-        let speedlines = EffectModule::request_post_effect_line_parallel_2d(agent.module_accessor,Hash40::new("dead_area_out"),vec1,vec2,vec3,vec4,false,0.0 /*idfk*/,0.0 /*idfk too*/);
+        let vec4 = Vector2f{x: 0.0, y: 1.0}; //idk seemingly does nothing
+        let speedlines = EffectModule::request_post_effect_line_parallel_2d(agent.module_accessor,Hash40::new("dead_area_out"),vec1,vec2,vec3,vec4,true,1.0 /*idfk*/,1.0 /*idfk too*/);
         //EffectModule::set_rot(agent.module_accessor, speedlines as u32, &Vector3f{x:50.0,y:0.0,z:30.0});
         //EffectModule::set_scale(agent.module_accessor, speedlines as u32, &Vector3f{x:0.5,y:0.5,z:0.5});
         macros::ATTACK(agent, 0, 0, Hash40::new("arml"), 20.0, 30, 90, 0, 60, 8.0, 0.0, 0.0, 0.0, Some(7.0), Some(0.0), Some(0.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_OBJECT);
@@ -455,10 +455,14 @@ pub unsafe extern "C" fn sound_finalvisualscene02(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
     let module_accessor = agent.module_accessor;
     let enemy_id = WorkModule::get_int(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_HPB_GOTTEM_ID);
+    println!("enemy id {}", enemy_id);
     let enemy = sv_battle_object::module_accessor(enemy_id as u32);
     let enemy_kind = sv_battle_object::kind(enemy_id as u32);
     let name = LOWERCASE_FIGHTER_NAMES.get(enemy_kind as usize).unwrap();
+    println!("enemy kind {}", enemy_kind);
+    println!("enemy name {}", name);
     let result = ["vc_",name,"_damage_twinkle"].join("");
+    println!("vc name {}", result);
     let scream_handle = SoundModule::play_se(enemy, Hash40::new(result.as_str()), true, false, false, false, enSEType(0));
     SoundModule::set_se_vol(enemy, scream_handle as i32, 2.0, 0);
 
