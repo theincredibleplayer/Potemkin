@@ -85,7 +85,7 @@ impl VtableEntry {
     pub const UNK52: usize = 52;
     pub const UNK53: usize = 53;
     pub const UNK54: usize = 54;
-    pub const ON_SHIELD: usize = 55;
+    pub const ON_SHIELD: usize = 55;                         //called on eflection
     pub const UNK56: usize = 56;
     pub const UNK57: usize = 57;
     pub const ON_NOTIFY_EVENT_MSC_CMD: usize = 58;

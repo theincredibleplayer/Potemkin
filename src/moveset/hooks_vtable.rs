@@ -16,9 +16,10 @@ use crate::FIGHTER_CUTIN_MANAGER_ADDR;
 use crate::FIGHTER_MANAGER;
 
 use crate::moveset::*;
-
+//searchbox implementations
 pub unsafe extern "C" fn kamui_on_search(_vtable: u64, fighter: &mut Fighter, log: u64, _some_float: f32) {
     let module_accessor = fighter.battle_object.module_accessor;
+    
     if StatusModule::status_kind(module_accessor) == *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL {
         let collision_log = *(log as *const u64).add(0x10 / 0x8);
         let collision_log = collision_log as *const CollisionLogScuffed;
@@ -27,10 +28,14 @@ pub unsafe extern "C" fn kamui_on_search(_vtable: u64, fighter: &mut Fighter, lo
             StatusModule::change_status_request(module_accessor,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_ATTACK,false);
         //}
     }
+
 }
 
 pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
-    let scale = PostureModule::scale(fighter.battle_object.module_accessor); 
+    let scale = PostureModule::scale(fighter.battle_object.module_accessor); //gets the model's scake
+    let module_accessor = fighter.battle_object.module_accessor;
+
+    // scales the models of both pot and his articles by -1 on the x axis to mirror (accurate to strive)
     if ((PostureModule::lr(fighter.battle_object.module_accessor) < 0.0) && (StatusModule::status_kind(fighter.battle_object.module_accessor) != FIGHTER_STATUS_KIND_TURN))
     || ((PostureModule::lr(fighter.battle_object.module_accessor) > 0.0) && (StatusModule::status_kind(fighter.battle_object.module_accessor) == FIGHTER_STATUS_KIND_TURN)){
             ModelModule::set_joint_scale(fighter.battle_object.module_accessor, Hash40::new("top") , &Vector3f{x:-scale,y:scale,z:scale});
@@ -44,7 +49,8 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
                 let article_boma2 = *(article2 as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
                 ModelModule::set_joint_scale(article_boma2, Hash40::new("trans") , &Vector3f{x:-1.0,y:1.0,z:1.0});
             }
-    }else{
+    } else { 
+        // reverses the -ve scale (i am not sure if its actually needed but we ball ig)
         ModelModule::set_joint_scale(fighter.battle_object.module_accessor, Hash40::new("top") , &Vector3f{x:scale,y:scale,z:scale});
         if ArticleModule::is_exist(fighter.battle_object.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND){
             let article = ArticleModule::get_article(fighter.battle_object.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND);
@@ -57,14 +63,16 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
             ModelModule::set_joint_scale(article_boma2, Hash40::new("trans") , &Vector3f{x:1.0,y:1.0,z:1.0});
         }
     }
-    let motion = MotionModule::motion_kind(fighter.battle_object.module_accessor);
-    let status = StatusModule::status_kind(fighter.battle_object.module_accessor);
-    println!("Status: {:#x}, Motion: {:#x}", status, motion);
+    if StopModule::is_hit(module_accessor) {
+        println!("is hit")
+    }
+    if StopModule::is_stop(module_accessor) {
+        println!("is stop")
+    }
+
+
+    //let motion = MotionModule::motion_kind(fighter.battle_object.module_accessor);
+    //let status = StatusModule::status_kind(fighter.battle_object.module_accessor);
+    //println!("Status: {:#x}, Motion: {:#x}", status, motion);
 }
 
-
-
-
-pub unsafe extern "C" fn cmd_enable(_vtable: u64, fighter: &mut Fighter) {
-    WorkModule::on_flag(fighter.battle_object.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_CAN_SPECIAL_COMMAND);
-}

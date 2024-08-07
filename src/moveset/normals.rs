@@ -28,10 +28,13 @@ pub unsafe extern "C" fn attack_s3(agent: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(agent.lua_state_agent, 10.0);
     if macros::is_excute(agent) {
+        //macros::CATCH(agent, 0, Hash40::new("top"), 6.0, 0.0, 5.5, 9.0, None, None, None, *FIGHTER_STATUS_KIND_CAPTURE_PULLED, *COLLISION_SITUATION_MASK_GA);
+        //macros::CATCH(agent, 1, Hash40::new("top"), 7.0, 0.0, 4.0, 13.0, None, None, None, *FIGHTER_STATUS_KIND_CAPTURE_PULLED, *COLLISION_SITUATION_MASK_G);
         macros::ATTACK(agent,0,0,Hash40::new("handr"),15.0,75,100,0,40,9.0,3.0,0.0,0.0,None,None,None,1.5,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,true,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_PUNCH,*ATTACK_REGION_NONE);
     }
     sv_animcmd::wait(agent.lua_state_agent, 17.0);
     if macros::is_excute(agent) {
+        //grab!(agent, MA_MSC_CMD_GRAB_CLEAR_ALL);
         AttackModule::clear_all(agent.module_accessor);
     }
     sv_animcmd::frame(agent.lua_state_agent, 28.0);
@@ -197,11 +200,11 @@ pub unsafe extern "C" fn attack_s4(agent: &mut L2CAgentBase) {
         //let vec2 = Vector2f{x: 6.0, y: 6.0}; /*density?*/
         //let vec3 = Vector3f{x: 0.0, y: 60.0, z: -5.0}; /*x???, y is duration, z???? */
         //EffectModule::request_post_effect_line_circle(agent.module_accessor,Hash40::new("genesis_get"),Hash40::new("top"),vec2,vec3,true,1.0/*radius*/,0.0);
-        let vec1 = Vector2f{x: 0.0, y: 0.0}; //idk seemingly does nothing
+        let vec1 = Vector2f{x: 1.0, y: 15.0}; //idk seemingly does nothing
         let vec2 = Vector2f{x: 0.0, y: 10.0}; // y is the distance which doesnt have the lines (relative to top?) x seems to be the same?
         let vec3 = Vector2f{x: 30.0 /*duration*/ , y: 10.0 /*fade out*/ }; //duration and fade out
         let vec4 = Vector2f{x: 0.0, y: 1.0}; //idk seemingly does nothing
-        let speedlines = EffectModule::request_post_effect_line_parallel_2d(agent.module_accessor,Hash40::new("dead_area_out"),vec1,vec2,vec3,vec4,true,1.0 /*idfk*/,1.0 /*idfk too*/);
+        let speedlines = EffectModule::request_post_effect_line_parallel_2d(agent.module_accessor,Hash40::new("dead_area_out"),vec1,vec2,vec3,vec4,false,50.0 /*idfk*/,1.0 /*idfk too*/);
         //EffectModule::set_rot(agent.module_accessor, speedlines as u32, &Vector3f{x:50.0,y:0.0,z:30.0});
         //EffectModule::set_scale(agent.module_accessor, speedlines as u32, &Vector3f{x:0.5,y:0.5,z:0.5});
         macros::ATTACK(agent, 0, 0, Hash40::new("arml"), 20.0, 30, 90, 0, 60, 8.0, 0.0, 0.0, 0.0, Some(7.0), Some(0.0), Some(0.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_OBJECT);

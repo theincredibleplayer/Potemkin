@@ -23,7 +23,7 @@ pub unsafe extern "C" fn special_lw(agent: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(agent.lua_state_agent, 30.0);
     if macros::is_excute(agent) {
-        macros::ATTACK(agent,0,0,Hash40::new("top"),10.0,60,100,0,0,15.0,0.0,10.0,20.0,None,None,None,3.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,true,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_saving"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_FIRE,*ATTACK_REGION_NONE);
+        macros::ATTACK(agent,0,0,Hash40::new("top"),10.0,60,100,0,0,15.0,0.0,10.0,20.0,None,None,None,3.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_saving"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_FIRE,*ATTACK_REGION_NONE);
         AttackModule::set_attack_level(agent.module_accessor,0,*FIGHTER_RYU_SAVING_LV_3 as u8);
         AttackModule::set_no_finish_camera(agent.module_accessor,0,true,false);
         macros::EFFECT(agent, Hash40::new("sys_bomb_a"), Hash40::new("top"), 0, 6.5, 20, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);

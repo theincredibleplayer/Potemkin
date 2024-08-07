@@ -18,7 +18,7 @@ use crate::FIGHTER_MANAGER;
 use crate::moveset::*;
 
 pub static mut NOTIFY_LOG_EVENT_COLLISION_HIT_OFFSET : usize = 0x67a7b0;
-
+// old implementation of grabs should be removed once full transition to real grabs has been done
 #[skyline::hook(offset = NOTIFY_LOG_EVENT_COLLISION_HIT_OFFSET)]
 pub unsafe extern "C" fn notify_log_event_collision_hit_replace(fighter_manager: *mut smash::app::FighterManager, attacker_id: u32, defender_id: u32, move_type: f32, arg5: i32, move_type_again: bool) -> u64 {
     let attacker_boma = sv_battle_object::module_accessor(attacker_id);
@@ -40,40 +40,65 @@ pub unsafe extern "C" fn notify_log_event_collision_hit_replace(fighter_manager:
     original!()(fighter_manager, attacker_id, defender_id, move_type, arg5, move_type_again)
 }
 
-/*#[skyline::hook(offset = 0xd5cd90)]
-pub unsafe extern "C" fn smth_ig(param_1: u8, fighter: smash::app::Fighter){
-    let scale = PostureModule::scale(fighter.battle_object.module_accessor); 
-    if ((PostureModule::lr(fighter.battle_object.module_accessor) < 0.0) && (StatusModule::status_kind(fighter.battle_object.module_accessor) != FIGHTER_STATUS_KIND_TURN))
-    || ((PostureModule::lr(fighter.battle_object.module_accessor) > 0.0) && (StatusModule::status_kind(fighter.battle_object.module_accessor) == FIGHTER_STATUS_KIND_TURN)){
-            ModelModule::set_joint_scale(fighter.battle_object.module_accessor, Hash40::new("top") , &Vector3f{x:-scale,y:scale,z:scale});
-            if ArticleModule::is_exist(fighter.battle_object.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND){
-                let article = ArticleModule::get_article(fighter.battle_object.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND);
-                let article_boma = *(article as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
-                ModelModule::set_joint_scale(article_boma, Hash40::new("hand1") , &Vector3f{x:-1.0,y:1.0,z:1.0});
-            }
-            if ArticleModule::is_exist(fighter.battle_object.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON){
-                let article2 = ArticleModule::get_article(fighter.battle_object.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON);
-                let article_boma2 = *(article2 as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
-                ModelModule::set_joint_scale(article_boma2, Hash40::new("trans") , &Vector3f{x:-1.0,y:1.0,z:1.0});
-            }
-    }else{
-        ModelModule::set_joint_scale(fighter.battle_object.module_accessor, Hash40::new("top") , &Vector3f{x:scale,y:scale,z:scale});
-        if ArticleModule::is_exist(fighter.battle_object.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND){
-            let article = ArticleModule::get_article(fighter.battle_object.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND);
-            let article_boma = *(article as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
-            ModelModule::set_joint_scale(article_boma, Hash40::new("hand1") , &Vector3f{x:1.0,y:1.0,z:1.0});
+
+#[skyline::hook(offset = 0xb5f380)]
+pub unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, event: &mut smash_rs::app::LinkEvent) -> u64 {
+    if event.link_event_kind.0 == hash40("capture") {
+        let capture_event : &mut smash_rs::app::LinkEventCapture = std::mem::transmute(event);
+        let module_accessor = fighter.battle_object.module_accessor;
+        //test linkmodule (should be removed later)
+        if StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_ATTACK_S3 {
+            capture_event.result = true;
+            capture_event.node = smash_rs::phx::Hash40::new("throw");
+            StatusModule::change_status_request(module_accessor, *FIGHTER_STATUS_KIND_CATCH_PULL, false);
+            return 0;
         }
-        if ArticleModule::is_exist(fighter.battle_object.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON){
-            let article2 = ArticleModule::get_article(fighter.battle_object.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON);
-            let article_boma2 = *(article2 as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
-            ModelModule::set_joint_scale(article_boma2, Hash40::new("trans") , &Vector3f{x:1.0,y:1.0,z:1.0});
+        //special_hi's link module
+        if StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_SPECIAL_HI {
+            capture_event.result = true;
+            capture_event.node = smash_rs::phx::Hash40::new("throw");
+            StatusModule::change_status_request(module_accessor, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START, false);
+            return 0;
         }
+        return 1;
+        //final smash's link module
+        if StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_FINAL {
+            capture_event.result = true;
+            capture_event.node = smash_rs::phx::Hash40::new("throw");
+            StatusModule::change_status_request(module_accessor, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START, false);      
+            return 0;
+        }
+        return 1;
     }
-    let motion = MotionModule::motion_kind(fighter.battle_object.module_accessor);
-    let status = StatusModule::status_kind(fighter.battle_object.module_accessor);
-    println!("Status: {:#x}, Motion: {:#x}", status, motion);
-    original!()(param_1,fighter)
+    original!()(vtable, fighter, event)
+}
+
+
+/*#[skyline::hook(offset = 0xb5e10)]
+pub unsafe extern "C" fn caught_status_hook(fighter: &mut L2CFighterCommon) {
+    let parent_id = LinkModule::get_parent_id(fighter.module_accessor,*LINK_NO_CAPTURE,true);
+    let parent_boma = sv_battle_object::module_accessor(parent_id as u32);
+    println!("caught status hook successful probably");
+    if LinkModule::get_parent_status_kind(fighter.module_accessor,*FIGHTER_LINK_NO_CONSTRAINT) as i32 == *FIGHTER_STATUS_KIND_SPECIAL_HI
+    || LinkModule::get_parent_status_kind(fighter.module_accessor,*FIGHTER_LINK_NO_CONSTRAINT) as i32 == FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START{
+        grabbed_anim_selector(fighter,"catched_pot_special_hi",1.0);
+    }
+    original!()(fighter)
 }*/
+
+
+/*#[skyline::hook(replace = STATUS_ADDR)]
+unsafe fn thrown_hook(fighter: &mut L2CFighterCommon) {
+
+}
+
+#[skyline::hook(replace = L2CFighterCommon_status_Walk_Main_common)]
+unsafe extern "C" fn status_walk_main_common(fighter: &mut L2CFighterCommon, arg1: L2CValue, arg2: L2CValue, arg3: L2CValue, arg4: L2CValue) -> L2CValue {
+
+    call_original!(fighter, arg1, arg2, arg3, arg4)
+}*/
+
+
 
 
 
