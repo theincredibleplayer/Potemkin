@@ -41,7 +41,7 @@ pub unsafe extern "C" fn CaptureWaitCommon(fighter: &mut L2CFighterCommon) -> bo
         return false;
     }*/
     if ( ( WorkModule::is_flag(fighter.module_accessor,*FIGHTER_STATUS_CAPTURE_PULLED_WORK_FLAG_JUMP) != true)) {
-        if ( ( fighter.global_table[0x16].get_i32() == *SITUATION_KIND_AIR ) ) {
+        if ( ( fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_AIR ) ) {
             fighter.change_status(FIGHTER_STATUS_KIND_CAPTURE_JUMP.into(), false.into());
             return true;
         }
@@ -59,8 +59,8 @@ pub unsafe extern "C" fn CaptureWaitCommon(fighter: &mut L2CFighterCommon) -> bo
 
 pub unsafe extern "C" fn status_CaptureWait_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     let the_motion = 0xccfd2e2d2;
-    if ( ( WorkModule::get_int(fighter.module_accessor,*FIGHTER_STATUS_CAPTURE_WAIT_WORK_INT_SITUATION) == fighter.global_table[0x16] ) == true) {
-        if ((fighter.global_table[0x16] != *SITUATION_KIND_GROUND)) {
+    if ( ( WorkModule::get_int(fighter.module_accessor,*FIGHTER_STATUS_CAPTURE_WAIT_WORK_INT_SITUATION) == fighter.global_table[SITUATION_KIND] ) == true) {
+        if ((fighter.global_table[SITUATION_KIND] != *SITUATION_KIND_GROUND)) {
           GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
           if (WorkModule::is_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_CATCHED_BUTTERFLYNET)) {
             let the_motion = WorkModule::get_int64(fighter.module_accessor,*FIGHTER_STATUS_CAPTURE_WAIT_WORK_INT_MOTION_KIND_GROUND);
@@ -86,7 +86,7 @@ pub unsafe extern "C" fn status_CaptureWait_loop(fighter: &mut L2CFighterCommon)
         else {
           MotionModule::change_motion_inherit_frame(fighter.module_accessor,Hash40::new_raw(the_motion),-1.0,1.0,0.0,false,false);
         }
-        WorkModule::set_int(fighter.module_accessor,fighter.global_table[0x16].get_i32(),*FIGHTER_STATUS_CAPTURE_WAIT_WORK_INT_SITUATION);
+        WorkModule::set_int(fighter.module_accessor,fighter.global_table[SITUATION_KIND].get_i32(),*FIGHTER_STATUS_CAPTURE_WAIT_WORK_INT_SITUATION);
       }    
     return L2CValue::I32(0)
 }

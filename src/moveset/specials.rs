@@ -31,7 +31,7 @@ unsafe fn motion_setup(fighter: &mut L2CFighterCommon, situation_change: bool) {
 
 pub unsafe extern "C" fn special_s_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
     let stick_x = ControlModule::get_stick_x(fighter.module_accessor);
-    if fighter.global_table[0x16].get_i32() != *SITUATION_KIND_GROUND {
+    if fighter.global_table[SITUATION_KIND].get_i32() != *SITUATION_KIND_GROUND {
         if ( stick_x * PostureModule::lr(fighter.module_accessor) ) > 0.0{
             StatusModule::set_status_kind_interrupt(fighter.module_accessor, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F);
         }else{
@@ -93,10 +93,11 @@ unsafe fn special_s_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_MOTION);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
 
-    if CancelModule::is_enable_cancel(fighter.module_accessor)
-    && fighter.sub_wait_ground_check_common(false.into()).get_bool() == false
-    && fighter.sub_air_check_fall_common().get_bool() {
-        return L2CValue::I32(0)
+    if CancelModule::is_enable_cancel(fighter.module_accessor) {
+        if fighter.sub_wait_ground_check_common(false.into()).get_bool()
+        || fighter.sub_air_check_fall_common().get_bool() {
+            return 0.into();
+        }
     }
     if fighter.global_table[PREV_SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND
     && fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_AIR {
@@ -165,12 +166,13 @@ unsafe fn side_b_slide_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
     fighter.clear_lua_stack();
     lua_args!(fighter, *FIGHTER_KINETIC_ENERGY_ID_STOP);
-    let speed_x = sv_kinetic_energy::get_speed_x(fighter.lua_state_agent);
+    let speed_x = KineticModule::get_sum_speed_x(module_accessor, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_ALL);
     println!("speed: {}", speed_x);
-    if CancelModule::is_enable_cancel(fighter.module_accessor)
-    && fighter.sub_wait_ground_check_common(false.into()).get_bool() == false
-    && fighter.sub_air_check_fall_common().get_bool() {
-        return L2CValue::I32(0)
+    if CancelModule::is_enable_cancel(fighter.module_accessor) {
+        if fighter.sub_wait_ground_check_common(false.into()).get_bool()
+        || fighter.sub_air_check_fall_common().get_bool() {
+            return 0.into();
+        }
     }
     if fighter.global_table[PREV_SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND
     && fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_AIR {
@@ -236,10 +238,11 @@ pub unsafe extern "C" fn side_b_end(fighter: &mut L2CFighterCommon) -> L2CValue 
 unsafe fn side_b_end_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
     //KineticModule::clear_speed_all(fighter.module_accessor);
-    if CancelModule::is_enable_cancel(fighter.module_accessor)
-    && fighter.sub_wait_ground_check_common(false.into()).get_bool() == false
-    && fighter.sub_air_check_fall_common().get_bool() {
-        return L2CValue::I32(0)
+    if CancelModule::is_enable_cancel(fighter.module_accessor) {
+        if fighter.sub_wait_ground_check_common(false.into()).get_bool()
+        || fighter.sub_air_check_fall_common().get_bool() {
+            return 0.into();
+        }
     }
     if MotionModule::is_end(fighter.module_accessor) {
         fighter.change_status(FIGHTER_STATUS_KIND_WAIT.into(),false.into());
@@ -286,10 +289,11 @@ pub unsafe extern "C" fn side_b_attack(fighter: &mut L2CFighterCommon) -> L2CVal
 
 unsafe fn side_b_attack_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
-    if CancelModule::is_enable_cancel(fighter.module_accessor)
-    && fighter.sub_wait_ground_check_common(false.into()).get_bool() == false
-    && fighter.sub_air_check_fall_common().get_bool() {
-        return L2CValue::I32(0)
+    if CancelModule::is_enable_cancel(fighter.module_accessor) {
+        if fighter.sub_wait_ground_check_common(false.into()).get_bool()
+        || fighter.sub_air_check_fall_common().get_bool() {
+            return 0.into();
+        }
     }
     if MotionModule::is_end(fighter.module_accessor) {
         fighter.change_status(FIGHTER_STATUS_KIND_WAIT.into(),false.into());
@@ -429,10 +433,11 @@ pub unsafe extern "C" fn megafist_f_land_main_loop(fighter: &mut L2CFighterCommo
 pub unsafe extern "C" fn megafist_b_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
     KineticModule::clear_speed_all(fighter.module_accessor);
-    if CancelModule::is_enable_cancel(fighter.module_accessor)
-    && fighter.sub_wait_ground_check_common(false.into()).get_bool() == false
-    && fighter.sub_air_check_fall_common().get_bool() {
-        return L2CValue::I32(0)
+    if CancelModule::is_enable_cancel(fighter.module_accessor) {
+        if fighter.sub_wait_ground_check_common(false.into()).get_bool()
+        || fighter.sub_air_check_fall_common().get_bool() {
+            return 0.into();
+        }
     }
     if MotionModule::is_end(fighter.module_accessor) {
         fighter.change_status(FIGHTER_STATUS_KIND_FALL.into(),false.into());
@@ -445,10 +450,11 @@ pub unsafe extern "C" fn megafist_b_main(fighter: &mut L2CFighterCommon) -> L2CV
 pub unsafe extern "C" fn megafist_b_land_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
     KineticModule::clear_speed_all(fighter.module_accessor);
-    if CancelModule::is_enable_cancel(fighter.module_accessor)
-    && fighter.sub_wait_ground_check_common(false.into()).get_bool() == false
-    && fighter.sub_air_check_fall_common().get_bool() {
-        return L2CValue::I32(0)
+    if CancelModule::is_enable_cancel(fighter.module_accessor) {
+        if fighter.sub_wait_ground_check_common(false.into()).get_bool()
+        || fighter.sub_air_check_fall_common().get_bool() {
+            return 0.into();
+        }
     }
     if MotionModule::is_end(fighter.module_accessor) {
         fighter.change_status(FIGHTER_STATUS_KIND_WAIT.into(),false.into());

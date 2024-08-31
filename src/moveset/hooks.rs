@@ -24,17 +24,22 @@ pub unsafe extern "C" fn notify_log_event_collision_hit_replace(fighter_manager:
     let attacker_boma = sv_battle_object::module_accessor(attacker_id);
     let attacker_kind = sv_battle_object::kind(attacker_id);
     if attacker_kind == *FIGHTER_KIND_KAMUI || attacker_kind == *WEAPON_KIND_KAMUI_WATERDRAGON {
+        println!("notify event log");
         let owner_id = WorkModule::get_int(attacker_boma,*WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER) as u32;
         let owner = sv_battle_object::module_accessor(owner_id);
         if WorkModule::is_flag(owner,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_CHECK_ENEMY) {
+            println!("check enemy enabled");
             WorkModule::on_flag(owner,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_GRABBED_ENEMY);
             WorkModule::off_flag(owner,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_CHECK_ENEMY);
             WorkModule::set_int(owner,defender_id as i32,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_GRABBED_ENEMY_ID);
+            println!("got the mf's id: {}",defender_id);
         }
         if WorkModule::is_flag(owner,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_HPB_CHECK_ENEMY) {
+            println!("check enemy enabled");
             WorkModule::on_flag(owner,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_HPB_GOTTEM);
             WorkModule::off_flag(owner,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_HPB_CHECK_ENEMY);
             WorkModule::set_int(owner,defender_id as i32,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_HPB_GOTTEM_ID);
+            println!("got the mf's id: {}",defender_id);
         }
     }
     original!()(fighter_manager, attacker_id, defender_id, move_type, arg5, move_type_again)
@@ -72,6 +77,22 @@ pub unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, ev
     }
     original!()(vtable, fighter, event)
 }
+
+#[skyline::hook(offset = 0x3414910)]
+pub unsafe extern "C" fn noping_the_eff(vtable:u64, weapon: *mut smash::app::Weapon, log:u64) -> u64 {
+    println!("effect done been nop'd");
+    *(weapon as *mut bool).add(0x90) = true; //Lets the weapon persist on hit
+    
+    if WorkModule::is_flag((*weapon).battle_object.module_accessor,WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_DID_IT_HIT){
+        StatusModule::change_status_request_from_script((*weapon).battle_object.module_accessor, WEAPON_KAMUI_RYUSENSYA_STATUS_KIND_BOOM, false);
+        WorkModule::off_flag((*weapon).battle_object.module_accessor,WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_DID_IT_HIT);
+    }
+    call_original!(vtable, weapon, log)
+}
+
+
+
+
 
 
 /*#[skyline::hook(offset = 0xb5e10)]

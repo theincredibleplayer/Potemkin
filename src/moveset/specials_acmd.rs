@@ -22,13 +22,15 @@ use crate::moveset::*;
 pub unsafe extern "C" fn game_specialsloop(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         //macros::ATTACK(agent, 0, 0, Hash40::new("top"), 0.0, 35, 0, 0, 0, 16, 0.0, 13.0, 5.0, Some(0.0), Some(0.0), Some(0.0), 0.0, 0.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
-        macros::SEARCH(agent, 0, 0, Hash40::new("bust"), 20.0, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(0.0), *COLLISION_KIND_MASK_HIT, *HIT_STATUS_MASK_NORMAL, 1, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIEB, *COLLISION_PART_MASK_BODY_HEAD, false);
+        macros::SEARCH(agent, 0, 0, Hash40::new("hip"), 15.0, -15.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(0.0), *COLLISION_KIND_MASK_HIT, *HIT_STATUS_MASK_NORMAL, 1, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIEB, *COLLISION_PART_MASK_BODY_HEAD, false);
     }
 }
 
 pub unsafe extern "C" fn effect_specialsloop(agent: &mut L2CAgentBase) {
     for n in 1..99{
     if macros::is_excute(agent) {
+        //macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_fdb_fire"), Hash40::new("head"), 0, 0, 0, 0, 0, 0, 0.5, true);
+
         macros::EFFECT_FOLLOW(agent, Hash40::new("dolly_buster_dash_ground"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1.5, true);
         EffectModule::set_rate_last(agent.module_accessor, 0.5);
     }
@@ -43,6 +45,9 @@ pub unsafe extern "C" fn effect_specials(agent: &mut L2CAgentBase) {
     }
 }
 pub unsafe extern "C" fn game_specialsattack(agent: &mut L2CAgentBase) {
+    if macros::is_excute(agent) {
+        macros::FT_MOTION_RATE(agent, 0.75);
+    }
     frame(agent.lua_state_agent, 9.0);
     if macros::is_excute(agent) {
         macros::ATTACK(agent, 0, 0, Hash40::new("top"), 20.0, 35, 80, 0, 50, 16, 0.0, 14.0, 6.0, Some(0.0), Some(-2.0), Some(2.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_PUNCH);

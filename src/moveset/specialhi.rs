@@ -30,6 +30,7 @@ pub unsafe extern "C" fn grabbed_anim_selector(fighter: &mut L2CFighterCommon,an
         let motion_share = WorkModule::get_param_int(capture_boma,0xcad2ee25e,0xc07d88ea0); //grabs the body type param
         let mut motion = hash40(anim_name);
         let mut share_type = 0;
+        
         if motion_share == *FIGHTER_MOTION_SHARE_TYPE_TARO {
             motion = FighterMotionModuleImpl::add_body_type_hash(
                 capture_boma,
@@ -37,6 +38,7 @@ pub unsafe extern "C" fn grabbed_anim_selector(fighter: &mut L2CFighterCommon,an
                 *BODY_TYPE_MOTION_DX
             );
         }
+
         else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_GIRL {
             motion = FighterMotionModuleImpl::add_body_type_hash(
                 capture_boma,
@@ -44,6 +46,7 @@ pub unsafe extern "C" fn grabbed_anim_selector(fighter: &mut L2CFighterCommon,an
                 *BODY_TYPE_MOTION_GIRL
             );
         }
+
         else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_BIG {
             motion = FighterMotionModuleImpl::add_body_type_hash(
                 capture_boma,
@@ -77,8 +80,7 @@ pub unsafe extern "C" fn grabbed_anim_selector(fighter: &mut L2CFighterCommon,an
 pub unsafe extern "C" fn special_hi_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
-
-    if fighter.global_table[0x16].get_i32() != *SITUATION_KIND_GROUND {
+    if fighter.global_table[SITUATION_KIND].get_i32() != *SITUATION_KIND_GROUND {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
         MotionModule::change_motion(module_accessor,Hash40::new("special_air_hi"),0.0,1.0,false,0.0,false,false);
         return smashline::original_status(Main, fighter, *FIGHTER_STATUS_KIND_SPECIAL_HI)(fighter);
@@ -96,21 +98,22 @@ unsafe fn special_hi_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
 
-    if CancelModule::is_enable_cancel(fighter.module_accessor)
-    && fighter.sub_wait_ground_check_common(false.into()).get_bool() == false
-    && fighter.sub_air_check_fall_common().get_bool() {
-        return L2CValue::I32(0)
+    if CancelModule::is_enable_cancel(fighter.module_accessor) {
+        if fighter.sub_wait_ground_check_common(false.into()).get_bool()
+        || fighter.sub_air_check_fall_common().get_bool() {
+            return 0.into();
+        }
     }
 
-    if fighter.global_table[0x16].get_i32() == *SITUATION_KIND_GROUND
-    && fighter.global_table[0x17].get_i32() == *SITUATION_KIND_AIR {
+    if fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND
+    && fighter.global_table[PREV_SITUATION_KIND].get_i32() == *SITUATION_KIND_AIR {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND_CLIFF_STOP));
         MotionModule::change_motion_inherit_frame(fighter.module_accessor,Hash40::new("special_hi"),-1.0,1.0,0.0,false,false);
         KineticModule::change_kinetic(module_accessor,*FIGHTER_KINETIC_TYPE_GROUND_STOP);
     }
 
-    else if fighter.global_table[0x17].get_i32() == *SITUATION_KIND_GROUND
-    && fighter.global_table[0x16].get_i32() == *SITUATION_KIND_AIR {
+    else if fighter.global_table[PREV_SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND
+    && fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_AIR {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
         MotionModule::change_motion_inherit_frame(fighter.module_accessor,Hash40::new("special_air_hi"),-1.0,1.0,0.0,false,false);
         KineticModule::change_kinetic(module_accessor,*FIGHTER_KINETIC_TYPE_AIR_STOP);
@@ -131,7 +134,7 @@ unsafe fn special_hi_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     }
 
     if MotionModule::is_end(fighter.module_accessor) {
-        if fighter.global_table[0x16].get_i32() == *SITUATION_KIND_GROUND {
+        if fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND {
             fighter.change_status(FIGHTER_STATUS_KIND_WAIT.into(),false.into());
         }
         else {
@@ -149,7 +152,7 @@ pub unsafe extern "C" fn special_hi_start_main(fighter: &mut L2CFighterCommon) -
     ArticleModule::generate_article(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
     ArticleModule::change_motion(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("entry_l"),false,-1.0);
 
-    if fighter.global_table[0x16].get_i32() != *SITUATION_KIND_GROUND {
+    if fighter.global_table[SITUATION_KIND].get_i32() != *SITUATION_KIND_GROUND {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
         MotionModule::change_motion(module_accessor,Hash40::new("special_air_hi_start"),0.0,1.0,false,0.0,false,false);
     }
@@ -169,21 +172,22 @@ unsafe fn special_hi_start_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue
 
     grabbed_anim_selector(fighter,"catched_pot_special_hi",1.0); //plays the caught anim on the opponent on every frame since i want it to lock to a specific frame (i will implement a custom anim later)
 
-    if CancelModule::is_enable_cancel(fighter.module_accessor)
-    && fighter.sub_wait_ground_check_common(false.into()).get_bool() == false
-    && fighter.sub_air_check_fall_common().get_bool() {
-        return L2CValue::I32(0)
+    if CancelModule::is_enable_cancel(fighter.module_accessor) {
+        if fighter.sub_wait_ground_check_common(false.into()).get_bool()
+        || fighter.sub_air_check_fall_common().get_bool() {
+            return 0.into();
+        }
     }
 
-    if fighter.global_table[0x16].get_i32() == *SITUATION_KIND_GROUND
-    && fighter.global_table[0x17].get_i32() == *SITUATION_KIND_AIR {
+    if fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND
+    && fighter.global_table[PREV_SITUATION_KIND].get_i32() == *SITUATION_KIND_AIR {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND_CLIFF_STOP));
         MotionModule::change_motion_inherit_frame(fighter.module_accessor,Hash40::new("special_hi_start"),-1.0,1.0,0.0,false,false);
         KineticModule::change_kinetic(module_accessor,*FIGHTER_KINETIC_TYPE_GROUND_STOP);
     }
 
-    else if fighter.global_table[0x17].get_i32() == *SITUATION_KIND_GROUND
-    && fighter.global_table[0x16].get_i32() == *SITUATION_KIND_AIR {
+    else if fighter.global_table[PREV_SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND
+    && fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_AIR {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
         MotionModule::change_motion_inherit_frame(fighter.module_accessor,Hash40::new("special_air_hi_start"),-1.0,1.0,0.0,false,false);
         KineticModule::change_kinetic(module_accessor,*FIGHTER_KINETIC_TYPE_AIR_STOP);
@@ -199,7 +203,7 @@ pub unsafe extern "C" fn special_hi_start_end(fighter: &mut L2CFighterCommon) ->
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
     ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
-    return L2CValue::I32(0)
+    fighter.status_end_Throw()
 }
 
 pub unsafe extern "C" fn special_hi_loop_main(fighter: &mut L2CFighterCommon) -> L2CValue {
@@ -208,7 +212,7 @@ pub unsafe extern "C" fn special_hi_loop_main(fighter: &mut L2CFighterCommon) ->
     ArticleModule::generate_article(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
     ArticleModule::change_motion(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("entry_r"),false,-1.0);
 
-    if fighter.global_table[0x16].get_i32() != *SITUATION_KIND_GROUND {
+    if fighter.global_table[SITUATION_KIND].get_i32() != *SITUATION_KIND_GROUND {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
         MotionModule::change_motion(module_accessor,Hash40::new("special_air_hi_loop"),0.0,1.0,false,0.0,false,false);
     }
@@ -226,21 +230,22 @@ unsafe fn special_hi_loop_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue 
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
 
-    if CancelModule::is_enable_cancel(fighter.module_accessor)
-    && fighter.sub_wait_ground_check_common(false.into()).get_bool() == false
-    && fighter.sub_air_check_fall_common().get_bool() {
-        return L2CValue::I32(0)
+    if CancelModule::is_enable_cancel(fighter.module_accessor) {
+        if fighter.sub_wait_ground_check_common(false.into()).get_bool()
+        || fighter.sub_air_check_fall_common().get_bool() {
+            return 0.into();
+        }
     }
 
-    if fighter.global_table[0x16].get_i32() == *SITUATION_KIND_GROUND
-    && fighter.global_table[0x17].get_i32() == *SITUATION_KIND_AIR {
+    if fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND
+    && fighter.global_table[PREV_SITUATION_KIND].get_i32() == *SITUATION_KIND_AIR {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND_CLIFF_STOP));
         MotionModule::change_motion_inherit_frame(fighter.module_accessor,Hash40::new("special_hi_loop"),-1.0,1.0,0.0,false,false);
         KineticModule::change_kinetic(module_accessor,*FIGHTER_KINETIC_TYPE_GROUND_STOP);
     }
 
-    else if fighter.global_table[0x17].get_i32() == *SITUATION_KIND_GROUND
-    && fighter.global_table[0x16].get_i32() == *SITUATION_KIND_AIR {
+    else if fighter.global_table[PREV_SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND
+    && fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_AIR {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
         MotionModule::change_motion_inherit_frame(fighter.module_accessor,Hash40::new("special_air_hi_loop"),-1.0,1.0,0.0,false,false);
         KineticModule::change_kinetic(module_accessor,*FIGHTER_KINETIC_TYPE_AIR_STOP);
@@ -257,7 +262,7 @@ unsafe fn special_hi_loop_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue 
 
             ArticleModule::change_motion(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("entry_r"),false,-1.0);
 
-            if fighter.global_table[0x16].get_i32() != *SITUATION_KIND_GROUND {
+            if fighter.global_table[SITUATION_KIND].get_i32() != *SITUATION_KIND_GROUND {
                 GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
                 MotionModule::change_motion(module_accessor,Hash40::new("special_air_hi_loop"),0.0,1.0,false,0.0,false,false);
             }
@@ -276,8 +281,9 @@ pub unsafe extern "C" fn special_hi_loop_end(fighter: &mut L2CFighterCommon) -> 
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
     ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
-    return L2CValue::I32(0)
+    fighter.status_end_Throw()
 }
+
 
 pub unsafe extern "C" fn special_hi_release_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
@@ -285,7 +291,7 @@ pub unsafe extern "C" fn special_hi_release_main(fighter: &mut L2CFighterCommon)
     ArticleModule::generate_article(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
     ArticleModule::change_motion(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("win_3"),false,-1.0);
 
-    if fighter.global_table[0x16].get_i32() != *SITUATION_KIND_GROUND {
+    if fighter.global_table[SITUATION_KIND].get_i32() != *SITUATION_KIND_GROUND {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
         MotionModule::change_motion(module_accessor,Hash40::new("special_air_hi_release"),0.0,1.0,false,0.0,false,false);
     }
@@ -309,23 +315,24 @@ unsafe fn special_hi_release_main_loop(fighter: &mut L2CFighterCommon) -> L2CVal
     }
 
 
-    if CancelModule::is_enable_cancel(fighter.module_accessor)
-    && fighter.sub_wait_ground_check_common(false.into()).get_bool() == false
-    && fighter.sub_air_check_fall_common().get_bool() {
-        return L2CValue::I32(0)
+    if CancelModule::is_enable_cancel(fighter.module_accessor) {
+        if fighter.sub_wait_ground_check_common(false.into()).get_bool()
+        || fighter.sub_air_check_fall_common().get_bool() {
+            return 0.into();
+        }
     }
 
 
-    if fighter.global_table[0x16].get_i32() == *SITUATION_KIND_GROUND
-    && fighter.global_table[0x17].get_i32() == *SITUATION_KIND_AIR {
+    if fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND
+    && fighter.global_table[PREV_SITUATION_KIND].get_i32() == *SITUATION_KIND_AIR {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND_CLIFF_STOP));
         MotionModule::change_motion_inherit_frame(fighter.module_accessor,Hash40::new("special_hi_release"),-1.0,1.0,0.0,false,false);
         KineticModule::change_kinetic(module_accessor,*FIGHTER_KINETIC_TYPE_GROUND_STOP);
     }
 
     
-    else if fighter.global_table[0x17].get_i32() == *SITUATION_KIND_GROUND
-    && fighter.global_table[0x16].get_i32() == *SITUATION_KIND_AIR {
+    else if fighter.global_table[PREV_SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND
+    && fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_AIR {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
         MotionModule::change_motion_inherit_frame(fighter.module_accessor,Hash40::new("special_air_hi_release"),-1.0,1.0,0.0,false,false);
         KineticModule::change_kinetic(module_accessor,*FIGHTER_KINETIC_TYPE_AIR_STOP);
@@ -347,7 +354,7 @@ unsafe fn special_hi_release_main_loop(fighter: &mut L2CFighterCommon) -> L2CVal
 
 
     if MotionModule::is_end(fighter.module_accessor) {
-        if fighter.global_table[0x16].get_i32() == *SITUATION_KIND_GROUND {
+        if fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND {
             fighter.change_status(FIGHTER_STATUS_KIND_WAIT.into(),false.into());
         }
         else {
@@ -363,7 +370,7 @@ pub unsafe extern "C" fn special_hi_release_end(fighter: &mut L2CFighterCommon) 
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
     ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
-    return L2CValue::I32(0)
+    fighter.status_end_Throw()
 }
 
 pub unsafe extern "C" fn special_hi_release_exec(fighter: &mut L2CFighterCommon) -> L2CValue {

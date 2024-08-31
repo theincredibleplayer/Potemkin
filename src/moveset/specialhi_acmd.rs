@@ -23,7 +23,7 @@ pub unsafe extern "C" fn special_hi(agent: &mut L2CAgentBase) {
         ArticleModule::generate_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
         ArticleModule::change_motion(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("special_hi"),false,-1.0);    
     }
-    sv_animcmd::frame(agent.lua_state_agent, 11.0);
+    sv_animcmd::frame(agent.lua_state_agent, 12.0);
     if macros::is_excute(agent) {
         //WorkModule::on_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_CHECK_ENEMY);
         macros::CATCH(agent, 0, Hash40::new("top"), 5.0,0.0,34.5,20.5, None, None, None, *FIGHTER_STATUS_KIND_THROWN, *COLLISION_SITUATION_MASK_G);
@@ -32,7 +32,7 @@ pub unsafe extern "C" fn special_hi(agent: &mut L2CAgentBase) {
         //macros::ATTACK(agent,1,0,Hash40::new("haver"),1.0,361,0,0,0,5.0,0.0,0.0,0.0,None,None,None,0.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_G,*COLLISION_CATEGORY_MASK_FIGHTER,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_HARISEN,*ATTACK_REGION_NONE);
         //WorkModule::on_flag(agent.module_accessor, *FIGHTER_STATUS_CATCH_FLAG_CATCH_WAIT);
     }
-    sv_animcmd::wait(agent.lua_state_agent, 7.0);
+    sv_animcmd::wait(agent.lua_state_agent, 6.0);
     if macros::is_excute(agent) {
         grab!(agent, *MA_MSC_CMD_GRAB_CLEAR_ALL);
         //AttackModule::clear_all(agent.module_accessor);

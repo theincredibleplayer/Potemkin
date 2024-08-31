@@ -78,6 +78,9 @@ pub unsafe extern "C" fn effect_attack_dash(_agent: &mut L2CAgentBase) {
 }
 
 pub unsafe extern "C" fn catch(agent: &mut L2CAgentBase) {
+    if macros::is_excute(agent) {
+        macros::FT_MOTION_RATE(agent, 0.6);
+    }
     frame(agent.lua_state_agent, 11.0);
     if macros::is_excute(agent) {
         GrabModule::set_rebound(agent.module_accessor, true);
@@ -93,10 +96,14 @@ pub unsafe extern "C" fn catch(agent: &mut L2CAgentBase) {
         smash_script::grab!(agent, *MA_MSC_CMD_GRAB_CLEAR_ALL);
         WorkModule::on_flag(agent.module_accessor, *FIGHTER_STATUS_CATCH_FLAG_CATCH_WAIT);
         GrabModule::set_rebound(agent.module_accessor, false);
+        macros::FT_MOTION_RATE(agent, 1.0);
     }
 }
 
 pub unsafe extern "C" fn catchdash(agent: &mut L2CAgentBase) {
+    if macros::is_excute(agent) {
+        macros::FT_MOTION_RATE(agent, 0.6);
+    }
     frame(agent.lua_state_agent, 11.0);
     if macros::is_excute(agent) {
         GrabModule::set_rebound(agent.module_accessor, true);
@@ -112,6 +119,8 @@ pub unsafe extern "C" fn catchdash(agent: &mut L2CAgentBase) {
         smash_script::grab!(agent, *MA_MSC_CMD_GRAB_CLEAR_ALL);
         WorkModule::on_flag(agent.module_accessor, *FIGHTER_STATUS_CATCH_FLAG_CATCH_WAIT);
         GrabModule::set_rebound(agent.module_accessor, false);
+        macros::FT_MOTION_RATE(agent, 1.0);
+
     }
 }
 

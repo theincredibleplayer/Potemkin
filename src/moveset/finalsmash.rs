@@ -24,7 +24,7 @@ use crate::moveset::*;
 
 
 unsafe fn motion_setup(fighter: &mut L2CFighterCommon, situation_change: bool) {
-  if fighter.global_table[0x16].get_i32() != *SITUATION_KIND_GROUND {
+  if fighter.global_table[SITUATION_KIND].get_i32() != *SITUATION_KIND_GROUND {
     GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
     if situation_change == false {
       MotionModule::change_motion(fighter.module_accessor,Hash40::new("final"),0.0,1.0,false,0.0,false,false);
@@ -59,7 +59,7 @@ pub unsafe extern "C" fn Final_main(fighter: &mut L2CFighterCommon) -> L2CValue 
     AreaModule::set_whole(fighter.module_accessor,false);
     KineticModule::clear_speed_all(fighter.module_accessor);
     WorkModule::on_flag(fighter.module_accessor,*FIGHTER_STATUS_WORK_ID_FLAG_RESERVE_DISABLE_OUTSIDE_ENERGY);
-    if ((fighter.global_table[0x16].get_i32() == *SITUATION_KIND_GROUND) != false) {
+    if ((fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND) != false) {
       MotionModule::change_motion(fighter.module_accessor,Hash40::new("final"),0.0,1.0,false,0.0,false,false); //should be air
       KineticModule::change_kinetic(fighter.module_accessor,*FIGHTER_KINETIC_TYPE_AIR_ESCAPE);
     }
@@ -118,12 +118,13 @@ pub unsafe extern "C" fn Final_main(fighter: &mut L2CFighterCommon) -> L2CValue 
 pub unsafe extern "C" fn Final_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
   let module_accessor = fighter.module_accessor;
   if WorkModule::is_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SELECT_FINAL) {
-  if CancelModule::is_enable_cancel(module_accessor)
-  && fighter.sub_wait_ground_check_common(false.into()).get_bool() == false
-  && fighter.sub_air_check_fall_common().get_bool() {
-      return L2CValue::I32(0)
+    if CancelModule::is_enable_cancel(fighter.module_accessor) {
+      if fighter.sub_wait_ground_check_common(false.into()).get_bool()
+      || fighter.sub_air_check_fall_common().get_bool() {
+          return 0.into();
+      }
   }
-  if fighter.global_table[0x16].get_i32() == *SITUATION_KIND_AIR {
+  if fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_AIR {
     fighter.set_situation(SITUATION_KIND_AIR.into());
     GroundModule::correct(module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
   }
@@ -138,7 +139,7 @@ pub unsafe extern "C" fn Final_main_loop(fighter: &mut L2CFighterCommon) -> L2CV
     return L2CValue::I32(0)
   }
   if MotionModule::is_end(fighter.module_accessor) {
-    if fighter.global_table[0x16].get_i32() != *SITUATION_KIND_GROUND {
+    if fighter.global_table[SITUATION_KIND].get_i32() != *SITUATION_KIND_GROUND {
       fighter.change_status(FIGHTER_STATUS_KIND_FINAL_JUMP_END.into(),false.into());
     }
     else {
@@ -245,11 +246,12 @@ unsafe fn finaldashloop_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_NONE,  5.0 * PostureModule::lr(module_accessor),0.0,0.0,0.0,0.0);
     sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
 
-    if CancelModule::is_enable_cancel(fighter.module_accessor)
-    && fighter.sub_wait_ground_check_common(false.into()).get_bool() == false
-    && fighter.sub_air_check_fall_common().get_bool() {
-        return L2CValue::I32(0)
-    }
+    if CancelModule::is_enable_cancel(fighter.module_accessor) {
+      if fighter.sub_wait_ground_check_common(false.into()).get_bool()
+      || fighter.sub_air_check_fall_common().get_bool() {
+          return 0.into();
+      }
+  }
     if MotionModule::is_end(fighter.module_accessor) {
         fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP.into(),false.into());
     }
