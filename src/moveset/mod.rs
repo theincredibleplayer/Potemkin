@@ -57,6 +57,8 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_N_HAS_REFLECTED : i32 = 0x20000
 pub const WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_ATTACK : i32 = 0x20000007;
 pub const WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_HIT_WALL : i32 = 0x20000008;
 pub const WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_DID_IT_HIT : i32 = 0x20000009;
+pub const WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_KILL_YOURSELF_NOW : i32 = 0x2000000a;
+
 
 
 
@@ -576,13 +578,18 @@ pub fn install() {
     
     .status(Main, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START, special_hi_start_main)
     .status(End, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START, special_hi_start_end)
+    .status(Exit, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START, special_hi_exit)
 
     .status(Main, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_LOOP, special_hi_loop_main)
     .status(End, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_LOOP, special_hi_loop_end)
+    .status(Exit, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_LOOP, special_hi_exit)
+
 
     .status(Main, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE, special_hi_release_main)
     .status(End, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE, special_hi_release_end)
     .status(Exec, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE, special_hi_release_exec)
+    .status(Exit, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE, special_hi_exit)
+
 
     .game_acmd("game_specialhi", special_hi)
     .effect_acmd("effect_specialhi", effect_special_hi)
@@ -648,7 +655,7 @@ pub fn install() {
     .status(End, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_HOLD, special_n_hold_end)
 
     .status(Main, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_SHOOT, special_n_shoot_main)
-    //.status(Main, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_SHOOT, special_n_hold_end)
+    .status(End, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_SHOOT, special_n_shoot_end)
 
 
     //.game_acmd("game_finalairlend", game_finalend)

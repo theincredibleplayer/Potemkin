@@ -20,8 +20,8 @@ use crate::moveset::*;
 
 pub unsafe extern "C" fn fly_main(weapon: &mut L2CWeaponCommon) -> L2CValue {
     WorkModule::on_flag(weapon.module_accessor,WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_DID_IT_HIT);
-    WorkModule::set_int(weapon.module_accessor,60,*WEAPON_INSTANCE_WORK_ID_INT_INIT_LIFE);
-    WorkModule::set_int(weapon.module_accessor,60,*WEAPON_INSTANCE_WORK_ID_INT_LIFE);
+    WorkModule::set_int(weapon.module_accessor,90,*WEAPON_INSTANCE_WORK_ID_INT_INIT_LIFE);
+    WorkModule::set_int(weapon.module_accessor,90,*WEAPON_INSTANCE_WORK_ID_INT_LIFE);
     MotionModule::change_motion(weapon.module_accessor,Hash40::new("regular"),0.0,1.0,false,0.0,false,false);
   
     let posture = PostureModule::lr(weapon.module_accessor);
@@ -44,7 +44,7 @@ pub unsafe extern "C" fn fly_main_loop(weapon: &mut L2CWeaponCommon) -> L2CValue
     //if (WorkModule::get_int(weapon.module_accessor, WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_INT_TIMER) % 3) == 0{
     //    EffectModule::req_follow(weapon.module_accessor, Hash40::new("sys_v_smoke_a"), Hash40::new("top"), &Vector3f{x: 0.0, y: 0.0, z: 0.0}, &Vector3f{x: 0.0, y: 0.0, z: 0.0}, 1.0, true, 0, 0, 0, 0, 0, false, false);
     //}
-    //WorkModule::inc_int(weapon.module_accessor, WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_INT_TIMER);
+    WorkModule::dec_int(weapon.module_accessor, *WEAPON_INSTANCE_WORK_ID_INT_LIFE);
     if WorkModule::is_flag(weapon.module_accessor,WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_ATTACK) {
         weapon.change_status(WEAPON_KAMUI_RYUSENSYA_STATUS_KIND_BOOM.into(),false.into());
     }
@@ -201,6 +201,8 @@ pub unsafe extern "C" fn special_n_hold_main(fighter: &mut L2CFighterCommon) -> 
 }
 
 unsafe fn special_n_hold_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
+    //ShieldModule::set_target_category(fighter.module_accessor,2,*COLLISION_CATEGORY_WEAPON as i32);
+    //ShieldModule::set_target_category(fighter.module_accessor,0,*COLLISION_CATEGORY_WEAPON as i32);
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
 
@@ -301,7 +303,11 @@ pub unsafe extern "C" fn special_n_end(fighter: &mut L2CFighterCommon) -> L2CVal
     //    ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
     //}
     //WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_N_HAS_REFLECTED);
-    smashline::original_status(End, fighter, *FIGHTER_STATUS_KIND_SPECIAL_N)(fighter)
+    ShieldModule::clear_all(module_accessor);
+
+    //smashline::original_status(End, fighter, *FIGHTER_STATUS_KIND_SPECIAL_N)(fighter)
+    return L2CValue::I32(0)
+
 }
 
 
@@ -312,6 +318,24 @@ pub unsafe extern "C" fn special_n_hold_end(fighter: &mut L2CFighterCommon) -> L
     //    ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
     //}
     ShieldModule::clear_all(module_accessor);
+
     //WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_N_HAS_REFLECTED);
-    smashline::original_status(End, fighter, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_HOLD)(fighter)
+    //smashline::original_status(End, fighter, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_HOLD)(fighter)
+    return L2CValue::I32(0)
+
+}
+
+
+pub unsafe extern "C" fn special_n_shoot_end(fighter: &mut L2CFighterCommon) -> L2CValue {
+    let lua_state = fighter.lua_state_agent;
+    let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
+    //if ArticleModule::is_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON) {
+    //    ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
+    //}
+    ShieldModule::clear_all(module_accessor);
+    //ShieldModule::clear_all_2
+    //WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_N_HAS_REFLECTED);
+    //smashline::original_status(End, fighter, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_HOLD)(fighter)
+    return L2CValue::I32(0)
+
 }

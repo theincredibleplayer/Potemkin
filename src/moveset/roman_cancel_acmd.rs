@@ -38,12 +38,16 @@ pub unsafe extern "C" fn game_romancancel(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RED_RC){
             macros::EFFECT(agent, Hash40::new("kamui_red_rc"), Hash40::new("top"),-2, 18, -10, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, false);
+            macros::PLAY_SE(agent, Hash40::new("se_kamui_special_n05b"));
         }else if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_PURPLE_RC){
             macros::EFFECT(agent, Hash40::new("kamui_purple_rc"), Hash40::new("top"), -2, 18, -10, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, false);
+            macros::PLAY_SE(agent, Hash40::new("se_kamui_special_n05"));
         }else if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_YELLOW_RC){
             macros::EFFECT(agent, Hash40::new("kamui_yellow_rc"), Hash40::new("top"), -2, 18, -10, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, false);
+            macros::PLAY_SE(agent, Hash40::new("se_kamui_special_n06"));
         }else if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_BLUE_RC){
             macros::EFFECT(agent, Hash40::new("kamui_blue_rc"), Hash40::new("top"), -2, 18, -10, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, false);
+            macros::PLAY_SE(agent, Hash40::new("se_kamui_special_n04"));
         }
         //macros::EFFECT(agent, Hash40::new("kamui_red_rc"), Hash40::new("bust"), 0, -5, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, false);
         //macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_red_rc"), Hash40::new("bust"), 0, 0, 0, 0, 0, 0, 6, true);

@@ -79,13 +79,38 @@ pub unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, ev
 }
 
 #[skyline::hook(offset = 0x3414910)]
-pub unsafe extern "C" fn noping_the_eff(vtable:u64, weapon: *mut smash::app::Weapon, log:u64) -> u64 {
+pub unsafe extern "C" fn noping_the_eff(vtable:u64, weapon: *mut smash::app::Weapon, log: CollisionLog) -> u64 {
     println!("effect done been nop'd");
     *(weapon as *mut bool).add(0x90) = true; //Lets the weapon persist on hit
-    
-    if WorkModule::is_flag((*weapon).battle_object.module_accessor,WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_DID_IT_HIT){
-        StatusModule::change_status_request_from_script((*weapon).battle_object.module_accessor, WEAPON_KAMUI_RYUSENSYA_STATUS_KIND_BOOM, false);
-        WorkModule::off_flag((*weapon).battle_object.module_accessor,WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_DID_IT_HIT);
+    let mut flag = true;
+    let opponent_id = log.opponent_battle_object_id;
+    let mut opponent_accessor = sv_battle_object::module_accessor(opponent_id);
+    println!("opponent id: {}", opponent_id);
+
+    if utility::get_kind(&mut *opponent_accessor) == *FIGHTER_KIND_KAMUI{
+        if (StatusModule::status_kind(opponent_accessor) == FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_HOLD)
+        || (StatusModule::status_kind(opponent_accessor) == FIGHTER_STATUS_KIND_SPECIAL_N)
+        || (StatusModule::status_kind(opponent_accessor) == FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_SHOOT){
+            println!("corrin has reflected");
+            flag = false;
+            let owner_id = WorkModule::get_int(opponent_accessor,*WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER);
+            let owner_accessor = sv_battle_object::module_accessor(owner_id as u32);
+            let damage = WorkModule::get_float(owner_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_REAL_POWER_REFLECT);
+            let my_owner_id =WorkModule::get_int((*weapon).battle_object.module_accessor,*WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER);
+            let my_owner_accessor = sv_battle_object::module_accessor(my_owner_id as u32);
+            WorkModule::set_float(my_owner_accessor,damage,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_REAL_POWER_REFLECT);
+        }
+    }
+
+
+
+    if (AttackModule::is_infliction((*weapon).battle_object.module_accessor, *COLLISION_KIND_MASK_HIT) || AttackModule::is_infliction((*weapon).battle_object.module_accessor, *COLLISION_KIND_MASK_SHIELD) || AttackModule::is_infliction((*weapon).battle_object.module_accessor, *COLLISION_KIND_MASK_ATTACK) )
+    &&  flag
+    {
+        if WorkModule::is_flag((*weapon).battle_object.module_accessor,WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_DID_IT_HIT){
+            WorkModule::off_flag((*weapon).battle_object.module_accessor,WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_DID_IT_HIT);
+            StatusModule::change_status_request_from_script((*weapon).battle_object.module_accessor, WEAPON_KAMUI_RYUSENSYA_STATUS_KIND_BOOM, false);
+        }
     }
     call_original!(vtable, weapon, log)
 }

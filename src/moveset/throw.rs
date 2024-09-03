@@ -50,6 +50,10 @@ pub unsafe extern "C" fn effect_throw_lw(fighter: &mut L2CAgentBase) {
 }
 
 pub unsafe extern "C" fn sound_throw_lw(fighter: &mut L2CAgentBase) {
+    frame(fighter.lua_state_agent, 40.0);
+    if macros::is_excute(fighter) {
+        macros::PLAY_SE(fighter, Hash40::new("se_kamui_special_n03"));
+    }
     frame(fighter.lua_state_agent, 103.0);
     if macros::is_excute(fighter) {
         macros::PLAY_SE(fighter, Hash40::new("se_common_bomb_l"));

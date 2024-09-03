@@ -22,13 +22,15 @@ pub unsafe extern "C" fn game_regular(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         AttackModule::disable_tip(agent.module_accessor);
         macros::ATTACK(agent, 0, 0, Hash40::new("top"), 6.0, 82, 15, 
-        0, 55, 15, 0.0, 0.0, 0.0, None, None, None, 1.0, 0.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, -3, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_MAGIC);
+        0, 55, 15, 0.0, 0.0, 0.0, None, None, None, 1.0, 0.0,
+         *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0.0,
+          0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_MAGIC);
         AttackModule::enable_safe_pos(agent.module_accessor);
     }
-    frame(agent.lua_state_agent, 60.0);
-    if macros::is_excute(agent) {
-        WorkModule::on_flag(agent.module_accessor,WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_ATTACK);
-    }
+    //frame(agent.lua_state_agent, 60.0);
+    //if macros::is_excute(agent) {
+    //    WorkModule::on_flag(agent.module_accessor,WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_ATTACK);
+    //}
 }
 
 pub unsafe extern "C" fn effect_regular(agent: &mut L2CAgentBase) {
@@ -44,7 +46,7 @@ pub unsafe extern "C" fn effect_regular(agent: &mut L2CAgentBase) {
         } else {
             let mut eff_string = "se_common_fire_m";
         }
-        macros::EFFECT_FLW_POS(agent, Hash40::new("lucario_hakkei_far"), Hash40::new("top"), 0.0, 0.0, 0.0, 0, 180, 0, 1, true);
+        macros::EFFECT_FLW_POS(agent, Hash40::new("master_bow_arrow2_hit"), Hash40::new("top"), 0.0, 0.0, 0.0, 0, 180, 0, 1, true);
         //macros::EFFECT(agent, Hash40::new(eff_string), Hash40::new("top"),0, 0, 0, 0, 0, 0, 1.0 + (smash::app::sv_math::rand(hash40("fighter"), 3) as f32 * 0.5), 0, 0, 0, 0, 0, 0, false);
     }
     for _ in 0..99{
@@ -62,9 +64,10 @@ pub unsafe extern "C" fn effect_regular(agent: &mut L2CAgentBase) {
                 let mut eff_string = "sys_bomb_c";
                 macros::PLAY_SE(agent, Hash40::new("se_common_fire_m"));
             }
-            macros::EFFECT_FLW_POS(agent, Hash40::new("lucario_hakkei_far"), Hash40::new("top"), 0.0, 0.0, 0.0, 0, 180, 0, 1, true);
-            EffectModule::set_rate_last(agent.module_accessor, 2.2);
-            EffectModule::set_scale_last(agent.module_accessor, &Vector3f{x:2.5,y:1.0,z:2.5} )
+            macros::EFFECT(agent, Hash40::new("master_bow_arrow2_hit"), Hash40::new("top"),0, 0, 0, 0, 180, 0, 1, 0, 0, 0, 0, 0, 0, false);
+            //macros::EFFECT_FLW_POS(agent, Hash40::new("master_bow_arrow2_hit"), Hash40::new("top"), 0.0, 0.0, 0.0, 0, 180, 0, 1, true);
+            EffectModule::set_rate_last(agent.module_accessor, 1.0);
+            EffectModule::set_scale_last(agent.module_accessor, &Vector3f{x:0.5,y:0.35,z:0.5} )
             //macros::EFFECT(agent, Hash40::new(eff_string), Hash40::new("top"),0, 0, 0, 0, 0, 0, 1.0 + (smash::app::sv_math::rand(hash40("fighter"), 3) as f32 * 0.5), 0, 0, 0, 0, 0, 0, false);
         }
     }
@@ -75,9 +78,15 @@ pub unsafe extern "C" fn game_shotmax(agent: &mut L2CAgentBase) {
         let owner_id = WorkModule::get_int(agent.module_accessor,*WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER);
         println!("owner id: {}",owner_id);
         let owner_accessor = sv_battle_object::module_accessor(owner_id as u32);
-        let damage = WorkModule::get_float(owner_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_REAL_POWER_REFLECT);
-
-        macros::ATTACK(agent, 0, 0, Hash40::new("top"), damage* 1.4   , 55, 90, 0, 70, 25.0, 0.0, 0.0, 0.0, None, None, None,2.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false,0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_BOMB, *ATTACK_REGION_NONE);
+        let mut damage = WorkModule::get_float(owner_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_REAL_POWER_REFLECT);
+        if damage < 10.0{
+            damage = 10.0/1.4;
+        }
+        macros::ATTACK(agent, 0, 0, Hash40::new("top"),  damage * 1.4 ,
+         55, 90, 0, 70, 25.0, 0.0, 0.0, 0.0, None, None, None,
+         2.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false,
+         0, 0.0, 0, true, true
+         , false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_BOMB, *ATTACK_REGION_NONE);
     }
     frame(agent.lua_state_agent, 10.0);
     if macros::is_excute(agent) {
@@ -191,8 +200,9 @@ pub unsafe extern "C" fn effect_specialnfire(agent: &mut L2CAgentBase) {
 }
 
 pub unsafe extern "C" fn sound_specialnfire(agent: &mut L2CAgentBase) {
-    frame(agent.lua_state_agent, 13.0);
+    frame(agent.lua_state_agent, 10.0);
     if macros::is_excute(agent) {
+        macros::PLAY_SE(agent, Hash40::new("se_kamui_special_n01"));
     }
 }
 

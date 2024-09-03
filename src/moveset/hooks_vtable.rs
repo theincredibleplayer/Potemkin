@@ -93,6 +93,8 @@ pub unsafe extern "C" fn kamui_init_original(vtable: u64, fighter: &mut Fighter)
 pub unsafe extern "C" fn kamui_init(vtable: u64, fighter: &mut Fighter) {
     println!("initialization hook successful");
     WorkModule::on_flag(fighter.battle_object.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_CAN_SPECIAL_COMMAND);
+
+
     kamui_init_original(vtable,fighter);
 }
 
@@ -118,7 +120,7 @@ pub unsafe extern "C" fn kamui_shield_declare(vtable: u64, fighter: &mut Fighter
         let shield_datas = &mut (ShieldDatas::new().add(shield_data, 0));
         let resource = &mut ShieldGroupResource::new(
             shield_datas,
-            1,
+            2,
             1,
             false,
             false,
@@ -127,7 +129,6 @@ pub unsafe extern "C" fn kamui_shield_declare(vtable: u64, fighter: &mut Fighter
         
         MiscModule::add_shield_group(module_accessor, resource, 2);
     }
-    //ShieldModule::set_target_category(module_accessor,0,*COLLISION_CATEGORY_MASK_NO_FIGHTER as i32);
     kamui_shield_declare_og(vtable,fighter);
 }
 
@@ -152,11 +153,17 @@ pub unsafe extern "C" fn kamui_on_shield(vtable: u64, fighter: &mut Fighter, col
     println!("the col kind category : {}", opponent_cat );
     println!("the raw power : {}", opponent_raw_power );
     println!("the real power : {}", opponent_real_power );
+    let opponent_accessor = sv_battle_object::module_accessor(opponent_id);
+    let opponent_common = get_fighter_common_from_accessor(&mut* opponent_accessor);
 
-    if opponent_cat as i32 == *BATTLE_OBJECT_CATEGORY_WEAPON{
+
+
+    if opponent_cat as i32 == *BATTLE_OBJECT_CATEGORY_WEAPON
+    || opponent_cat as i32 == *BATTLE_OBJECT_CATEGORY_ITEM{
         if StatusModule::status_kind(module_accessor) == *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_HOLD
         || StatusModule::status_kind(module_accessor) == *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_SHOOT{
             WorkModule::on_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_N_HAS_REFLECTED);
+            notify_event_msc_cmd!(opponent_common, Hash40::new_raw(0x199c462b5d));
             //WorkModule::set_float(module_accessor, opponent_real_power, WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLOAT_BOOM_POWER);
             //ArticleModule::generate_article(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_RYUSENSYA, false, 0);
             ShieldModule::clear_all(module_accessor);
