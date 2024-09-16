@@ -349,34 +349,24 @@ pub unsafe extern "C" fn megafist_f_pre(fighter: &mut L2CFighterCommon) -> L2CVa
 
 pub unsafe extern "C" fn megafist_f_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
-
     GroundModule::correct(fighter.module_accessor, GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
     StatusModule::set_situation_kind(fighter.module_accessor, SituationKind(*SITUATION_KIND_AIR), false);
-
     KineticModule::enable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_STOP);
     KineticModule::enable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_MOTION);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
-
     if StatusModule::status_kind(module_accessor) == *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F {
         MotionModule::change_motion(fighter.module_accessor,Hash40::new("special_s_mf_f"),0.0,1.0,false,0.0,false,false);
     } else {
         MotionModule::change_motion(fighter.module_accessor,Hash40::new("special_s_mf_f"),0.0,1.0,false,0.0,false,false);
     }
-
     fighter.clear_lua_stack();
     lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,3.0);
     sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
     sv_kinetic_energy::set_limit_speed(fighter.lua_state_agent);
-
-
-    
-
-
     fighter.clear_lua_stack();
     lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,*ENERGY_STOP_RESET_TYPE_AIR, 0.0,3.0,0.0,0.0,0.0);
     sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
-
     fighter.clear_lua_stack();
     let speed_const;
     if StatusModule::status_kind(module_accessor) == *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F {

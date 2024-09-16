@@ -25,7 +25,6 @@ use {
 };
 use crate::FIGHTER_CUTIN_MANAGER_ADDR;
 use crate::FIGHTER_MANAGER;
-use crate::ITEM_MANAGER;
 
 // flags
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_CHECK_ENEMY: i32 = 0x200000ec;
@@ -54,14 +53,6 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FAST_RC_ENABLE : i32 = 0x200000fe;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FAST_RC_DETECTED : i32 = 0x200000ff;
 
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_N_HAS_REFLECTED : i32 = 0x20000100;
-
-pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_ONE : i32 = 0x20000101;
-pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_TWO : i32 = 0x20000102;
-pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_THREE : i32 = 0x20000103;
-pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_KILL : i32 = 0x20000104;
-pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_WIN_FRAME : i32 = 0x20000105;
-
-
 // for weapon
 pub const WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_ATTACK : i32 = 0x20000007;
 pub const WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_HIT_WALL : i32 = 0x20000008;
@@ -94,8 +85,6 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_GRABBED_ENEMY_ID: i32 = 0x100000c1;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_HPB_GOTTEM_ID: i32 = 0x100000c2;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_LOOP_HITS_SPECIAL_HI: i32 = 0x100000c3;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_ARTICLE_ID: i32 = 0x100000c4;
-pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_BAR_INT_VALUE: i32 = 0x100000c5;
-
 
 // for weapon
 pub const WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_INT_TIMER: i32 = 0x10000524;
@@ -110,7 +99,6 @@ pub const FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK: i32 = 0x1f9;
 pub const FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP: i32 = 0x1fa;
 pub const FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE: i32 = 0x1fb;
 pub const FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL: i32 = 0x1fc;
-pub const FIGHTER_KAMUI_STATUS_KIND_WIN: i32 = 0x1fd;
 // for weapon
 pub const WEAPON_KAMUI_RYUSENSYA_STATUS_KIND_BOOM: i32 = 0x1;
 
@@ -194,8 +182,6 @@ mod lowercase_letters;
 use lowercase_letters::*;
 mod misc;
 use misc::*;
-mod win;
-use win::*;
 
 //this does... something......... probably
 extern "C" {
@@ -229,97 +215,6 @@ extern "C" {
     }
     return L2CValue::I32(0)
 }*/
-
-pub unsafe extern "C" fn sound_selector(fighter: &mut L2CAgentBase, mut sound_name: String, num_of_vars: i32, is_sequence: bool, continue_sequence: bool, sequence_order_number: i32) -> u64 {
-    //let sound_name_return = "w";
-    let mut random = smash::app::sv_math::rand(hash40("fighter"), num_of_vars);
-    let random2 = smash::app::sv_math::rand(hash40("fighter"), num_of_vars-1);
-
-    if !continue_sequence{
-        if num_of_vars == 3{
-            if WorkModule::is_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_ONE){
-                if random == 0{
-                    if random2 == 0{
-                        random = 1;
-                    }else{
-                        random = 2;
-                    }
-                }
-            }
-            if WorkModule::is_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_TWO){
-                if random == 1{
-                    if random2 == 0{
-                        random = 0;
-                    }else{
-                        random = 2;
-                    }
-                }
-            }
-            if WorkModule::is_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_THREE){
-                if random == 2{
-                    if random2 == 0{
-                        random = 0;
-                    }else{
-                        random = 1;
-                    }
-                }
-            }
-        }else if num_of_vars == 2{
-            if WorkModule::is_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_ONE){
-                random = 1;
-            }
-            if WorkModule::is_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_TWO){
-                random = 0;
-            }
-        }
-        WorkModule::off_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_ONE);
-        WorkModule::off_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_TWO);
-        WorkModule::off_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_THREE);
-        if is_sequence{
-            for _ in 0..3 {
-                sound_name.pop();
-            }
-            if random == 0{
-                WorkModule::on_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_ONE);
-                sound_name = [sound_name,"a_1".to_string()].join("");
-            }else if random == 1{
-                WorkModule::on_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_TWO);
-                sound_name = [sound_name,"b_1".to_string()].join("");
-            }else if random == 2{
-                WorkModule::on_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_THREE);
-                sound_name = [sound_name,"c_1".to_string()].join("");
-            }
-            println!("{}",sound_name);
-        }else{
-            sound_name.pop();
-            if random == 0{
-                WorkModule::on_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_ONE);
-                sound_name = [sound_name,"a".to_string()].join("");
-            }else if random == 1{
-                WorkModule::on_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_TWO);
-                sound_name = [sound_name,"b".to_string()].join("");
-            }else if random == 2{
-                WorkModule::on_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_THREE);
-                sound_name = [sound_name,"c".to_string()].join("");
-            }
-            println!("{}",sound_name);
-        }
-    } else {
-        for _ in 0..3 {
-            sound_name.pop();
-        }
-        if WorkModule::is_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_ONE){
-            sound_name = [sound_name,"a_".to_string()].join("");
-        }else if WorkModule::is_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_TWO){
-            sound_name = [sound_name,"b_".to_string()].join("");
-        }else if WorkModule::is_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_THREE){
-            sound_name = [sound_name,"c_".to_string()].join("");
-        }
-        sound_name = [sound_name,sequence_order_number.to_string()].join("");
-    }
-    println!("{}",sound_name);
-    return hash40(sound_name.as_str())
-}
 
 
 pub unsafe extern "C" fn rc_speed_float_setter(fighter: &mut L2CFighterCommon) {
@@ -617,12 +512,6 @@ pub fn install() {
                 .as_bytes()
                 .as_ptr(),
         );
-        LookupSymbol(
-            &mut ITEM_MANAGER,
-            "_ZN3lib9SingletonIN3app11ItemManagerEE9instance_E\u{0}"
-            .as_bytes()
-            .as_ptr(),
-        );
         let text_ptr = getRegionAddress(Region::Text) as *const u8;
         let text_size = (getRegionAddress(Region::Rodata) as usize) - (text_ptr as usize);
         let text = std::slice::from_raw_parts(text_ptr, text_size);
@@ -638,18 +527,18 @@ pub fn install() {
 
 
     //throw
-    .game_acmd("game_throwlw", throw_lw, Priority::Low)
-    .effect_acmd("effect_throwlw", effect_throw_lw, Priority::Low)
-    .sound_acmd("sound_throwlw", sound_throw_lw, Priority::Low)
-    .expression_acmd("expression_throwlw", expression_throwlw, Priority::Low)
+    .game_acmd("game_throwlw", throw_lw)
+    .effect_acmd("effect_throwlw", effect_throw_lw)
+    .sound_acmd("sound_throwlw", sound_throw_lw)
+    .expression_acmd("expression_throwlw", expression_throwlw)
 
     //taunt
-    .game_acmd("game_appealsr", appeal_srl, Priority::Low)
-    .effect_acmd("effect_appealsr", effect_appeal_srl, Priority::Low)
-    .sound_acmd("sound_appealsr", sound_appeal_srl, Priority::Low)
-    .game_acmd("game_appealsl", appeal_srl, Priority::Low)
-    .effect_acmd("effect_appealsl", effect_appeal_srl, Priority::Low)
-    .sound_acmd("sound_appealsl", sound_appeal_srl, Priority::Low)
+    .game_acmd("game_appealsr", appeal_srl)
+    .effect_acmd("effect_appealsr", effect_appeal_srl)
+    .sound_acmd("sound_appealsr", sound_appeal_srl)
+    .game_acmd("game_appealsl", appeal_srl)
+    .effect_acmd("effect_appealsl", effect_appeal_srl)
+    .sound_acmd("sound_appealsl", sound_appeal_srl)
     .status(End, *FIGHTER_STATUS_KIND_APPEAL, appeal_end)
 
     //special_s
@@ -664,30 +553,25 @@ pub fn install() {
     .status(Init, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL, side_b_slide_init)
     .status(Exit, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL, side_b_slide_exit)
     .status(Exec, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL, side_b_slide_exec)
-    .sound_acmd("sound_specials", sound_specialsstart, Priority::Low)
-    .game_acmd("game_specialsslide", game_specialsloop, Priority::Low)
-    .effect_acmd("effect_specialsslide", effect_specialsloop, Priority::Low)
-    .effect_acmd("effect_specials", effect_specials, Priority::Low)
-    .game_acmd("game_specialsattack", game_specialsattack, Priority::Low)
-    .sound_acmd("sound_specialsend", sound_specialsend, Priority::Low)
-
+    .game_acmd("game_specialsslide", game_specialsloop)
+    .effect_acmd("effect_specialsslide", effect_specialsloop)
+    .effect_acmd("effect_specials", effect_specials)
+    .game_acmd("game_specialsattack", game_specialsattack)
     //.status(Pre, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_B, megafist_f_pre)
     .status(Main, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_B, megafist_f_main)
     .status(Main, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_B_LANDING, megafist_f_land_main)
     //.status(Pre, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F, megafist_f_pre)
     .status(Main, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F, megafist_f_main)
-    .game_acmd("game_specialsmff", game_specialsmff, Priority::Low)
-    .sound_acmd("sound_specialsmff", sound_specialsmff, Priority::Low)
-
+    .game_acmd("game_specialsmff", game_specialsmff)
     .status(Main, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F_LANDING, megafist_f_land_main)
 
 
     //special_lw
     .status(Main, *FIGHTER_STATUS_KIND_SPECIAL_LW, special_lw_main)
     .status(End, *FIGHTER_STATUS_KIND_SPECIAL_LW, special_lw_end)
-    .game_acmd("game_speciallw", special_lw, Priority::Low)
-    .effect_acmd("effect_speciallw", effect_special_lw, Priority::Low)
-    .sound_acmd("sound_speciallw", sound_special_lw, Priority::Low)
+    .game_acmd("game_speciallw", special_lw)
+    .effect_acmd("effect_speciallw", effect_special_lw)
+    .sound_acmd("sound_speciallw", sound_special_lw)
 
     //special_hi
     .status(Main, *FIGHTER_STATUS_KIND_SPECIAL_HI, special_hi_main)
@@ -707,51 +591,48 @@ pub fn install() {
     .status(Exit, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE, special_hi_exit)
 
 
-    .game_acmd("game_specialhi", special_hi, Priority::Low)
-    .effect_acmd("effect_specialhi", effect_special_hi, Priority::Low)
-    .sound_acmd("sound_specialhi", sound_special_hi, Priority::Low)
-    .game_acmd("game_specialhistart", special_hi_start, Priority::Low)
-    .sound_acmd("sound_specialhistart", sound_special_hi_start, Priority::Low)
-    .game_acmd("game_specialhiloop", special_hi_loop, Priority::Low)
-    .game_acmd("game_specialhirelease", special_hi_release, Priority::Low)
-    .sound_acmd("sound_specialhirelease", sound_special_hi_release, Priority::Low)
+    .game_acmd("game_specialhi", special_hi)
+    .effect_acmd("effect_specialhi", effect_special_hi)
+    .sound_acmd("sound_specialhi", sound_special_hi)
+    .game_acmd("game_specialhistart", special_hi_start)
+    .game_acmd("game_specialhiloop", special_hi_loop)
+    .game_acmd("game_specialhirelease", special_hi_release)
 
     //normals
-    .game_acmd("game_attacks3", attack_s3, Priority::Low)
-    .effect_acmd("effect_attacks3", effect_attack_s3, Priority::Low)
-    .game_acmd("game_attacklw3", attack_lw3, Priority::Low)
-    .effect_acmd("effect_attacklw3", effect_attack_lw3, Priority::Low)
-    .game_acmd("game_attackdash", attack_dash, Priority::Low)
-    .effect_acmd("effect_attackdash", effect_attack_dash, Priority::Low)
-    .game_acmd("game_catch", catch, Priority::Low)
-    .game_acmd("game_catchdash", catchdash, Priority::Low)
-    .game_acmd("game_catchturn", catchturn, Priority::Low)
-    .game_acmd("game_attackhi4", attack_hi4, Priority::Low)
-    .sound_acmd("sound_attackhi4", sound_attackhi4, Priority::Low)
-    .expression_acmd("expression_attackhi4", expression_attackhi4, Priority::Low)
-    .effect_acmd("effect_attackhi4", effect_attack_hi4, Priority::Low)
-    .effect_acmd("effect_attackshi4charge", effect_attack_hi4_charge, Priority::Low)
-    .game_acmd("game_attacks4", attack_s4, Priority::Low)
-    .sound_acmd("sound_attacks4", sound_attacks4, Priority::Low)
-    .sound_acmd("sound_attacks4charge", sound_attacks4charge, Priority::Low)
-    .expression_acmd("expression_attacks4", expression_attacks4, Priority::Low)
-    .effect_acmd("effect_attacks4", effect_attack_s4, Priority::Low)
-    .effect_acmd("effect_attacks4charge", effect_attack_s4_charge, Priority::Low)
-    .game_acmd("game_final", game_final, Priority::Low)
-    .sound_acmd("sound_final", sound_final, Priority::Low)
-    .effect_acmd("effect_final", effect_final, Priority::Low)
-    .game_acmd("game_finalvisualscene01", game_finalvisualscene01, Priority::Low)
-    .game_acmd("game_finalvisualscene02", game_finalvisualscene02, Priority::Low)
-    .game_acmd("game_finalvisualscene03", game_finalvisualscene03, Priority::Low)
-    .sound_acmd("sound_finalvisualscene01", sound_finalvisualscene01, Priority::Low)
-    .sound_acmd("sound_finalvisualscene02", sound_finalvisualscene02, Priority::Low)
-    .sound_acmd("sound_finalvisualscene03", sound_finalvisualscene03, Priority::Low)
-    .game_acmd("game_fakefinalvisualscene01", game_fakefinalvisualscene01, Priority::Low)
-    .sound_acmd("sound_fakefinalvisualscene01", sound_fakefinalvisualscene01, Priority::Low)
-    .effect_acmd("effect_finalvisualscene02", effect_finalvisualscene02, Priority::Low)
-    .game_acmd("game_attacklw4", game_attacklw4, Priority::Low)
-    .sound_acmd("sound_attacklw4", sound_attacklw4, Priority::Low)
-    .game_acmd("game_win1a", game_win1a, Priority::Low)
+    .game_acmd("game_attacks3", attack_s3)
+    .effect_acmd("effect_attacks3", effect_attack_s3)
+    .game_acmd("game_attacklw3", attack_lw3)
+    .effect_acmd("effect_attacklw3", effect_attack_lw3)
+    .game_acmd("game_attackdash", attack_dash)
+    .effect_acmd("effect_attackdash", effect_attack_dash)
+    .game_acmd("game_catch", catch)
+    .game_acmd("game_catchdash", catchdash)
+    .game_acmd("game_catchturn", catchturn)
+    .game_acmd("game_attackhi4", attack_hi4)
+    .sound_acmd("sound_attackhi4", sound_attackhi4)
+    .expression_acmd("expression_attackhi4", expression_attackhi4)
+    .effect_acmd("effect_attackhi4", effect_attack_hi4)
+    .effect_acmd("effect_attackshi4charge", effect_attack_hi4_charge)
+    .game_acmd("game_attacks4", attack_s4)
+    .sound_acmd("sound_attacks4", sound_attacks4)
+    .sound_acmd("sound_attacks4charge", sound_attacks4charge)
+    .expression_acmd("expression_attacks4", expression_attacks4)
+    .effect_acmd("effect_attacks4", effect_attack_s4)
+    .effect_acmd("effect_attacks4charge", effect_attack_s4_charge)
+    .game_acmd("game_final", game_final)
+    .sound_acmd("sound_final", sound_final)
+    .effect_acmd("effect_final", effect_final)
+    .game_acmd("game_finalvisualscene01", game_finalvisualscene01)
+    .game_acmd("game_finalvisualscene02", game_finalvisualscene02)
+    .game_acmd("game_finalvisualscene03", game_finalvisualscene03)
+    .sound_acmd("sound_finalvisualscene01", sound_finalvisualscene01)
+    .sound_acmd("sound_finalvisualscene02", sound_finalvisualscene02)
+    .sound_acmd("sound_finalvisualscene03", sound_finalvisualscene03)
+    .game_acmd("game_fakefinalvisualscene01", game_fakefinalvisualscene01)
+    .sound_acmd("sound_fakefinalvisualscene01", sound_fakefinalvisualscene01)
+    .effect_acmd("effect_finalvisualscene02", effect_finalvisualscene02)
+    .game_acmd("game_attacklw4", game_attacklw4)
+    .game_acmd("game_win1a", game_win1a)
 
     //roman cancel
     .status(Pre, FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL, roman_cancel_pre)
@@ -760,8 +641,8 @@ pub fn install() {
     //.status(Init,FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL, caught_upb_init)
     //.status(Exec,FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL, caught_upb_exec)
     .status(End, FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL, roman_cancel_end)
-    .game_acmd("game_romancancel", game_romancancel, Priority::Low)
-    .game_acmd("game_romancancelair", game_romancancel, Priority::Low)
+    .game_acmd("game_romancancel", game_romancancel)
+    .game_acmd("game_romancancelair", game_romancancel)
 
 
     
@@ -777,20 +658,20 @@ pub fn install() {
     .status(End, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_SHOOT, special_n_shoot_end)
 
 
-    //.game_acmd("game_finalairlend", game_finalend, Priority::Low)
-    .sound_acmd("sound_specialnstart", sound_specialnstart, Priority::Low)
-    .effect_acmd("effect_specialnstart", effect_specialnstart, Priority::Low)
-    .expression_acmd("expression_specialnstart", expression_specialnstart, Priority::Low)
+    //.game_acmd("game_finalairlend", game_finalend)
+    .sound_acmd("sound_specialnstart", sound_specialnstart)
+    .effect_acmd("effect_specialnstart", effect_specialnstart)
+    .expression_acmd("expression_specialnstart", expression_specialnstart)
 
-    .game_acmd("game_specialnhold", game_specialnhold, Priority::Low)
-    .sound_acmd("sound_specialnhold", sound_specialnhold, Priority::Low)
-    .effect_acmd("effect_specialnhold", effect_specialnhold, Priority::Low)
-    .expression_acmd("expression_specialnhold", expression_specialnhold, Priority::Low)
+    .game_acmd("game_specialnhold", game_specialnhold)
+    .sound_acmd("sound_specialnhold", sound_specialnhold)
+    .effect_acmd("effect_specialnhold", effect_specialnhold)
+    .expression_acmd("expression_specialnhold", expression_specialnhold)
 
-    .game_acmd("game_specialnfire", game_specialnfire, Priority::Low)
-    .sound_acmd("sound_specialnfire", sound_specialnfire, Priority::Low)
-    .effect_acmd("effect_specialnfire", effect_specialnfire, Priority::Low)
-    .expression_acmd("sound_specialnfire", sound_specialnfire, Priority::Low)
+    .game_acmd("game_specialnfire", game_specialnfire)
+    .sound_acmd("sound_specialnfire", sound_specialnfire)
+    .effect_acmd("effect_specialnfire", effect_specialnfire)
+    .expression_acmd("sound_specialnfire", sound_specialnfire)
 
 
     //final
@@ -835,46 +716,34 @@ pub fn install() {
 
 
 
-    .game_acmd("game_heavenlydashloop", game_finaldash, Priority::Low)
-    .game_acmd("game_heavenlydashattack", game_finaldashattack, Priority::Low)
-    .game_acmd("game_finalend", game_finalend, Priority::Low)
-    .game_acmd("game_finalairlend", game_finalend, Priority::Low)
-    .sound_acmd("sound_finalend", sound_finalend, Priority::Low)
-    .sound_acmd("sound_finalairend", sound_finalend, Priority::Low)
-    .effect_acmd("effect_finalend", effect_finalend, Priority::Low)
-    .effect_acmd("effect_finalairend", effect_finalend, Priority::Low)
-    .game_acmd("game_heavenlystart", game_heavenlystart, Priority::Low)
+    .game_acmd("game_heavenlydashloop", game_finaldash)
+    .game_acmd("game_heavenlydashattack", game_finaldashattack)
+    .game_acmd("game_finalend", game_finalend)
+    .game_acmd("game_finalairlend", game_finalend)
+    .sound_acmd("sound_finalend", sound_finalend)
+    .sound_acmd("sound_finalairend", sound_finalend)
+    .effect_acmd("effect_finalend", effect_finalend)
+    .effect_acmd("effect_finalairend", effect_finalend)
+    .game_acmd("game_heavenlystart", game_heavenlystart)
 
 
-
-    //.status(Main, *FIGHTER_STATUS_KIND_DEMO, win_pre)
-    .status(Pre, *FIGHTER_STATUS_KIND_DEMO, win_pre)
-    .status(Main,*FIGHTER_STATUS_KIND_DEMO, win_main)
-    //.status(Exit,*FIGHTER_STATUS_KIND_DEMO, win_exit)
-    .status(Init,*FIGHTER_STATUS_KIND_DEMO, win_init)
-    //.status(Exec,*FIGHTER_STATUS_KIND_DEMO, win_exec)
-    //.status(End, *FIGHTER_STATUS_KIND_DEMO, win_end)
-    //.status(Pre, FIGHTER_KAMUI_STATUS_KIND_WIN, win_new_pre)
-    //.status(Main, FIGHTER_KAMUI_STATUS_KIND_WIN, win_new_main)
-    
     .install();
 
     Agent::new("kamui_waterdragon")
     //special_lw
-    .game_acmd("game_speciallwhit", special_lw_hit, Priority::Low)
-    .effect_acmd("effect_speciallwhit", effect_special_lw_hit, Priority::Low)
-    .sound_acmd("sound_speciallwhit", sound_special_lw_hit, Priority::Low)
+    .game_acmd("game_speciallwhit", special_lw_hit)
+    .effect_acmd("effect_speciallwhit", effect_special_lw_hit)
+    .sound_acmd("sound_speciallwhit", sound_special_lw_hit)
 
     //special_hi
-    .game_acmd("game_specialhi", special_dragon_hi, Priority::Low)
-    .game_acmd("game_entryr", special_dragon_hi_loop, Priority::Low)
-    .game_acmd("game_win3", special_dragon_hi_release, Priority::Low)
-    .game_acmd("game_entryl", entry_lr_throw_hi, Priority::Low)
-    .game_acmd("game_throwhi", entry_lr_throw_hi, Priority::Low)
-    .effect_acmd("effect_entryl", effect_entry_lr_throw_hi, Priority::Low)
-    .effect_acmd("effect_entryr", effect_entry_lr_throw_hi, Priority::Low)
-    .effect_acmd("effect_throwhi", effect_entry_lr_throw_hi, Priority::Low)
-    
+    .game_acmd("game_specialhi", special_dragon_hi)
+    .game_acmd("game_entryr", special_dragon_hi_loop)
+    .game_acmd("game_win3", special_dragon_hi_release)
+    .game_acmd("game_entryl", entry_lr_throw_hi)
+    .game_acmd("game_throwhi", entry_lr_throw_hi)
+    .effect_acmd("effect_entryl", effect_entry_lr_throw_hi)
+    .effect_acmd("effect_entryr", effect_entry_lr_throw_hi)
+    .effect_acmd("effect_throwhi", effect_entry_lr_throw_hi)
 
 
 
@@ -883,8 +752,8 @@ pub fn install() {
     .install();
 
     Agent::new("kamui_spearhand")
-    .game_acmd("game_attacks4", spear_attack_s4, Priority::Low)
-    .effect_acmd("effect_attacks4charge", effect_attack_s4_charge_spear, Priority::Low)
+    .game_acmd("game_attacks4", spear_attack_s4)
+    .effect_acmd("effect_attacks4charge", effect_attack_s4_charge_spear)
     .install();
 
     Agent::new("kamui_ryusensya")
@@ -895,11 +764,11 @@ pub fn install() {
     //.status(Init,WEAPON_KAMUI_RYUSENSYA_STATUS_KIND_BOOM, boom_init)
     //.status(Exec,WEAPON_KAMUI_RYUSENSYA_STATUS_KIND_BOOM, boom_exec)
     //.status(End, WEAPON_KAMUI_RYUSENSYA_STATUS_KIND_BOOM, boom_end)
-    .game_acmd("game_regular", game_regular, Priority::Low)
-    .effect_acmd("effect_regular", effect_regular, Priority::Low)
-    .game_acmd("game_shotmax", game_shotmax, Priority::Low)
-    .effect_acmd("effect_shotmax", effect_shotmax, Priority::Low)
-    .sound_acmd("sound_shotmax", sound_shotmax, Priority::Low)
+    .game_acmd("game_regular", game_regular)
+    .effect_acmd("effect_regular", effect_regular)
+    .game_acmd("game_shotmax", game_shotmax)
+    .effect_acmd("effect_shotmax", effect_shotmax)
+    .sound_acmd("sound_shotmax", sound_shotmax)
 
     .install();
 
@@ -912,7 +781,7 @@ pub fn install() {
     .status(Exec,FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_upb_exec)
     .status(End, FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_upb_end)
     .status(Main, *FIGHTER_STATUS_KIND_THROWN, thrown_status_common)
-    .game_acmd("game_catchedpotspecialhi", game_catchedpotspecialhi, Priority::Low)
+    .game_acmd("game_catchedpotspecialhi", game_catchedpotspecialhi)
 
     .install();
 
@@ -921,8 +790,7 @@ pub fn install() {
     skyline::install_hooks!(
         notify_log_event_collision_hit_replace,
         kamui_link_event,
-        noping_the_eff,
-        change_motion_hook
+        noping_the_eff
         //caught_status_hook
         //initialization,
     );
@@ -931,19 +799,13 @@ pub fn install() {
         for i in 1..146 {
             KAMUI_VTABLE_ENTRIES[i] = KAMUI_VTABLE_ENTRIES[0] + (0x8 * (i as usize));
         }
-        patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_FRAME_3],kamui_on_frame as u64);
+        patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_FRAME],kamui_on_frame as u64);
         patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_SEARCH],kamui_on_search as u64);
         //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::INITIALIZE],cmd_enable as u64);
         //println!("the offset for initialization is {:#x} ",KAMUI_VTABLE_ENTRIES[VtableEntry::INITIALIZE]);
-        patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::RESET_1], kamui_reset as u64);
         patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::INITIALIZE], kamui_init as u64);
+        patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::UNK0], kamui_shield_declare as u64);
         patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_SHIELD_COLLISION], kamui_on_shield as u64);
-//
-        //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_FRAME_2], kamui_on_frame_2 as u64);
-        //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_FRAME_1], kamui_on_frame_1 as u64);
-        //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::RESET_2], kamui_reset_2 as u64);
-        //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::RESET_3], kamui_reset_3 as u64);
-        //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_DAMAGE], kamui_on_damage as u64);
 
     }
     skyline::patching::Patch::in_text(0x3414784).nop();

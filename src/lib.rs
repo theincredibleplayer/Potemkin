@@ -5,7 +5,6 @@
 
 pub static mut FIGHTER_MANAGER: usize = 0;
 pub static mut FIGHTER_CUTIN_MANAGER_ADDR: usize = 0;
-pub static mut ITEM_MANAGER : usize = 0;
 
 mod moveset;
 

@@ -14,7 +14,6 @@ use smash_script::macros;
 use std::arch::asm;
 use crate::FIGHTER_CUTIN_MANAGER_ADDR;
 use crate::FIGHTER_MANAGER;
-use crate::moveset::*;
 
 pub unsafe extern "C" fn special_lw(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
@@ -36,18 +35,12 @@ pub unsafe extern "C" fn special_lw(agent: &mut L2CAgentBase) {
     }
 }
 
-pub unsafe extern "C" fn effect_special_lw(agent: &mut L2CAgentBase) {}
+pub unsafe extern "C" fn effect_special_lw(_agent: &mut L2CAgentBase) {}
 
-pub unsafe extern "C" fn sound_special_lw(agent: &mut L2CAgentBase) {
-    sv_animcmd::wait(agent.lua_state_agent, 5.0);
-    if macros::is_excute(agent) {
-        let sound = sound_selector(agent,"vc_pot_garuda_impact_X".to_string(),2,false,false,0);
-        macros::PLAY_SE(agent, Hash40::new_raw(sound));
-    }
-}
+pub unsafe extern "C" fn sound_special_lw(_agent: &mut L2CAgentBase) {}
 
-pub unsafe extern "C" fn special_lw_hit(agent: &mut L2CAgentBase) {}
+pub unsafe extern "C" fn special_lw_hit(_agent: &mut L2CAgentBase) {}
 
-pub unsafe extern "C" fn effect_special_lw_hit(agent: &mut L2CAgentBase) {}
+pub unsafe extern "C" fn effect_special_lw_hit(_agent: &mut L2CAgentBase) {}
 
-pub unsafe extern "C" fn sound_special_lw_hit(agent: &mut L2CAgentBase) {} 
+pub unsafe extern "C" fn sound_special_lw_hit(_agent: &mut L2CAgentBase) {} 

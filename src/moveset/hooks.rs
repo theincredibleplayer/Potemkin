@@ -65,6 +65,7 @@ pub unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, ev
             StatusModule::change_status_request(module_accessor, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START, false);
             return 0;
         }
+        return 1;
         //final smash's link module
         if StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_FINAL {
             capture_event.result = true;
@@ -86,11 +87,25 @@ pub unsafe extern "C" fn noping_the_eff(vtable:u64, weapon: *mut smash::app::Wea
     let mut opponent_accessor = sv_battle_object::module_accessor(opponent_id);
     println!("opponent id: {}", opponent_id);
 
-
+    if utility::get_kind(&mut *opponent_accessor) == *FIGHTER_KIND_KAMUI{
+        if (StatusModule::status_kind(opponent_accessor) == FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_HOLD)
+        || (StatusModule::status_kind(opponent_accessor) == FIGHTER_STATUS_KIND_SPECIAL_N)
+        || (StatusModule::status_kind(opponent_accessor) == FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_SHOOT){
+            println!("corrin has reflected");
+            flag = false;
+            let owner_id = WorkModule::get_int(opponent_accessor,*WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER);
+            let owner_accessor = sv_battle_object::module_accessor(owner_id as u32);
+            let damage = WorkModule::get_float(owner_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_REAL_POWER_REFLECT);
+            let my_owner_id =WorkModule::get_int((*weapon).battle_object.module_accessor,*WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER);
+            let my_owner_accessor = sv_battle_object::module_accessor(my_owner_id as u32);
+            WorkModule::set_float(my_owner_accessor,damage,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_REAL_POWER_REFLECT);
+        }
+    }
 
 
 
     if (AttackModule::is_infliction((*weapon).battle_object.module_accessor, *COLLISION_KIND_MASK_HIT) || AttackModule::is_infliction((*weapon).battle_object.module_accessor, *COLLISION_KIND_MASK_SHIELD) || AttackModule::is_infliction((*weapon).battle_object.module_accessor, *COLLISION_KIND_MASK_ATTACK) )
+    &&  flag
     {
         if WorkModule::is_flag((*weapon).battle_object.module_accessor,WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_DID_IT_HIT){
             WorkModule::off_flag((*weapon).battle_object.module_accessor,WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_DID_IT_HIT);
@@ -102,17 +117,7 @@ pub unsafe extern "C" fn noping_the_eff(vtable:u64, weapon: *mut smash::app::Wea
 
 
 
-#[skyline::hook(replace=MotionModule::change_motion)]
-unsafe fn change_motion_hook(boma: &mut BattleObjectModuleAccessor, mut motion_hash: smash::phx::Hash40, start_frame: f32, arg4: f32, arg5: bool, arg6: f32, arg7: bool, arg8: bool) -> u64 {
-    let kind = WorkModule::get_int(boma, *FIGHTER_INSTANCE_WORK_ID_INT_KIND);
-    println!("change motion hook successful");
-    if kind == *FIGHTER_KIND_KAMUI{
-        if motion_hash == Hash40::new("win_2") || motion_hash == Hash40::new("win_3"){
-            motion_hash = Hash40::new("win_1");
-        }
-    }
-    original!()(boma, motion_hash, start_frame, arg4, arg5, arg6, arg7, arg8)
-}
+
 
 
 /*#[skyline::hook(offset = 0xb5e10)]

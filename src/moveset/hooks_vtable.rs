@@ -14,7 +14,6 @@ use smash_script::macros;
 use std::arch::asm;
 use crate::FIGHTER_CUTIN_MANAGER_ADDR;
 use crate::FIGHTER_MANAGER;
-use crate::ITEM_MANAGER;
 
 use crate::moveset::*;
 
@@ -89,40 +88,39 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
 
 // initialization vtable hook (using it as agent init since i cant use workmodule in agent init) (thanks wuboy)
 #[skyline::from_offset(0xb5c360)]
-pub unsafe extern "C" fn kamui_reset_original(vtable: u64, fighter: &mut Fighter);
+pub unsafe extern "C" fn kamui_init_original(vtable: u64, fighter: &mut Fighter);
 
-pub unsafe extern "C" fn kamui_reset(vtable: u64, fighter: &mut Fighter) {
+pub unsafe extern "C" fn kamui_init(vtable: u64, fighter: &mut Fighter) {
     println!("initialization hook successful");
     WorkModule::on_flag(fighter.battle_object.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_CAN_SPECIAL_COMMAND);
-    //ShieldModule::set_target_category(fighter.battle_object.module_accessor,*COLLISION_CATEGORY_WEAPON as i32,2); both work ig but property is more broad 
-    ShieldModule::set_target_property(fighter.battle_object.module_accessor, *COLLISION_PROPERTY_REFLECT,2);
 
-    kamui_reset_original(vtable,fighter);
+
+    kamui_init_original(vtable,fighter);
 }
 
 
 #[skyline::from_offset(0xb5c1a0)]
-pub unsafe extern "C" fn kamui_init_og(vtable: u64, fighter: &mut Fighter);
+pub unsafe extern "C" fn kamui_shield_declare_og(vtable: u64, fighter: &mut Fighter);
 
-pub unsafe extern "C" fn kamui_init(vtable: u64, fighter: &mut Fighter) {
+pub unsafe extern "C" fn kamui_shield_declare(vtable: u64, fighter: &mut Fighter) {
     let module_accessor = (*fighter).battle_object.module_accessor;
     if (*fighter).battle_object.kind == *FIGHTER_KIND_KAMUI as u32 {
         let shield_data = ShieldDataResource::new(
             0.0,
-            7.0,
-            11.0,
             0.0,
-            17.0,
-            11.0,
-            8.0,
-            Hash40::new("top"),
-            *COLLISION_SHAPE_TYPE_CAPSULE as u8,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            13.0,
+            Hash40::new("haver"),
+            *COLLISION_SHAPE_TYPE_SPHERE as u8,
             *SHIELD_TYPE_GUARD as u8
         );
         let shield_datas = &mut (ShieldDatas::new().add(shield_data, 0));
         let resource = &mut ShieldGroupResource::new(
             shield_datas,
-            1,
+            2,
             1,
             false,
             false,
@@ -131,7 +129,7 @@ pub unsafe extern "C" fn kamui_init(vtable: u64, fighter: &mut Fighter) {
         
         MiscModule::add_shield_group(module_accessor, resource, 2);
     }
-    kamui_init_og(vtable,fighter);
+    kamui_shield_declare_og(vtable,fighter);
 }
 
 
@@ -164,10 +162,6 @@ pub unsafe extern "C" fn kamui_on_shield(vtable: u64, fighter: &mut Fighter, col
     || opponent_cat as i32 == *BATTLE_OBJECT_CATEGORY_ITEM{
         if StatusModule::status_kind(module_accessor) == *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_HOLD
         || StatusModule::status_kind(module_accessor) == *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_SHOOT{
-            if opponent_cat as i32 == *BATTLE_OBJECT_CATEGORY_ITEM {
-                let item_manager = *(ITEM_MANAGER as *mut *mut smash::app::ItemManager);
-                smash::app::lua_bind::ItemManager::remove_item_from_id(item_manager,opponent_id);
-            }
             WorkModule::on_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_N_HAS_REFLECTED);
             notify_event_msc_cmd!(opponent_common, Hash40::new_raw(0x199c462b5d));
             //WorkModule::set_float(module_accessor, opponent_real_power, WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLOAT_BOOM_POWER);
@@ -186,54 +180,4 @@ pub unsafe extern "C" fn kamui_on_shield(vtable: u64, fighter: &mut Fighter, col
 }
 
 
-#[skyline::from_offset(0xb5e710)]
-pub unsafe extern "C" fn kamui_on_damage_og(vtable: u64, fighter: &mut Fighter,log:u64);
 
-pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,log:u64) {
-    println!("on damage hook successful");
-    WorkModule::on_flag(fighter.battle_object.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_ONE);
-    WorkModule::on_flag(fighter.battle_object.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_TWO);
-    WorkModule::on_flag(fighter.battle_object.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_THREE);
-    WorkModule::on_flag(fighter.battle_object.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_KILL);
-    kamui_on_damage_og(vtable,fighter,log);
-}
-
-
-
-
-// testing section ==============================================================================
-
-
-
-#[skyline::from_offset(0xb5caf0)]
-pub unsafe extern "C" fn kamui_reset_2_original(vtable: u64, fighter: &mut Fighter);
-
-pub unsafe extern "C" fn kamui_reset_2(vtable: u64, fighter: &mut Fighter) {
-    println!("reset 2 active");
-    kamui_reset_2_original(vtable,fighter);
-}
-
-#[skyline::from_offset(0x68D600)]
-pub unsafe extern "C" fn kamui_reset_3_original(vtable: u64, fighter: &mut Fighter);
-
-pub unsafe extern "C" fn kamui_reset_3(vtable: u64, fighter: &mut Fighter) {
-    println!("reset 3 active");
-    //kamui_reset_3_original(vtable,fighter);
-}
-
-
-#[skyline::from_offset(0x68D660)]
-pub unsafe extern "C" fn kamui_on_frame_2_original(vtable: u64, fighter: &mut Fighter);
-
-pub unsafe extern "C" fn kamui_on_frame_2(vtable: u64, fighter: &mut Fighter) {
-    println!("on frame 2 active");
-    //kamui_on_frame_2_original(vtable,fighter);
-}
-
-#[skyline::from_offset(0xB5CDB0)]
-pub unsafe extern "C" fn kamui_on_frame_1_original(vtable: u64, fighter: &mut Fighter);
-
-pub unsafe extern "C" fn kamui_on_frame_1(vtable: u64, fighter: &mut Fighter) {
-    println!("on_frame_1 active");
-    //kamui_on_frame_3_original(vtable,fighter);
-}
