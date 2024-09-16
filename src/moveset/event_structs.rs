@@ -311,22 +311,22 @@ impl ShieldGroupResource2 {
 
 #[repr(C)]
 pub struct VtableEntry(usize);
-
+                                                                    // as a general rule every vtable has at least 1 usage 
 impl VtableEntry {
-    pub const UNK0: usize = 0;
-    pub const UNK1: usize = 1;
-    pub const UNK2: usize = 2;
-    pub const UNK3: usize = 3;
-    pub const INITIALIZE: usize = 4;
-    pub const UNK5: usize = 5;
-    pub const UNK6: usize = 6;
+    pub const INITIALIZE: usize = 0;
+    pub const EVENT_LISTENER_INITIALIZE: usize = 1;
+    pub const UNK2: usize = 2; //only duck hunt for some item and gnw for event listener initializer use it
+    pub const SOME_FUNC_SETTER: usize = 3;
+    pub const RESET_1: usize = 4;
+    pub const RESET_2: usize = 5;
+    pub const RESET_3: usize = 6; //maybe not sure, just used for m2 and snake
     pub const ON_DEATH: usize = 7;
-    pub const UNK8: usize = 8;
-    pub const UNK9: usize = 9;
-    pub const UNK10: usize = 10;
-    pub const UNK11: usize = 11;
-    pub const UNK12: usize = 12;
-    pub const ON_FRAME: usize = 13;
+    pub const ON_REBIRTH2: usize = 8;
+    pub const PERMA_WEAPON_LINK_REMOVE: usize = 9; //unsure, only used for bowser jr. from findings
+    pub const ON_FRAME_1: usize = 10;
+    pub const CORRECTIVE_FRAME: usize = 11; //opff of sorts for some corrective action, like setting shape or detecting distance from ground and taking some action
+    pub const ON_FRAME_2: usize = 12;
+    pub const ON_FRAME_3: usize = 13; //some use for Partial Motion
     pub const UNK14: usize = 14;
     pub const UNK15: usize = 15;
     pub const UNK16: usize = 16;
@@ -356,7 +356,7 @@ impl VtableEntry {
     pub const UNK40: usize = 40;
     pub const ON_ATTACK_EVENT: usize = 41;
     pub const UNK42: usize = 42;
-    pub const SOME_GANON_EVENT: usize = 43;
+    pub const SOME_GANON_EVENT: usize = 43;                   //apparently this removes the hammer and the kart from the victory screen for koopajr?
     pub const UNK44: usize = 44;
     pub const SECOND_SITUATION_CALLBACK: usize = 45;
     pub const ON_LINK_EVENT: usize = 46;
@@ -446,19 +446,25 @@ impl VtableEntry {
     pub const UNK130: usize = 130;
     pub const UNK131: usize = 131;
     pub const UNK132: usize = 132;
-    pub const UNK133: usize = 133;
-    pub const UNK134: usize = 134;
-    pub const UNK135: usize = 135;
-    pub const UNK136: usize = 136;
-    pub const UNK137: usize = 137;
-    pub const UNK138: usize = 138;
-    pub const UNK139: usize = 139;
-    pub const UNK140: usize = 140;
-    pub const UNK141: usize = 141;
-    pub const UNK142: usize = 142;
-    pub const UNK143: usize = 143;
-    pub const UNK144: usize = 144;
-    pub const UNK145: usize = 145;
+    pub const UNK133: usize = 133;                          // shared to everyone except popo and nana
+    pub const UNK134: usize = 134;                          // has a whole 5 params, sets 3,4 and 5 to 0 then returns 0, shared for every character
+    pub const UNK135: usize = 135;                          // stubbed, shared for every character
+    pub const UNK136: usize = 136;                          // always true, shared for every character
+    pub const UNK137: usize = 137;                          // always true, shared for every character
+    pub const UNK138: usize = 138;                          // shared for every character, returns the function's third argument (idk what it is tho)
+    pub const UNK139: usize = 139;                          // always false, shared for every character
+                                                            // except for demon, if it isnt
+    pub const UNK140: usize = 140;                          // always false, shared for every character
+    pub const UNK141: usize = 141;                          // always false, shared for every character
+    pub const UNK142: usize = 142;                          // always false, shared for every character
+    
+    pub const RETRUNS_NUMBER_2: usize = 143;                // shared across the entire cast except sora it , always returns 2
+                                                            // in sora's case it checks if (param_3 == '\x03') and if so returns 3, otherwise returns 2
+
+    pub const RETURN_IN_X3: usize = 144;                    // shared across the entire cast except sora and kazuya it seems, returns whatever was in the register in_x3 + 0x58
+                                                            // sora and kazuya have 14 params to the function and i am not reading allat
+
+    pub const RETURNS_ITEM_HAND_GRIP_HEX: usize = 145;      // shared across the entire cast except minmin it seems, this one always returns the hash for item_hand_grip even with minmin
 }
 
 #[repr(C)]

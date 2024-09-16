@@ -256,7 +256,7 @@ pub unsafe extern "C" fn game_heavenlystart(agent: &mut L2CAgentBase) {
       macros::CAM_ZOOM_IN_arg5(
       agent,
       /*frames to zoom in totally*/5.0,
-      /*idk best kept 0*/0,
+      /*according to calude the object id?*/0.0,
       /*the amt of zoom needed, higher the number lower the zoom*/1.5,
       /*y_rot*/0.0,
       /*x_rot*/0.0,
@@ -446,16 +446,19 @@ pub unsafe extern "C" fn game_fakefinalvisualscene01(agent: &mut L2CAgentBase) {
 
 pub unsafe extern "C" fn sound_fakefinalvisualscene01(agent: &mut L2CAgentBase) {
         if macros::is_excute(agent) {
-            macros::PLAY_SE(agent, Hash40::new("heavenly_1_1"));
+            let sound = sound_selector(agent,"vc_pot_heavenly_X_X".to_string(),3,true,false,1);
+            macros::PLAY_SE(agent, Hash40::new_raw(sound));
             macros::PLAY_SE(agent, Hash40::new("se_kamui_final01"));
         }
         frame(agent.lua_state_agent, 120.0);
         if macros::is_excute(agent) {
-            macros::PLAY_SE(agent, Hash40::new("heavenly_1_2"));
+            let sound = sound_selector(agent,"vc_pot_heavenly_X_X".to_string(),3,true,true,2);
+            macros::PLAY_SE(agent, Hash40::new_raw(sound));
         }
         frame(agent.lua_state_agent, 240.0);
         if macros::is_excute(agent) {
-            macros::PLAY_SE(agent, Hash40::new("heavenly_1_3"));
+            let sound = sound_selector(agent,"vc_pot_heavenly_X_X".to_string(),3,true,true,3);
+            macros::PLAY_SE(agent, Hash40::new_raw(sound));
         }
 }
 
@@ -501,7 +504,8 @@ pub unsafe extern "C" fn sound_finalvisualscene02(agent: &mut L2CAgentBase) {
     }
     frame(agent.lua_state_agent, 130.0);
     if macros::is_excute(agent) {
-        macros::PLAY_SE(agent, Hash40::new("heavenly_1_4"));
+        let sound = sound_selector(agent,"vc_pot_heavenly_X_X".to_string(),3,true,true,4);
+        macros::PLAY_SE(agent, Hash40::new_raw(sound));
     }
 }
 pub unsafe extern "C" fn effect_finalvisualscene02(agent: &mut L2CAgentBase) {
