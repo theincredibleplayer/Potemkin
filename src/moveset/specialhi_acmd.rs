@@ -66,6 +66,14 @@ pub unsafe extern "C" fn sound_special_hi(_agent: &mut L2CAgentBase) {}
 
 pub unsafe extern "C" fn special_hi_start(agent: &mut L2CAgentBase) {}
 
+pub unsafe extern "C" fn sound_special_hi_start(agent: &mut L2CAgentBase) {
+    sv_animcmd::frame(agent.lua_state_agent, 31.0);
+    if macros::is_excute(agent) {
+        let sound = sound_selector(agent,"vc_pot_heat_extender_X_X".to_string(),2,true,false,1);
+        macros::PLAY_SE(agent, Hash40::new_raw(sound));
+    }
+}
+
 pub unsafe extern "C" fn special_hi_loop(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         //macros::FT_MOTION_RATE(agent, 0.5);
@@ -140,6 +148,14 @@ pub unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
         smash::app::lua_bind::FighterCutInManager::set_throw_finish_zoom_rate(fighter_cutin_manager, 1.5);
         macros::QUAKE(agent, *CAMERA_QUAKE_KIND_XL);
         macros::PLAY_SE(agent, Hash40::new("se_kamui_special_h02"));
+        CameraModule::zoom_in(
+            agent.module_accessor,
+            5,
+            9,
+            1.0,
+            &Vector2f{x: 50.0, y: 0.0},
+            true
+        );
     }
     sv_animcmd::wait(agent.lua_state_agent, 1.0);
     if macros::is_excute(agent) {
@@ -161,6 +177,16 @@ pub unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
     }
 
 }
+
+pub unsafe extern "C" fn sound_special_hi_release(agent: &mut L2CAgentBase) {
+    sv_animcmd::frame(agent.lua_state_agent, 45.0);
+    if macros::is_excute(agent) {
+        let sound = sound_selector(agent,"vc_pot_heat_extender_X_X".to_string(),2,true,true,2);
+        macros::PLAY_SE(agent, Hash40::new_raw(sound));
+    }
+
+}
+
 
 pub unsafe extern "C" fn special_dragon_hi_release(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {

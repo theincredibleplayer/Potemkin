@@ -25,12 +25,20 @@ pub unsafe extern "C" fn game_romancancel(agent: &mut L2CAgentBase) {
         macros::FILL_SCREEN_MODEL_COLOR(agent, 0, 10, 0.3, 0.3, 0.3, 0, 0, 0, 1, 1, *smash::lib::lua_const::EffectScreenLayer::GROUND, *EFFECT_SCREEN_PRIO_FINAL);
         if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RED_RC){
             macros::SLOW_OPPONENT(agent, 400.0, 29.0);
+            let sound = sound_selector(agent,"vc_pot_red_rc_X".to_string(),3,false,false,2);
+            macros::PLAY_SE(agent, Hash40::new_raw(sound));
         }else if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_PURPLE_RC){
             macros::SLOW_OPPONENT(agent, 400.0, 60.0);
+            let sound = sound_selector(agent,"vc_pot_purple_rc_X".to_string(),3,false,false,2);
+            macros::PLAY_SE(agent, Hash40::new_raw(sound));
         }else if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_YELLOW_RC){
             macros::SLOW_OPPONENT(agent, 400.0, 29.0);
+            let sound = sound_selector(agent,"vc_pot_yellow_rc_X".to_string(),3,false,false,2);
+            macros::PLAY_SE(agent, Hash40::new_raw(sound));
         }else if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_BLUE_RC){
             macros::SLOW_OPPONENT(agent, 7.0, 60.0);
+            let sound = sound_selector(agent,"vc_pot_blue_rc_X".to_string(),3,false,false,2);
+            macros::PLAY_SE(agent, Hash40::new_raw(sound));
         }
     }
 
