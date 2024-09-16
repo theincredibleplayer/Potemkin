@@ -370,7 +370,6 @@ pub unsafe extern "C" fn special_hi_release_end(fighter: &mut L2CFighterCommon) 
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
     ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
-    CameraModule::zoom_out(module_accessor, 0);
     fighter.status_end_Throw()
 }
 
@@ -399,7 +398,6 @@ pub unsafe extern "C" fn special_hi_exit(fighter: &mut L2CFighterCommon) -> L2CV
     if StatusModule::status_kind_next(fighter.module_accessor) != FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_LOOP
     && StatusModule::status_kind_next(fighter.module_accessor) != FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START
     && StatusModule::status_kind_next(fighter.module_accessor) != FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE{
-        
         fighter.sub_throw_uniq_process_exit();
     }
     return L2CValue::I32(0)

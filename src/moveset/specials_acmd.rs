@@ -17,13 +17,7 @@ use crate::FIGHTER_MANAGER;
 
 use crate::moveset::*;
 
-pub unsafe extern "C" fn sound_specialsstart(agent: &mut L2CAgentBase) {
-    sv_animcmd::frame(agent.lua_state_agent, 2.0);
-    if macros::is_excute(agent) {
-        let sound = sound_selector(agent,"vc_pot_hammerfall_X".to_string(),2,false,false,0);
-        macros::PLAY_SE(agent, Hash40::new_raw(sound));
-    }
-}
+
 
 pub unsafe extern "C" fn game_specialsloop(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
@@ -75,17 +69,6 @@ pub unsafe extern "C" fn effect_specialsattack(agent: &mut L2CAgentBase) {
     }
 }
 
-pub unsafe extern "C" fn sound_specialsend(agent: &mut L2CAgentBase) {
-    sv_animcmd::frame(agent.lua_state_agent, 2.0);
-    if macros::is_excute(agent) {
-        let sound = sound_selector(agent,"vc_pot_hammerfall_break_X".to_string(),3,false,false,0);
-        macros::PLAY_SE(agent, Hash40::new_raw(sound));
-        macros::STOP_SE(agent, Hash40::new("vc_pot_hammerfall_a"));
-        macros::STOP_SE(agent, Hash40::new("vc_pot_hammerfall_b"));
-        macros::STOP_SE(agent, Hash40::new("vc_pot_hammerfall_c"));
-    }
-}
-
 pub unsafe extern "C" fn game_specialsmff(agent: &mut L2CAgentBase) {
     sv_animcmd::frame(agent.lua_state_agent, 23.0);
     if macros::is_excute(agent) {
@@ -109,10 +92,4 @@ pub unsafe extern "C" fn game_specialsmff(agent: &mut L2CAgentBase) {
     }
 }
 
-pub unsafe extern "C" fn sound_specialsmff(agent: &mut L2CAgentBase) {
-    sv_animcmd::frame(agent.lua_state_agent, 5.0);
-    if macros::is_excute(agent) {
-        let sound = sound_selector(agent,"vc_pot_megafist_X".to_string(),2,false,false,0);
-        macros::PLAY_SE(agent, Hash40::new_raw(sound));
-    }
-}
+
