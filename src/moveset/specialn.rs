@@ -22,6 +22,7 @@ pub unsafe extern "C" fn fly_main(weapon: &mut L2CWeaponCommon) -> L2CValue {
     WorkModule::on_flag(weapon.module_accessor,WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_DID_IT_HIT);
     WorkModule::set_int(weapon.module_accessor,90,*WEAPON_INSTANCE_WORK_ID_INT_INIT_LIFE);
     WorkModule::set_int(weapon.module_accessor,90,*WEAPON_INSTANCE_WORK_ID_INT_LIFE);
+    
     MotionModule::change_motion(weapon.module_accessor,Hash40::new("regular"),0.0,1.0,false,0.0,false,false);
   
     let posture = PostureModule::lr(weapon.module_accessor);
@@ -201,8 +202,7 @@ pub unsafe extern "C" fn special_n_hold_main(fighter: &mut L2CFighterCommon) -> 
 }
 
 unsafe fn special_n_hold_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
-    //ShieldModule::set_target_category(fighter.module_accessor,2,*COLLISION_CATEGORY_WEAPON as i32);
-    //ShieldModule::set_target_category(fighter.module_accessor,0,*COLLISION_CATEGORY_WEAPON as i32);
+    
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
 

@@ -284,11 +284,26 @@ pub unsafe extern "C" fn game_attacklw4(agent: &mut L2CAgentBase) {
         AttackModule::clear_all(agent.module_accessor);
     }
 }
+pub unsafe extern "C" fn sound_attacklw4(agent: &mut L2CAgentBase) {
+    frame(agent.lua_state_agent, 20.0);
+    if macros::is_excute(agent) {
+        let sound = sound_selector(agent,"vc_pot_slidehead_X_X".to_string(),3,false,false,0);
+        macros::PLAY_SE(agent, Hash40::new_raw(sound));
+    }
+}
+
 
 pub unsafe extern "C" fn game_win1a(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        ArticleModule::generate_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
-        ArticleModule::change_motion(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("win_1"),false,-1.0);
+    }
+    frame(agent.lua_state_agent, 50.0);
+    if macros::is_excute(agent) {
+        //macros::CAM_ZOOM_OUT(agent);
+    }
+}
+
+pub unsafe extern "C" fn sound_win1a(agent: &mut L2CAgentBase) {
+    if macros::is_excute(agent) {
     }
 }
 
