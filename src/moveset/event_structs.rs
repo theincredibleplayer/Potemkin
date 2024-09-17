@@ -315,18 +315,18 @@ pub struct VtableEntry(usize);
 impl VtableEntry {
     pub const INITIALIZE: usize = 0;
     pub const EVENT_LISTENER_INITIALIZE: usize = 1;
-    pub const UNK2: usize = 2; //only duck hunt for some item and gnw for event listener initializer use it
+    pub const UNK2: usize = 2;                                      //only duck hunt for some item and gnw for event listener initializer use it
     pub const SOME_FUNC_SETTER: usize = 3;
     pub const RESET_1: usize = 4;
     pub const RESET_2: usize = 5;
-    pub const RESET_3: usize = 6; //maybe not sure, just used for m2 and snake
+    pub const RESET_3: usize = 6;                                   //maybe not sure, just used for m2 and snake
     pub const ON_DEATH: usize = 7;
     pub const ON_REBIRTH2: usize = 8;
-    pub const PERMA_WEAPON_LINK_REMOVE: usize = 9; //unsure, only used for bowser jr. from findings
+    pub const PERMA_WEAPON_LINK_REMOVE: usize = 9;                  //unsure, only used for bowser jr. from findings
     pub const ON_FRAME_1: usize = 10;
-    pub const CORRECTIVE_FRAME: usize = 11; //opff of sorts for some corrective action, like setting shape or detecting distance from ground and taking some action
+    pub const CORRECTIVE_FRAME: usize = 11;                         //opff of sorts for some corrective action, like setting shape or detecting distance from ground and taking some action
     pub const ON_FRAME_2: usize = 12;
-    pub const ON_FRAME_3: usize = 13; //some use for Partial Motion
+    pub const ON_FRAME_3: usize = 13;                               //some use for Partial Motion
     pub const UNK14: usize = 14;
     pub const UNK15: usize = 15;
     pub const UNK16: usize = 16;
@@ -356,7 +356,7 @@ impl VtableEntry {
     pub const UNK40: usize = 40;
     pub const ON_ATTACK_EVENT: usize = 41;
     pub const UNK42: usize = 42;
-    pub const SOME_GANON_EVENT: usize = 43;                   //apparently this removes the hammer and the kart from the victory screen for koopajr?
+    pub const SOME_GANON_EVENT: usize = 43;                         //apparently this removes the hammer and the kart from the victory screen for koopajr?
     pub const UNK44: usize = 44;
     pub const SECOND_SITUATION_CALLBACK: usize = 45;
     pub const ON_LINK_EVENT: usize = 46;
@@ -368,7 +368,7 @@ impl VtableEntry {
     pub const UNK52: usize = 52;
     pub const UNK53: usize = 53;
     pub const UNK54: usize = 54;
-    pub const ON_SHIELD: usize = 55;                         //aka on rflection
+    pub const ON_SHIELD: usize = 55;                                //aka on rflection
     pub const UNK56: usize = 56;
     pub const UNK57: usize = 57;
     pub const ON_NOTIFY_EVENT_MSC_CMD: usize = 58;
@@ -446,25 +446,54 @@ impl VtableEntry {
     pub const UNK130: usize = 130;
     pub const UNK131: usize = 131;
     pub const UNK132: usize = 132;
-    pub const UNK133: usize = 133;                          // shared to everyone except popo and nana
-    pub const UNK134: usize = 134;                          // has a whole 5 params, sets 3,4 and 5 to 0 then returns 0, shared for every character
-    pub const UNK135: usize = 135;                          // stubbed, shared for every character
-    pub const UNK136: usize = 136;                          // always true, shared for every character
-    pub const UNK137: usize = 137;                          // always true, shared for every character
-    pub const UNK138: usize = 138;                          // shared for every character, returns the function's third argument (idk what it is tho)
-    pub const UNK139: usize = 139;                          // always false, shared for every character
-                                                            // except for demon, if it isnt
-    pub const UNK140: usize = 140;                          // always false, shared for every character
-    pub const UNK141: usize = 141;                          // always false, shared for every character
-    pub const UNK142: usize = 142;                          // always false, shared for every character
-    
-    pub const RETRUNS_NUMBER_2: usize = 143;                // shared across the entire cast except sora it , always returns 2
-                                                            // in sora's case it checks if (param_3 == '\x03') and if so returns 3, otherwise returns 2
-
-    pub const RETURN_IN_X3: usize = 144;                    // shared across the entire cast except sora and kazuya it seems, returns whatever was in the register in_x3 + 0x58
-                                                            // sora and kazuya have 14 params to the function and i am not reading allat
-
-    pub const RETURNS_ITEM_HAND_GRIP_HEX: usize = 145;      // shared across the entire cast except minmin it seems, this one always returns the hash for item_hand_grip even with minmin
+    pub const UNK133: usize = 133;                                  // stubbed, shared to everyone except popo and nana
+                                                                    // something sideb and link module related
+        
+    pub const UNK134: usize = 134;                                  // has a whole 5 params, sets 3,4 and 5 to 0 then returns 0, shared for every character except hero
+                                                                    // for hero it sets the reflection parameters for bounce
+                                                                    // passes the params reflect_attack_mul to param_3, reflect_speed_mul to param_4 and reflect_life_mul to param_5 if bounce is active
+                                                                    // if bounce isnt active it sets param_3, param_4 and param_5 to 0
+                                                                    // function returns 1 as long as bounce is active, otherwise 0
+                                                                    // im saying "passes the params" here under the assumption that these args are passed by refrence cuz it wont really make sense if it just changes local variables and leaves lmao
+        
+    pub const UNK135: usize = 135;                                  // stubbed, shared for every character except hero
+                                                                    // SetVisibleKind on the "brave_fire3_hold_max" effect and "brave_reflect" effect, true or false depends on the third arg
+        
+    pub const UNK136: usize = 136;                                  // always true, shared for every character except master
+                                                                    // seems to check if current status is not FIGHTER_MASTER_STATUS_KIND_SPECIAL_HI_HIT and returns true if so 
+                                                                    // but it does it in a wierd expression            return (status_kind & 0xfffffffe) != 0x1ea
+        
+    pub const UNK137: usize = 137;                                  // always true, shared for every character except elight
+                                                                    // interestingly the 2nd arg isnt fighter but instead its battleobject, or so it seems
+                                                                    // no clue what param_3 is or what the function is doing
+        
+    pub const UNK138: usize = 138;                                  // shared for every character, returns the function's third argument (idk what it is tho) except for demon
+                                                                    // demon: checks if param_3 == 0x41, then checks if rage is enabled and some other condition i dont understand, then does some buffering related stuff and returns either 0x41 or 0x1ca depending on outcome
+                                                                    // 0x41 seems to be capture pulled and 0x1ca is FIGHTER_STATUS_KIND_DEMON_DIVED
+                                                                    // is this doing the fucking input for rage drive?????????????????????????????????
+                                                                    // i am so confused
+        
+    pub const UNK139: usize = 139;                                  // always false, shared for every character
+                                                                    // except for demon, if it isnt FIGHTER_DEMON_STATUS_KIND_THROW_COMMAND or FIGHTER_STATUS_KIND_THROW it returns 0, otherwise returns 1
+        
+    pub const SORA_EVENT_1: usize = 140;                            // always false, shared for every character except sora
+                                                                    // sora: param_3 and param_4 seem to be ints
+                                                                    // if param_3 == 3 then some code that i dont understand is ran
+                                                                    // if param_3 == 2 && param_4 ==1 it returns 1
+        
+    pub const SORA_EVENT_2: usize = 141;                            // always false, shared for every character except sora
+                                                                    // sora: i dont exactly know what its doing but its checking if the status is downb and doing stuff
+        
+    pub const SORA_EVENT_3: usize = 142;                            // always false, shared for every character except sora
+                                                                    // sora: its doing some checks for sora but i cant tell what exactly its doing or what the args are
+            
+    pub const RETRUNS_NUMBER_2: usize = 143;                        // shared across the entire cast except sora it , always returns 2
+                                                                    // in sora's case it checks if (param_3 == '\x03') and if so returns 3, otherwise returns 2
+        
+    pub const RETURN_IN_X3: usize = 144;                            // shared across the entire cast except sora and kazuya it seems, returns whatever was in the register in_x3 + 0x58
+                                                                    // sora and kazuya have 14 params to the function and i am not reading allat
+        
+    pub const RETURNS_ITEM_HAND_GRIP_HEX: usize = 145;              // shared across the entire cast except minmin it seems, this one always returns the hash for item_hand_grip even with minmin
 }
 
 #[repr(C)]
