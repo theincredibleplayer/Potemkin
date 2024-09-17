@@ -48,7 +48,7 @@ pub unsafe extern "C" fn win_main(fighter: &mut L2CFighterCommon) -> L2CValue {
         MotionModule::change_motion(fighter.module_accessor,Hash40::new("win_1"),0.0,1.0,false,0.0,false,false);
         ArticleModule::generate_article(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
         ArticleModule::change_motion(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("win_1"),false,-1.0);
-        CameraModule::zoom_out(fighter.module_accessor, 0);
+        //CameraModule::zoom_out(fighter.module_accessor, 0);
         //macros::REQ_FINAL_START_CAMERA_arg3(fighter,Hash40::new("j02win1.nuanmb"), false, false);
     }else{
         return smashline::original_status(Main, fighter, *FIGHTER_STATUS_KIND_DEMO)(fighter);
@@ -57,14 +57,16 @@ pub unsafe extern "C" fn win_main(fighter: &mut L2CFighterCommon) -> L2CValue {
 }
 
 pub unsafe extern "C" fn win_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
-    if WorkModule::is_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_WIN_FRAME){
+    if WorkModule::is_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_WIN_FRAME) {
         //CameraModule::reset_all(fighter.module_accessor);
-        macros::REQ_MOTION_CAMERA(fighter, Hash40::new("j02win1.nuanmb"), false);
+        //macros::REQ_MOTION_CAMERA(fighter, Hash40::new("j02win1.nuanmb"), false);
         //macros::REQ_FINAL_START_CAMERA_arg3(fighter,Hash40::new("j02win1.nuanmb"), false, false);
         MotionModule::change_motion(fighter.module_accessor,Hash40::new("win_1"),0.0,1.0,false,0.0,false,false);
     }
+    //macros::REQ_MOTION_CAMERA(fighter, Hash40::new("j02win1.nuanmb"), false);
     PostureModule::set_pos(fighter.module_accessor, &Vector3f{x:0.0,y:0.0,z:0.0});
     PostureModule::set_rot(fighter.module_accessor, &Vector3f{x:0.0,y:0.0,z:0.0}, 0);
+    //macros::REQ_FINAL_START_CAMERA_arg3(fighter,Hash40::new("j02win1.nuanmb"), false, false);
     WorkModule::off_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_WIN_FRAME);
     return L2CValue::I32(0)
 

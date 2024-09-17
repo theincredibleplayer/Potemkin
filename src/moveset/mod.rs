@@ -939,7 +939,7 @@ pub fn install() {
         patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::INITIALIZE], kamui_init as u64);
         patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_SHIELD_COLLISION], kamui_on_shield as u64);
 //
-        //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_FRAME_2], kamui_on_frame_2 as u64);
+        patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::UNK19], kamui_on_frame_2 as u64);
         //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_FRAME_1], kamui_on_frame_1 as u64);
         //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::RESET_2], kamui_reset_2 as u64);
         //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::RESET_3], kamui_reset_3 as u64);

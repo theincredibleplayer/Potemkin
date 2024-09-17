@@ -328,18 +328,19 @@ impl VtableEntry {
     pub const ON_FRAME_2: usize = 12;
     pub const ON_FRAME_3: usize = 13;                               //some use for Partial Motion
     pub const UNK14: usize = 14;
-    pub const UNK15: usize = 15;
-    pub const UNK16: usize = 16;
-    pub const UNK17: usize = 17;
-    pub const ON_HIT: usize = 18;
-    pub const UNK19: usize = 19;
-    pub const UNK20: usize = 20;
-    pub const UNK21: usize = 21;
-    pub const UNK22: usize = 22;
-    pub const UNK23: usize = 23;
-    pub const UNK24: usize = 24;
-    pub const ON_DEATH_RESET: usize = 25;
-    pub const UNK26: usize = 26;
+    pub const SOME_KIRBY_RELATED: usize = 15;
+    pub const MOUTH_BREATHERS_OBJECT_RESET: usize = 16;             // DDD and kirby related
+    pub const ON_PRE_DAMAGE: usize = 17;                            // only ever used by snake, it runs right before going into a damage status it seems
+    pub const ON_FRAME_4: usize = 18;                               // lol, lmao even
+    pub const FS_RELATED: usize = 19;                               //seems to be final smash related except on rob and lucario for some reason
+                                                                    // i am actually not fully convinced of this naming cuz cloud is doing some weird ass shit i wanna  test when this gets called later
+    pub const ON_FINAL_END: usize = 20;                             // this is also a massive guess i should test this later
+    pub const ON_PAUSE: usize = 21;
+    pub const UNK22: usize = 22;                                    // maybe on throw, needs testing to confirm
+    pub const ON_UNPAUSE: usize = 23;
+    pub const UNK24: usize = 24;                                    // some popo nana pause unpause function idfk
+    pub const ON_DEATH_RESET_1: usize = 25;
+    pub const ON_DEATH_RESET_2: usize = 26;
     pub const UNK27: usize = 27;
     pub const UNK28: usize = 28;
     pub const UNK29: usize = 29;
@@ -471,11 +472,13 @@ impl VtableEntry {
                                                                     // interestingly the 2nd arg isnt fighter but instead its battleobject, or so it seems
                                                                     // no clue what param_3 is or what the function is doing
 
-    pub const UNK138: usize = 138;                                  // shared for every character, returns the function's third argument (idk what it is tho) except for demon
+    pub const ON_GRAB: usize = 138;                                 // shared for every character, returns the function's third argument (idk what it is tho) except for demon
                                                                     // demon: checks if param_3 == 0x41, then checks if rage is enabled and some other condition i dont understand, then does some buffering related stuff and returns either 0x41 or 0x1ca depending on outcome
                                                                     // 0x41 seems to be capture pulled and 0x1ca is FIGHTER_STATUS_KIND_DEMON_DIVED
-                                                                    // is this doing the fucking input for rage drive?????????????????????????????????
+                                                                    // this seems to handle grab buffering when rage drive is active
+                                                                    // aka handles weather to select rage drive or a throw
                                                                     // i am so confused
+                                                                    // i think this just returns which status to go to if grabbed
 
     pub const UNK139: usize = 139;                                  // always false, shared for every character
                                                                     // except for demon, if it isnt FIGHTER_DEMON_STATUS_KIND_THROW_COMMAND or FIGHTER_STATUS_KIND_THROW it returns 0, otherwise returns 1

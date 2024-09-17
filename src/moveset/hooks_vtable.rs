@@ -227,7 +227,7 @@ pub unsafe extern "C" fn kamui_on_frame_2_original(vtable: u64, fighter: &mut Fi
 
 pub unsafe extern "C" fn kamui_on_frame_2(vtable: u64, fighter: &mut Fighter) {
     println!("on frame 2 active");
-    //kamui_on_frame_2_original(vtable,fighter);
+    kamui_on_frame_2_original(vtable,fighter);
 }
 
 #[skyline::from_offset(0xB5CDB0)]
