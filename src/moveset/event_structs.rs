@@ -315,35 +315,36 @@ pub struct VtableEntry(usize);
 impl VtableEntry {
     pub const INITIALIZE: usize = 0;
     pub const EVENT_LISTENER_INITIALIZE: usize = 1;
-    pub const UNK2: usize = 2;                                      //only duck hunt for some item and gnw for event listener initializer use it
+    pub const UNK2: usize = 2;                                      // only duck hunt for some item and gnw for event listener initializer use it
     pub const SOME_FUNC_SETTER: usize = 3;
     pub const RESET_1: usize = 4;
     pub const RESET_2: usize = 5;
-    pub const RESET_3: usize = 6;                                   //maybe not sure, just used for m2 and snake
+    pub const RESET_3: usize = 6;                                   // maybe not sure, just used for m2 and snake
     pub const ON_DEATH: usize = 7;
     pub const ON_REBIRTH2: usize = 8;
-    pub const PERMA_WEAPON_LINK_REMOVE: usize = 9;                  //unsure, only used for bowser jr. from findings
+    pub const PERMA_WEAPON_LINK_REMOVE: usize = 9;                  // unsure, only used for bowser jr. from findings
     pub const ON_FRAME_1: usize = 10;
-    pub const CORRECTIVE_FRAME: usize = 11;                         //opff of sorts for some corrective action, like setting shape or detecting distance from ground and taking some action
+    pub const CORRECTIVE_FRAME: usize = 11;                         // opff of sorts for some corrective action, like setting shape or detecting distance from ground and taking some action
     pub const ON_FRAME_2: usize = 12;
-    pub const ON_FRAME_3: usize = 13;                               //some use for Partial Motion
+    pub const ON_FRAME_3: usize = 13;                               // some use for Partial Motion
     pub const UNK14: usize = 14;
     pub const SOME_KIRBY_RELATED: usize = 15;
     pub const MOUTH_BREATHERS_OBJECT_RESET: usize = 16;             // DDD and kirby related
     pub const ON_PRE_DAMAGE: usize = 17;                            // only ever used by snake, it runs right before going into a damage status it seems
     pub const ON_FRAME_4: usize = 18;                               // lol, lmao even
-    pub const FS_RELATED: usize = 19;                               //seems to be final smash related except on rob and lucario for some reason
+    pub const FS_RELATED: usize = 19;                               // seems to be final smash related except on rob and lucario for some reason
                                                                     // i am actually not fully convinced of this naming cuz cloud is doing some weird ass shit i wanna  test when this gets called later
+                                                                    // its a fucking opff LMFAOOOOOOOOOOOOOOOOOOOOOOOO
     pub const ON_FINAL_END: usize = 20;                             // this is also a massive guess i should test this later
     pub const ON_PAUSE: usize = 21;
     pub const UNK22: usize = 22;                                    // maybe on throw, needs testing to confirm
     pub const ON_UNPAUSE: usize = 23;
     pub const UNK24: usize = 24;                                    // some popo nana pause unpause function idfk
     pub const ON_DEATH_RESET_1: usize = 25;
-    pub const ON_DEATH_RESET_2: usize = 26;
-    pub const UNK27: usize = 27;
-    pub const UNK28: usize = 28;
-    pub const UNK29: usize = 29;
+    pub const ON_DEATH_RESET_2: usize = 26;                         // seems to be another on death
+    pub const ON_FRAME_5: usize = 27;                               // you cant make this shit up LMFAO 5 OPFFS
+    pub const ON_FRAME_FOR_KIRBY_1: usize = 28;
+    pub const ON_FRAME_FOR_KIRBY_2: usize = 29;
     pub const ON_STATUS_CHANGE: usize = 30;
     pub const ON_SITUATION_CHANGE: usize = 31;
     pub const UNK32: usize = 32;
@@ -357,7 +358,7 @@ impl VtableEntry {
     pub const UNK40: usize = 40;
     pub const ON_ATTACK_EVENT: usize = 41;
     pub const UNK42: usize = 42;
-    pub const SOME_GANON_EVENT: usize = 43;                         //apparently this removes the hammer and the kart from the victory screen for koopajr?
+    pub const SOME_GANON_EVENT: usize = 43;                         // apparently this removes the hammer and the kart from the victory screen for koopajr?
     pub const UNK44: usize = 44;
     pub const SECOND_SITUATION_CALLBACK: usize = 45;
     pub const ON_LINK_EVENT: usize = 46;
@@ -367,9 +368,9 @@ impl VtableEntry {
     pub const ON_SHIELD_COLLISION: usize = 50;
     pub const SHIELD_LR_AND_COUNTER_STATUS: usize = 51;
     pub const UNK52: usize = 52;
-    pub const UNK53: usize = 53;
+    pub const UNK53: usize = 53;                                    // shield related but usure what its doing
     pub const UNK54: usize = 54;
-    pub const ON_SHIELD: usize = 55;                                //aka on rflection
+    pub const ON_SHIELD: usize = 55;                                // aka on rflection
     pub const UNK56: usize = 56;
     pub const UNK57: usize = 57;
     pub const ON_NOTIFY_EVENT_MSC_CMD: usize = 58;

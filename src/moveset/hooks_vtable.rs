@@ -78,7 +78,8 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
             ModelModule::set_joint_scale(article_boma2, Hash40::new("trans") , &Vector3f{x:1.0,y:1.0,z:1.0});
         }
     }
-
+    let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+    UiManager::add_atb(entry_id, 0.1);
 
 
     //let motion = MotionModule::motion_kind(fighter.battle_object.module_accessor);
@@ -92,11 +93,13 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
 pub unsafe extern "C" fn kamui_reset_original(vtable: u64, fighter: &mut Fighter);
 
 pub unsafe extern "C" fn kamui_reset(vtable: u64, fighter: &mut Fighter) {
+    let module_accessor = (*fighter).battle_object.module_accessor;
     println!("initialization hook successful");
     WorkModule::on_flag(fighter.battle_object.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_CAN_SPECIAL_COMMAND);
     //ShieldModule::set_target_category(fighter.battle_object.module_accessor,*COLLISION_CATEGORY_WEAPON as i32,2); both work ig but property is more broad 
     ShieldModule::set_target_property(fighter.battle_object.module_accessor, *COLLISION_PROPERTY_REFLECT,2);
-
+    let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+    UiManager::reset_on_rebirth(entry_id);
     kamui_reset_original(vtable,fighter);
 }
 
@@ -106,6 +109,8 @@ pub unsafe extern "C" fn kamui_init_og(vtable: u64, fighter: &mut Fighter);
 
 pub unsafe extern "C" fn kamui_init(vtable: u64, fighter: &mut Fighter) {
     let module_accessor = (*fighter).battle_object.module_accessor;
+    let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+    UiManager::enable_ui(entry_id);
     if (*fighter).battle_object.kind == *FIGHTER_KIND_KAMUI as u32 {
         let shield_data = ShieldDataResource::new(
             0.0,

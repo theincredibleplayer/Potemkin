@@ -148,17 +148,22 @@ pub unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
         smash::app::lua_bind::FighterCutInManager::set_throw_finish_zoom_rate(fighter_cutin_manager, 1.5);
         macros::QUAKE(agent, *CAMERA_QUAKE_KIND_XL);
         macros::PLAY_SE(agent, Hash40::new("se_kamui_special_h02"));
-        CameraModule::zoom_in(
-            agent.module_accessor,
-            5,
-            9,
-            1.0,
-            &Vector2f{x: 50.0, y: 0.0},
-            true
-        );
+
     }
     sv_animcmd::wait(agent.lua_state_agent, 1.0);
     if macros::is_excute(agent) {
+        let capture_id = WorkModule::get_int(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_GRABBED_ENEMY_ID);
+        println!("capture id: {}",capture_id);
+        macros::CAM_ZOOM_IN_arg5(
+            agent,
+            /*frames to zoom in totally*/20.0,
+            /*according to calude the object id?*/capture_id as f32,
+            /*the amt of zoom needed, higher the number lower the zoom*/0.5,
+            /*y_rot*/0.0,
+            /*x_rot*/1.0,
+        );
+        
+        //zoom_in(agent.module_accessor,capture_id,Vector3f{x:20.0,y:0.0,z:0.0},9,Hash40::new("param_special_hi"),0,0);
         macros::FT_MOTION_RATE(agent, 2.0);
         //macros::EFFECT(agent,Hash40::new("sys_bg_criticalhit"),Hash40::new("top"),0,0,0,0,0,0,1,0,0,0,0,0,0,false);
         //SlowModule::set_whole(agent.module_accessor,2,60);

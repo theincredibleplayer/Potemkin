@@ -183,6 +183,7 @@ pub unsafe extern "C" fn Final_exit(fighter: &mut L2CFighterCommon) -> L2CValue 
   let module_accessor = fighter.module_accessor;
   ArticleModule::remove_exist(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
   return smashline::original_status(Exit, fighter, *FIGHTER_STATUS_KIND_FINAL)(fighter);
+  return L2CValue::I32(0)
 }
 
 

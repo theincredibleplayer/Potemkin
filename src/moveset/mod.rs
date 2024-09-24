@@ -23,6 +23,9 @@ use {
     smash_script::*,
     smashline::{*, Priority::*}
 };
+use nnsdk::ui2d::*;
+use smash::ui2d::SmashPane;
+use skyline::libc::c_void;
 use crate::FIGHTER_CUTIN_MANAGER_ADDR;
 use crate::FIGHTER_MANAGER;
 use crate::ITEM_MANAGER;
@@ -196,6 +199,10 @@ mod misc;
 use misc::*;
 mod win;
 use win::*;
+mod ui_manager;
+use ui_manager::*;
+mod dual_meter;
+use dual_meter::*;
 
 //this does... something......... probably
 extern "C" {
@@ -351,6 +358,7 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
         //let speed_vector = smash::phx::Vector3f { x: speed_x, y: speed_y, z: 0.0 };
         //KineticModule::add_speed(module_accessor, &speed);
 
+        let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
 
         if StatusModule::status_kind(module_accessor) != *FIGHTER_STATUS_KIND_FINAL
@@ -485,7 +493,8 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
         ,FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_LOOP
         ,FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE].contains(&status_kind) )
         || (StatusModule::prev_status_kind(module_accessor, 0) == FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL
-            && StatusModule::is_changing(module_accessor)) {
+            && StatusModule::is_changing(module_accessor)) 
+        || !UiManager::is_atb_available(entry_id){
             can_rc = false;
         }
         if MotionModule::motion_kind(module_accessor) == smash::hash40("just_shield_off")
@@ -597,6 +606,8 @@ unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter) {
     kamui_init_original();
 }*/
 
+#[skyline::from_offset(0x695f20)]
+unsafe extern "C" fn zoom_in(module_accessor: *mut smash::app::BattleObjectModuleAccessor, battle_object_id: i32, location: Vector3f, unk2: i32, param_hash: smash::phx::Hash40 , unk4: u32, unk5: u32) -> u8;
 
 
 
@@ -850,10 +861,10 @@ pub fn install() {
     //.status(Main, *FIGHTER_STATUS_KIND_DEMO, win_pre)
     .status(Pre, *FIGHTER_STATUS_KIND_DEMO, win_pre)
     .status(Main,*FIGHTER_STATUS_KIND_DEMO, win_main)
-    //.status(Exit,*FIGHTER_STATUS_KIND_DEMO, win_exit)
+    .status(Exit,*FIGHTER_STATUS_KIND_DEMO, win_exit)
     .status(Init,*FIGHTER_STATUS_KIND_DEMO, win_init)
-    //.status(Exec,*FIGHTER_STATUS_KIND_DEMO, win_exec)
-    //.status(End, *FIGHTER_STATUS_KIND_DEMO, win_end)
+    .status(Exec,*FIGHTER_STATUS_KIND_DEMO, win_exec)
+    .status(End, *FIGHTER_STATUS_KIND_DEMO, win_end)
     //.status(Pre, FIGHTER_KAMUI_STATUS_KIND_WIN, win_new_pre)
     //.status(Main, FIGHTER_KAMUI_STATUS_KIND_WIN, win_new_main)
     
@@ -922,7 +933,8 @@ pub fn install() {
         notify_log_event_collision_hit_replace,
         kamui_link_event,
         noping_the_eff,
-        change_motion_hook
+        change_motion_hook,
+        handle_draw
         //caught_status_hook
         //initialization,
     );
@@ -938,8 +950,8 @@ pub fn install() {
         patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::RESET_1], kamui_reset as u64);
         patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::INITIALIZE], kamui_init as u64);
         patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_SHIELD_COLLISION], kamui_on_shield as u64);
-//
-        patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::UNK19], kamui_on_frame_2 as u64);
+        //
+        patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_PAUSE], kamui_on_frame_2 as u64);
         //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_FRAME_1], kamui_on_frame_1 as u64);
         //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::RESET_2], kamui_reset_2 as u64);
         //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::RESET_3], kamui_reset_3 as u64);
@@ -951,5 +963,5 @@ pub fn install() {
 
     //skyline::patching::Patch::in_text(0x51d3ad8).nop();
     //skyline::install_hooks!(stub_kill_screen);
-    skyline::patching::Patch::in_text(0xb5cca0).nop().expect("Failed to patch 0xb5cca0");
+    skyline::patching::Patch::in_text(0xb5ccc0).nop().expect("Failed to patch 0xb5ccc0");
 }
