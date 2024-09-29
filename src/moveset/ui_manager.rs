@@ -16,14 +16,16 @@ use parking_lot::RwLock;
 use once_cell::sync::Lazy;
 pub static UI_MANAGER: Lazy<RwLock<UiManager>> = Lazy::new(|| RwLock::new(UiManager { 
     limit_meter: [LimitMeter::default(); 8],
-    atb_meter: [ATBMeter::default(); 8],
+    tension_meter: [TensionMeter::default(); 8],
+    cutin_ui: [CutInUI::default(); 8],
     is_enabled: [false; 8]
 }));
 
 #[repr(C)]
 pub struct UiManager {
     pub limit_meter: [LimitMeter; 8],
-    pub atb_meter: [ATBMeter; 8],
+    pub tension_meter: [TensionMeter; 8],
+    pub cutin_ui: [CutInUI; 8],
     pub is_enabled: [bool; 8]
 }
 
@@ -53,35 +55,35 @@ impl UiManager {
         let mut manager = UI_MANAGER.write();
         unsafe {
             manager.limit_meter[entry_id].reset();
-            manager.atb_meter[entry_id].reset();
+            manager.tension_meter[entry_id].reset();
         }
     }
 
-    pub fn add_atb(entry_id: usize, amount: f32) {
+    pub fn add_tension(entry_id: usize, amount: f32) {
         let mut manager = UI_MANAGER.write();
         unsafe {
-            manager.atb_meter[entry_id].add_meter(amount);
+            manager.tension_meter[entry_id].add_meter(amount);
         }
     }
 
-    pub fn is_atb_available(entry_id: usize) -> bool {
+    pub fn is_tension_available(entry_id: usize) -> bool {
         let mut manager = UI_MANAGER.write();
         unsafe {
-            manager.atb_meter[entry_id].is_available()
+            manager.tension_meter[entry_id].is_available()
         }
     }
 
-    pub fn is_atb_full(entry_id: usize) -> bool {
+    pub fn is_tension_full(entry_id: usize) -> bool {
         let mut manager = UI_MANAGER.write();
         unsafe {
-            manager.atb_meter[entry_id].is_atb2_available()
+            manager.tension_meter[entry_id].is_tension2_available()
         }
     }
 
-    pub fn consume_atb(entry_id: usize) {
+    pub fn consume_tension(entry_id: usize) {
         let mut manager = UI_MANAGER.write();
         unsafe {
-            manager.atb_meter[entry_id].consume_atb();
+            manager.tension_meter[entry_id].consume_tension();
         }
     }
 
@@ -109,20 +111,25 @@ impl UiManager {
     pub fn get_frame_from_name(entry_id: usize, name: &str) -> f32 {
         let mut manager = UI_MANAGER.write();
         unsafe {
-            if name == "limit" {
-                return manager.limit_meter[entry_id].get_meter_frame();
+            if name == "atb" {
+                return manager.tension_meter[entry_id].get_meter_frame();
             }
-            else if name == "atb" {
-                return manager.atb_meter[entry_id].get_meter_frame();
+            else if name == "atb_border1"{
+                return manager.tension_meter[entry_id].get_gear_frame_1();
             }
-            else if name == "atb_border1"
-            || name == "atb_border2" {
-                return manager.atb_meter[entry_id].get_glow_frame();
+            else if name == "limit_border"{
+                return manager.tension_meter[entry_id].get_flame_frame_1();
             }
-            else if name == "limit_border" {
-                return manager.limit_meter[entry_id].get_glow_frame();
+            else if name == "atb_border2"{
+                return manager.tension_meter[entry_id].get_gear_frame_2();  
             }
-            else {
+            else if name == "limit_guage"
+            || name == "gear_2_frame"
+            || name == "limit"
+            || name == "limit_bar"{
+                return manager.tension_meter[entry_id].get_flame_frame_2();  
+            }
+            else{
                 return 0.0;
             }
         }
@@ -131,18 +138,62 @@ impl UiManager {
     pub fn get_border_availability_from_name(entry_id: usize, name: &str) -> bool {
         let mut manager = UI_MANAGER.write();
         unsafe {
-            if name == "atb_border1" {
-                return manager.atb_meter[entry_id].is_atb1_available();
+            if name == "atb_border1" 
+            || name == "limit_border"{
+                return manager.tension_meter[entry_id].is_tension1_available();
             }
-            else if name == "atb_border2" {
-                return manager.atb_meter[entry_id].is_atb2_available();
-            }
-            else if name == "limit_border" {
-                return manager.limit_meter[entry_id].is_available();
+            else if name == "atb_border2" 
+            || name == "gear_2_frame"
+            || name == "limit_guage"
+            || name == "limit"
+            || name == "limit_bar"{
+                return manager.tension_meter[entry_id].is_tension2_available();
             }
             else {
                 return false;
             }
+        }
+    }
+    pub fn get_bar_out() -> f32{
+        let mut manager = UI_MANAGER.write();
+        unsafe {
+            return manager.cutin_ui[0].get_bar_out_frame();
+        }
+    }
+    pub fn get_bar_in() -> f32{
+        let mut manager = UI_MANAGER.write();
+        unsafe {
+            return manager.cutin_ui[0].get_bar_in_frame();
+        }
+    }
+    pub fn is_bar_on() -> bool{
+        let mut manager = UI_MANAGER.write();
+        unsafe {
+            return manager.cutin_ui[0].is_bar_on();
+        }
+    }
+    pub fn set_bar_out(state: bool) {
+        let mut manager = UI_MANAGER.write();
+        unsafe {
+            manager.cutin_ui[0].set_bar(state);
+        }
+    }
+    pub fn is_bar_out() -> bool{
+        let mut manager = UI_MANAGER.write();
+        unsafe {
+            return manager.cutin_ui[0].is_bar_out();
+        }
+    }
+    pub fn set_bar(state: bool) {
+        let mut manager = UI_MANAGER.write();
+        unsafe {
+            manager.cutin_ui[0].set_bar(state);
+        }
+    }
+    pub fn reset_cutin() {
+        let mut manager = UI_MANAGER.write();
+        unsafe {
+            manager.cutin_ui[0].reset_all();
         }
     }
 }
@@ -206,7 +257,7 @@ unsafe fn handle_layout(layout: *mut Layout) -> *mut Layout {
                                     let anim_cont_offset = *anim_cont_offsets;
                                     let res_animation_cont = (res_animation_block_data_start + anim_cont_offset as u64) as *const ResAnimationContent;
                                     let name = skyline::try_from_c_str((*res_animation_cont).name.as_ptr()).unwrap_or_else(|_| "UNKNOWN".to_string());
-                                    let name_list = ["limit","atb","atb_border1","atb_border2","limit_border"];
+                                    let name_list = ["limit","atb","atb_border1","atb_border2","limit_border","limit_guage","gear_2_frame","limit","limit_bar"];
                                     for _name in name_list {
                                         if name == _name {
                                             (*anim_transform).enabled = true;
@@ -221,7 +272,7 @@ unsafe fn handle_layout(layout: *mut Layout) -> *mut Layout {
                                 break;
                             }
                         }
-                        let border_list = ["atb_border1","atb_border2","limit_border"];
+                        let border_list = ["atb_border1","atb_border2","limit_border","limit","gear_2_frame","limit_guage","limit_bar"];
                         for pane in border_list {
                             if let Some(border) = child.find_pane_by_name_recursive(pane) {
                                 border.set_visible(UiManager::get_border_availability_from_name(idx,pane));
@@ -236,6 +287,60 @@ unsafe fn handle_layout(layout: *mut Layout) -> *mut Layout {
                 }
                 idx += 1;
             }
+        }
+// ==========================================================================================================================================================================
+//==========================================================================================================================================================================
+//==========================================================================================================================================================================
+        if let Some(parent2) = root_pane.find_pane_by_name_recursive("pot") {
+            //if UiManager::is_bar_on() {
+                println!("pot pane found");
+                    let anim_list = &mut (*parent2.as_parts().layout).anim_trans_list;
+                    let mut curr = anim_list as *mut AnimTransformNode;
+                    while !curr.is_null() {
+                        println!("entered the while");
+                        if curr != (*curr).next {
+                            println!("entered the if curr");
+                            let anim_transform = (curr as *mut u64).add(2) as *mut AnimTransform;
+                            let res_animation_block_data_start = (*anim_transform).res_animation_block as u64;
+                            let res_animation_block = &(*anim_transform).res_animation_block;
+                            let mut anim_cont_offsets = (res_animation_block_data_start + (*(*res_animation_block)).anim_cont_offsets_offset as u64) as *const u32;
+                            for _ in 0..(*(*res_animation_block)).anim_cont_count {
+                                let anim_cont_offset = *anim_cont_offsets;
+                                let res_animation_cont = (res_animation_block_data_start + anim_cont_offset as u64) as *const ResAnimationContent;
+                                let name = skyline::try_from_c_str((*res_animation_cont).name.as_ptr()).unwrap_or_else(|_| "UNKNOWN".to_string());
+                                println!("name:{}",name);
+                                let name_list = ["barin","barout"];
+                                for _name in name_list {
+                                    if name == _name {
+                                        if UiManager::is_bar_out(){
+                                            (*anim_transform).enabled = true;
+                                            (*anim_transform).frame = UiManager::get_bar_out();
+                                            break;
+                                        } else {
+                                            (*anim_transform).enabled = true;
+                                            (*anim_transform).frame = UiManager::get_bar_in();
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        curr = (*curr).next;
+                        if curr == anim_list as *mut AnimTransformNode || curr == (*curr).next {
+                            break;
+                        }
+                    }
+                    let border_list = ["bar_in","bar_out"];
+                    for pane in border_list {
+                        if let Some(border) = parent2.find_pane_by_name_recursive(pane) {
+                            println!("found bar_in/bar_out");
+                            border.set_visible(UiManager::is_bar_on());
+                        }
+                    }
+            //}
+            //else {
+            //    UiManager::reset_cutin();
+            //}
         }
     }
     return layout;

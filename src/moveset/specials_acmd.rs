@@ -22,12 +22,13 @@ pub unsafe extern "C" fn sound_specialsstart(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         let sound = sound_selector(agent,"vc_pot_hammerfall_X".to_string(),2,false,false,0);
         macros::PLAY_SE(agent, Hash40::new_raw(sound));
-    }
+        macros::PLAY_SE(agent, Hash40::new("se_btl_pot_00"));
+        FighterUtil::set_stage_disable_reverse_screen(true);
+        }
 }
 
 pub unsafe extern "C" fn game_specialsloop(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        //macros::ATTACK(agent, 0, 0, Hash40::new("top"), 0.0, 35, 0, 0, 0, 16, 0.0, 13.0, 5.0, Some(0.0), Some(0.0), Some(0.0), 0.0, 0.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
         macros::SEARCH(agent, 0, 0, Hash40::new("hip"), 15.0, -15.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(0.0), *COLLISION_KIND_MASK_HIT, *HIT_STATUS_MASK_NORMAL, 1, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIEB, *COLLISION_PART_MASK_BODY_HEAD, false);
     }
 }
@@ -36,7 +37,6 @@ pub unsafe extern "C" fn effect_specialsloop(agent: &mut L2CAgentBase) {
     for n in 1..99{
     if macros::is_excute(agent) {
         //macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_fdb_fire"), Hash40::new("head"), 0, 0, 0, 0, 0, 0, 0.5, true);
-
         macros::EFFECT_FOLLOW(agent, Hash40::new("dolly_buster_dash_ground"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1.5, true);
         EffectModule::set_rate_last(agent.module_accessor, 0.5);
     }
@@ -61,6 +61,7 @@ pub unsafe extern "C" fn game_specialsattack(agent: &mut L2CAgentBase) {
     wait(agent.lua_state_agent, 3.0);
     if macros::is_excute(agent) {
         AttackModule::clear_all(agent.module_accessor);
+        FighterUtil::set_stage_disable_reverse_screen(false);
     }
 }
 

@@ -58,7 +58,7 @@ pub unsafe extern "C" fn roman_cancel_main(fighter: &mut L2CFighterCommon) -> L2
         MotionModule::change_motion(module_accessor,Hash40::new("roman_cancel"),0.0,1.0,false,0.0,false,false);
     }
     KineticModule::clear_speed_all(module_accessor);
-
+    WorkModule::set_float(module_accessor, 0.0, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_ROMAN_CANCEL_METER_DRAIN);
     KineticModule::enable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_STOP);
     KineticModule::enable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_MOTION);
@@ -143,6 +143,12 @@ pub unsafe extern "C" fn roman_cancel_main(fighter: &mut L2CFighterCommon) -> L2
 
 unsafe fn roman_cancel_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+    let timer = WorkModule::get_float(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_ROMAN_CANCEL_METER_DRAIN);
+    if timer < 50.0{
+        UiManager::add_tension(entry_id,-2.0);
+        WorkModule::set_float(module_accessor, timer + 2.0, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_ROMAN_CANCEL_METER_DRAIN);
+    }
 
     if WorkModule::is_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FAST_RC_ENABLE){
         WorkModule::enable_transition_term_group(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_GROUP_CHK_GROUND_ATTACK);

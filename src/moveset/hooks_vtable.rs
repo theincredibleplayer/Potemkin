@@ -15,6 +15,8 @@ use std::arch::asm;
 use crate::FIGHTER_CUTIN_MANAGER_ADDR;
 use crate::FIGHTER_MANAGER;
 use crate::ITEM_MANAGER;
+use skyline::hooks::{getRegionAddress, Region};
+
 
 use crate::moveset::*;
 
@@ -79,9 +81,11 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
         }
     }
     let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
-    UiManager::add_atb(entry_id, 0.1);
-
-
+    //UiManager::add_tension(entry_id, 0.1);
+    let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
+    if smash::app::lua_bind::FighterManager::is_result_mode(fighter_manager) {
+        UiManager::disable_ui(entry_id);
+    }
     //let motion = MotionModule::motion_kind(fighter.battle_object.module_accessor);
     //let status = StatusModule::status_kind(fighter.battle_object.module_accessor);
     //println!("Status: {:#x}, Motion: {:#x}", status, motion);
@@ -111,6 +115,7 @@ pub unsafe extern "C" fn kamui_init(vtable: u64, fighter: &mut Fighter) {
     let module_accessor = (*fighter).battle_object.module_accessor;
     let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     UiManager::enable_ui(entry_id);
+    println!("entry id :{}", entry_id);
     if (*fighter).battle_object.kind == *FIGHTER_KIND_KAMUI as u32 {
         let shield_data = ShieldDataResource::new(
             0.0,
@@ -192,18 +197,46 @@ pub unsafe extern "C" fn kamui_on_shield(vtable: u64, fighter: &mut Fighter, col
 
 
 #[skyline::from_offset(0xb5e710)]
-pub unsafe extern "C" fn kamui_on_damage_og(vtable: u64, fighter: &mut Fighter,log:u64);
+pub unsafe extern "C" fn kamui_on_damage_og(vtable: u64, fighter: &mut Fighter,damage_log:u64);
 
-pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,log:u64) {
+pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,damage_log:u64) {
     println!("on damage hook successful");
-    WorkModule::on_flag(fighter.battle_object.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_ONE);
-    WorkModule::on_flag(fighter.battle_object.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_TWO);
-    WorkModule::on_flag(fighter.battle_object.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_THREE);
-    WorkModule::on_flag(fighter.battle_object.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_KILL);
-    kamui_on_damage_og(vtable,fighter,log);
+    let module_accessor = (*fighter).battle_object.module_accessor;
+
+    let module_accessor = fighter.battle_object.module_accessor;
+    let entry_id = WorkModule::get_int(module_accessor,*FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+    let dmg = *((*(((damage_log as u64) + 0x10) as *const u64) + 0x4) as *const f32);
+
+    let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+    UiManager::add_tension(entry_id, dmg);
+    kamui_on_damage_og(vtable,fighter,damage_log);
 }
 
+#[skyline::from_offset(0xb5e240)]
+pub unsafe extern "C" fn kamui_on_attack_og(vtable: u64, fighter: &mut Fighter,collision_log:CollisionLog);
 
+pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,collision_log:CollisionLog) {
+    println!("on hit hook successful");
+    let attack_data = AttackModule::attack_data(fighter.battle_object.module_accessor, collision_log.collider_id as i32, false);
+    let module_accessor = (*fighter).battle_object.module_accessor;
+    let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+    let status = StatusModule::status_kind(module_accessor);
+    if 
+    ![FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL,
+    FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK,
+    FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP,
+    FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_START,
+    *FIGHTER_KAMUI_STATUS_KIND_FINAL_END,
+    FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP,
+    FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE,
+    *FIGHTER_KAMUI_STATUS_KIND_FINAL_READY,
+    *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK,
+    *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK_WAIT,
+    *FIGHTER_STATUS_KIND_FINAL].contains(&status){
+    UiManager::add_tension(entry_id, (*attack_data).power);
+    }
+    kamui_on_attack_og(vtable,fighter,collision_log);
+}
 
 
 // testing section ==============================================================================

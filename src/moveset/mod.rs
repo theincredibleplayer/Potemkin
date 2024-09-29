@@ -30,6 +30,8 @@ use crate::FIGHTER_CUTIN_MANAGER_ADDR;
 use crate::FIGHTER_MANAGER;
 use crate::ITEM_MANAGER;
 
+pub static mut IDX: usize = 0;
+
 // flags
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_CHECK_ENEMY: i32 = 0x200000ec;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_GRABBED_ENEMY: i32 = 0x200000ed;
@@ -63,6 +65,8 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_TWO : i32 = 0x20000102;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_THREE : i32 = 0x20000103;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_KILL : i32 = 0x20000104;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_WIN_FRAME : i32 = 0x20000105;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_TEST : i32 = 0x20000106;
+
 
 
 // for weapon
@@ -88,6 +92,8 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_PRE_RC_X_SPEED: i32 = 0x67;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_PRE_RC_Y_SPEED: i32 = 0x68;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_REAL_POWER_REFLECT: i32 = 0x69;
 
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_ROMAN_CANCEL_METER_DRAIN: i32 = 0x6a;
+
 
 // for weapon
 pub const WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLOAT_BOOM_POWER: i32 = 0x4;
@@ -97,7 +103,7 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_GRABBED_ENEMY_ID: i32 = 0x100000c1;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_HPB_GOTTEM_ID: i32 = 0x100000c2;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_LOOP_HITS_SPECIAL_HI: i32 = 0x100000c3;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_ARTICLE_ID: i32 = 0x100000c4;
-pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_BAR_INT_VALUE: i32 = 0x100000c5;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_TEST: i32 = 0x100000c5;
 
 
 // for weapon
@@ -494,7 +500,7 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
         ,FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE].contains(&status_kind) )
         || (StatusModule::prev_status_kind(module_accessor, 0) == FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL
             && StatusModule::is_changing(module_accessor)) 
-        || !UiManager::is_atb_available(entry_id){
+        || !UiManager::is_tension_available(entry_id){
             can_rc = false;
         }
         if MotionModule::motion_kind(module_accessor) == smash::hash40("just_shield_off")
@@ -607,9 +613,31 @@ unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter) {
 }*/
 
 #[skyline::from_offset(0x695f20)]
-unsafe extern "C" fn zoom_in(module_accessor: *mut smash::app::BattleObjectModuleAccessor, battle_object_id: i32, location: Vector3f, unk2: i32, param_hash: smash::phx::Hash40 , unk4: u32, unk5: u32) -> u8;
+pub unsafe extern "C" fn zoom_in(module_accessor: *mut smash::app::BattleObjectModuleAccessor, battle_object_id: i32, location: Vector3f, unk2: i32, param_hash: smash::phx::Hash40 , unk4: u32, unk5: u32) -> u8;
 
 
+#[skyline::from_offset(0x1378ad0)]
+pub unsafe extern "C" fn ui_disable(param_1: u64, param_2: u64);
+//ui_disable(0x1100b8cc00, 0x4f82860);  // relative to main
+//ui_disable(75174054912, 2230872160);  // 
+
+
+
+#[skyline::hook(offset = 0x67f74c, inline)]
+unsafe fn idkman(ctx: &mut skyline::hooks::InlineCtx) {
+    let register = *ctx.registers[8].x.as_ref();
+    println!("the second arg: {:#x}",register - getRegionAddress(Region::Text) as u64 );
+}
+
+
+#[skyline::hook(offset = 0x67f790, inline)]
+unsafe fn idkman2(ctx: &mut skyline::hooks::InlineCtx) {
+    let register = *ctx.registers[0].x.as_ref();
+    println!("the first arg: {:#x}",register - getRegionAddress(Region::Text) as u64 );
+}
+
+#[skyline::from_offset(0x1653900)]
+pub fn set_vis_hud(param_1: bool);
 
 
 
@@ -806,10 +834,10 @@ pub fn install() {
 
     //final
     .status(Main, *FIGHTER_STATUS_KIND_FINAL, Final_main)
-    //.status(Exit, *FIGHTER_STATUS_KIND_FINAL, Final_exit)
+    .status(Exit, *FIGHTER_STATUS_KIND_FINAL, Final_exit)
     .status(Pre, FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP, finaldashloop_pre)
     .status(Main, FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP, finaldashloop_main)
-    .status(Exit, FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP, finaldashloop_exit)
+    //.status(Exit, FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP, finaldashloop_exit)
     .status(Init, FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP, finaldashloop_init)
     .status(Exec, FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP, finaldashloop_exec)
 
@@ -826,7 +854,7 @@ pub fn install() {
 
     .status(Pre, FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP, finaldashattack_pre)
     .status(Main, FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP, finaljump_main)
-    .status(Exit, FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP, finaldashattack_exit)
+    //.status(Exit, FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP, finaldashattack_exit)
     .status(Init, FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP, finaldashattack_init)
     .status(Exec, FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP, finaldashattack_exec)
     .status(End, FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP, finaldashattack_end)
@@ -834,7 +862,7 @@ pub fn install() {
 
     .status(Pre, FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE, fakefinalsceneenter_pre)
     .status(Main, FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE, fakefinalsceneenter_main)
-    .status(Exit, FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE, fakefinalsceneenter_exit)
+    //.status(Exit, FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE, fakefinalsceneenter_exit)
     .status(Init, FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE, fakefinalsceneenter_init)
     .status(Exec, FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE, fakefinalsceneenter_exec)
     .status(End, FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE, fakefinalsceneenter_end)
@@ -933,8 +961,10 @@ pub fn install() {
         notify_log_event_collision_hit_replace,
         kamui_link_event,
         noping_the_eff,
-        change_motion_hook,
-        handle_draw
+        //change_motion_hook,
+        handle_draw,
+        idkman,
+        idkman2
         //caught_status_hook
         //initialization,
     );
@@ -955,7 +985,9 @@ pub fn install() {
         //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_FRAME_1], kamui_on_frame_1 as u64);
         //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::RESET_2], kamui_reset_2 as u64);
         //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::RESET_3], kamui_reset_3 as u64);
-        //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_DAMAGE], kamui_on_damage as u64);
+        patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_DAMAGE], kamui_on_damage as u64);
+        patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_ATTACK], kamui_on_attack as u64);
+
 
     }
     skyline::patching::Patch::in_text(0x3414784).nop();

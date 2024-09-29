@@ -21,7 +21,7 @@ use crate::moveset::*;
 
 pub unsafe extern "C" fn game_finaldash(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        macros::EFFECT(agent, Hash40::new("sys_genesis_bg"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
+        //macros::EFFECT(agent, Hash40::new("sys_genesis_bg"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
         //EffectModule::req_screen(agent.module_accessor, Hash40::new("sys_genesis_bg_criticalhit"), false, false, false);
         JostleModule::set_status(agent.module_accessor, false);
         HitModule::set_whole(agent.module_accessor, smash::app::HitStatus(*HIT_STATUS_INVINCIBLE), 0);
@@ -233,6 +233,7 @@ pub unsafe extern "C" fn effect_finalend(agent: &mut L2CAgentBase) {
     
     frame(agent.lua_state_agent, 110.0);
     if macros::is_excute(agent) {
+        set_vis_hud(true);
         EffectModule::kill_kind(agent.module_accessor, Hash40::new("sys_soccer"), false, true);
     }
 }
@@ -241,47 +242,58 @@ pub unsafe extern "C" fn effect_finalend(agent: &mut L2CAgentBase) {
 
 pub unsafe extern "C" fn game_heavenlystart(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-      HitModule::set_whole(agent.module_accessor, smash::app::HitStatus(*HIT_STATUS_XLU), 0);
-      JostleModule::set_status(agent.module_accessor, false);
-      ArticleModule::remove_exist(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
-  }
-  frame(agent.lua_state_agent, 7.0);
-  if macros::is_excute(agent) {
-      macros::PLAY_SE(agent, Hash40::new("se_kamui_final04"));
-      macros::FT_MOTION_RATE(agent, 6.0);
-      macros::SLOW_OPPONENT(agent, 400.0, 30.0);
-      //stub_kill_screen();
-      //camera!(agent, *MA_MSC_CMD_CAMERA_CAM_OFFSET, 50, 50);
-      //CameraModule::add_camera_range_offset(agent.module_accessor,&Vector3f{x:30.0,y:30.0,z:5.0}, 0);
-      macros::CAM_ZOOM_IN_arg5(
-      agent,
-      /*frames to zoom in totally*/5.0,
-      /*according to calude the object id?*/0.0,
-      /*the amt of zoom needed, higher the number lower the zoom*/1.5,
-      /*y_rot*/0.0,
-      /*x_rot*/0.0,
-      );
-      //CameraModule::update_force(agent.module_accessor,*MA_MSC_CMD_CAMERA_CAM_OFFSET,&Vector3f{x:30.0,y:30.0,z:5.0},&Vector3f{x:30.0,y:30.0,z:5.0});
-      let pos = Vector2f{
-      x:0.0,
-      y:100.0,
-      };
-      //CameraModule::zoom_in(agent.module_accessor, 1, 1, 1.0,  &pos, true);
-      //CameraModule::set_camera_range_offset(agent.module_accessor,&Vector3f{x:30.0,y:30.0,z:5.0}, 0);
-  }
-  frame(agent.lua_state_agent, 12.0);
-  if macros::is_excute(agent) {
-      EffectModule::kill_kind(agent.module_accessor, Hash40::new("sys_genesis_bg"), false, true);
-      macros::FT_MOTION_RATE(agent, 1.0);
-      SlowModule::clear_whole(agent.module_accessor);
-      WorkModule::on_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_JUMP);
-      macros::ATTACK(agent, 0, 0, Hash40::new("hip"), 0.0, 0, 0, 0, 0, 15.0, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_LL, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
-      AttackModule::set_no_dead_all(agent.module_accessor, true, false);
-      AttackModule::set_force_reaction(agent.module_accessor, 0, true, false);
-      AttackModule::set_force_reaction(agent.module_accessor, 1, true, false);
-      AttackModule::set_force_reaction(agent.module_accessor, 2, true, false);
-      AttackModule::set_force_reaction(agent.module_accessor, 3, true, false);
-      CameraModule::zoom_out(agent.module_accessor, 30);
+        set_vis_hud(false);
+        HitModule::set_whole(agent.module_accessor, smash::app::HitStatus(*HIT_STATUS_XLU), 0);
+        JostleModule::set_status(agent.module_accessor, false);
+        ArticleModule::remove_exist(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+
+    }
+    frame(agent.lua_state_agent, 7.0);
+    if macros::is_excute(agent) {
+
+        let lr = PostureModule::lr(agent.module_accessor);
+        macros::PLAY_SE(agent, Hash40::new("se_kamui_final04"));
+        macros::FT_MOTION_RATE(agent, 6.0);
+        macros::SLOW_OPPONENT(agent, 400.0, 30.0);
+
+
+    }
+    wait(agent.lua_state_agent, 1.0);
+    if macros::is_excute(agent){
+        let lr = PostureModule::lr(agent.module_accessor);
+        macros::CAM_ZOOM_IN_arg5(
+            agent,
+            /*frames to zoom in totally*/5.0,
+            /*according to calude the object id?*/0.0,
+            /*the amt of zoom needed, higher the number lower the zoom*/1.5,
+            /*y_rot*/0.0,
+            /*x_rot*/0.0*lr,
+        );
+        agent.clear_lua_stack();
+        lua_args!(agent,
+        *MA_MSC_CMD_CAMERA_CAM_OFFSET,
+        /*x*/12.0 * lr,
+        /*y*/12,
+        /*z*/0);
+        smash::app::sv_module_access::camera(agent.lua_state_agent);
+        //camera!(agent, *MA_MSC_CMD_CAMERA_CAM_OFFSET, 10.0 * lr, 10);
+    }
+    wait(agent.lua_state_agent, 1.0);
+    if macros::is_excute(agent){
+    }
+    frame(agent.lua_state_agent, 12.0);
+    if macros::is_excute(agent) {
+        EffectModule::kill_kind(agent.module_accessor, Hash40::new("sys_genesis_bg"), false, true);
+        macros::FT_MOTION_RATE(agent, 1.0);
+        SlowModule::clear_whole(agent.module_accessor);
+        WorkModule::on_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_JUMP);
+        macros::ATTACK(agent, 0, 0, Hash40::new("hip"), 0.0, 0, 0, 0, 0, 15.0, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_LL, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
+        AttackModule::set_no_dead_all(agent.module_accessor, true, false);
+        AttackModule::set_force_reaction(agent.module_accessor, 0, true, false);
+        AttackModule::set_force_reaction(agent.module_accessor, 1, true, false);
+        AttackModule::set_force_reaction(agent.module_accessor, 2, true, false);
+        AttackModule::set_force_reaction(agent.module_accessor, 3, true, false);
+        macros::CAM_ZOOM_OUT(agent);
   }
 }
 
@@ -353,15 +365,12 @@ pub unsafe extern "C" fn game_final(agent: &mut L2CAgentBase) {
 
 pub unsafe extern "C" fn effect_final(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        //EffectModule::req_screen(agent.module_accessor, Hash40::new("kamui_final_bg"), false, false, false);
-        macros::EFFECT(agent, Hash40::new("sys_bg_black"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
-        let eff = EffectModule::req(agent.module_accessor, Hash40::new("sys_bg_vortex"),  &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, 1.0, 0, 0, false,0);
-        //macros::EFFECT(agent, Hash40::new("sys_bg_vortex"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
-        EffectModule::set_rgb(agent.module_accessor, eff as u32, 0.0,0.0,0.3);
-        macros::EFFECT(agent, Hash40::new("sys_bg_lightning"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
-        //EffectModule::req_screen(agent.module_accessor, Hash40::new("sys_genesis_bg"), false, false, false);
-        macros::EFFECT_FLW_POS(agent, Hash40::new("kamui_transform_splash_start"), Hash40::new("neck"), 2, 0, 0, 0, 0, 0, 1, true);
-    }
+        //macros::EFFECT(agent, Hash40::new("sys_bg_black"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
+        //let eff = EffectModule::req(agent.module_accessor, Hash40::new("sys_bg_vortex"),  &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, 1.0, 0, 0, false,0);
+        //EffectModule::set_rgb(agent.module_accessor, eff as u32, 0.0,0.0,0.3);
+        //macros::EFFECT(agent, Hash40::new("sys_bg_lightning"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
+        //macros::EFFECT_FLW_POS(agent, Hash40::new("kamui_transform_splash_start"), Hash40::new("neck"), 2, 0, 0, 0, 0, 0, 1, true);
+    }//
     frame(agent.lua_state_agent, 20.0);
     if get_value_float(agent.lua_state_agent, *SO_VAR_FLOAT_LR) <= 0.0  {
         if macros::is_excute(agent) {

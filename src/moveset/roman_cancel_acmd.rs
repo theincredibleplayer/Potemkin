@@ -22,8 +22,6 @@ use crate::moveset::*;
 pub unsafe extern "C" fn game_romancancel(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         HitModule::set_whole(agent.module_accessor, smash::app::HitStatus(*HIT_STATUS_XLU), 0);
-        let entry_id = WorkModule::get_int(agent.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
-        UiManager::consume_atb(entry_id);
         macros::FILL_SCREEN_MODEL_COLOR(agent, 0, 10, 0.3, 0.3, 0.3, 0, 0, 0, 1, 1, *smash::lib::lua_const::EffectScreenLayer::GROUND, *EFFECT_SCREEN_PRIO_FINAL);
         if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RED_RC){
             macros::SLOW_OPPONENT(agent, 400.0, 29.0);

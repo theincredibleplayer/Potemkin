@@ -182,7 +182,7 @@ pub unsafe extern "C" fn Final_main_loop(fighter: &mut L2CFighterCommon) -> L2CV
 pub unsafe extern "C" fn Final_exit(fighter: &mut L2CFighterCommon) -> L2CValue {
   let module_accessor = fighter.module_accessor;
   ArticleModule::remove_exist(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
-  return smashline::original_status(Exit, fighter, *FIGHTER_STATUS_KIND_FINAL)(fighter);
+  //return smashline::original_status(Exit, fighter, *FIGHTER_STATUS_KIND_FINAL)(fighter);
   return L2CValue::I32(0)
 }
 
@@ -318,7 +318,14 @@ unsafe fn finaldashattack_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue 
 }
 
 pub unsafe extern "C" fn finaldashattack_exit(fighter: &mut L2CFighterCommon) -> L2CValue {
-  return smashline::original_status(Exit, fighter, *FIGHTER_STATUS_KIND_FINAL)(fighter);
+  if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_SUCCESS){
+    HitModule::set_whole(fighter.module_accessor, smash::app::HitStatus(*HIT_STATUS_NORMAL), 0);
+    JostleModule::set_status(fighter.module_accessor, true);
+    EffectModule::kill_kind(fighter.module_accessor, Hash40::new("sys_genesis_bg"), false, true);
+    return L2CValue::I32(0)
+  }else{
+    return smashline::original_status(Exit, fighter, *FIGHTER_STATUS_KIND_FINAL)(fighter);
+  }
 }
 pub unsafe extern "C" fn finaldashattack_exec(fighter: &mut L2CFighterCommon) -> L2CValue {
   return smashline::original_status(Exec, fighter, *FIGHTER_STATUS_KIND_FINAL)(fighter);
