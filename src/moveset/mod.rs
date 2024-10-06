@@ -127,6 +127,8 @@ pub const WEAPON_KAMUI_RYUSENSYA_STATUS_KIND_BOOM: i32 = 0x1;
 
 // new common statuses
 pub const FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT: i32 = 0x555;
+pub const FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT: i32 = 0x556;
+
 
 // global table consts
 pub const KIND:                     i32 = 0x2;
@@ -576,6 +578,12 @@ pub unsafe extern "C" fn pot_check_special_command(fighter: &mut L2CFighterCommo
     let mut ret = false;
     let cat4 = fighter.global_table[CMD_CAT4].get_i32();
 
+    if cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_HI_COMMAND  != 0
+    && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_HI_COMMAND)
+    && fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND {
+        fighter.change_status(FIGHTER_STATUS_KIND_SPECIAL_HI.into(), true.into());
+        ret = true;
+    }
     if cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_N_COMMAND != 0
     && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_S_COMMAND) {
         fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F.into(), true.into());
@@ -584,12 +592,6 @@ pub unsafe extern "C" fn pot_check_special_command(fighter: &mut L2CFighterCommo
     if cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_S_COMMAND != 0
     && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_S_COMMAND) {
         fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_B.into(), true.into());
-        ret = true;
-    }
-    if cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_HI_COMMAND  != 0
-    && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_HI_COMMAND)
-    && fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND {
-        fighter.change_status(FIGHTER_STATUS_KIND_SPECIAL_HI.into(), true.into());
         ret = true;
     }
     ret.into()
@@ -859,6 +861,7 @@ pub fn install() {
     .status(Exec, FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP, finaldashattack_exec)
     .status(End, FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP, finaldashattack_end)
 
+/* 
 
     .status(Pre, FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE, fakefinalsceneenter_pre)
     .status(Main, FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE, fakefinalsceneenter_main)
@@ -866,10 +869,9 @@ pub fn install() {
     .status(Init, FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE, fakefinalsceneenter_init)
     .status(Exec, FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE, fakefinalsceneenter_exec)
     .status(End, FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE, fakefinalsceneenter_end)
-    
+    */
     .status(Exec, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ENTRY, vissceneentry_exec)
     .status(Exec, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK_WAIT, vissceneattackwait_exec)
-
 
 
 
@@ -952,6 +954,9 @@ pub fn install() {
     .status(End, FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_upb_end)
     .status(Main, *FIGHTER_STATUS_KIND_THROWN, thrown_status_common)
     .game_acmd("game_catchedpotspecialhi", game_catchedpotspecialhi, Priority::Low)
+
+    .status(Main, FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_final_main)
+
 
     .install();
 

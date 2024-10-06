@@ -104,6 +104,7 @@ pub unsafe extern "C" fn kamui_reset(vtable: u64, fighter: &mut Fighter) {
     ShieldModule::set_target_property(fighter.battle_object.module_accessor, *COLLISION_PROPERTY_REFLECT,2);
     let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     UiManager::reset_on_rebirth(entry_id);
+    UiManager::reset_cutin();
     kamui_reset_original(vtable,fighter);
 }
 

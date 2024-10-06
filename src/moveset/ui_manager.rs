@@ -293,47 +293,49 @@ unsafe fn handle_layout(layout: *mut Layout) -> *mut Layout {
 //==========================================================================================================================================================================
         if let Some(parent2) = root_pane.find_pane_by_name_recursive("pot") {
             //if UiManager::is_bar_on() {
-                println!("pot pane found");
-                    let anim_list = &mut (*parent2.as_parts().layout).anim_trans_list;
-                    let mut curr = anim_list as *mut AnimTransformNode;
-                    while !curr.is_null() {
-                        println!("entered the while");
-                        if curr != (*curr).next {
-                            println!("entered the if curr");
-                            let anim_transform = (curr as *mut u64).add(2) as *mut AnimTransform;
-                            let res_animation_block_data_start = (*anim_transform).res_animation_block as u64;
-                            let res_animation_block = &(*anim_transform).res_animation_block;
-                            let mut anim_cont_offsets = (res_animation_block_data_start + (*(*res_animation_block)).anim_cont_offsets_offset as u64) as *const u32;
-                            for _ in 0..(*(*res_animation_block)).anim_cont_count {
-                                let anim_cont_offset = *anim_cont_offsets;
-                                let res_animation_cont = (res_animation_block_data_start + anim_cont_offset as u64) as *const ResAnimationContent;
-                                let name = skyline::try_from_c_str((*res_animation_cont).name.as_ptr()).unwrap_or_else(|_| "UNKNOWN".to_string());
-                                println!("name:{}",name);
-                                let name_list = ["barin","barout"];
-                                for _name in name_list {
-                                    if name == _name {
+                //println!("pot pane found");
+                    let anim_list2 = &mut (*parent2.as_parts().layout).anim_trans_list;
+                    let mut curr2 = anim_list2 as *mut AnimTransformNode;
+                    while !curr2.is_null() {
+                        println!("curr : {}",curr2 as u64);
+                        //println!("entered the while");
+                        if curr2 != (*curr2).next {
+                            println!("curr next : {}",curr2 as u64);
+                            //println!("entered the if curr");
+                            let anim_transform2 = (curr2 as *mut u64).add(2) as *mut AnimTransform;
+                            let res_animation_block_data_start2 = (*anim_transform2).res_animation_block as u64;
+                            let res_animation_block2 = &(*anim_transform2).res_animation_block;
+                            let mut anim_cont_offsets2 = (res_animation_block_data_start2 + (*(*res_animation_block2)).anim_cont_offsets_offset as u64) as *const u32;
+                            for _ in 0..(*(*res_animation_block2)).anim_cont_count {
+                                let anim_cont_offset2 = *anim_cont_offsets2;
+                                let res_animation_cont2 = (res_animation_block_data_start2 + anim_cont_offset2 as u64) as *const ResAnimationContent;
+                                let name2 = skyline::try_from_c_str((*res_animation_cont2).name.as_ptr()).unwrap_or_else(|_| "UNKNOWN".to_string());
+                                println!("name:{}",name2);
+                                let name_list2 = ["cut_in","cut_out"];
+                                for _name in name_list2 {
+                                    if name2 == _name {
                                         if UiManager::is_bar_out(){
-                                            (*anim_transform).enabled = true;
-                                            (*anim_transform).frame = UiManager::get_bar_out();
+                                            (*anim_transform2).enabled = true;
+                                            (*anim_transform2).frame = UiManager::get_bar_out();
                                             break;
                                         } else {
-                                            (*anim_transform).enabled = true;
-                                            (*anim_transform).frame = UiManager::get_bar_in();
+                                            (*anim_transform2).enabled = true;
+                                            (*anim_transform2).frame = UiManager::get_bar_in();
                                             break;
                                         }
                                     }
                                 }
                             }
                         }
-                        curr = (*curr).next;
-                        if curr == anim_list as *mut AnimTransformNode || curr == (*curr).next {
+                        curr2 = (*curr2).next;
+                        if curr2 == anim_list2 as *mut AnimTransformNode || curr2 == (*curr2).next {
                             break;
                         }
                     }
-                    let border_list = ["bar_in","bar_out"];
+                    let border_list = ["bar_hi","bar_low"];
                     for pane in border_list {
                         if let Some(border) = parent2.find_pane_by_name_recursive(pane) {
-                            println!("found bar_in/bar_out");
+                            //println!("found bar_in/bar_out");
                             border.set_visible(UiManager::is_bar_on());
                         }
                     }

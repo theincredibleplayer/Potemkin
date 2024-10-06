@@ -42,7 +42,9 @@ pub unsafe extern "C" fn appeal_srl(agent: &mut L2CAgentBase) {
         WorkModule::on_flag(agent.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
         WorkModule::on_flag(agent.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD_DOWN);
         //WorkModule::on_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_TEST);
-        //ui_disable(0x1100b8cc00, 0x4f82860);
+        //let main = getRegionAddress(Region::Text) as u64;
+        //let ptr: u64 = main + 0x4f82860;
+        //ui_disable(75174054912, ptr);
     }
 }
 

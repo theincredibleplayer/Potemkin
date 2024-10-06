@@ -74,32 +74,32 @@ pub unsafe extern "C" fn Final_main(fighter: &mut L2CFighterCommon) -> L2CValue 
   } else {
     KineticModule::clear_speed_all(fighter.module_accessor);
     let module_accessor = fighter.module_accessor;
-    let enemy_id = WorkModule::get_int(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_HPB_GOTTEM_ID);
-    let enemy = sv_battle_object::module_accessor(enemy_id as u32);
+    //let enemy_id = WorkModule::get_int(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_HPB_GOTTEM_ID);
+    //let enemy = sv_battle_object::module_accessor(enemy_id as u32);
     //StatusModule::set_situation_kind(enemy, smash::app::SituationKind(*SITUATION_KIND_GROUND), false);
     AreaModule::set_whole(fighter.module_accessor, false);
-    AreaModule::set_whole(enemy, false);
-    StatusModule::change_status_request(enemy, *FIGHTER_STATUS_KIND_CAPTURE_WAIT, false);
-    MotionModule::change_motion(enemy,Hash40::new("down_wait_u"),0.0,1.0,false,0.0,false,false);
-    LinkModule::remove_model_constraint(enemy,true);
-    if LinkModule::is_link(enemy,*LINK_NO_CAPTURE) == false {
-        LinkModule::link(enemy,*LINK_NO_CAPTURE,(*(fighter.module_accessor)).battle_object_id);
-        LinkModule::set_model_constraint_pos_ort(enemy,*LINK_NO_CAPTURE,Hash40::new("hip"),Hash40::new("throw"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_DISABLE_RESTRICT_Z as u32,true);
-      }
+  //  AreaModule::set_whole(enemy, false);
+  //  StatusModule::change_status_request(enemy, *FIGHTER_STATUS_KIND_CAPTURE_WAIT, false);
+  //  MotionModule::change_motion(enemy,Hash40::new("down_wait_u"),0.0,1.0,false,0.0,false,false);
+  //  LinkModule::remove_model_constraint(enemy,true);
+  //  if LinkModule::is_link(enemy,*LINK_NO_CAPTURE) == false {
+  //      LinkModule::link(enemy,*LINK_NO_CAPTURE,(*(fighter.module_accessor)).battle_object_id);
+  //      LinkModule::set_model_constraint_pos_ort(enemy,*LINK_NO_CAPTURE,Hash40::new("hip"),Hash40::new("throw"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_DISABLE_RESTRICT_Z as u32,true);
+  //    }
       HitModule::set_whole(module_accessor, smash::app::HitStatus(*HIT_STATUS_INVINCIBLE), 0);
-      HitModule::set_whole(enemy, smash::app::HitStatus(*HIT_STATUS_INVINCIBLE), 0);
+      //HitModule::set_whole(enemy, smash::app::HitStatus(*HIT_STATUS_INVINCIBLE), 0);
       let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
       AreaModule::set_whole(fighter.module_accessor, false);
       WorkModule::set_flag(fighter.module_accessor, false, *FIGHTER_INSTANCE_WORK_ID_FLAG_NAME_CURSOR);
       WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
-      WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
+      //WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
       macros::REQ_FINAL_START_CAMERA_arg3(fighter,Hash40::new("d04finalvisualscene01.nuanmb"), false, false);
       MotionModule::change_motion(fighter.module_accessor,Hash40::new("fake_final_visual_scene_01"),0.0,1.0,false,0.0,false,false);
 
       //let plane_id = ArticleModule::get_active_num(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND);
       ArticleModule::generate_article(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND,false,-1);
       ArticleModule::set_visibility_whole(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
-      ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, Hash40::new("fake_final_visual_scene_01"), false, -1.0);
+      //ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, Hash40::new("fake_final_visual_scene_01"), false, -1.0);
       let plane = ArticleModule::get_article(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND);
       let plane_boma = *(plane as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
       LinkModule::remove_model_constraint(plane_boma,true);
@@ -155,19 +155,19 @@ pub unsafe extern "C" fn Final_main_loop(fighter: &mut L2CFighterCommon) -> L2CV
   return L2CValue::I32(0) 
   }else{
     let module_accessor = fighter.module_accessor;
-    let enemy_id = WorkModule::get_int(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_HPB_GOTTEM_ID);
-    let enemy = sv_battle_object::module_accessor(enemy_id as u32);
+    //let enemy_id = WorkModule::get_int(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_HPB_GOTTEM_ID);
+    //let enemy = sv_battle_object::module_accessor(enemy_id as u32);
     WorkModule::off_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_NAME_CURSOR);
-    WorkModule::off_flag(enemy, *FIGHTER_INSTANCE_WORK_ID_FLAG_NAME_CURSOR);
+    //WorkModule::off_flag(enemy, *FIGHTER_INSTANCE_WORK_ID_FLAG_NAME_CURSOR);
     WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
-    WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
+    //WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
     AreaModule::set_whole(fighter.module_accessor, false);
-    AreaModule::set_whole(enemy, false);
+    //AreaModule::set_whole(enemy, false);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_STOP);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_MOTION);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
-    PostureModule::set_pos_2d(fighter.module_accessor,&Vector2f{x: 0.0 , y: 0.0});
+    //PostureModule::set_pos_2d(fighter.module_accessor,&Vector2f{x: 0.0 , y: 0.0});
     if MotionModule::is_end(fighter.module_accessor) {
       WorkModule::on_flag(fighter.module_accessor,*FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_SUCCESS);
       ArticleModule::remove_exist(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
@@ -339,25 +339,25 @@ pub unsafe extern "C" fn finaldashattack_end(fighter: &mut L2CFighterCommon) -> 
 
 pub unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> L2CValue {
   let module_accessor = fighter.module_accessor;
-  let enemy_id = WorkModule::get_int(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_HPB_GOTTEM_ID);
-  let enemy = sv_battle_object::module_accessor(enemy_id as u32);
+  //let enemy_id = WorkModule::get_int(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_HPB_GOTTEM_ID);
+  //let enemy = sv_battle_object::module_accessor(enemy_id as u32);
   WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
-  WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
+  //WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
 
-  LinkModule::remove_model_constraint(enemy,true);
-  if LinkModule::is_link(enemy,*LINK_NO_CAPTURE) {
-      LinkModule::unlink(enemy,*LINK_NO_CAPTURE);
-  }
+  //LinkModule::remove_model_constraint(enemy,true);
+  //if LinkModule::is_link(enemy,*LINK_NO_CAPTURE) {
+  //    LinkModule::unlink(enemy,*LINK_NO_CAPTURE);
+  //}
   macros::REQ_FINAL_START_CAMERA_arg3(fighter,Hash40::new("d04finalvisualscene03.nuanmb"), false,false);
 
-  StatusModule::set_situation_kind(enemy, smash::app::SituationKind(*SITUATION_KIND_GROUND), false);
-  StatusModule::change_status_request(enemy, *FIGHTER_STATUS_KIND_KAMUI_FINAL_TARGET_DAMAGE, false);
-  MotionModule::change_motion(enemy,Hash40::new("fall_damage"),0.0,1.0,false,0.0,false,false);
-  LinkModule::remove_model_constraint(enemy,true);
-  if LinkModule::is_link(enemy,*LINK_NO_CAPTURE) == false {
-      LinkModule::link(enemy,*LINK_NO_CAPTURE,(*(fighter.module_accessor)).battle_object_id);
-      LinkModule::set_model_constraint_pos_ort(enemy,*LINK_NO_CAPTURE,Hash40::new("hip"),Hash40::new("throw"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_DISABLE_RESTRICT_Z as u32,true);
-    }
+  //StatusModule::set_situation_kind(enemy, smash::app::SituationKind(*SITUATION_KIND_GROUND), false);
+  //StatusModule::change_status_request(enemy, *FIGHTER_STATUS_KIND_KAMUI_FINAL_TARGET_DAMAGE, false);
+  //MotionModule::change_motion(enemy,Hash40::new("fall_damage"),0.0,1.0,false,0.0,false,false);
+  //LinkModule::remove_model_constraint(enemy,true);
+  //if LinkModule::is_link(enemy,*LINK_NO_CAPTURE) == false {
+  //    LinkModule::link(enemy,*LINK_NO_CAPTURE,(*(fighter.module_accessor)).battle_object_id);
+  //    LinkModule::set_model_constraint_pos_ort(enemy,*LINK_NO_CAPTURE,Hash40::new("hip"),Hash40::new("throw"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_DISABLE_RESTRICT_Z as u32,true);
+  //  }
   PostureModule::set_pos_2d(fighter.module_accessor,&Vector2f{x: 0.0 , y: 0.0});
   return smashline::original_status(Main, fighter, *FIGHTER_KAMUI_STATUS_KIND_FINAL_END)(fighter);
 }
@@ -369,26 +369,26 @@ pub unsafe extern "C" fn finalsceneenter_main(fighter: &mut L2CFighterCommon) ->
     let enemy = sv_battle_object::module_accessor(enemy_id as u32);
 
 
-      WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
-      WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
+      //WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
+      //WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
 
       
-      LinkModule::remove_model_constraint(enemy,true);
-      if LinkModule::is_link(enemy,*LINK_NO_CAPTURE) {
-          LinkModule::unlink(enemy,*LINK_NO_CAPTURE);
-      }
-      let pos = Vector2f{x: 0.0, y: 0.0};
-      PostureModule::set_pos_2d(enemy,&pos);    
+      //LinkModule::remove_model_constraint(enemy,true);
+      //if LinkModule::is_link(enemy,*LINK_NO_CAPTURE) {
+      //    LinkModule::unlink(enemy,*LINK_NO_CAPTURE);
+      //}
+      //let pos = Vector2f{x: 0.0, y: 0.0};
+      //PostureModule::set_pos_2d(enemy,&pos);    
     //StatusModule::set_situation_kind(enemy, smash::app::SituationKind(*SITUATION_KIND_GROUND), false);
-    StatusModule::change_status_request(enemy, *FIGHTER_STATUS_KIND_KAMUI_FINAL_TARGET_DAMAGE, false);
-    MotionModule::change_motion(enemy,Hash40::new("down_wait_u"),0.0,1.0,false,0.0,false,false);
-    LinkModule::remove_model_constraint(enemy,true);
-    if LinkModule::is_link(enemy,*LINK_NO_CAPTURE) == false {
-        LinkModule::link(enemy,*LINK_NO_CAPTURE,(*(fighter.module_accessor)).battle_object_id);
-        LinkModule::set_model_constraint_pos_ort(enemy,*LINK_NO_CAPTURE,Hash40::new("trans"),Hash40::new("throw"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_DISABLE_RESTRICT_Z  as u32 | *CONSTRAINT_FLAG_OFFSET_ROT as u32,true);
-        let offset_rot = Vector3f{x: 0.0, y: -90.0, z: 0.0};
-        LinkModule::set_constraint_rot_offset(enemy,&offset_rot);
-      }
+    //StatusModule::change_status_request(enemy, *FIGHTER_STATUS_KIND_KAMUI_FINAL_TARGET_DAMAGE, false);
+    //MotionModule::change_motion(enemy,Hash40::new("down_wait_u"),0.0,1.0,false,0.0,false,false);
+    //LinkModule::remove_model_constraint(enemy,true);
+    //if LinkModule::is_link(enemy,*LINK_NO_CAPTURE) == false {
+    //    LinkModule::link(enemy,*LINK_NO_CAPTURE,(*(fighter.module_accessor)).battle_object_id);
+    //    LinkModule::set_model_constraint_pos_ort(enemy,*LINK_NO_CAPTURE,Hash40::new("trans"),Hash40::new("throw"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_DISABLE_RESTRICT_Z  as u32 | *CONSTRAINT_FLAG_OFFSET_ROT as u32,true);
+    //    let offset_rot = Vector3f{x: 0.0, y: -90.0, z: 0.0};
+    //    LinkModule::set_constraint_rot_offset(enemy,&offset_rot);
+    //  }
       return smashline::original_status(Main, fighter, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ENTRY)(fighter);
 
 }
@@ -402,7 +402,7 @@ pub unsafe extern "C" fn finalsceneattack_main(fighter: &mut L2CFighterCommon) -
       return smashline::original_status(Main, fighter, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK)(fighter);
 }
 
-
+/* 
 pub unsafe extern "C" fn fakefinalsceneenter_main(fighter: &mut L2CFighterCommon) -> L2CValue {
   let module_accessor = fighter.module_accessor;
   PostureModule::set_pos_2d(fighter.module_accessor,&Vector2f{x: 0.0 , y: 0.0});
@@ -411,23 +411,22 @@ pub unsafe extern "C" fn fakefinalsceneenter_main(fighter: &mut L2CFighterCommon
   KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY);
   KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_MOTION);
   KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
-    let enemy_id = WorkModule::get_int(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_HPB_GOTTEM_ID);
-    let enemy = sv_battle_object::module_accessor(enemy_id as u32);
+    //let enemy_id = WorkModule::get_int(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_HPB_GOTTEM_ID);
+    //let enemy = sv_battle_object::module_accessor(enemy_id as u32);
     //StatusModule::set_situation_kind(enemy, smash::app::SituationKind(*SITUATION_KIND_GROUND), false);
     //GroundModule::correct(module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
     //StatusModule::change_status_request(enemy, *FIGHTER_STATUS_KIND_CAPTURE_WAIT, false);
-    MotionModule::change_motion(enemy,Hash40::new("down_wait_u"),0.0,1.0,false,0.0,false,false);
+    //MotionModule::change_motion(enemy,Hash40::new("down_wait_u"),0.0,1.0,false,0.0,false,false);
     //GroundModule::correct(module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
-    LinkModule::remove_model_constraint(enemy,true);
-    if LinkModule::is_link(enemy,*LINK_NO_CAPTURE) == false {
-        LinkModule::link(enemy,*LINK_NO_CAPTURE,(*(fighter.module_accessor)).battle_object_id);
-        LinkModule::set_model_constraint_pos_ort(enemy,*LINK_NO_CAPTURE,Hash40::new("hip"),Hash40::new("throw"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_DISABLE_RESTRICT_Z as u32,true);
-      }
+    //LinkModule::remove_model_constraint(enemy,true);
+    //if LinkModule::is_link(enemy,*LINK_NO_CAPTURE) == false {
+    //    LinkModule::link(enemy,*LINK_NO_CAPTURE,(*(fighter.module_accessor)).battle_object_id);
+    //    LinkModule::set_model_constraint_pos_ort(enemy,*LINK_NO_CAPTURE,Hash40::new("hip"),Hash40::new("throw"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_DISABLE_RESTRICT_Z as u32,true);
+    //}
       let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
       AreaModule::set_whole(fighter.module_accessor, false);
       WorkModule::set_flag(fighter.module_accessor, false, *FIGHTER_INSTANCE_WORK_ID_FLAG_NAME_CURSOR);
       WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
-      WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
       MotionModule::change_motion(fighter.module_accessor,Hash40::new("final_visual_scene_01"),0.0,1.0,false,0.0,false,false);
       ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, false, -1);
       ArticleModule::set_visibility_whole(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
@@ -466,7 +465,7 @@ pub unsafe extern "C" fn fakefinalsceneenter_init(fighter: &mut L2CFighterCommon
 pub unsafe extern "C" fn fakefinalsceneenter_end(fighter: &mut L2CFighterCommon) -> L2CValue {
   return smashline::original_status(End, fighter, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ENTRY)(fighter);
 }
-
+*/
 
 
 pub unsafe extern "C" fn finaljump_main(fighter: &mut L2CFighterCommon) -> L2CValue {
@@ -502,17 +501,10 @@ unsafe fn finaljump_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY, 0.0, 0.0);
     sv_kinetic_energy::set_accel(fighter.lua_state_agent);
     }
-    if AttackModule::is_infliction(fighter.module_accessor,*COLLISION_KIND_MASK_HIT)
-    || AttackModule::is_infliction(fighter.module_accessor,*COLLISION_KIND_MASK_SHIELD) {
-      WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SELECT_FINAL);
-      WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_JUMP);
-      fighter.change_status(FIGHTER_STATUS_KIND_FINAL.into(),false.into());
-      return L2CValue::I32(0)
-    }
     if MotionModule::is_end(fighter.module_accessor) {
-      WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SELECT_FINAL);
+      WorkModule::on_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SELECT_FINAL);
       WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_JUMP);
-      fighter.change_status(FIGHTER_STATUS_KIND_FINAL.into(),false.into());
+      fighter.change_status(FIGHTER_STATUS_KIND_FALL.into(),false.into());
     }
     return L2CValue::I32(0)
 }

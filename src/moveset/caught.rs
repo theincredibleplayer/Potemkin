@@ -144,9 +144,14 @@ pub unsafe extern "C" fn thrown_status_common(fighter: &mut L2CFighterCommon) ->
         );
     }
     WorkModule::set_int64(fighter.module_accessor, motion as i64,*FIGHTER_STATUS_THROWN_WORK_INT_MOTION_KIND);
-    StatusModule::set_situation_kind(fighter.module_accessor, SituationKind(*SITUATION_KIND_AIR), true);
-    GroundModule::set_correct(fighter.module_accessor, GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
+    //StatusModule::set_situation_kind(fighter.module_accessor, SituationKind(*SITUATION_KIND_AIR), true);
+    //GroundModule::set_correct(fighter.module_accessor, GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
 
+  }
+  if (StatusModule::status_kind(parent_boma) == *FIGHTER_STATUS_KIND_FINAL
+  || StatusModule::status_kind(parent_boma) == FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP)
+  && (utility::get_kind(&mut *parent_boma) == *FIGHTER_KIND_KAMUI) {
+    WorkModule::set_int64(fighter.module_accessor, hash40("down_wait_d") as i64,*FIGHTER_STATUS_THROWN_WORK_INT_MOTION_KIND);
   }
   return smashline::original_status(Main, fighter, *FIGHTER_STATUS_KIND_THROWN)(fighter)
 }
@@ -156,4 +161,26 @@ pub unsafe extern "C" fn game_catchedpotspecialhi(agent: &mut L2CAgentBase) {
     MotionModule::set_flip(agent.module_accessor,true,true,false);
     println!("hiiiiiiiiiiiiiiiiii");
   }
+}
+
+
+
+
+
+
+pub unsafe extern "C" fn caught_final_main(fighter: &mut L2CFighterCommon) -> L2CValue {
+  let module_accessor = fighter.module_accessor;
+  //grabbed_anim_selector(module_accessor,"heavenly_caught",1);
+  MotionModule::change_motion(module_accessor, Hash40::new("down_wait_d"), 0.0, 1.0, false, 0.0, false, false);
+  WorkModule::on_flag(module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
+  fighter.status_Throw_Main();
+  fighter.sub_shift_status_main(L2CValue::Ptr(caught_upb_main_loop as *const () as _))
+}
+
+
+
+pub unsafe extern "C" fn caught_final_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
+  let module_accessor = fighter.module_accessor;
+  WorkModule::on_flag(module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
+  return status_CaptureWait_loop(fighter);
 }

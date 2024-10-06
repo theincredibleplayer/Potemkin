@@ -34,13 +34,13 @@ pub unsafe extern "C" fn notify_log_event_collision_hit_replace(fighter_manager:
             WorkModule::set_int(owner,defender_id as i32,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_GRABBED_ENEMY_ID);
             println!("got the mf's id: {}",defender_id);
         }*/
-        if WorkModule::is_flag(owner,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_HPB_CHECK_ENEMY) {
-            println!("check enemy enabled");
-            WorkModule::on_flag(owner,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_HPB_GOTTEM);
-            WorkModule::off_flag(owner,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_HPB_CHECK_ENEMY);
-            WorkModule::set_int(owner,defender_id as i32,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_HPB_GOTTEM_ID);
-            println!("got the mf's id: {}",defender_id);
-        }
+        //if WorkModule::is_flag(owner,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_HPB_CHECK_ENEMY) {
+        //    println!("check enemy enabled");
+        //    WorkModule::on_flag(owner,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_HPB_GOTTEM);
+        //    WorkModule::off_flag(owner,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_HPB_CHECK_ENEMY);
+        //    WorkModule::set_int(owner,defender_id as i32,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_HPB_GOTTEM_ID);
+        //    println!("got the mf's id: {}",defender_id);
+        //}
     }
     original!()(fighter_manager, attacker_id, defender_id, move_type, arg5, move_type_again)
 }
@@ -62,14 +62,20 @@ pub unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, ev
         if StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_SPECIAL_HI {
             capture_event.result = true;
             capture_event.node = smash_rs::phx::Hash40::new("throw");
+            capture_event.is_motion_hi_lw = false;
             StatusModule::change_status_request(module_accessor, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START, false);
             return 0;
         }
         //final smash's link module
-        if StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_FINAL {
+        if StatusModule::status_kind(module_accessor) == FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP
+        || StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_FINAL {
             capture_event.result = true;
             capture_event.node = smash_rs::phx::Hash40::new("throw");
-            StatusModule::change_status_request(module_accessor, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START, false);      
+            WorkModule::on_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_HPB_GOTTEM);
+            WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SELECT_FINAL);
+            WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_JUMP);
+            PostureModule::set_pos_2d(module_accessor,&Vector2f{x: 0.0 , y: 0.0});
+            StatusModule::change_status_request(module_accessor, *FIGHTER_STATUS_KIND_FINAL, false);      
             return 0;
         }
         return 1;
