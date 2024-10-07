@@ -69,6 +69,7 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_TEST : i32 = 0x20000106;
 
 
 
+
 // for weapon
 pub const WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_ATTACK : i32 = 0x20000007;
 pub const WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_HIT_WALL : i32 = 0x20000008;
@@ -860,6 +861,9 @@ pub fn install() {
     .status(Init, FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP, finaldashattack_init)
     .status(Exec, FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP, finaldashattack_exec)
     .status(End, FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP, finaldashattack_end)
+
+    .status(Main, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK, finalvisscene2_main)
+    //.status(Main, *FIGHTER_KAMUI_STATUS_KIND_FINAL_END, finalvissceneend_main)
 
 /* 
 

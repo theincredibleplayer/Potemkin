@@ -22,7 +22,7 @@ pub unsafe extern "C" fn appeal_end(fighter: &mut L2CFighterCommon) -> L2CValue 
     if ArticleModule::is_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON) {
         ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
     }
-    UiManager::set_bar_out(true);
+    UiManager::set_bar_out();
     WorkModule::inc_int(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_TEST);
     smashline::original_status(End, fighter, *FIGHTER_STATUS_KIND_APPEAL)(fighter)
 }

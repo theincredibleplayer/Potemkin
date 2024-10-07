@@ -82,7 +82,7 @@ pub unsafe extern "C" fn special_hi_loop(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         let pos = Vector3f{x:10.0, y:20.0, z:3.0};
         let rot = Vector3f{x:-60.0, y:0.0, z:-20.0};
-        let effect = EffectModule::req_follow(agent.module_accessor, Hash40::new("sys_attack_line_b"), Hash40::new("top"), &pos, &rot, 2.5, true, 0, 0, 0, 0, 0, true, true) as u32;
+        let effect = EffectModule::req(agent.module_accessor, Hash40::new("sys_attack_line_b"), &pos, &rot, 2.50,0, -1, false, 0) as u32;
         //macros::EFFECT_FOLLOW(agent, Hash40::new("sys_attack_line_b"), Hash40::new("top"), 18, 20, 3, -45, 0, -20, 2.5, true);
         EffectModule::set_rgb(agent.module_accessor, effect, 1.0, 0.64, 0.0);
         macros::LAST_EFFECT_SET_RATE(agent, 0.75);
@@ -101,16 +101,6 @@ pub unsafe extern "C" fn special_hi_loop(agent: &mut L2CAgentBase) {
 }
 
 pub unsafe extern "C" fn special_dragon_hi_loop(agent: &mut L2CAgentBase) {
-    if macros::is_excute(agent) {
-        //macros::FT_MOTION_RATE(agent, 0.5);
-    }
-    sv_animcmd::frame(agent.lua_state_agent, 3.0);
-    if macros::is_excute(agent) {
-
-    }
-    sv_animcmd::wait(agent.lua_state_agent, 1.0);
-    if macros::is_excute(agent) {
-    }
 }
 
 pub unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {

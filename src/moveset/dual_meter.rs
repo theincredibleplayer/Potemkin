@@ -181,30 +181,33 @@ impl TensionMeter {
 #[repr(C)]
 pub struct CutInUI {
     pub is_on: bool,
-    pub bar_in_frame: f32,
-    pub bar_out_frame: f32,
+    pub bar_low_pos: f32,
+    pub bar_hi_pos: f32,
+    pub bars_alpha: f32,
     pub is_bar_out: bool,
-    pub is_anim_in_done: bool,
-    pub is_anim_out_done: bool,
+    pub game_speed: f32,
+    pub bar_in_out_duration: f32
 }
 impl CutInUI {
     pub fn reset() -> Self {
         Self {
             is_on: false,
-            bar_in_frame: 0.0,
-            bar_out_frame: 0.0,
+            bar_low_pos: -550.0,
+            bar_hi_pos: 550.0,
+            bars_alpha: 0.0,
             is_bar_out: false,
-            is_anim_in_done: false,
-            is_anim_out_done: false,
+            game_speed: 1.0,
+            bar_in_out_duration: 30.0,
         }
     }
     pub fn reset_all(&mut self) {
         self.is_on= false;
-        self.bar_in_frame= 0.0;
-        self.bar_out_frame= 0.0;
+        self.bar_low_pos = -550.0;
+        self.bar_hi_pos = 550.0;
+        self.bars_alpha = 0.0;
         self.is_bar_out= false;
-        self.is_anim_in_done= false;
-        self.is_anim_out_done= false;
+        self.game_speed = 1.0;
+        self.bar_in_out_duration = 30.0;
     }
     pub fn is_bar_on(&mut self) -> bool {
         return self.is_on;
@@ -220,27 +223,63 @@ impl CutInUI {
         self.is_on = state;
         return self.is_on;
     }
-    pub fn get_bar_in_frame(&mut self) -> f32 {
-        if self.bar_in_frame >= 9.0 {
-            self.is_anim_in_done = true;
-            self.bar_in_frame = 9.0;
+    pub fn get_bar_in_pos(&mut self, pane: &str) -> f32 {
+        if pane == "bar_hi"{
+            if self.bar_hi_pos <= 475.0 {
+                self.bar_hi_pos = 475.0;
+            }else{
+                self.bar_hi_pos -= (75.0/self.bar_in_out_duration) * self.game_speed;
+            }
+            return self.bar_hi_pos;
         }else{
-            self.bar_in_frame += 1.0;
+            if self.bar_low_pos >= -475.0 {
+                self.bar_low_pos = -475.0;
+            }else{
+                self.bar_low_pos += (75.0/self.bar_in_out_duration) * self.game_speed;
+            }
+            return self.bar_low_pos;
         }
-        return self.bar_in_frame;
     }
-    pub fn get_bar_out_frame(&mut self) -> f32 {
-        if self.bar_out_frame >= 9.0 {
-            self.is_anim_out_done = true;
-            self.set_bar(false);
-            self.bar_out_frame = 9.0;
+    pub fn get_bar_out_pos(&mut self, pane: &str) -> f32 {
+        if pane == "bar_hi"{
+            if self.bar_hi_pos >= 550.0 {
+                self.set_bar(false);
+                self.is_bar_out = false;
+                self.bar_hi_pos = 550.0;
+            }else{
+                self.bar_hi_pos += (75.0/self.bar_in_out_duration) * self.game_speed;
+            }
+            return self.bar_hi_pos;
         }else{
-            self.bar_out_frame += 1.0;
+            if self.bar_low_pos <= -550.0 {
+                self.set_bar(false);
+                self.is_bar_out = false;
+                self.bar_low_pos = -550.0;
+            }else{
+                self.bar_low_pos -= (75.0/self.bar_in_out_duration) * self.game_speed;  // move this and similar up later since this doesnt seem entirely correct
+            }
+            return self.bar_low_pos;
         }
-        return self.bar_out_frame;
     }
-    pub fn is_anim_out_done(&mut self) -> bool {
-        return self.is_anim_out_done;
+    pub fn get_bar_in_alpha(&mut self) -> f32 {
+        if self.bars_alpha >= 255.0 {
+            self.bars_alpha = 255.0;
+        }else{
+            self.bars_alpha += (255.0/self.bar_in_out_duration) * self.game_speed;
+        }
+        return self.bars_alpha;
+    }
+    pub fn get_bar_out_alpha(&mut self) -> f32 {
+        if self.bars_alpha <= 0.0 {
+            self.bars_alpha = 0.0;
+        }else{
+            self.bars_alpha -= (255.0/self.bar_in_out_duration) * self.game_speed;
+        }
+        return self.bars_alpha;
+    }
+
+    pub fn set_game_speed(&mut self, speed:f32) {
+        self.game_speed = speed;
     }
 
 }

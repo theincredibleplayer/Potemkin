@@ -39,12 +39,17 @@ pub unsafe extern "C" fn kamui_on_search(_vtable: u64, fighter: &mut Fighter, lo
         WorkModule::set_float(opp_boma, 0.3, *FIGHTER_STATUS_WORK_ID_FLOAT_REBOUND_MOTION_RATE);
         StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND, false);
     }
-    if StatusModule::status_kind(module_accessor) == FIGHTER_STATUS_KIND_SPECIAL_N {
+    if StatusModule::status_kind(module_accessor) == FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP {
         let collision_log = *(log as *const u64).add(0x10 / 0x8);
         let collision_log = collision_log as *const CollisionLogScuffed;
         let opp_boma = sv_battle_object::module_accessor((*collision_log).opponent_object_id);
-
-        StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND, false);
+        StatusModule::change_status_request_from_script(module_accessor, FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK, false);
+    }
+    if StatusModule::status_kind(module_accessor) == FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP {
+        let collision_log = *(log as *const u64).add(0x10 / 0x8);
+        let collision_log = collision_log as *const CollisionLogScuffed;
+        let opp_boma = sv_battle_object::module_accessor((*collision_log).opponent_object_id);
+        StatusModule::change_status_request_from_script(module_accessor, FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK, false);
     }
 }
 

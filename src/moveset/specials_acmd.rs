@@ -23,8 +23,7 @@ pub unsafe extern "C" fn sound_specialsstart(agent: &mut L2CAgentBase) {
         let sound = sound_selector(agent,"vc_pot_hammerfall_X".to_string(),2,false,false,0);
         macros::PLAY_SE(agent, Hash40::new_raw(sound));
         macros::PLAY_SE(agent, Hash40::new("se_btl_pot_00"));
-        FighterUtil::set_stage_disable_reverse_screen(true);
-        }
+    }
 }
 
 pub unsafe extern "C" fn game_specialsloop(agent: &mut L2CAgentBase) {
@@ -61,7 +60,6 @@ pub unsafe extern "C" fn game_specialsattack(agent: &mut L2CAgentBase) {
     wait(agent.lua_state_agent, 3.0);
     if macros::is_excute(agent) {
         AttackModule::clear_all(agent.module_accessor);
-        FighterUtil::set_stage_disable_reverse_screen(false);
     }
 }
 

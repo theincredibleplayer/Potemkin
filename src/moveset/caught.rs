@@ -151,7 +151,31 @@ pub unsafe extern "C" fn thrown_status_common(fighter: &mut L2CFighterCommon) ->
   if (StatusModule::status_kind(parent_boma) == *FIGHTER_STATUS_KIND_FINAL
   || StatusModule::status_kind(parent_boma) == FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP)
   && (utility::get_kind(&mut *parent_boma) == *FIGHTER_KIND_KAMUI) {
-    WorkModule::set_int64(fighter.module_accessor, hash40("down_wait_d") as i64,*FIGHTER_STATUS_THROWN_WORK_INT_MOTION_KIND);
+    let motion_share = WorkModule::get_param_int(fighter.module_accessor,0xcad2ee25e,0xc07d88ea0);
+    let mut motion = hash40("catched_pot_final_scene_01");
+    let mut share_type = 0;
+    if motion_share == *FIGHTER_MOTION_SHARE_TYPE_TARO {
+        motion = FighterMotionModuleImpl::add_body_type_hash(
+            fighter.module_accessor,
+            Hash40::new_raw(motion),
+            *BODY_TYPE_MOTION_DX
+        );
+    }
+    else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_GIRL {
+        motion = FighterMotionModuleImpl::add_body_type_hash(
+          fighter.module_accessor,
+            Hash40::new_raw(motion),
+            *BODY_TYPE_MOTION_GIRL
+        );
+    }
+    else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_BIG {
+        motion = FighterMotionModuleImpl::add_body_type_hash(
+          fighter.module_accessor,
+            Hash40::new_raw(motion),
+            *BODY_TYPE_MOTION_BIG
+        );
+    }
+    WorkModule::set_int64(fighter.module_accessor, motion as i64,*FIGHTER_STATUS_THROWN_WORK_INT_MOTION_KIND);
   }
   return smashline::original_status(Main, fighter, *FIGHTER_STATUS_KIND_THROWN)(fighter)
 }
