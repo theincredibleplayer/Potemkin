@@ -85,12 +85,65 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
             ModelModule::set_joint_scale(article_boma2, Hash40::new("trans") , &Vector3f{x:1.0,y:1.0,z:1.0});
         }
     }
+
+
+
     let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     //UiManager::add_tension(entry_id, 0.1);
     let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
     if smash::app::lua_bind::FighterManager::is_result_mode(fighter_manager) {
         UiManager::disable_ui(entry_id);
     }
+
+
+/*
+    if StatusModule::status_kind(fighter.battle_object.module_accessor) == *FIGHTER_STATUS_KIND_FINAL
+    || StatusModule::status_kind(fighter.battle_object.module_accessor) == *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK
+    || StatusModule::status_kind(fighter.battle_object.module_accessor) == *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK_WAIT
+    || StatusModule::status_kind(fighter.battle_object.module_accessor) == *FIGHTER_KAMUI_STATUS_KIND_FINAL_END{
+        let capture_id = LinkModule::get_node_object_id(module_accessor, *LINK_NO_CAPTURE);
+        if capture_id != 0x50000000 {
+            let enemy = sv_battle_object::module_accessor(capture_id as u32);
+            let hight = WorkModule::get_param_float(enemy, hash40("height"), 0);
+            let motion_share =   WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_FINAL_MOTION_SHARE);
+
+            let mut base_hight = 22.0;
+            if motion_share == *FIGHTER_MOTION_SHARE_TYPE_TARO {
+                base_hight = 15.0;
+            }
+            else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_GIRL {
+                base_hight = 17.0;
+            }
+            else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_BIG {
+                base_hight = 19.0;
+            } 
+            //let scale = PostureModule::scale(module_accessor);
+        
+            let base_pos = &mut Vector3f{ x: 0.0, y: 0.0, z: 0.0 };
+            let mut position = ModelModule::joint_global_position(module_accessor, Hash40::new("throw"), base_pos, true);
+            println!("global x: {}\nglobal y: {} \nglobal z: {}",position.x,position.y,position.z);
+            println!("base x: {}\nbase y: {} \nbase z: {}",base_pos.x,base_pos.y,base_pos.z);
+            println!("hight :{}",hight);
+            println!("base hight :{}",base_hight);
+            //println!("scale :{}",scale);
+            let mut offset_y = 11.0;
+            let mut z_mul = 1.0;
+            if StatusModule::status_kind(fighter.battle_object.module_accessor) == *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK{
+                offset_y = 1511.0;
+                z_mul = -1.0;
+            }
+
+
+            let mut final_pos = Vector3f{ x: 0.0, y: 0.0, z: 0.0 };
+            final_pos.x = base_pos.x - (base_hight - hight);
+            final_pos.y = base_pos.y - offset_y;
+            final_pos.z = base_pos.z * z_mul;
+            ModelModule::set_joint_translate(module_accessor, Hash40::new("throw"), &mut final_pos, false, false);
+        
+        }
+    }
+
+*/
     //let motion = MotionModule::motion_kind(fighter.battle_object.module_accessor);
     //let status = StatusModule::status_kind(fighter.battle_object.module_accessor);
     //println!("Status: {:#x}, Motion: {:#x}", status, motion);

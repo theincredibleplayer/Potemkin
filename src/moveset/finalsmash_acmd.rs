@@ -446,6 +446,10 @@ pub unsafe extern "C" fn sound_finalvisualscene02(agent: &mut L2CAgentBase) {
     println!("vc name {}", result);
     let scream_handle = SoundModule::play_se(enemy, Hash40::new(result.as_str()), true, false, false, false, enSEType(0));
     SoundModule::set_se_vol(enemy, scream_handle as i32, 2.0, 0);
+    //for zarek's pacman mod
+    let pac_handle = SoundModule::play_se(enemy, Hash40::new("se_pacman_damage_twinkle"), true, false, false, false, enSEType(0));
+    SoundModule::set_se_vol(enemy, pac_handle as i32, 2.0, 0);
+
 
     }
     frame(agent.lua_state_agent, 130.0);

@@ -316,20 +316,20 @@ unsafe fn handle_layout(layout: *mut Layout) -> *mut Layout {
             let border_list = ["bar_hi","bar_low"];
             for pane in border_list {
                 if let Some(border) = child.find_pane_by_name_recursive(pane) {
-                    println!("bar found: {}", pane);
+                    //println!("bar found: {}", pane);
                     if UiManager::is_bar_on(){
                         if UiManager::is_bar_out(){
-                            println!("bar out");
+                            //println!("bar out");
                             border.pos_y = UiManager::get_bar_out_pos(pane);
-                            println!("pos_y = {}", border.pos_y);
+                            //println!("pos_y = {}", border.pos_y);
                             border.alpha = UiManager::get_bar_out_alpha() as u8;
-                            println!("alpha = {}", border.alpha);
+                            //println!("alpha = {}", border.alpha);
                         } else {
-                            println!("bar in");
+                            //println!("bar in");
                             border.pos_y = UiManager::get_bar_in_pos(pane);
-                            println!("pos_y = {}", border.pos_y);
+                            //println!("pos_y = {}", border.pos_y);
                             border.alpha = UiManager::get_bar_in_alpha() as u8;
-                            println!("alpha = {}", border.alpha);
+                            //println!("alpha = {}", border.alpha);
                         }
                     }
                     border.set_visible(UiManager::is_bar_on());

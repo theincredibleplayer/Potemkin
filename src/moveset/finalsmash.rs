@@ -49,7 +49,18 @@ unsafe fn motion_setup(fighter: &mut L2CFighterCommon, situation_change: bool) {
 
 pub unsafe extern "C" fn finalvisscene2_main(fighter: &mut L2CFighterCommon) -> L2CValue {
   grabbed_anim_selector(fighter,"catched_pot_final_scene_02", 1.0);
+  //LinkModule::set_constraint_translate_offset(enemy, &Vector3f{x:20.0,y:0.0,z:0.0});
   return smashline::original_status(Main, fighter, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK)(fighter);
+}
+
+pub unsafe extern "C" fn finalvisscene2_(fighter: &mut L2CFighterCommon) -> L2CValue {
+  let capture_id = LinkModule::get_node_object_id(fighter.module_accessor, *LINK_NO_CAPTURE);
+  let enemy = sv_battle_object::module_accessor(capture_id as u32);
+  let offset_x = WorkModule::get_param_float(enemy, hash40("hight"), 0);
+  LinkModule::set_model_constraint_flag(fighter.module_accessor,(*CONSTRAINT_FLAG_ORIENTATION | *CONSTRAINT_FLAG_POSITION | *CONSTRAINT_FLAG_OFFSET_TRANSLATE | *CONSTRAINT_FLAG_DISABLE_RESTRICT_Z) as u32);
+  LinkModule::set_constraint_translate_offset(fighter.module_accessor, &Vector3f{x:20.0,y:20.0,z:20.0});
+  return 0.into();
+  //return smashline::original_status(Exec, fighter, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK)(fighter);
 }
 
 pub unsafe extern "C" fn Final_main(fighter: &mut L2CFighterCommon) -> L2CValue {
@@ -166,6 +177,10 @@ pub unsafe extern "C" fn Final_main_loop(fighter: &mut L2CFighterCommon) -> L2CV
     //WorkModule::on_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
     AreaModule::set_whole(fighter.module_accessor, false);
     //AreaModule::set_whole(enemy, false);
+
+
+
+
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_STOP);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_MOTION);
@@ -345,7 +360,15 @@ pub unsafe extern "C" fn finaldashattack_end(fighter: &mut L2CFighterCommon) -> 
 
 pub unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> L2CValue {
   let module_accessor = fighter.module_accessor;
+  let capture_id = LinkModule::get_node_object_id(fighter.module_accessor, *LINK_NO_CAPTURE);
+  let enemy = sv_battle_object::module_accessor(capture_id as u32);
+  let offset_x = WorkModule::get_param_float(enemy, hash40("hight"), 0);
+  println!("offset y : {}",offset_x);
+  //LinkModule::set_constraint_translate_offset(fighter.module_accessor, &Vector3f{x:0.0,y:50.0,z:0.0});
   grabbed_anim_selector(fighter,"catched_pot_final_scene_03", 1.0);
+  let motion_share = WorkModule::get_param_int(enemy,0xcad2ee25e,0xc07d88ea0); //grabs the body type param
+  WorkModule::set_int(module_accessor,motion_share, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_FINAL_MOTION_SHARE);
+  
   //let enemy_id = WorkModule::get_int(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_HPB_GOTTEM_ID);
   //let enemy = sv_battle_object::module_accessor(enemy_id as u32);
   WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);

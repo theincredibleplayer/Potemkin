@@ -70,7 +70,10 @@ pub unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, ev
         if StatusModule::status_kind(module_accessor) == FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP
         || StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_FINAL {
             capture_event.result = true;
+            //capture_event.constraint_offset.y = 20.0;
             capture_event.node = smash_rs::phx::Hash40::new("throw");
+            
+
             WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SELECT_FINAL);
             WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_JUMP);
             PostureModule::set_pos_2d(module_accessor,&Vector2f{x: 0.0 , y: 0.0});
