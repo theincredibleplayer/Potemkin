@@ -12,11 +12,11 @@ crate-type = ["cdylib"]
 
 [dependencies]
 skyline = { git = "https://github.com/ultimate-research/skyline-rs.git" }
-skyline_smash = { git =  "https://github.com/Claude-1308/skyline-smash", features = ["weak_l2cvalue"] }
-smash_script = { git = "https://github.com/Claude-1308/smash-script", branch = "development" }
-smashline = { git = "https://github.com/Claude-1308/smashline2"}
+skyline_smash = { git =  "https://github.com/blu-dev/skyline-smash", features = ["weak_l2cvalue"] }
+smash_script = { git = "https://github.com/blu-dev/smash-script", branch = "development" }
+smashline = { git = "https://github.com/HDR-Development/smashline"}
 smash_singletons = { git = "https://github.com/WuBoytH/smash_singletons.git" }
-smash_rs = { package = "smash", git = "https://github.com/Claude-1308/smash-rs" }
+smash_rs = { package = "smash", git = "https://github.com/blu-dev/smash-rs" }
 nnsdk = "0.3.0"
 lazy_static = "1.4.0"
 parking_lot = "0.11.2"

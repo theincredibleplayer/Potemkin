@@ -153,6 +153,7 @@ pub unsafe extern "C" fn side_b_slide(fighter: &mut L2CFighterCommon) -> L2CValu
 
 unsafe fn side_b_slide_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
+    let lr = PostureModule::lr(fighter.module_accessor);
     fighter.clear_lua_stack();
     lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_AIR, 3.0 * PostureModule::lr(module_accessor),0.0,0.0,0.0,0.0);
     sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
@@ -180,7 +181,7 @@ unsafe fn side_b_slide_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
         return L2CValue::I32(0)
     }
     if ControlModule::check_button_on(fighter.module_accessor,*CONTROL_PAD_BUTTON_SPECIAL) == false
-    || (speed_x==0.0) {
+    || GroundModule::is_ottotto_lr(fighter.module_accessor, lr, 1.5) {
         fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_END.into(),false.into());
         return L2CValue::I32(0)
     }

@@ -144,9 +144,9 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
     }
 
 */
-    //let motion = MotionModule::motion_kind(fighter.battle_object.module_accessor);
-    //let status = StatusModule::status_kind(fighter.battle_object.module_accessor);
-    //println!("Status: {:#x}, Motion: {:#x}", status, motion);
+    let motion = MotionModule::motion_kind(fighter.battle_object.module_accessor);
+    let status = StatusModule::status_kind(fighter.battle_object.module_accessor);
+    println!("Status: {:#x}, Motion: {:#x}", status, motion);
 }
 
 

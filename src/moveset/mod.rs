@@ -642,11 +642,37 @@ unsafe fn idkman2(ctx: &mut skyline::hooks::InlineCtx) {
     println!("the first arg: {:#x}",register - getRegionAddress(Region::Text) as u64 );
 }
 
-#[skyline::from_offset(0x1653900)]
-pub fn set_vis_hud(param_1: bool);
 
-
-
+extern "C" {
+    #[link_name = "\u{1}_ZN3app16kiiladarzmanager15set_visible_hudEb"]
+    pub fn set_vis_hud(param_1: bool);
+}
+extern "C" {
+    #[link_name = "\u{1}_ZN3app16kiiladarzmanager16stop_stage_soundEv"]
+    pub fn stop_stage_sound();
+}
+extern "C" {
+    #[link_name = "\u{1}_ZN3app13kozukatasight14set_bgm_volumeEfj"]
+    pub fn set_bgm_volume(param_1: f32, param_2: i32); //param 1 is probably volume and paramm 2 is probably fade in frames
+}
+//squid sisters shit
+extern "C" {
+    #[link_name = "\u{1}_ZN3app10shiokarazu7end_bgmEii"]
+    pub fn end_bgm(param_1:i32 ,param_2:i32); // param 2 is fade in frame but no clue what param 1 is
+}
+extern "C" {
+    #[link_name = "\u{1}_ZN3app10shiokarazu12get_bgm_kindEv"]
+    pub fn get_bgm_kind();
+}
+extern "C" {
+    #[link_name = "\u{1}_ZN3app10shiokarazu12get_warp_posEv"]
+    pub fn get_warp_pos();
+}
+//sv_information
+extern "C" {
+    #[link_name = "\u{1}_ZN3app14sv_information13is_flat_stageEv"]
+    pub fn is_flat_stage();
+}
 
 pub fn install() {
     unsafe {
