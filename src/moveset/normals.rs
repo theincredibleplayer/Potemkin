@@ -16,6 +16,14 @@ use crate::FIGHTER_CUTIN_MANAGER_ADDR;
 use crate::FIGHTER_MANAGER;
 use crate::moveset::*;
 
+pub unsafe extern "C" fn game_turn(agent: &mut L2CAgentBase) {
+    if macros::is_excute(agent) {
+        macros::FT_MOTION_RATE(agent, 0.3);
+    }
+}
+
+
+
 pub unsafe extern "C" fn attack_s3(agent: &mut L2CAgentBase) {
     sv_animcmd::frame(agent.lua_state_agent, 7.0);
     if macros::is_excute(agent) {
@@ -209,10 +217,10 @@ pub unsafe extern "C" fn attack_s4(agent: &mut L2CAgentBase) {
         //let vec2 = Vector2f{x: 6.0, y: 6.0}; /*density?*/
         //let vec3 = Vector3f{x: 0.0, y: 60.0, z: -5.0}; /*x???, y is duration, z???? */
         //EffectModule::request_post_effect_line_circle(agent.module_accessor,Hash40::new("genesis_get"),Hash40::new("top"),vec2,vec3,true,1.0/*radius*/,0.0);
-        let vec1 = Vector2f{x: 1.0, y: 15.0}; //idk seemingly does nothing
+        let vec1 = Vector2f{x: 1.0, y: 1.0}; //idk seemingly does nothing //vanilla sets it to 1,1 i think
         let vec2 = Vector2f{x: 0.0, y: 10.0}; // y is the distance which doesnt have the lines (relative to top?) x seems to be the same?
         let vec3 = Vector2f{x: 30.0 /*duration*/ , y: 10.0 /*fade out*/ }; //duration and fade out
-        let vec4 = Vector2f{x: 0.0, y: 1.0}; //idk seemingly does nothing
+        let vec4 = Vector2f{x: 0.0, y: 0.2}; //idk seemingly does nothing
         let speedlines = EffectModule::request_post_effect_line_parallel_2d(agent.module_accessor,Hash40::new("dead_area_out"),vec1,vec2,vec3,vec4,false,50.0 /*idfk*/,1.0 /*idfk too*/);
         //EffectModule::set_rot(agent.module_accessor, speedlines as u32, &Vector3f{x:50.0,y:0.0,z:30.0});
         //EffectModule::set_scale(agent.module_accessor, speedlines as u32, &Vector3f{x:0.5,y:0.5,z:0.5});

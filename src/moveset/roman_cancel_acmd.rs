@@ -57,8 +57,6 @@ pub unsafe extern "C" fn game_romancancel(agent: &mut L2CAgentBase) {
             macros::EFFECT(agent, Hash40::new("kamui_blue_rc"), Hash40::new("top"), -2, 18, -10, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, false);
             macros::PLAY_SE(agent, Hash40::new("se_kamui_special_n04"));
         }
-        //macros::EFFECT(agent, Hash40::new("kamui_red_rc"), Hash40::new("bust"), 0, -5, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, false);
-        //macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_red_rc"), Hash40::new("bust"), 0, 0, 0, 0, 0, 0, 6, true);
     }
 
     sv_animcmd::frame(agent.lua_state_agent, 9.0);
@@ -78,35 +76,17 @@ pub unsafe extern "C" fn game_romancancel(agent: &mut L2CAgentBase) {
     sv_animcmd::frame(agent.lua_state_agent, 29.0);
     if macros::is_excute(agent) {
         if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RED_RC){
-        
             macros::ATTACK(agent,0,0,Hash40::new("top"),5.0,65,70,20,70,20.0,-2.0,16.0,0.0,None,None,None,1.0,0.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,true,0.0,0.0,0.0,false,false,false,false,true,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_PUNCH,*ATTACK_REGION_NONE);
-            //macros::EFFECT(agent, Hash40::new("kamui_red_rc_blast"), Hash40::new("top"), -2, 16, -10, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, false);        
             macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_red_rc_blast"), Hash40::new("top"), 10, 16, -2, 0, 0, 0, 5, true);
         }else if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_PURPLE_RC){
-
             macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_purple_rc_blast"), Hash40::new("top"), 10, 16, -2, 0, 0, 0, 5, true);
-
-            //macros::EFFECT(agent, Hash40::new("kamui_purple_rc_blast"), Hash40::new("top"), -2, 16, -10, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, false);        
-        
         }else if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_YELLOW_RC){
-
             macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_yellow_rc_blast"), Hash40::new("top"),  10, 16, -2, 0, 0, 0, 5, true);
-
             macros::SEARCH(agent, 0, 0, Hash40::new("top"), 30.0, -2.0, 16.0, 0.0, Some(0.0), Some(0.0), Some(0.0), *COLLISION_KIND_MASK_HIT, *HIT_STATUS_MASK_NORMAL, 1, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIEB, *COLLISION_PART_MASK_ALL, false);
-            //macros::EFFECT(agent, Hash40::new("kamui_yellow_rc_blast"), Hash40::new("top"),-2, 16, -10, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, false);        
-        
         }else if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_BLUE_RC){
-
             macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_blue_rc_blast"), Hash40::new("top"), 10, 16, -2, 0, 0, 0, 5, true);
-
-            //macros::EFFECT(agent, Hash40::new("kamui_blue_rc_blast"), Hash40::new("top"), -2, 16, -10, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, false);        
-        
         }
-        //macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_rc_burst"), Hash40::new("bust"), 0, 0, 0, 0, 0, 0, 6, true);
-        //
-        //if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RED_RC){
-        //    macros::ATTACK(agent,0,0,Hash40::new("bust"),5.0,65,70,20,70,20.0,0.0,0.0,0.0,None,None,None,1.0,0.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,true,0.0,0.0,0.0,false,false,false,false,true,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_PUNCH,*ATTACK_REGION_NONE);
-        //}
+
     }
 
     sv_animcmd::wait(agent.lua_state_agent, 3.0);
@@ -117,16 +97,5 @@ pub unsafe extern "C" fn game_romancancel(agent: &mut L2CAgentBase) {
         if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_YELLOW_RC){
         search!(agent, *MA_MSC_CMD_SEARCH_SEARCH_SCH_CLR_ALL);
         }
-    }
-
-    sv_animcmd::frame(agent.lua_state_agent, 40.0);
-    if macros::is_excute(agent) {
-        macros::CANCEL_FILL_SCREEN(agent, 0, 20);
-        HitModule::set_status_all(agent.module_accessor, HitStatus(*HIT_STATUS_NORMAL), 0);
-        WorkModule::off_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_PURPLE_RC);
-        WorkModule::off_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RED_RC);
-        WorkModule::off_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_YELLOW_RC);
-        WorkModule::off_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_BLUE_RC);
-
     }
 }

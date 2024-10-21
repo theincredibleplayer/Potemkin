@@ -10,7 +10,6 @@ use smash::app::*;
 use smash::phx::*;
 use skyline::nn::ro::LookupSymbol;
 use skyline::nn::ui2d::*;
-use smash::ui2d::SmashPane;
 use skyline::libc::c_void;
 use parking_lot::RwLock;
 

@@ -149,6 +149,27 @@ unsafe fn special_hi_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
 pub unsafe extern "C" fn special_hi_start_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
+
+    let lr = PostureModule::lr(fighter.module_accessor);
+    CameraModule::reset_all(fighter.module_accessor);            
+    macros::CAM_ZOOM_IN_arg6(
+        fighter,
+        /*frames to zoom in totally*/10.0,
+        /*according to calude the object id?*/0.0,
+        /*the amt of zoom needed, higher the number lower the zoom*/1.2,
+        /*y_rot*/0.1, // up and down
+        /*x_rot*/0.1, //left and right
+        true,
+    );
+    fighter.clear_lua_stack();
+    lua_args!(fighter,
+    *MA_MSC_CMD_CAMERA_CAM_OFFSET,
+    /*x*/12.0 * lr,
+    /*y*/14.0,
+    /*z*/0);
+    smash::app::sv_module_access::camera(fighter.lua_state_agent);
+
+
     ArticleModule::generate_article(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
     ArticleModule::change_motion(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("entry_l"),false,-1.0);
 
@@ -209,6 +230,27 @@ pub unsafe extern "C" fn special_hi_start_end(fighter: &mut L2CFighterCommon) ->
 pub unsafe extern "C" fn special_hi_loop_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
+
+    macros::CAM_ZOOM_OUT(fighter);
+    let lr = PostureModule::lr(fighter.module_accessor);
+    CameraModule::reset_all(fighter.module_accessor);            
+    macros::CAM_ZOOM_IN_arg6(
+        fighter,
+        /*frames to zoom in totally*/110.0,
+        /*according to calude the object id?*/0.0,
+        /*the amt of zoom needed, higher the number lower the zoom*/1.4,
+        /*y_rot*/0.2, // up and down
+        /*x_rot*/-0.7 * lr, //left and right
+        /*this seems to be a quake multiplier*/ true,
+    );
+    fighter.clear_lua_stack();
+    lua_args!(fighter,
+    *MA_MSC_CMD_CAMERA_CAM_OFFSET,
+    /*x*/12.0 * lr,
+    /*y*/17.0,
+    /*z*/0.0);
+    smash::app::sv_module_access::camera(fighter.lua_state_agent);
+
     ArticleModule::generate_article(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
     ArticleModule::change_motion(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("entry_r"),false,-1.0);
 
@@ -269,7 +311,6 @@ unsafe fn special_hi_loop_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue 
             else {
                 GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
                 MotionModule::change_motion(module_accessor,Hash40::new("special_hi_loop"),0.0,1.0,false,0.0,false,false);
-
                 grabbed_anim_selector(fighter,"catched_pot_special_hi",1.0); //same as the other ones but this plays it on every hit
             }
         }
@@ -288,8 +329,20 @@ pub unsafe extern "C" fn special_hi_loop_end(fighter: &mut L2CFighterCommon) -> 
 pub unsafe extern "C" fn special_hi_release_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
+    let lr = PostureModule::lr(fighter.module_accessor);
+
+    fighter.clear_lua_stack();
+    lua_args!(fighter,
+    *MA_MSC_CMD_CAMERA_CAM_OFFSET,
+    /*x*/12.0 * lr,
+    /*y*/17.0,
+    /*z*/0);
+    smash::app::sv_module_access::camera(fighter.lua_state_agent);
+
+
+
     ArticleModule::generate_article(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
-    ArticleModule::change_motion(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("win_3"),false,-1.0);
+    ArticleModule::change_motion(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("win_3"),false,0.0);
 
     if fighter.global_table[SITUATION_KIND].get_i32() != *SITUATION_KIND_GROUND {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
@@ -381,14 +434,13 @@ pub unsafe extern "C" fn special_hi_release_exec(fighter: &mut L2CFighterCommon)
         if WorkModule::is_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_HI_FLAG_CAPTURE) {
             println!("special hi flag hit capture");
             let capture_id = LinkModule::get_node_object_id(fighter.module_accessor, *LINK_NO_CAPTURE);
-            notify_event_msc_cmd!(fighter, Hash40::new_raw(0x31dbed6513), Hash40::new("throw"), Hash40::new("invalid"));
+            //notify_event_msc_cmd!(fighter, Hash40::new_raw(0x31dbed6513), Hash40::new("throw"), Hash40::new("invalid"));
             if capture_id != 0x50000000 {
                 println!("releasing attack");
                 AttackModule::hit_absolute_joint(fighter.module_accessor, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW,capture_id as u32,Hash40::new("throw"), 0, 0);
             }
             WorkModule::off_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_HI_FLAG_HIT);
             WorkModule::off_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_HI_FLAG_CAPTURE);
-            CameraModule::reset_all(fighter.module_accessor);            
         }
     }
     return L2CValue::I32(0)

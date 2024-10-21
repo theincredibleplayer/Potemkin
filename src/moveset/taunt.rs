@@ -22,13 +22,14 @@ pub unsafe extern "C" fn appeal_end(fighter: &mut L2CFighterCommon) -> L2CValue 
     if ArticleModule::is_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON) {
         ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
     }
+    set_stage_visibility(fighter.module_accessor, 1);
     smashline::original_status(End, fighter, *FIGHTER_STATUS_KIND_APPEAL)(fighter)
 }
 
 pub unsafe extern "C" fn appeal_srl(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
-        
+        set_stage_visibility(agent.module_accessor, 0);
         //smash::app::lua_bind::FighterManager::prepare_movie(fighter_manager,Hash40::new("prebuilt:/movie/fighter/jack/c00/final_02.h264"));
         //smash::app::lua_bind::FighterManager::start_movie(fighter_manager, 1.0);
         //macros::REQ_FINAL_START_CAMERA(agent, Hash40::new("d04finalvisualscene02.nuanmb"), false);

@@ -101,6 +101,9 @@ pub unsafe extern "C" fn roman_cancel_main(fighter: &mut L2CFighterCommon) -> L2
             }
         }
     }
+    if (moving_x != 0.0) || (moving_y != 0.0){
+        WorkModule::on_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_RC_DASH);
+    }
     WorkModule::set_float(module_accessor, moving_x as f32, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_RC_MOVE_X);
     WorkModule::set_float(module_accessor, moving_y as f32, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_RC_MOVE_Y);
     WorkModule::set_float(module_accessor, limiting_speed as f32, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_RC_LIMITING_SPEED);
@@ -229,11 +232,6 @@ pub unsafe extern "C" fn roman_cancel_end(fighter: &mut L2CFighterCommon) -> L2C
         EffectModule::detach_kind(module_accessor, Hash40::new("kamui_blue_rc_blast"), -1);
     }
     
-    WorkModule::off_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FAST_RC_ENABLE);
-    WorkModule::off_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_PURPLE_RC);
-    WorkModule::off_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RED_RC);
-    WorkModule::off_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_YELLOW_RC);
-    WorkModule::off_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_BLUE_RC);
 
 
     if WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FAST_RC_DETECTED)
@@ -273,7 +271,8 @@ pub unsafe extern "C" fn roman_cancel_end(fighter: &mut L2CFighterCommon) -> L2C
         lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,limiting_speed);
         sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
         sv_kinetic_energy::set_limit_speed(fighter.lua_state_agent);
-    } else if fighter.global_table[SITUATION_KIND] == *SITUATION_KIND_AIR{
+    } else if fighter.global_table[SITUATION_KIND] == *SITUATION_KIND_AIR
+    && !WorkModule::is_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_RC_DASH) {
         let direction = PostureModule::lr(module_accessor);
         let speed_x = WorkModule::get_float(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_PRE_RC_X_SPEED);
         let speed_y = WorkModule::get_float(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_PRE_RC_Y_SPEED);
@@ -283,8 +282,12 @@ pub unsafe extern "C" fn roman_cancel_end(fighter: &mut L2CFighterCommon) -> L2C
     }
 
 
-
+    WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FAST_RC_ENABLE);
+    WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_PURPLE_RC);
+    WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RED_RC);
+    WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_YELLOW_RC);
+    WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_BLUE_RC);
     WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FAST_RC_DETECTED);
-
+    WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_RC_DASH);
     return L2CValue::I32(0)
 }

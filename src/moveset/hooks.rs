@@ -174,8 +174,3 @@ pub unsafe extern "C" fn motion_hook(unk: u64, unk2: u64) -> u64 {
     original!()(unk,unk2)
 }*/
 
-
-/*#[skyline::hook(offset=0x6a7100)] // unadjusted for 13.0.2?
-pub fn stub_kill_screen() {
-    original!()()
-}*/

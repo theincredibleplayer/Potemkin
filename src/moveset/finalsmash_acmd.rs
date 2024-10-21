@@ -368,7 +368,6 @@ pub unsafe extern "C" fn sound_finalvisualscene01(agent: &mut L2CAgentBase) {
 
 pub unsafe extern "C" fn game_fakefinalvisualscene01(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        //macros::ATTACK(agent, 0, 0, Hash40::new("handr"), 0.0, 80, 100, 180, 0, 30.0, 0.0, 1.0, 12.0, Some(0.0), Some(0.0), Some(0.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
         set_vis_hud(false);
         UiManager::set_bar(true);
         ArticleModule::generate_article(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, false, -1);
@@ -436,18 +435,16 @@ pub unsafe extern "C" fn sound_finalvisualscene02(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
     let module_accessor = agent.module_accessor;
     let enemy_id = LinkModule::get_node_object_id(agent.module_accessor, *LINK_NO_CAPTURE);
-    println!("enemy id {}", enemy_id);
     let enemy = sv_battle_object::module_accessor(enemy_id as u32);
     let enemy_kind = sv_battle_object::kind(enemy_id as u32);
     let name = LOWERCASE_FIGHTER_NAMES.get(enemy_kind as usize).unwrap();
-    println!("enemy kind {}", enemy_kind);
-    println!("enemy name {}", name);
     let result = ["vc_",name,"_damage_twinkle"].join("");
-    println!("vc name {}", result);
     let scream_handle = SoundModule::play_se(enemy, Hash40::new(result.as_str()), true, false, false, false, enSEType(0));
     SoundModule::set_se_vol(enemy, scream_handle as i32, 2.0, 0);
     //for zarek's pacman mod
-    let pac_handle = SoundModule::play_se(enemy, Hash40::new("se_pacman_damage_twinkle"), true, false, false, false, enSEType(0));
+    let name = LOWERCASE_FIGHTER_NAMES.get(enemy_kind as usize).unwrap();
+    let result = ["se_",name,"_damage_twinkle"].join("");
+    let pac_handle = SoundModule::play_se(enemy, Hash40::new(result.as_str()), true, false, false, false, enSEType(0));
     SoundModule::set_se_vol(enemy, pac_handle as i32, 2.0, 0);
 
 

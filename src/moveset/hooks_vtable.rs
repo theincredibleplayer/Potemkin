@@ -59,7 +59,8 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
 
     // scales the models of both pot and his articles by -1 on the x axis to mirror (accurate to strive)
     if ((PostureModule::lr(fighter.battle_object.module_accessor) < 0.0) && (StatusModule::status_kind(fighter.battle_object.module_accessor) != FIGHTER_STATUS_KIND_TURN))
-    || ((PostureModule::lr(fighter.battle_object.module_accessor) > 0.0) && (StatusModule::status_kind(fighter.battle_object.module_accessor) == FIGHTER_STATUS_KIND_TURN)){
+    || ((PostureModule::lr(fighter.battle_object.module_accessor) > 0.0) && (StatusModule::status_kind(fighter.battle_object.module_accessor) == FIGHTER_STATUS_KIND_TURN))
+    {
             ModelModule::set_joint_scale(fighter.battle_object.module_accessor, Hash40::new("top") , &Vector3f{x:-scale,y:scale,z:scale});
             if ArticleModule::is_exist(fighter.battle_object.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND){
                 let article = ArticleModule::get_article(fighter.battle_object.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND);
@@ -84,6 +85,9 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
             let article_boma2 = *(article2 as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
             ModelModule::set_joint_scale(article_boma2, Hash40::new("trans") , &Vector3f{x:1.0,y:1.0,z:1.0});
         }
+
+
+
     }
 
 
@@ -91,62 +95,21 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
     let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     //UiManager::add_tension(entry_id, 0.1);
     let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
-    if smash::app::lua_bind::FighterManager::is_result_mode(fighter_manager) {
+    if !sv_information::is_ready_go() {
         UiManager::disable_ui(entry_id);
     }
+    UiManager::set_game_speed(sv_information::slow_rate()); 
+    //println!("game_speed= {}",sv_information::slow_rate());
 
 
-/*
-    if StatusModule::status_kind(fighter.battle_object.module_accessor) == *FIGHTER_STATUS_KIND_FINAL
-    || StatusModule::status_kind(fighter.battle_object.module_accessor) == *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK
-    || StatusModule::status_kind(fighter.battle_object.module_accessor) == *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK_WAIT
-    || StatusModule::status_kind(fighter.battle_object.module_accessor) == *FIGHTER_KAMUI_STATUS_KIND_FINAL_END{
-        let capture_id = LinkModule::get_node_object_id(module_accessor, *LINK_NO_CAPTURE);
-        if capture_id != 0x50000000 {
-            let enemy = sv_battle_object::module_accessor(capture_id as u32);
-            let hight = WorkModule::get_param_float(enemy, hash40("height"), 0);
-            let motion_share =   WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_FINAL_MOTION_SHARE);
+    WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_RUN);
+    WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_DASH_TO_RUN);
+    WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_TURN_DASH);
+    WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_DASH);
 
-            let mut base_hight = 22.0;
-            if motion_share == *FIGHTER_MOTION_SHARE_TYPE_TARO {
-                base_hight = 15.0;
-            }
-            else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_GIRL {
-                base_hight = 17.0;
-            }
-            else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_BIG {
-                base_hight = 19.0;
-            } 
-            //let scale = PostureModule::scale(module_accessor);
-        
-            let base_pos = &mut Vector3f{ x: 0.0, y: 0.0, z: 0.0 };
-            let mut position = ModelModule::joint_global_position(module_accessor, Hash40::new("throw"), base_pos, true);
-            println!("global x: {}\nglobal y: {} \nglobal z: {}",position.x,position.y,position.z);
-            println!("base x: {}\nbase y: {} \nbase z: {}",base_pos.x,base_pos.y,base_pos.z);
-            println!("hight :{}",hight);
-            println!("base hight :{}",base_hight);
-            //println!("scale :{}",scale);
-            let mut offset_y = 11.0;
-            let mut z_mul = 1.0;
-            if StatusModule::status_kind(fighter.battle_object.module_accessor) == *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK{
-                offset_y = 1511.0;
-                z_mul = -1.0;
-            }
-
-
-            let mut final_pos = Vector3f{ x: 0.0, y: 0.0, z: 0.0 };
-            final_pos.x = base_pos.x - (base_hight - hight);
-            final_pos.y = base_pos.y - offset_y;
-            final_pos.z = base_pos.z * z_mul;
-            ModelModule::set_joint_translate(module_accessor, Hash40::new("throw"), &mut final_pos, false, false);
-        
-        }
-    }
-
-*/
-    let motion = MotionModule::motion_kind(fighter.battle_object.module_accessor);
-    let status = StatusModule::status_kind(fighter.battle_object.module_accessor);
-    println!("Status: {:#x}, Motion: {:#x}", status, motion);
+    //let motion = MotionModule::motion_kind(fighter.battle_object.module_accessor);
+    //let status = StatusModule::status_kind(fighter.battle_object.module_accessor);
+    //println!("Status: {:#x}, Motion: {:#x}", status, motion);
 }
 
 
@@ -200,6 +163,7 @@ pub unsafe extern "C" fn kamui_init(vtable: u64, fighter: &mut Fighter) {
         
         MiscModule::add_shield_group(module_accessor, resource, 2);
     }
+
     kamui_init_og(vtable,fighter);
 }
 

@@ -113,142 +113,146 @@ pub unsafe extern "C" fn caught_upb_main_loop(fighter: &mut L2CFighterCommon) ->
 
 
 pub unsafe extern "C" fn thrown_status_common(fighter: &mut L2CFighterCommon) -> L2CValue {
-  let parent_id = LinkModule::get_parent_id(fighter.module_accessor,*LINK_NO_CAPTURE,true);
-  let parent_boma = sv_battle_object::module_accessor(parent_id as u32);
-  println!("caught status hook successful probably");
-  if (StatusModule::status_kind(parent_boma) == *FIGHTER_STATUS_KIND_SPECIAL_HI
-  || StatusModule::status_kind(parent_boma) == FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START)
-  && (utility::get_kind(&mut *parent_boma) == *FIGHTER_KIND_KAMUI) {
-    let motion_share = WorkModule::get_param_int(fighter.module_accessor,0xcad2ee25e,0xc07d88ea0);
-    let mut motion = hash40("catched_pot_special_hi");
-    let mut share_type = 0;
-    if motion_share == *FIGHTER_MOTION_SHARE_TYPE_TARO {
-        motion = FighterMotionModuleImpl::add_body_type_hash(
+    let parent_id = LinkModule::get_parent_id(fighter.module_accessor,*LINK_NO_CAPTURE,true);
+    let parent_boma = sv_battle_object::module_accessor(parent_id as u32);
+    println!("caught status hook successful probably");
+    if (StatusModule::status_kind(parent_boma) == *FIGHTER_STATUS_KIND_SPECIAL_HI
+    || StatusModule::status_kind(parent_boma) == FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START)
+    && (utility::get_kind(&mut *parent_boma) == *FIGHTER_KIND_KAMUI) {
+        let motion_share = WorkModule::get_param_int(fighter.module_accessor,0xcad2ee25e,0xc07d88ea0);
+        let mut motion = hash40("catched_pot_special_hi");
+        let mut share_type = 0;
+        if motion_share == *FIGHTER_MOTION_SHARE_TYPE_TARO {
+            motion = FighterMotionModuleImpl::add_body_type_hash(
+                fighter.module_accessor,
+                Hash40::new_raw(motion),
+                *BODY_TYPE_MOTION_DX
+            );
+        }
+        else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_GIRL {
+            motion = FighterMotionModuleImpl::add_body_type_hash(
             fighter.module_accessor,
-            Hash40::new_raw(motion),
-            *BODY_TYPE_MOTION_DX
-        );
-    }
-    else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_GIRL {
-        motion = FighterMotionModuleImpl::add_body_type_hash(
-          fighter.module_accessor,
-            Hash40::new_raw(motion),
-            *BODY_TYPE_MOTION_GIRL
-        );
-    }
-    else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_BIG {
-        motion = FighterMotionModuleImpl::add_body_type_hash(
-          fighter.module_accessor,
-            Hash40::new_raw(motion),
-            *BODY_TYPE_MOTION_BIG
-        );
-    }
-    WorkModule::set_int64(fighter.module_accessor, motion as i64,*FIGHTER_STATUS_THROWN_WORK_INT_MOTION_KIND);
-    //StatusModule::set_situation_kind(fighter.module_accessor, SituationKind(*SITUATION_KIND_AIR), true);
-    //GroundModule::set_correct(fighter.module_accessor, GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
-
-  }
-  if (StatusModule::status_kind(parent_boma) == *FIGHTER_STATUS_KIND_FINAL
-  || StatusModule::status_kind(parent_boma) == FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP)
-  && (utility::get_kind(&mut *parent_boma) == *FIGHTER_KIND_KAMUI) {
-    let motion_share = WorkModule::get_param_int(fighter.module_accessor,0xcad2ee25e,0xc07d88ea0);
-    let mut motion = hash40("catched_pot_final_scene_01");
-    let height = WorkModule::get_param_float(fighter.module_accessor, hash40("height"), 0);
-    let egg_size = WorkModule::get_param_float(fighter.module_accessor, hash40("egg_collision_size"), 0);
-    let mut x_offset = 22.0 - height;
-    let mut z_offset = (7.2 -egg_size)/4.0;
-    let mut y_offset = 0.0;
-
-    MotionModule::change_motion(fighter.module_accessor, Hash40::new_raw(motion), 0.0, 1.0, false, 0.0, false, false);
-
-    let head_pos = &mut Vector3f{ x: 0.0, y: 0.0, z: 0.0 };
-    let hip_pos = &mut Vector3f{ x: 0.0, y: 0.0, z: 0.0 };
-    let position = &mut Vector3f{ x: 0.0, y: 0.0, z: 0.0 };
-    ModelModule::joint_global_position(fighter.module_accessor, Hash40::new("hip"), hip_pos, true);
-    ModelModule::joint_global_position(fighter.module_accessor, Hash40::new("head"), head_pos, true);
-    position.x = hip_pos.x - head_pos.x;
-    
-    println!("====================offset_x: {}",position.x);
-    //ganon's offset is 8.321199
-    x_offset = (8.321199 - position.x)/3.0;
-
-
-
-    if motion_share == *FIGHTER_MOTION_SHARE_TYPE_TARO {
-        motion = FighterMotionModuleImpl::add_body_type_hash(
+                Hash40::new_raw(motion),
+                *BODY_TYPE_MOTION_GIRL
+            );
+        }
+        else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_BIG {
+            motion = FighterMotionModuleImpl::add_body_type_hash(
             fighter.module_accessor,
-            Hash40::new_raw(motion),
-            *BODY_TYPE_MOTION_DX
-        );
-        x_offset = 9.0 - height;
-        y_offset = -1.0;
-        z_offset = -1.0;
-    }
-    else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_GIRL {
-        motion = FighterMotionModuleImpl::add_body_type_hash(
-          fighter.module_accessor,
-            Hash40::new_raw(motion),
-            *BODY_TYPE_MOTION_GIRL
-        );
-        x_offset = 17.0 - height;
-        y_offset = 0.5;
-        z_offset = -1.0;
-    }
-    else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_BIG {
-        motion = FighterMotionModuleImpl::add_body_type_hash(
-          fighter.module_accessor,
-            Hash40::new_raw(motion),
-            *BODY_TYPE_MOTION_BIG
-        );
-        y_offset = 0.0;
-        z_offset = 0.0;
-        x_offset = 19.0- height;
-    }
-    if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_YOSHI {
-      x_offset = -4.0;
-    }
-    if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_PACKUN {
-      x_offset = -7.0;
-    }
-    if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_ROBOT {
-      x_offset = -6.0;
-    }
-    if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIIFIGHTER
-    || utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIIGUNNER
-    || utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIISWORDSMAN
-    || utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIIENEMYF
-    || utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIIENEMYG
-    || utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIIENEMYS {
-      x_offset = -2.0;
-      z_offset = -2.5;
+                Hash40::new_raw(motion),
+                *BODY_TYPE_MOTION_BIG
+            );
+        }
+        WorkModule::set_int64(fighter.module_accessor, motion as i64,*FIGHTER_STATUS_THROWN_WORK_INT_MOTION_KIND);
     }
 
-    fighter.status_Thrown();
-    let constraint_flags = LinkModule::get_model_constraint_flag(fighter.module_accessor);
-    LinkModule::set_model_constraint_flag(fighter.module_accessor,(*CONSTRAINT_FLAG_OFFSET_TRANSLATE | constraint_flags as i32) as u32);
-    //WorkModule::set_int64(fighter.module_accessor, motion as i64,*FIGHTER_STATUS_THROWN_WORK_INT_MOTION_KIND);
-    MotionModule::change_motion(fighter.module_accessor, Hash40::new_raw(motion), 0.0, 1.0, false, 0.0, false, false);
-    LinkModule::set_constraint_translate_offset(fighter.module_accessor, &Vector3f{ x: x_offset, y: y_offset, z: z_offset });
-    //CaptureModule::set_capture_node_offset(fighter.module_accessor, &Vector3f{ x: 10.0, y: 0.0, z: 0.0 });  
-    if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_GAMEWATCH {
-      let z_scale = ModelModule::scale_z(fighter.module_accessor);
-      WorkModule::set_float(fighter.module_accessor,z_scale,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_GAMEWATCH_Z_SCALE);
-      ModelModule::set_scale_z(fighter.module_accessor,1.0);
+
+    if (StatusModule::status_kind(parent_boma) == *FIGHTER_STATUS_KIND_FINAL
+    || StatusModule::status_kind(parent_boma) == FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP)
+    && (utility::get_kind(&mut *parent_boma) == *FIGHTER_KIND_KAMUI) {
+        let motion_share = WorkModule::get_param_int(fighter.module_accessor,0xcad2ee25e,0xc07d88ea0);
+        let mut motion = hash40("catched_pot_final_scene_01");
+        let height = WorkModule::get_param_float(fighter.module_accessor, hash40("height"), 0);
+        let egg_size = WorkModule::get_param_float(fighter.module_accessor, hash40("egg_collision_size"), 0);
+        let mut x_offset = 22.0 - height;
+        let mut z_offset = (7.2 -egg_size)/4.0;
+        let mut y_offset = 0.0;
+
+        MotionModule::change_motion(fighter.module_accessor, Hash40::new_raw(motion), 0.0, 1.0, false, 0.0, false, false);
+
+        let head_pos = &mut Vector3f{ x: 0.0, y: 0.0, z: 0.0 };
+        let hip_pos = &mut Vector3f{ x: 0.0, y: 0.0, z: 0.0 };
+        let position = &mut Vector3f{ x: 0.0, y: 0.0, z: 0.0 };
+        ModelModule::joint_global_position(fighter.module_accessor, Hash40::new("hip"), hip_pos, true);
+        ModelModule::joint_global_position(fighter.module_accessor, Hash40::new("head"), head_pos, true);
+        position.x = hip_pos.x - head_pos.x;
+        
+        println!("====================offset_x: {}",position.x);
+        //ganon's offset is 8.321199
+        x_offset = (8.321199 - position.x)/3.0;
+
+
+
+        if motion_share == *FIGHTER_MOTION_SHARE_TYPE_TARO {
+            motion = FighterMotionModuleImpl::add_body_type_hash(
+                fighter.module_accessor,
+                Hash40::new_raw(motion),
+                *BODY_TYPE_MOTION_DX
+            );
+            x_offset = 9.0 - height;
+            y_offset = -1.0;
+            z_offset = -1.0;
+        }
+        else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_GIRL {
+            motion = FighterMotionModuleImpl::add_body_type_hash(
+            fighter.module_accessor,
+                Hash40::new_raw(motion),
+                *BODY_TYPE_MOTION_GIRL
+            );
+            x_offset = 17.0 - height;
+            y_offset = 0.5;
+            z_offset = -1.0;
+        }
+        else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_BIG {
+            motion = FighterMotionModuleImpl::add_body_type_hash(
+            fighter.module_accessor,
+                Hash40::new_raw(motion),
+                *BODY_TYPE_MOTION_BIG
+            );
+            y_offset = 0.0;
+            z_offset = 0.0;
+            x_offset = 19.0- height;
+        }
+        if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_YOSHI {
+            x_offset = -4.0;
+        }
+        if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_PACKUN {
+            x_offset = -7.0;
+        }
+        if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_ROBOT {
+            x_offset = -6.0;
+        }
+        if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIIFIGHTER
+        || utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIIGUNNER
+        || utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIISWORDSMAN
+        || utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIIENEMYF
+        || utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIIENEMYG
+        || utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIIENEMYS {
+            x_offset = -2.0;
+            z_offset = -2.5;
+        }
+
+        fighter.status_Thrown();
+        let constraint_flags = LinkModule::get_model_constraint_flag(fighter.module_accessor);
+        LinkModule::set_model_constraint_flag(fighter.module_accessor,(*CONSTRAINT_FLAG_OFFSET_TRANSLATE | constraint_flags as i32) as u32);
+        //WorkModule::set_int64(fighter.module_accessor, motion as i64,*FIGHTER_STATUS_THROWN_WORK_INT_MOTION_KIND);
+        MotionModule::change_motion(fighter.module_accessor, Hash40::new_raw(motion), 0.0, 1.0, false, 0.0, false, false);
+        LinkModule::set_constraint_translate_offset(fighter.module_accessor, &Vector3f{ x: x_offset, y: y_offset, z: z_offset });
+        //CaptureModule::set_capture_node_offset(fighter.module_accessor, &Vector3f{ x: 10.0, y: 0.0, z: 0.0 });  
+        if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_GAMEWATCH {
+            let z_scale = ModelModule::scale_z(fighter.module_accessor);
+            WorkModule::set_float(fighter.module_accessor,z_scale,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_GAMEWATCH_Z_SCALE);
+            ModelModule::set_scale_z(fighter.module_accessor,1.0);
+        }
+        if LinkModule::get_parent_lr(fighter.module_accessor,*LINK_NO_CAPTURE) < 0.0{
+            println!("in get lr");
+            MotionModule::set_flip(fighter.module_accessor,true,true,false);
+            println!("flip has been set");
+        }
+        println!("it happens");
+        return 0.into();
     }
-    println!("it happens");
-    return 0.into();
-  }
-  println!("it goes past");
-  return smashline::original_status(Main, fighter, *FIGHTER_STATUS_KIND_THROWN)(fighter)
+    println!("it goes past");
+    return smashline::original_status(Main, fighter, *FIGHTER_STATUS_KIND_THROWN)(fighter)
 }
 
 
 pub unsafe extern "C" fn thrown_status_common_end(fighter: &mut L2CFighterCommon) -> L2CValue {
     if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_GAMEWATCH {
-      let z_scale = WorkModule::get_float(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_GAMEWATCH_Z_SCALE);
-      ModelModule::set_scale_z(fighter.module_accessor,z_scale);
+        let z_scale = WorkModule::get_float(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_GAMEWATCH_Z_SCALE);
+        ModelModule::set_scale_z(fighter.module_accessor,z_scale);
     }
-  return smashline::original_status(End, fighter, *FIGHTER_STATUS_KIND_THROWN)(fighter)
+    return smashline::original_status(End, fighter, *FIGHTER_STATUS_KIND_THROWN)(fighter)
 }
 
 
@@ -259,28 +263,122 @@ pub unsafe extern "C" fn thrown_status_common_end(fighter: &mut L2CFighterCommon
 
 
 pub unsafe extern "C" fn game_catchedpotspecialhi(agent: &mut L2CAgentBase) {
-  if macros::is_excute(agent) {
-    MotionModule::set_flip(agent.module_accessor,true,true,false);
-    println!("hiiiiiiiiiiiiiiiiii");
-  }
+    if macros::is_excute(agent) {
+        MotionModule::set_flip(agent.module_accessor,true,true,false);
+        println!("hiiiiiiiiiiiiiiiiii");
+    }
 }
 
 
 
-
-
-
 pub unsafe extern "C" fn caught_final_main(fighter: &mut L2CFighterCommon) -> L2CValue {
-  let module_accessor = fighter.module_accessor;
-  //grabbed_anim_selector(module_accessor,"heavenly_caught",1);
-  MotionModule::change_motion(module_accessor, Hash40::new("down_wait_d"), 0.0, 1.0, false, 0.0, false, false);
-  WorkModule::on_flag(module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
-  fighter.status_Throw_Main();
-  fighter.sub_shift_status_main(L2CValue::Ptr(caught_upb_main_loop as *const () as _))
+    let parent_id = LinkModule::get_parent_id(fighter.module_accessor,*LINK_NO_CAPTURE,true);
+    let parent_boma = sv_battle_object::module_accessor(parent_id as u32);
+    if (StatusModule::status_kind(parent_boma) == *FIGHTER_STATUS_KIND_FINAL
+    || StatusModule::status_kind(parent_boma) == FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP)
+    && (utility::get_kind(&mut *parent_boma) == *FIGHTER_KIND_KAMUI) {
+        let motion_share = WorkModule::get_param_int(fighter.module_accessor,0xcad2ee25e,0xc07d88ea0);
+        let mut motion = hash40("catched_pot_final_scene_01");
+        let height = WorkModule::get_param_float(fighter.module_accessor, hash40("height"), 0);
+        let egg_size = WorkModule::get_param_float(fighter.module_accessor, hash40("egg_collision_size"), 0);
+        let mut x_offset = 22.0 - height;
+        let mut z_offset = (7.2 -egg_size)/4.0;
+        let mut y_offset = 0.0;
+
+        MotionModule::change_motion(fighter.module_accessor, Hash40::new_raw(motion), 0.0, 1.0, false, 0.0, false, false);
+
+        let head_pos = &mut Vector3f{ x: 0.0, y: 0.0, z: 0.0 };
+        let hip_pos = &mut Vector3f{ x: 0.0, y: 0.0, z: 0.0 };
+        let position = &mut Vector3f{ x: 0.0, y: 0.0, z: 0.0 };
+        ModelModule::joint_global_position(fighter.module_accessor, Hash40::new("hip"), hip_pos, true);
+        ModelModule::joint_global_position(fighter.module_accessor, Hash40::new("head"), head_pos, true);
+        position.x = hip_pos.x - head_pos.x;
+        
+        println!("====================offset_x: {}",position.x);
+        //ganon's offset is 8.321199
+        x_offset = (8.321199 - position.x)/3.0;
+
+
+
+        if motion_share == *FIGHTER_MOTION_SHARE_TYPE_TARO {
+            motion = FighterMotionModuleImpl::add_body_type_hash(
+                fighter.module_accessor,
+                Hash40::new_raw(motion),
+                *BODY_TYPE_MOTION_DX
+            );
+            x_offset = 9.0 - height;
+            y_offset = -1.0;
+            z_offset = -1.0;
+        }
+        else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_GIRL {
+            motion = FighterMotionModuleImpl::add_body_type_hash(
+            fighter.module_accessor,
+                Hash40::new_raw(motion),
+                *BODY_TYPE_MOTION_GIRL
+            );
+            x_offset = 17.0 - height;
+            y_offset = 0.5;
+            z_offset = -1.0;
+        }
+        else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_BIG {
+            motion = FighterMotionModuleImpl::add_body_type_hash(
+            fighter.module_accessor,
+                Hash40::new_raw(motion),
+                *BODY_TYPE_MOTION_BIG
+            );
+            y_offset = 0.0;
+            z_offset = 0.0;
+            x_offset = 19.0- height;
+        }
+        if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_YOSHI {
+            x_offset = -4.0;
+        }
+        if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_PACKUN {
+            x_offset = -7.0;
+        }
+        if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_ROBOT {
+            x_offset = -6.0;
+        }
+        if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIIFIGHTER
+        || utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIIGUNNER
+        || utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIISWORDSMAN
+        || utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIIENEMYF
+        || utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIIENEMYG
+        || utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIIENEMYS {
+            x_offset = -2.0;
+            z_offset = -2.5;
+        }
+
+        let constraint_flags = LinkModule::get_model_constraint_flag(fighter.module_accessor);
+        LinkModule::set_model_constraint_flag(fighter.module_accessor,(*CONSTRAINT_FLAG_OFFSET_TRANSLATE | constraint_flags as i32) as u32);
+        MotionModule::change_motion(fighter.module_accessor, Hash40::new_raw(motion), 0.0, 1.0, false, 0.0, false, false);
+        LinkModule::set_constraint_translate_offset(fighter.module_accessor, &Vector3f{ x: x_offset, y: y_offset, z: z_offset });
+        if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_GAMEWATCH {
+        let z_scale = ModelModule::scale_z(fighter.module_accessor);
+        WorkModule::set_float(fighter.module_accessor,z_scale,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_GAMEWATCH_Z_SCALE);
+        ModelModule::set_scale_z(fighter.module_accessor,1.0);
+        }
+
+    }
+    println!("after the if");
+    println!("right before shift status");
+    fighter.sub_shift_status_main(L2CValue::Ptr(caught_final_main_loop as *const () as _))
 }
 
 
 
 pub unsafe extern "C" fn caught_final_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
-  return 0.into()
+    println!("before on flag");
+    println!("before 0");
+    return 0.into();
 }
+
+
+pub unsafe extern "C" fn caught_final_end(fighter: &mut L2CFighterCommon) -> L2CValue {
+    if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_GAMEWATCH {
+        let z_scale = WorkModule::get_float(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_GAMEWATCH_Z_SCALE);
+        ModelModule::set_scale_z(fighter.module_accessor,z_scale);
+    }
+    return L2CValue::I32(0)
+}
+

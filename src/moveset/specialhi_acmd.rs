@@ -82,20 +82,22 @@ pub unsafe extern "C" fn special_hi_loop(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         let pos = Vector3f{x:10.0, y:20.0, z:3.0};
         let rot = Vector3f{x:-60.0, y:0.0, z:-20.0};
-        let effect = EffectModule::req(agent.module_accessor, Hash40::new("sys_attack_line_b"), &pos, &rot, 2.50,0, -1, false, 0) as u32;
+        let effect = EffectModule::req_follow(agent.module_accessor, Hash40::new("sys_attack_line_b"), Hash40::new("top"), &pos, &rot, 2.5, true, 0, 0, 0, 0, 0, true, true) as u32;
         //macros::EFFECT_FOLLOW(agent, Hash40::new("sys_attack_line_b"), Hash40::new("top"), 18, 20, 3, -45, 0, -20, 2.5, true);
-        EffectModule::set_rgb(agent.module_accessor, effect, 1.0, 0.64, 0.0);
+        EffectModule::set_rgb(agent.module_accessor, effect, 1.0, 0.24, 0.0);
         macros::LAST_EFFECT_SET_RATE(agent, 0.75);
     }
     sv_animcmd::frame(agent.lua_state_agent, 3.0);
     if macros::is_excute(agent) {
-        macros::QUAKE(agent, *CAMERA_QUAKE_KIND_S);
+        let lr = PostureModule::lr(agent.module_accessor);
+        macros::QUAKE(agent, *CAMERA_QUAKE_KIND_XL);
         macros::ATTACK(agent,0,0,Hash40::new("top"),1.0,361,30,10,12,5.0,0.0,28.0,12.0,None,None,None,0.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_PUNCH,*ATTACK_REGION_NONE);
         AttackModule::set_catch_only_all(agent.module_accessor, true, false);
         AttackModule::set_no_dead_all(agent.module_accessor, true, false);
     }
-    sv_animcmd::wait(agent.lua_state_agent, 1.0);
+    sv_animcmd::frame(agent.lua_state_agent, 9.0);
     if macros::is_excute(agent) {
+        CameraModule::stop_quake(agent.module_accessor, *CAMERA_QUAKE_KIND_XL);
         AttackModule::clear_all(agent.module_accessor);
     }
 }
@@ -110,19 +112,24 @@ pub unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
         macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 20.0, 361, 100, 0, 50, 1.5, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         WorkModule::on_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_HI_FLAG_CAPTURE);
     }
+    sv_animcmd::frame(agent.lua_state_agent, 1.0);
+    if macros::is_excute(agent) {
+        CameraModule::stop_quake(agent.module_accessor, *CAMERA_QUAKE_KIND_XL);
+        
+    }
     sv_animcmd::frame(agent.lua_state_agent, 2.0);
     if macros::is_excute(agent) {
         let pos = Vector3f{x:10.0, y:20.0, z:3.0};
         let rot = Vector3f{x:-60.0, y:0.0, z:-20.0};
         let effect = EffectModule::req_follow(agent.module_accessor, Hash40::new("sys_attack_line_b"), Hash40::new("top"), &pos, &rot, 2.5, true, 0, 0, 0, 0, 0, true, true) as u32;
         //macros::EFFECT_FOLLOW(agent, Hash40::new("sys_attack_line_b"), Hash40::new("top"), 18, 20, 3, -45, 0, -20, 2.5, true);
-        EffectModule::set_rgb(agent.module_accessor, effect, 1.0, 0.64, 0.0);
+        EffectModule::set_rgb(agent.module_accessor, effect, 1.0, 0.24, 0.0);
         macros::LAST_EFFECT_SET_RATE(agent, 0.75);
         
     }
     sv_animcmd::frame(agent.lua_state_agent, 3.0);
     if macros::is_excute(agent) {
-        macros::QUAKE(agent, *CAMERA_QUAKE_KIND_S);
+        macros::QUAKE(agent, *CAMERA_QUAKE_KIND_XL);
         macros::ATTACK(agent,0,0,Hash40::new("top"),1.0,361,30,10,12,5.0,0.0,28.0,12.0,None,None,None,0.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_PUNCH,*ATTACK_REGION_NONE);
         AttackModule::set_catch_only_all(agent.module_accessor, true, false);
         AttackModule::set_no_dead_all(agent.module_accessor, true, false);
@@ -141,30 +148,34 @@ pub unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
         //AttackModule::set_catch_only_all(agent.module_accessor, true, false);
         //AttackModule::set_no_dead_all(agent.module_accessor, true, false);
         WorkModule::on_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_HI_FLAG_HIT);
-        let fighter_cutin_manager = *(FIGHTER_CUTIN_MANAGER_ADDR as *mut *mut smash::app::FighterCutInManager);
-        smash::app::lua_bind::FighterCutInManager::set_throw_finish_zoom_rate(fighter_cutin_manager, 1.7);
-        macros::QUAKE(agent, *CAMERA_QUAKE_KIND_XL);
+        //let fighter_cutin_manager = *(FIGHTER_CUTIN_MANAGER_ADDR as *mut *mut smash::app::FighterCutInManager);
+        //smash::app::lua_bind::FighterCutInManager::set_throw_finish_zoom_rate(fighter_cutin_manager, 1.7);
+        
         macros::PLAY_SE(agent, Hash40::new("se_kamui_special_h02"));
-
-    }
-    sv_animcmd::wait(agent.lua_state_agent, 1.0);
-    if macros::is_excute(agent) {
+        macros::CAM_ZOOM_OUT(agent);
         let lr = PostureModule::lr(agent.module_accessor);
-        macros::CAM_ZOOM_IN_arg5(
+        CameraModule::reset_all(agent.module_accessor);            
+        macros::CAM_ZOOM_IN_arg6(
             agent,
-            /*frames to zoom in totally*/5.0,
+            /*frames to zoom in totally*/3.0,
             /*according to calude the object id?*/0.0,
-            /*the amt of zoom needed, higher the number lower the zoom*/1.8,
-            /*y_rot*/0.1, // up and down
-            /*x_rot*/-0.8 * lr, //left and right
+            /*the amt of zoom needed, higher the number lower the zoom*/1.7,
+            /*y_rot*/0.2, // up and down
+            /*x_rot*/-0.6 * lr, //left and right
+            true
         );
+        CameraModule::stop_quake(agent.module_accessor, *CAMERA_QUAKE_KIND_XL);
+        macros::QUAKE(agent, *CAMERA_QUAKE_KIND_XL);
         agent.clear_lua_stack();
         lua_args!(agent,
         *MA_MSC_CMD_CAMERA_CAM_OFFSET,
         /*x*/12.0 * lr,
-        /*y*/12,
+        /*y*/17.0,
         /*z*/0);
         smash::app::sv_module_access::camera(agent.lua_state_agent);
+    }
+    sv_animcmd::wait(agent.lua_state_agent, 1.0);
+    if macros::is_excute(agent) {
         /*camera!(agent,
         *MA_MSC_CMD_CAMERA_CAM_OFFSET,
         /*x*/12.0 * lr,
@@ -172,10 +183,33 @@ pub unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
         /*z*/30);*/
         macros::FT_MOTION_RATE(agent, 2.0);
     }
-    sv_animcmd::wait(agent.lua_state_agent, 22.0);
+    sv_animcmd::wait(agent.lua_state_agent, 10.0);
+    if macros::is_excute(agent) {
+        macros::CAM_ZOOM_OUT(agent);
+        let lr = PostureModule::lr(agent.module_accessor);
+        CameraModule::reset_all(agent.module_accessor);            
+        macros::CAM_ZOOM_IN_arg6(
+            agent,
+            /*frames to zoom in totally*/10.0,
+            /*according to calude the object id?*/0.0,
+            /*the amt of zoom needed, higher the number lower the zoom*/3.0,
+            /*y_rot*/0.0, // up and down
+            /*x_rot*/0.0, //left and right
+            true
+        );
+        agent.clear_lua_stack();
+        lua_args!(agent,
+        *MA_MSC_CMD_CAMERA_CAM_OFFSET,
+        /*x*/12.0 * lr,
+        /*y*/17.0,
+        /*z*/0);
+        smash::app::sv_module_access::camera(agent.lua_state_agent);
+    }
+    sv_animcmd::wait(agent.lua_state_agent, 5.0);
     if macros::is_excute(agent) {
         macros::CAM_ZOOM_OUT(agent);
     }
+
 }
 
 pub unsafe extern "C" fn sound_special_hi_release(agent: &mut L2CAgentBase) {

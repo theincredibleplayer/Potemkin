@@ -24,7 +24,6 @@ use {
     smashline::{*, Priority::*}
 };
 use nnsdk::ui2d::*;
-use smash::ui2d::SmashPane;
 use skyline::libc::c_void;
 use crate::FIGHTER_CUTIN_MANAGER_ADDR;
 use crate::FIGHTER_MANAGER;
@@ -65,7 +64,8 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_TWO : i32 = 0x20000102;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_THREE : i32 = 0x20000103;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_KILL : i32 = 0x20000104;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_WIN_FRAME : i32 = 0x20000105;
-pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_TEST : i32 = 0x20000106;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_RC_DASH : i32 = 0x20000106;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_STOP_FINAL_I_FRAMES : i32 = 0x20000107;
 
 
 
@@ -215,7 +215,10 @@ mod ui_manager;
 use ui_manager::*;
 mod dual_meter;
 use dual_meter::*;
-
+mod ui2d;
+use ui2d::*;
+mod autoturn;
+use autoturn::*;
 //this does... something......... probably
 extern "C" {
     #[link_name = "\u{1}_ZN3app19FighterCutInManager13is_one_on_oneEv"]
@@ -225,7 +228,7 @@ extern "C" {
 
 //will be autoturn hopefully (should prolly move to a new rs)
 
-/*unsafe fn auto_turn(fighter: &mut L2CFighterCommon) -> L2CValue {
+unsafe fn auto_turn_2(fighter: &mut L2CFighterCommon) -> L2CValue {
     if FighterCutInManager__is_one_on_one()
     && fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND {
         let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
@@ -239,18 +242,19 @@ extern "C" {
         let battle_object = *(entry as *mut u64).add(0x4160/8) as *mut u64;
         let enemy = *battle_object.add(0x20/8) as *mut BattleObjectModuleAccessor;
         if PostureModule::pos_x(enemy) > PostureModule::pos_x(fighter.module_accessor) {
-            PostureModule::set_lr(fighter.module_accessor,1.0);
+            WorkModule::set_float(fighter.module_accessor, 1.0,*FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1);
         }
         else {
-            PostureModule::set_lr(fighter.module_accessor,-1.0);
+            WorkModule::set_float(fighter.module_accessor, -1.0,*FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1);
         }
         PostureModule::update_rot_y_lr(fighter.module_accessor);
     }
     return L2CValue::I32(0)
-}*/
+}
 
+
+// used for sound randomization
 pub unsafe extern "C" fn sound_selector(fighter: &mut L2CAgentBase, mut sound_name: String, num_of_vars: i32, is_sequence: bool, continue_sequence: bool, sequence_order_number: i32) -> u64 {
-    //let sound_name_return = "w";
     let mut random = smash::app::sv_math::rand(hash40("fighter"), num_of_vars);
     let random2 = smash::app::sv_math::rand(hash40("fighter"), num_of_vars-1);
 
@@ -606,6 +610,7 @@ pub unsafe extern "C" fn pot_check_special_command(fighter: &mut L2CFighterCommo
 unsafe extern "C" fn agent_init(fighter: &mut L2CFighterCommon) {
     let fighter_kind = fighter.global_table[KIND].get_i32();
     if fighter_kind == *FIGHTER_KIND_KAMUI {
+        fighter.global_table[0x3E].assign(&L2CValue::Ptr(auto_turn as *const () as _));   
         fighter.global_table[CHECK_SPECIAL_COMMAND].assign(&L2CValue::Ptr(pot_check_special_command as *const () as _));
     }
 }
@@ -618,15 +623,9 @@ unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter) {
     kamui_init_original();
 }*/
 
-#[skyline::from_offset(0x695f20)]
-pub unsafe extern "C" fn zoom_in(module_accessor: *mut smash::app::BattleObjectModuleAccessor, battle_object_id: i32, location: Vector3f, unk2: i32, param_hash: smash::phx::Hash40 , unk4: u32, unk5: u32) -> u8;
-
-
-#[skyline::from_offset(0x1378ad0)]
-pub unsafe extern "C" fn ui_disable(param_1: u64, param_2: u64);
-//ui_disable(0x1100b8cc00, 0x4f82860);  // relative to main
-//ui_disable(75174054912, 2230872160);  // 
-
+// arg 2 as 0 hides the stage and as 1 unhides it
+#[skyline::from_offset(0x159fb20)]
+pub unsafe extern "C" fn set_stage_visibility(module_accessor: *mut smash::app::BattleObjectModuleAccessor, param_2: i32);
 
 
 #[skyline::hook(offset = 0x67f74c, inline)]
@@ -906,8 +905,11 @@ pub fn install() {
     .status(Exec, FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE, fakefinalsceneenter_exec)
     .status(End, FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE, fakefinalsceneenter_end)
     */
-    .status(Exec, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ENTRY, vissceneentry_exec)
-    .status(Exec, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK_WAIT, vissceneattackwait_exec)
+    .status(Pre, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ENTRY, vissceneentry_pre)
+    .status(Init, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ENTRY, vissceneentry_init)
+
+    .status(Pre, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK_WAIT, vissceneattackwait_pre)
+    .status(Init, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK_WAIT, vissceneattackwait_init)
 
 
 
@@ -994,9 +996,15 @@ pub fn install() {
     .status(End, *FIGHTER_STATUS_KIND_THROWN, thrown_status_common_end)
 
 
-    .game_acmd("game_catchedpotspecialhi", game_catchedpotspecialhi, Priority::Low)
+    //.game_acmd("game_catchedpotspecialhi", game_catchedpotspecialhi, Priority::Low)
 
+
+    .status(Pre, FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_upb_pre)
     .status(Main, FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_final_main)
+    .status(End, FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_final_end)
+    .status(Init, FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_upb_init)
+    .status(Exec, FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_upb_exec)
+    .status(End, FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_upb_end)
 
 
     .install();
@@ -1037,6 +1045,14 @@ pub fn install() {
 
     }
     skyline::patching::Patch::in_text(0x3414784).nop();
+
+
+    //for n in (0xb620e4..0xb621c0).step_by(4) {
+        skyline::patching::Patch::in_text(0xb620f0).nop();
+    //}
+
+
+
     //skyline::patching::Patch::in_text(0x51d3ad8).nop();
 
     //skyline::patching::Patch::in_text(0x51d3ad8).nop();
