@@ -110,16 +110,18 @@ pub unsafe extern "C" fn noping_the_eff(vtable:u64, weapon: *mut smash::app::Wea
 
 
 
-#[skyline::hook(replace=MotionModule::change_motion)]
-unsafe fn change_motion_hook(boma: &mut BattleObjectModuleAccessor, mut motion_hash: smash::phx::Hash40, start_frame: f32, arg4: f32, arg5: bool, arg6: f32, arg7: bool, arg8: bool) -> u64 {
-    let kind = WorkModule::get_int(boma, *FIGHTER_INSTANCE_WORK_ID_INT_KIND);
-    println!("change motion hook successful");
-    if kind == *FIGHTER_KIND_KAMUI{
-        if motion_hash == Hash40::new("win_2") || motion_hash == Hash40::new("win_3"){
-            motion_hash = Hash40::new("win_1");
+
+#[skyline::hook(offset=0x4E53E0)]
+unsafe fn get_param_float_hook(x0:u64, arg2:u64, arg3:u64) -> f32 {
+    let mut boma = *((x0 as *mut u64).offset(1)) as *mut BattleObjectModuleAccessor;
+    let boma_reference = &mut *boma;
+    let fighter_kind = utility::get_kind(boma_reference);
+    if fighter_kind == *FIGHTER_KIND_KAMUI{
+        if (arg2 == 0xdf05c072b) && (arg3 == 0x19996b81b6){
+            return 1200.0;
         }
     }
-    original!()(boma, motion_hash, start_frame, arg4, arg5, arg6, arg7, arg8)
+    original!()(x0, arg2, arg3)
 }
 
 

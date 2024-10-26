@@ -124,6 +124,10 @@ pub const FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP: i32 = 0x1fa;
 pub const FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE: i32 = 0x1fb;
 pub const FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL: i32 = 0x1fc;
 pub const FIGHTER_KAMUI_STATUS_KIND_WIN: i32 = 0x1fd;
+pub const FIGHTER_KAMUI_STATUS_KIND_WALK_BACK: i32 = 0x200;
+pub const FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN: i32 = 0x201;
+pub const FIGHTER_KAMUI_STATUS_KIND_WALK_BRAKE_BACK: i32 = 0x202;
+
 // for weapon
 pub const WEAPON_KAMUI_RYUSENSYA_STATUS_KIND_BOOM: i32 = 0x1;
 
@@ -610,7 +614,7 @@ pub unsafe extern "C" fn pot_check_special_command(fighter: &mut L2CFighterCommo
 unsafe extern "C" fn agent_init(fighter: &mut L2CFighterCommon) {
     let fighter_kind = fighter.global_table[KIND].get_i32();
     if fighter_kind == *FIGHTER_KIND_KAMUI {
-        fighter.global_table[0x3E].assign(&L2CValue::Ptr(auto_turn as *const () as _));   
+        fighter.global_table[0x3E].assign(&L2CValue::Ptr(auto_turn as *const () as _));
         fighter.global_table[CHECK_SPECIAL_COMMAND].assign(&L2CValue::Ptr(pot_check_special_command as *const () as _));
     }
 }
@@ -626,6 +630,12 @@ unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter) {
 // arg 2 as 0 hides the stage and as 1 unhides it
 #[skyline::from_offset(0x159fb20)]
 pub unsafe extern "C" fn set_stage_visibility(module_accessor: *mut smash::app::BattleObjectModuleAccessor, param_2: i32);
+
+#[skyline::from_offset(0x69a6e0)]
+pub unsafe extern "C" fn get_opponent_lr(module_accessor: *mut smash::app::BattleObjectModuleAccessor, is_damage: bool, status_kind: i32, param_always_0: i32) -> f32;
+
+#[skyline::from_offset(0x69ad00)]
+pub unsafe extern "C" fn set_lr_float(lr_float: f32, module_accessor: *mut smash::app::BattleObjectModuleAccessor, status_kind: i32, param_always_0: i32) -> u64;
 
 
 #[skyline::hook(offset = 0x67f74c, inline)]
@@ -706,6 +716,31 @@ pub fn install() {
     .on_line(Main, kamui)
     .on_start(agent_init)
 
+    //autoturn
+    .status(Main      , *FIGHTER_STATUS_KIND_WAIT, wait_main)
+    .status(Pre       ,  *FIGHTER_STATUS_KIND_WAIT, wait_pre)
+
+    .status(Main      , *FIGHTER_STATUS_KIND_WALK, walk_main)
+
+    //.status(Main      , *FIGHTER_STATUS_KIND_FALL, fall_main)
+
+    .status(Pre       , FIGHTER_KAMUI_STATUS_KIND_WALK_BACK, walkback_pre)
+    .status(Main      , FIGHTER_KAMUI_STATUS_KIND_WALK_BACK, walkback_main)
+    .status(Exit      , FIGHTER_KAMUI_STATUS_KIND_WALK_BACK, walkback_exit)
+    .status(Init      , FIGHTER_KAMUI_STATUS_KIND_WALK_BACK, walkback_init)
+    .status(Exec      , FIGHTER_KAMUI_STATUS_KIND_WALK_BACK, walkback_exec)
+    .status(End       , FIGHTER_KAMUI_STATUS_KIND_WALK_BACK, walkback_end)
+    .status(CalcParam , FIGHTER_KAMUI_STATUS_KIND_WALK_BACK, walkback_calc_param)
+
+    .status(Pre       , FIGHTER_KAMUI_STATUS_KIND_WALK_BRAKE_BACK, walk_back_brake_pre)
+    .status(Main      , FIGHTER_KAMUI_STATUS_KIND_WALK_BRAKE_BACK, walk_back_brake_main)
+    .status(Init      , FIGHTER_KAMUI_STATUS_KIND_WALK_BRAKE_BACK, walk_back_brake_init)
+    .status(Exec      , FIGHTER_KAMUI_STATUS_KIND_WALK_BRAKE_BACK, walk_back_brake_exec)
+    .status(End       , FIGHTER_KAMUI_STATUS_KIND_WALK_BRAKE_BACK, walk_back_brake_end)
+
+    .status(Pre       ,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN, autoturn_pre)
+    .status(Main      ,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN, autoturn_main)
+    .status(End       ,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN, autoturn_end)
 
     //throw
     .game_acmd("game_throwlw", throw_lw, Priority::Low)
@@ -1015,7 +1050,7 @@ pub fn install() {
         notify_log_event_collision_hit_replace,
         kamui_link_event,
         noping_the_eff,
-        //change_motion_hook,
+        get_param_float_hook,
         handle_draw,
         idkman,
         idkman2

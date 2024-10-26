@@ -95,27 +95,11 @@ pub unsafe extern "C" fn auto_turn(fighter: &mut L2CFighterCommon) -> L2CValue {
     let status_kind_interrupt = fighter.global_table[0x9].get_i32();
     let situation_kind = fighter.global_table[0x16].get_i32();
     let cat_3 = fighter.global_table[0x22].get_i32();
-    let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
-    let entry_id = if utility::get_kind(&mut *fighter.module_accessor) == *FIGHTER_KIND_KAMUI {
-        1
-    }
-    else {
-        0
-    };
-    let entry = smash::app::lua_bind::FighterManager::get_fighter_entry(fighter_manager,FighterEntryID(entry_id));
-    let battle_object = *(entry as *mut u64).add(0x4160/8) as *mut u64;
-    let enemy = *battle_object.add(0x20/8) as *mut BattleObjectModuleAccessor;
-    if PostureModule::pos_x(enemy) > PostureModule::pos_x(fighter.module_accessor) {
-        WorkModule::set_float(fighter.module_accessor, 1.0,*FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1);
-    }
-    else {
-        WorkModule::set_float(fighter.module_accessor, -1.0,*FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1);
-    }
+
 
 
 
     let lr_1on1 = WorkModule::get_float(fighter.module_accessor, *FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1);
-    WorkModule::off_flag(fighter.module_accessor, *FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLAG_AUTO_TURN_END_STATUS);
     if !(lr_1on1 == 0.0) {
         if !(lr_1on1 == PostureModule::lr(fighter.module_accessor)) {
             if StatusModule::situation_kind(fighter.module_accessor) == *SITUATION_KIND_GROUND {
@@ -182,7 +166,8 @@ pub unsafe extern "C" fn auto_turn(fighter: &mut L2CFighterCommon) -> L2CValue {
                                 return 0.into();
                             }
                             if status_kind == *FIGHTER_STATUS_KIND_ITEM_THROW {
-                                if situation_kind == *SITUATION_KIND_GROUND {
+                                if situation_kind == *SITUATION_KIND_GROUND
+                                || situation_kind == *SITUATION_KIND_AIR {
                                     if cat_3 == *FIGHTER_PAD_CMD_CAT3_FLAG_ITEM_LIGHT_THROW_4 {
                                         if cat_3 == *FIGHTER_PAD_CMD_CAT3_FLAG_ITEM_LIGHT_THROW_FB4{
                                             if var90 {
@@ -257,7 +242,8 @@ pub unsafe extern "C" fn auto_turn(fighter: &mut L2CFighterCommon) -> L2CValue {
                         return 0.into();
                     }
                     if status_kind == *FIGHTER_STATUS_KIND_ITEM_THROW {
-                        if situation_kind == *SITUATION_KIND_GROUND {
+                        if situation_kind == *SITUATION_KIND_GROUND
+                        || situation_kind == *SITUATION_KIND_AIR {
                             if cat_3 == *FIGHTER_PAD_CMD_CAT3_FLAG_ITEM_LIGHT_THROW_4 {
                                 if cat_3 == *FIGHTER_PAD_CMD_CAT3_FLAG_ITEM_LIGHT_THROW_FB4{
                                     if var90 {
@@ -296,3 +282,282 @@ pub unsafe extern "C" fn auto_turn(fighter: &mut L2CFighterCommon) -> L2CValue {
     }
     return 0.into();
 }
+
+
+pub unsafe extern "C" fn wait_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
+    let lua_state = fighter.lua_state_agent;
+    let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
+    if fighter.status_pre_Wait_check_interrupt().get_bool() {
+        return 1.into();
+    }
+    if !(WorkModule::get_float(fighter.module_accessor, *FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1) == 0.0) {
+        if !(WorkModule::get_float(fighter.module_accessor, *FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1) == PostureModule::lr(fighter.module_accessor)) {
+            let mut some_bool = false;
+            let mut some_bool_2= false;
+            some_function(&some_bool,fighter.global_table[PREV_STATUS_KIND].get_i32());
+            if (some_bool == false) {
+                if !(GroundModule::is_ottotto(fighter.module_accessor, 0.86)) {
+                    some_bool_2 = false;
+                } else {
+                    if !(fighter.global_table[STICK_X].get_f32().abs() < 0.75) {
+                        StatusModule::set_status_kind_interrupt(fighter.module_accessor, FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN);
+                        return 1.into();
+                    }
+                    if !WorkModule::is_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_DISABLE_OTTOTTO) {
+                        StatusModule::set_status_kind_interrupt(fighter.module_accessor, FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN);
+                        return 1.into();
+                    }
+                    some_bool_2 = true;
+                }
+                if some_bool_2 {
+                    fighter.status_pre_Wait_main();
+                    return 1.into();
+                }
+            }
+            StatusModule::set_status_kind_interrupt(fighter.module_accessor, FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN);
+            return 1.into();
+        }
+    }
+    fighter.status_pre_Wait_main();
+    return 1.into();
+}
+
+
+pub unsafe extern "C" fn wait_main(fighter: &mut L2CFighterCommon) -> L2CValue {
+    let lua_state = fighter.lua_state_agent;
+    let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
+    fighter.sub_wait_common();
+    fighter.sub_wait_motion_mtrans();
+    WorkModule::unable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_TURN);
+    fighter.sub_shift_status_main(L2CValue::Ptr(wait_main_loop as *const () as _))
+}
+
+pub unsafe extern "C" fn wait_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
+    let lua_state = fighter.lua_state_agent;
+    let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
+    if fighter.status_Wait_Main().get_bool() {
+        return 0.into();
+    }
+    let lr_1on1 = WorkModule::get_float(fighter.module_accessor, *FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1);
+    let lr = PostureModule::lr(fighter.module_accessor);
+    if lr_1on1 != 0.0 {
+        if (lr_1on1 == lr)
+        && (WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_WALK))
+        && (WorkModule::get_param_float(fighter.module_accessor, hash40("common"), hash40("walk_stick_x")) <= (PostureModule::lr(fighter.module_accessor)*ControlModule::get_stick_x(module_accessor)).abs() )
+        && (WorkModule::get_param_float(fighter.module_accessor, hash40("common"), hash40("squat_stick_y")) <= fighter.global_table[STICK_Y].get_f32())
+        {
+            fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_WALK_BACK.into(),true.into());
+            return 0.into();
+        }else if (lr_1on1 != lr){
+            fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN.into(),false.into());
+            return 0.into();
+        }
+    }
+    return 0.into();
+}
+
+
+pub unsafe extern "C" fn sub_walk_uniq_check(fighter: &mut L2CFighterCommon) {
+    fighter.sub_walk_uniq_check();
+}
+
+
+
+
+pub unsafe extern "C" fn walk_main(fighter: &mut L2CFighterCommon) -> L2CValue {
+    let lua_state = fighter.lua_state_agent;
+    let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
+    fighter.status_Walk_Common();
+    if StopModule::is_stop(fighter.module_accessor) == false {
+        fighter.sub_walk_uniq_check();
+    }
+    fighter.global_table[0x14].assign(&L2CValue::Ptr(sub_walk_uniq_check as *const () as _));   
+    fighter.sub_shift_status_main(L2CValue::Ptr(walk_main_loop as *const () as _))
+}
+
+
+
+pub unsafe extern "C" fn walk_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
+    let lua_state = fighter.lua_state_agent;
+    let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
+    fighter.status_Walk_Main_common((*FIGHTER_STATUS_KIND_WALK_BRAKE).into(), (fighter.global_table[0x1a].get_f32()*PostureModule::lr(fighter.module_accessor)).into(), true.into(), L2CValue::Ptr(walk_function_idfk as *const () as _));
+
+    return 0.into();
+}
+
+
+pub unsafe extern "C" fn walk_function_idfk(fighter: &mut L2CFighterCommon) -> bool{
+    let lua_state = fighter.lua_state_agent;
+    let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
+
+    if (WorkModule::get_float(module_accessor,*FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1) != 0.0 )
+    && (WorkModule::get_float(module_accessor,*FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1) != PostureModule::lr(module_accessor)) {
+        fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN.into(),false.into());
+        return true.into()
+    }
+    return false.into()
+}
+
+
+
+
+pub unsafe extern "C" fn walkback_main(fighter: &mut L2CFighterCommon) -> L2CValue {
+    fighter.status_Walk_Common();
+    if StopModule::is_stop(fighter.module_accessor) == false {
+        fighter.sub_walk_uniq_check();
+    }
+    fighter.global_table[0x14].assign(&L2CValue::Ptr(sub_walk_uniq_check as *const () as _));   
+    fighter.sub_shift_status_main(L2CValue::Ptr(walkback_main_loop as *const () as _))
+}
+
+pub unsafe extern "C" fn walkback_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
+    //fighter.status_Walk_Main_common((*FIGHTER_STATUS_KIND_WALK_BRAKE).into(), (fighter.global_table[0x1a].get_f32()*PostureModule::lr(fighter.module_accessor)).into(), true.into(), L2CValue::Ptr(walk_function_idfk as *const () as _));
+    fighter.status_Walk_Main_common(
+        (FIGHTER_KAMUI_STATUS_KIND_WALK_BRAKE_BACK).into(),
+        (-PostureModule::lr(fighter.module_accessor) * fighter.global_table[STICK_X].get_f32()).into(),
+        false.into(),
+        L2CValue::Ptr(walk_function_idfk as *const () as _)
+    );
+    return 0.into();
+}
+
+pub unsafe extern "C" fn walkback_calc_param(fighter: &mut L2CFighterCommon) -> L2CValue {
+    fighter.FighterStatusUniqProcessWalkBack_calc_param();
+    return 0.into();
+}
+
+pub unsafe extern "C" fn walkback_exec(fighter: &mut L2CFighterCommon) -> L2CValue {
+    fighter.sub_walk_back_uniq_process_exec();
+    return 0.into();
+}
+pub unsafe extern "C" fn walkback_init(fighter: &mut L2CFighterCommon) -> L2CValue {
+    fighter.sub_walk_back_uniq_process_init();
+    return 0.into();
+}
+pub unsafe extern "C" fn walkback_exit(fighter: &mut L2CFighterCommon) -> L2CValue {
+    fighter.sub_walk_back_uniq_process_exit();
+    return 0.into();
+}
+pub unsafe extern "C" fn walkback_end(fighter: &mut L2CFighterCommon) -> L2CValue {
+    fighter.status_end_WalkBack();
+    return 0.into();
+}
+pub unsafe extern "C" fn walkback_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
+    fighter.status_pre_WalkBack();
+    return 0.into();
+}
+
+
+
+pub unsafe extern "C" fn autoturn_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
+    fighter.status_pre_Wait();
+    return 0.into();
+}
+
+pub unsafe extern "C" fn autoturn_main(fighter: &mut L2CFighterCommon) -> L2CValue {
+    fighter.sub_wait_common();
+    PostureModule::reverse_lr(fighter.module_accessor);
+    if ControlModule::is_remake_command(fighter.module_accessor) {
+        fighter.sub_fighter_remake_control_command();
+    }
+    MotionModule::change_motion(fighter.module_accessor, Hash40::new("turn"), 0.0, 1.0, false, 0.0, false, false);
+    fighter.sub_shift_status_main(L2CValue::Ptr(autoturn_main_loop as *const () as _))
+}
+
+pub unsafe extern "C" fn autoturn_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
+    if !fighter.sub_wait_common_Main().get_bool() {
+        if MotionModule::is_end(fighter.module_accessor) {
+            fighter.change_status(FIGHTER_STATUS_KIND_WAIT.into(),false.into());
+        }
+    }
+    return 0.into();
+}
+
+pub unsafe extern "C" fn autoturn_end(fighter: &mut L2CFighterCommon) -> L2CValue {
+    fighter.status_end_Wait();
+    return 0.into();
+}
+
+
+pub unsafe extern "C" fn walk_back_brake_exec(fighter: &mut L2CFighterCommon) -> L2CValue {
+    fighter.sub_walk_brake_uniq_process_exec();
+    return 0.into();
+}
+pub unsafe extern "C" fn walk_back_brake_init(fighter: &mut L2CFighterCommon) -> L2CValue {
+    fighter.sub_walk_brake_uniq_process_init();
+    return 0.into();
+}
+pub unsafe extern "C" fn walk_back_brake_main(fighter: &mut L2CFighterCommon) -> L2CValue {
+    fighter.status_WalkBrake();
+    return 0.into();
+}
+pub unsafe extern "C" fn walk_back_brake_end(fighter: &mut L2CFighterCommon) -> L2CValue {
+    fighter.status_end_WalkBrakeBack();
+    return 0.into();
+}
+pub unsafe extern "C" fn walk_back_brake_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
+    fighter.status_pre_WalkBrake();
+    return 0.into();
+}
+
+
+
+
+
+
+/*
+        // #[null_check]
+        #[link_name = "\u{1}_ZN7lua2cpp16L2CFighterCommon31sub_walk_back_uniq_process_execEv"]
+        pub fn L2CFighterCommon_sub_walk_back_uniq_process_exec(
+            this: *mut crate::common::root::lua2cpp::L2CFighterCommon
+        );
+
+
+        // #[null_check]
+        #[link_name = "\u{1}_ZN7lua2cpp16L2CFighterCommon31sub_walk_back_uniq_process_exitEv"]
+        pub fn L2CFighterCommon_sub_walk_back_uniq_process_exit(
+            this: *mut crate::common::root::lua2cpp::L2CFighterCommon
+        );
+
+
+        // #[null_check]
+        #[link_name = "\u{1}_ZN7lua2cpp16L2CFighterCommon31sub_walk_back_uniq_process_initEv"]
+        pub fn L2CFighterCommon_sub_walk_back_uniq_process_init(
+            this: *mut crate::common::root::lua2cpp::L2CFighterCommon
+        );
+
+
+        // #[null_check]
+        #[link_name = "\u{1}_ZN7lua2cpp16L2CFighterCommon43FighterStatusUniqProcessWalkBack_calc_paramEv"]
+        pub fn L2CFighterCommon_FighterStatusUniqProcessWalkBack_calc_param(
+            this: *mut crate::common::root::lua2cpp::L2CFighterCommon
+        );
+
+
+        // #[null_check]
+        #[link_name = "\u{1}_ZN7lua2cpp16L2CFighterCommon22status_WalkBack_commonEv"]
+        pub fn L2CFighterCommon_status_WalkBack_common(
+            this: *mut crate::common::root::lua2cpp::L2CFighterCommon
+        );
+
+        #[inline]
+        pub unsafe fn sub_walk_back_uniq_process_exec(&mut self) {
+            L2CFighterCommon_sub_walk_back_uniq_process_exec(self)
+        }
+        #[inline]
+        pub unsafe fn sub_walk_back_uniq_process_exit(&mut self) {
+            L2CFighterCommon_sub_walk_back_uniq_process_exit(self)
+        }
+        #[inline]
+        pub unsafe fn sub_walk_back_uniq_process_init(&mut self) {
+            L2CFighterCommon_sub_walk_back_uniq_process_init(self)
+        }
+        #[inline]
+        pub unsafe fn FighterStatusUniqProcessWalkBack_calc_param(&mut self) {
+            L2CFighterCommon_FighterStatusUniqProcessWalkBack_calc_param(self)
+        }
+        #[inline]
+        pub unsafe fn status_WalkBack_common(&mut self) {
+            L2CFighterCommon_status_WalkBack_common(self)
+        }
+*/

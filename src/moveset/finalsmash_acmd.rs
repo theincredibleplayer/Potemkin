@@ -113,6 +113,8 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
             if capture_id != 0x50000000 {
                 println!("releasing attack");
                 AttackModule::hit_absolute_joint(agent.module_accessor, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW,capture_id as u32,Hash40::new("throw"), 0, 0);
+                CameraModule::zoom_out(agent.module_accessor, 10);
+
             }
 
             for n in 1..21{
@@ -135,6 +137,7 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
             if capture_id != 0x50000000 {
                 println!("releasing attack");
                 AttackModule::hit_absolute_joint(agent.module_accessor, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW,capture_id as u32,Hash40::new("throw"), 0, 0);
+                CameraModule::zoom_out(agent.module_accessor, 10);
             }
         }
     }
