@@ -58,10 +58,10 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
     let module_accessor = fighter.battle_object.module_accessor;
     let status_kind =StatusModule::status_kind(fighter.battle_object.module_accessor) ;
     let situation_kind = StatusModule::situation_kind(module_accessor);
-
+    let motion_kind =MotionModule::motion_kind(module_accessor);
     // scales the models of both pot and his articles by -1 on the x axis to mirror (accurate to strive)
-    if ((PostureModule::lr(module_accessor) < 0.0) && (![*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN].contains(&status_kind)))
-    || ((PostureModule::lr(module_accessor) > 0.0) && ( [*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN].contains(&status_kind)))
+    if ((PostureModule::lr(module_accessor) < 0.0) && (![*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN].contains(&status_kind) || motion_kind != hash40("air_turn")))
+    || ((PostureModule::lr(module_accessor) > 0.0) && ( [*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN].contains(&status_kind) || motion_kind == hash40("air_turn")))
     {
             ModelModule::set_joint_scale(module_accessor, Hash40::new("top") , &Vector3f{x:-scale,y:scale,z:scale});
             if ArticleModule::is_exist(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND){
@@ -89,13 +89,24 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
         }
     }
 
-
+    
+    let time_base = WorkModule::get_float(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FIRE_TIME_BASE);
+    let agent = get_fighter_common_from_accessor((&mut*module_accessor));
+    let fire_timer = WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_FIRE_TIMER);
+    if (fire_timer > 0) {
+        WorkModule::dec_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_FIRE_TIMER);
+        let fire_timer = WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_FIRE_TIMER);
+        macros::BURN_COLOR_FRAME(agent, 0, 24, 1, 1, 0);
+        macros::BURN_COLOR(agent, 24.0 * ( time_base/((fire_timer as f32)+1.0) ),  1.0 * ( time_base/((fire_timer as f32)+1.0) ),  1.0 * ( time_base/((fire_timer as f32)+1.0) ), (0.5/time_base)*(fire_timer as f32));
+    }
 
 
     let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
     if smash::app::lua_bind::FighterManager::is_result_mode(fighter_manager) {
         UiManager::disable_ui(entry_id);
+    }else{
+        UiManager::enable_ui(entry_id);
     }
     UiManager::set_game_speed(sv_information::slow_rate()); 
     //println!("game_speed= {}",sv_information::slow_rate());
@@ -112,6 +123,7 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
     set_lr_float(lr,module_accessor,status_kind,0);
 
     let lr_1on1 = WorkModule::get_float(module_accessor, *FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1);
+    println!("the lr float: {}",lr_1on1);
     let lr = PostureModule::lr(module_accessor);
     if lr_1on1 != 0.0 {
         if situation_kind == *SITUATION_KIND_AIR
@@ -162,12 +174,10 @@ pub unsafe extern "C" fn kamui_reset(vtable: u64, fighter: &mut Fighter) {
     let module_accessor = (*fighter).battle_object.module_accessor;
     println!("initialization hook successful");
     WorkModule::on_flag(fighter.battle_object.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_CAN_SPECIAL_COMMAND);
-    //ShieldModule::set_target_category(fighter.battle_object.module_accessor,*COLLISION_CATEGORY_WEAPON as i32,2); both work ig but property is more broad 
     ShieldModule::set_target_property(fighter.battle_object.module_accessor, *COLLISION_PROPERTY_REFLECT,2);
     let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     UiManager::reset_on_rebirth(entry_id);
     UiManager::reset_cutin();
-    
     WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_RUN);
     WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_DASH_TO_RUN);
     WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_TURN_DASH);
@@ -182,9 +192,8 @@ pub unsafe extern "C" fn kamui_init_og(vtable: u64, fighter: &mut Fighter);
 
 pub unsafe extern "C" fn kamui_init(vtable: u64, fighter: &mut Fighter) {
     let module_accessor = (*fighter).battle_object.module_accessor;
-    let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
-    UiManager::enable_ui(entry_id);
-    println!("entry id :{}", entry_id);
+
+
     if (*fighter).battle_object.kind == *FIGHTER_KIND_KAMUI as u32 {
         let shield_data = ShieldDataResource::new(
             0.0,
@@ -276,8 +285,25 @@ pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,dama
     let module_accessor = fighter.battle_object.module_accessor;
     let entry_id = WorkModule::get_int(module_accessor,*FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     let dmg = *((*(((damage_log as u64) + 0x10) as *const u64) + 0x4) as *const f32);
+    let status_kind =StatusModule::status_kind(fighter.battle_object.module_accessor);
 
-    let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+    if [*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL,
+        *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_END,
+        *FIGHTER_STATUS_KIND_SPECIAL_S,
+        *FIGHTER_STATUS_KIND_ATTACK_LW4,
+        *FIGHTER_STATUS_KIND_ATTACK_LW4_HOLD,
+        *FIGHTER_STATUS_KIND_ATTACK_LW4_START,
+        *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_ATTACK,
+        ].contains(&status_kind)
+    && WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON) {
+        let time_base = 45.0 * (1.0/sv_information::slow_rate());
+        WorkModule::set_float(module_accessor, time_base, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FIRE_TIME_BASE);
+        WorkModule::set_int(module_accessor, time_base as i32, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_FIRE_TIMER);
+        let agent = get_fighter_common_from_accessor((&mut*module_accessor));
+        damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_NORMAL, 0); 
+        macros::BURN_COLOR(agent, 24,  1,  1, 0.5);
+        WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
+    }
     UiManager::add_tension(entry_id, dmg);
     kamui_on_damage_og(vtable,fighter,damage_log);
 }
@@ -307,6 +333,9 @@ pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,coll
     }
     kamui_on_attack_og(vtable,fighter,collision_log);
 }
+
+
+
 
 
 // testing section ==============================================================================

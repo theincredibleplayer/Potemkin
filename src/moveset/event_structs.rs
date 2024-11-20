@@ -437,7 +437,7 @@ impl VtableEntry {
     pub const UNK119: usize = 119;
     pub const UNK120: usize = 120;
     pub const UNK121: usize = 121;
-    pub const UNK122: usize = 122;
+    pub const UNK122: usize = 122;                                  // something knockout voice related?
     pub const UNK123: usize = 123;
     pub const UNK124: usize = 124;
     pub const UNK125: usize = 125;

@@ -66,6 +66,7 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_KILL : i32 = 0x20000104;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_WIN_FRAME : i32 = 0x20000105;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_RC_DASH : i32 = 0x20000106;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_STOP_FINAL_I_FRAMES : i32 = 0x20000107;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON : i32 = 0x20000108;
 
 
 
@@ -97,6 +98,7 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_ROMAN_CANCEL_METER_DRAIN: i32 = 0
 
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_GAMEWATCH_Z_SCALE: i32 = 0x6b;
 
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FIRE_TIME_BASE: i32 = 0x6c;
 
 
 // for weapon
@@ -108,6 +110,7 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_HPB_GOTTEM_ID: i32 = 0x100000c2;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_LOOP_HITS_SPECIAL_HI: i32 = 0x100000c3;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_ARTICLE_ID: i32 = 0x100000c4;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_FINAL_MOTION_SHARE: i32 = 0x100000c5;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_FIRE_TIMER: i32 = 0x100000c6;
 
 
 // for weapon
@@ -637,6 +640,14 @@ pub unsafe extern "C" fn get_opponent_lr(module_accessor: *mut smash::app::Battl
 #[skyline::from_offset(0x69ad00)]
 pub unsafe extern "C" fn set_lr_float(lr_float: f32, module_accessor: *mut smash::app::BattleObjectModuleAccessor, status_kind: i32, param_always_0: i32) -> u64;
 
+#[skyline::hook(offset = 0x69a728, inline)]
+unsafe extern "C" fn autoturn_situation_check_hook(ctx: &mut skyline::hooks::InlineCtx) {
+    let module_accessor = *ctx.registers[21].x.as_ref() as *mut BattleObjectModuleAccessor;
+    let fighter_kind = utility::get_kind(&mut *(module_accessor));
+    if fighter_kind == *FIGHTER_KIND_KAMUI {
+        *ctx.registers[0].x.as_mut() = 0;
+    }
+}
 
 #[skyline::hook(offset = 0x67f74c, inline)]
 unsafe fn idkman(ctx: &mut skyline::hooks::InlineCtx) {
@@ -1053,7 +1064,8 @@ pub fn install() {
         get_param_float_hook,
         handle_draw,
         idkman,
-        idkman2
+        idkman2,
+        autoturn_situation_check_hook
         //caught_status_hook
         //initialization,
     );
@@ -1076,8 +1088,6 @@ pub fn install() {
         //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::RESET_3], kamui_reset_3 as u64);
         patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_DAMAGE], kamui_on_damage as u64);
         patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_ATTACK], kamui_on_attack as u64);
-
-
     }
     skyline::patching::Patch::in_text(0x3414784).nop();
 

@@ -277,6 +277,11 @@ pub unsafe extern "C" fn effect_attack_s4_charge_spear(_agent: &mut L2CAgentBase
 
 
 pub unsafe extern "C" fn game_attacklw4(agent: &mut L2CAgentBase) {
+    frame(agent.lua_state_agent, 5.0);
+    if macros::is_excute(agent) {
+        WorkModule::on_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
+        damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0); 
+    }
     frame(agent.lua_state_agent, 19.0);
     if macros::is_excute(agent) {
         WorkModule::on_flag(agent.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -289,6 +294,8 @@ pub unsafe extern "C" fn game_attacklw4(agent: &mut L2CAgentBase) {
     }
     wait(agent.lua_state_agent, 3.0);
     if macros::is_excute(agent) {
+        damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_NORMAL, 0);
+        WorkModule::off_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
         AttackModule::clear_all(agent.module_accessor);
     }
 }

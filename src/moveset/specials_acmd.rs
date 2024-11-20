@@ -28,6 +28,8 @@ pub unsafe extern "C" fn sound_specialsstart(agent: &mut L2CAgentBase) {
 
 pub unsafe extern "C" fn game_specialsloop(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
+        WorkModule::on_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
+        damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0); 
         macros::SEARCH(agent, 0, 0, Hash40::new("hip"), 15.0, -15.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(0.0), *COLLISION_KIND_MASK_HIT, *HIT_STATUS_MASK_NORMAL, 1, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIEB, *COLLISION_PART_MASK_ALL, false);
     }
 }
@@ -51,10 +53,14 @@ pub unsafe extern "C" fn effect_specials(agent: &mut L2CAgentBase) {
 }
 pub unsafe extern "C" fn game_specialsattack(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
+        WorkModule::on_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
+        damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0); 
         macros::FT_MOTION_RATE(agent, 0.75);
     }
     frame(agent.lua_state_agent, 9.0);
     if macros::is_excute(agent) {
+        damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_NORMAL, 0);
+        WorkModule::off_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
         macros::ATTACK(agent, 0, 0, Hash40::new("top"), 20.0, 35, 80, 0, 50, 16, 0.0, 14.0, 6.0, Some(0.0), Some(-2.0), Some(2.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_PUNCH);
     }
     wait(agent.lua_state_agent, 3.0);
@@ -77,6 +83,9 @@ pub unsafe extern "C" fn effect_specialsattack(agent: &mut L2CAgentBase) {
 pub unsafe extern "C" fn sound_specialsend(agent: &mut L2CAgentBase) {
     sv_animcmd::frame(agent.lua_state_agent, 2.0);
     if macros::is_excute(agent) {
+        WorkModule::off_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
+        damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_NORMAL, 0);
+
         let sound = sound_selector(agent,"vc_pot_hammerfall_break_X".to_string(),3,false,false,0);
         macros::PLAY_SE(agent, Hash40::new_raw(sound));
         macros::STOP_SE(agent, Hash40::new("vc_pot_hammerfall_a"));

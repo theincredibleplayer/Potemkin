@@ -154,6 +154,8 @@ pub unsafe extern "C" fn thrown_status_common(fighter: &mut L2CFighterCommon) ->
         let mut motion = hash40("catched_pot_final_scene_01");
         let height = WorkModule::get_param_float(fighter.module_accessor, hash40("height"), 0);
         let egg_size = WorkModule::get_param_float(fighter.module_accessor, hash40("egg_collision_size"), 0);
+        let fighter_kind = utility::get_kind(&mut (*fighter.module_accessor));
+
         let mut x_offset = 22.0 - height;
         let mut z_offset = (7.2 -egg_size)/4.0;
         let mut y_offset = 0.0;
@@ -201,30 +203,29 @@ pub unsafe extern "C" fn thrown_status_common(fighter: &mut L2CFighterCommon) ->
             );
             y_offset = 0.0;
             z_offset = 0.0;
-            x_offset = 19.0- height;
+            x_offset = 19.0 - height;
         }
-        if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_YOSHI {
+        if fighter_kind == *FIGHTER_KIND_YOSHI {
             x_offset = -4.0;
         }
-        if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_PACKUN {
+        if fighter_kind == *FIGHTER_KIND_PACKUN {
             x_offset = -7.0;
         }
-        if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_ROBOT {
+        if fighter_kind == *FIGHTER_KIND_ROBOT {
             x_offset = -6.0;
         }
-        if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIIFIGHTER
-        || utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIIGUNNER
-        || utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIISWORDSMAN
-        || utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIIENEMYF
-        || utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIIENEMYG
-        || utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_MIIENEMYS {
+        if  [*FIGHTER_KIND_MIIFIGHTER,
+            *FIGHTER_KIND_MIIGUNNER,
+            *FIGHTER_KIND_MIISWORDSMAN,
+            *FIGHTER_KIND_MIIENEMYF,
+            *FIGHTER_KIND_MIIENEMYG,
+            *FIGHTER_KIND_MIIENEMYS].contains(&fighter_kind) {
             x_offset = -2.0;
             z_offset = -2.5;
         }
-
         fighter.status_Thrown();
         let constraint_flags = LinkModule::get_model_constraint_flag(fighter.module_accessor);
-        LinkModule::set_model_constraint_flag(fighter.module_accessor,(*CONSTRAINT_FLAG_OFFSET_TRANSLATE | constraint_flags as i32) as u32);
+        LinkModule::set_model_constraint_flag(fighter.module_accessor,(*CONSTRAINT_FLAG_OFFSET_TRANSLATE | *CONSTRAINT_FLAG_FLIP_ROT_X | constraint_flags as i32) as u32);
         //WorkModule::set_int64(fighter.module_accessor, motion as i64,*FIGHTER_STATUS_THROWN_WORK_INT_MOTION_KIND);
         MotionModule::change_motion(fighter.module_accessor, Hash40::new_raw(motion), 0.0, 1.0, false, 0.0, false, false);
         LinkModule::set_constraint_translate_offset(fighter.module_accessor, &Vector3f{ x: x_offset, y: y_offset, z: z_offset });

@@ -125,6 +125,9 @@ unsafe fn get_param_float_hook(x0:u64, arg2:u64, arg3:u64) -> f32 {
 }
 
 
+
+
+
 /*#[skyline::hook(offset = 0xb5e10)]
 pub unsafe extern "C" fn caught_status_hook(fighter: &mut L2CFighterCommon) {
     let parent_id = LinkModule::get_parent_id(fighter.module_accessor,*LINK_NO_CAPTURE,true);
