@@ -332,17 +332,17 @@ impl VtableEntry {
     pub const MOUTH_BREATHERS_OBJECT_RESET: usize = 16;             // DDD and kirby related
     pub const ON_PRE_DAMAGE: usize = 17;                            // only ever used by snake, it runs right before going into a damage status it seems
     pub const ON_FRAME_4: usize = 18;                               // lol, lmao even
-    pub const FS_RELATED: usize = 19;                               // seems to be final smash related except on rob and lucario for some reason
+    pub const ON_FRAME_5: usize = 19;                               // seems to be final smash related except on rob and lucario for some reason
                                                                     // i am actually not fully convinced of this naming cuz cloud is doing some weird ass shit i wanna  test when this gets called later
                                                                     // its a fucking opff LMFAOOOOOOOOOOOOOOOOOOOOOOOO
-    pub const ON_FINAL_END: usize = 20;                             // this is also a massive guess i should test this later
+    pub const ON_FRAME_6: usize = 20;                             // this is also a massive guess i should test this later (THIS IS ANOTHER OPFFFF AAAAAAAAAAAAAAAAAAAAAAAAA)
     pub const ON_PAUSE: usize = 21;
-    pub const UNK22: usize = 22;                                    // maybe on throw, needs testing to confirm
+    pub const ON_PAUSE_FRAME: usize = 22;                           // its an on frame while paused
     pub const ON_UNPAUSE: usize = 23;
-    pub const UNK24: usize = 24;                                    // some popo nana pause unpause function idfk
+    pub const ON_MATCH_GO: usize = 24;                              // it runs once when the announcer says GO
     pub const ON_DEATH_RESET_1: usize = 25;
     pub const ON_DEATH_RESET_2: usize = 26;                         // seems to be another on death
-    pub const ON_FRAME_5: usize = 27;                               // you cant make this shit up LMFAO 5 OPFFS
+    pub const ON_FRAME_7: usize = 27;                               // you cant make this shit up LMFAO 7 OPFFS
     pub const ON_FRAME_FOR_KIRBY_1: usize = 28;
     pub const ON_FRAME_FOR_KIRBY_2: usize = 29;
     pub const ON_STATUS_CHANGE: usize = 30;

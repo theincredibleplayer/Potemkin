@@ -622,6 +622,18 @@ unsafe extern "C" fn agent_init(fighter: &mut L2CFighterCommon) {
     }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
 /*#[skyline::from_offset(0xb5f380)]
 unsafe extern "C" fn kamui_link_event_original();
 
@@ -649,10 +661,9 @@ unsafe extern "C" fn autoturn_situation_check_hook(ctx: &mut skyline::hooks::Inl
     }
 }
 
-#[skyline::hook(offset = 0x67f74c, inline)]
+#[skyline::hook(offset = 0x2017ea0, inline)]
 unsafe fn idkman(ctx: &mut skyline::hooks::InlineCtx) {
-    let register = *ctx.registers[8].x.as_ref();
-    println!("the second arg: {:#x}",register - getRegionAddress(Region::Text) as u64 );
+    println!("register: {}",*ctx.registers[3].w.as_ref() as u64 - getRegionAddress(Region::Text) as u64);
 }
 
 
@@ -1055,7 +1066,7 @@ pub fn install() {
 
     .install();
 
-    
+    skyline::nro::add_hook(nro_hook);
 
     skyline::install_hooks!(
         notify_log_event_collision_hit_replace,
@@ -1065,8 +1076,8 @@ pub fn install() {
         handle_draw,
         idkman,
         idkman2,
-        autoturn_situation_check_hook
-        //caught_status_hook
+        autoturn_situation_check_hook,
+        get_params_outside
         //initialization,
     );
     unsafe {
@@ -1082,8 +1093,8 @@ pub fn install() {
         patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::INITIALIZE], kamui_init as u64);
         patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_SHIELD_COLLISION], kamui_on_shield as u64);
         //
-        patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_PAUSE], kamui_on_frame_2 as u64);
-        //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_FRAME_1], kamui_on_frame_1 as u64);
+        //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_FINAL_END], kamui_on_frame_2 as u64);
+        //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_FINAL_END], kamui_on_frame_1 as u64);
         //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::RESET_2], kamui_reset_2 as u64);
         //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::RESET_3], kamui_reset_3 as u64);
         patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_DAMAGE], kamui_on_damage as u64);

@@ -71,9 +71,13 @@ pub unsafe extern "C" fn special_hi_loop(agent: &mut L2CAgentBase) {
     sv_animcmd::frame(agent.lua_state_agent, 1.0);
     if macros::is_excute(agent) {
         let lr = PostureModule::lr(agent.module_accessor);
-        let pos = Vector3f{x:10.0, y:20.0, z:3.0};
+        let pos = Vector3f{x:10.0, y:15.0, z:-2.0};
         let rot = Vector3f{x:-60.0, y:0.0, z:-20.0*lr};
-        let effect = EffectModule::req_follow(agent.module_accessor, Hash40::new("sys_attack_line_b"), Hash40::new("top"), &pos, &rot, 2.5, true, 0, 0, 0, 0, 0, true, true) as u32;
+        let pos2 = Vector3f{x:10.0, y:30.0, z:15.0}; //z is left ad right, y is up and down, x is in and out
+        let rot2 = Vector3f{x:0.0, y:0.0, z:120.0*lr}; 
+
+        EffectModule::req_follow(agent.module_accessor, Hash40::new("sys_damage_spark"), Hash40::new("top"), &pos2, &rot2, 2.5, true, 0, 0, 0, 0, 0, true, true) as u32;
+        let effect = EffectModule::req_follow(agent.module_accessor, Hash40::new("sys_attack_line_b"), Hash40::new("top"), &pos, &rot, 3.0, true, 0, 0, 0, 0, 0, true, true) as u32;
         //macros::EFFECT_FOLLOW(agent, Hash40::new("sys_attack_line_b"), Hash40::new("top"), 18, 20, 3, -45, 0, -20, 2.5, true);
         EffectModule::set_rgb(agent.module_accessor, effect, 1.0, 0.24, 0.0);
         macros::LAST_EFFECT_SET_RATE(agent, 0.75);
@@ -82,7 +86,7 @@ pub unsafe extern "C" fn special_hi_loop(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         let lr = PostureModule::lr(agent.module_accessor);
         macros::QUAKE(agent, *CAMERA_QUAKE_KIND_XL);
-        macros::ATTACK(agent,0,0,Hash40::new("top"),1.0,361,30,10,12,5.0,0.0,28.0,12.0,None,None,None,1.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_NONE,*ATTACK_REGION_NONE);
+        macros::ATTACK(agent,0,0,Hash40::new("top"),1.0,361,30,10,12,5.0,0.0,28.0,12.0,None,None,None,1.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_none"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_NONE,*ATTACK_REGION_NONE);
         AttackModule::set_catch_only_all(agent.module_accessor, true, false);
         AttackModule::set_no_dead_all(agent.module_accessor, true, false);
     }
@@ -110,9 +114,13 @@ pub unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
     sv_animcmd::frame(agent.lua_state_agent, 2.0);
     if macros::is_excute(agent) {
         let lr = PostureModule::lr(agent.module_accessor);
-        let pos = Vector3f{x:10.0, y:20.0, z:3.0};
+        let pos = Vector3f{x:10.0, y:15.0, z:-2.0}; //z is left ad right, y is up and down, x is in and out
         let rot = Vector3f{x:-60.0, y:0.0, z:-20.0*lr};
-        let effect = EffectModule::req_follow(agent.module_accessor, Hash40::new("sys_attack_line_b"), Hash40::new("top"), &pos, &rot, 2.5, true, 0, 0, 0, 0, 0, true, true) as u32;
+        let pos2 = Vector3f{x:10.0, y:30.0, z:15.0}; 
+        let rot2 = Vector3f{x:0.0, y:0.0, z:120.0*lr}; 
+
+        EffectModule::req_follow(agent.module_accessor, Hash40::new("sys_damage_spark"), Hash40::new("top"), &pos2, &rot2, 2.5, true, 0, 0, 0, 0, 0, true, true) as u32;
+        let effect = EffectModule::req_follow(agent.module_accessor, Hash40::new("sys_attack_line_b"), Hash40::new("top"), &pos, &rot, 3.0, true, 0, 0, 0, 0, 0, true, true) as u32;
         //macros::EFFECT_FOLLOW(agent, Hash40::new("sys_attack_line_b"), Hash40::new("top"), 18, 20, 3, -45, 0, -20, 2.5, true);
         EffectModule::set_rgb(agent.module_accessor, effect, 1.0, 0.24, 0.0);
         macros::LAST_EFFECT_SET_RATE(agent, 0.75);
@@ -120,7 +128,7 @@ pub unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
     sv_animcmd::frame(agent.lua_state_agent, 3.0);
     if macros::is_excute(agent) {
         macros::QUAKE(agent, *CAMERA_QUAKE_KIND_XL);
-        macros::ATTACK(agent,0,0,Hash40::new("top"),1.0,361,30,10,12,5.0,0.0,28.0,12.0,None,None,None,1.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_NONE,*ATTACK_REGION_NONE);
+        macros::ATTACK(agent,0,0,Hash40::new("top"),1.0,361,30,10,12,5.0,0.0,28.0,12.0,None,None,None,1.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_none"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_NONE,*ATTACK_REGION_NONE);
         AttackModule::set_catch_only_all(agent.module_accessor, true, false);
         AttackModule::set_no_dead_all(agent.module_accessor, true, false);
         WorkModule::on_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_HI_FLAG_FINAL_JAB_HIT_MOTION_PLAY);
@@ -130,10 +138,13 @@ pub unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
         AttackModule::clear_all(agent.module_accessor);
     }
 
+    sv_animcmd::frame(agent.lua_state_agent, 44.0);
+    if macros::is_excute(agent) {
+        macros::FILL_SCREEN_MODEL_COLOR(agent, 0, 0, 0.0, 0.0, 0.2, 1, 1, 0.8, 1, 1, *smash::lib::lua_const::EffectScreenLayer::GROUND, *EFFECT_SCREEN_PRIO_FINAL);
+        macros::CANCEL_FILL_SCREEN(agent, 0, 5);
+    }
     sv_animcmd::frame(agent.lua_state_agent, 45.0);
     if macros::is_excute(agent) {
-        macros::EFFECT(agent, Hash40::new("sys_bomb_d"), Hash40::new("haver"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
-        macros::LAST_EFFECT_SET_RATE(agent, 0.6);
         let entry_id = WorkModule::get_int(agent.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         UiManager::add_tension(entry_id,18.0);
         WorkModule::on_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_HI_FLAG_HIT);
@@ -141,13 +152,14 @@ pub unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
         //smash::app::lua_bind::FighterCutInManager::set_throw_finish_zoom_rate(fighter_cutin_manager, 1.7);
         macros::PLAY_SE(agent, Hash40::new("se_kamui_special_h02"));
         macros::CAM_ZOOM_OUT(agent);
+        let scale = PostureModule::scale(agent.module_accessor);
         let lr = PostureModule::lr(agent.module_accessor);
         CameraModule::reset_all(agent.module_accessor);            
         macros::CAM_ZOOM_IN_arg6(
             agent,
             /*frames to zoom in totally*/3.0,
             /*according to calude the object id?*/0.0,
-            /*the amt of zoom needed, higher the number lower the zoom*/1.7,
+            /*the amt of zoom needed, higher the number lower the zoom*/1.7*scale,
             /*y_rot*/0.2, // up and down
             /*x_rot*/-0.6 * lr, //left and right
             true
@@ -165,17 +177,25 @@ pub unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
     sv_animcmd::wait(agent.lua_state_agent, 1.0);
     if macros::is_excute(agent) {
         macros::FT_MOTION_RATE(agent, 2.0);
+        macros::EFFECT(agent, Hash40::new("sys_bomb_d"), Hash40::new("haver"), 0, 0, -7, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
+        macros::LAST_EFFECT_SET_RATE(agent, 0.6);
     }
-    sv_animcmd::wait(agent.lua_state_agent, 10.0);
+    sv_animcmd::wait(agent.lua_state_agent, 1.0);
+    if macros::is_excute(agent) {
+        macros::FILL_SCREEN_MODEL_COLOR(agent, 0, 0, 0.0, 0.0, 0.2, 1, 1, 0.8, 1, 1, *smash::lib::lua_const::EffectScreenLayer::GROUND, *EFFECT_SCREEN_PRIO_FINAL);
+        macros::CANCEL_FILL_SCREEN(agent, 0, 20);
+    }
+    sv_animcmd::wait(agent.lua_state_agent, 9.0);
     if macros::is_excute(agent) {
         macros::CAM_ZOOM_OUT(agent);
+        let scale = PostureModule::scale(agent.module_accessor);
         let lr = PostureModule::lr(agent.module_accessor);
         CameraModule::reset_all(agent.module_accessor);            
         macros::CAM_ZOOM_IN_arg6(
             agent,
             /*frames to zoom in totally*/5.0,
             /*according to calude the object id?*/0.0,
-            /*the amt of zoom needed, higher the number lower the zoom*/3.0,
+            /*the amt of zoom needed, higher the number lower the zoom*/3.0*scale,
             /*y_rot*/0.0, // up and down
             /*x_rot*/0.0, //left and right
             true

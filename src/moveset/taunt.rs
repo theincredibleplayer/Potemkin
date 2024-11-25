@@ -22,6 +22,7 @@ pub unsafe extern "C" fn appeal_end(fighter: &mut L2CFighterCommon) -> L2CValue 
     if ArticleModule::is_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON) {
         ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
     }
+    macros::CAM_ZOOM_OUT(fighter);
     set_stage_visibility(fighter.module_accessor, 1);
     smashline::original_status(End, fighter, *FIGHTER_STATUS_KIND_APPEAL)(fighter)
 }
@@ -30,6 +31,29 @@ pub unsafe extern "C" fn appeal_srl(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
         set_stage_visibility(agent.module_accessor, 0);
+        macros::CAM_ZOOM_OUT(agent);
+        let lr = PostureModule::lr(agent.module_accessor);
+        CameraModule::reset_all(agent.module_accessor);            
+        macros::CAM_ZOOM_IN_arg6(
+            agent,
+            /*frames to zoom in totally*/20.0,
+            /*according to calude the object id?*/0.0,
+            /*the amt of zoom needed, higher the number lower the zoom*/50.0,
+            /*y_rot*/0.0, // up and down
+            /*x_rot*/0.0 * lr, //left and right
+            /*quake bool*/ true,
+        );
+        agent.clear_lua_stack();
+        lua_args!(agent,
+        *MA_MSC_CMD_CAMERA_CAM_OFFSET,
+        /*x*/0.0 * lr,
+        /*y*/0.0,
+        /*z*/-2000.0);
+        smash::app::sv_module_access::camera(agent.lua_state_agent);
+
+
+
+
         //smash::app::lua_bind::FighterManager::prepare_movie(fighter_manager,Hash40::new("prebuilt:/movie/fighter/jack/c00/final_02.h264"));
         //smash::app::lua_bind::FighterManager::start_movie(fighter_manager, 1.0);
         //macros::REQ_FINAL_START_CAMERA(agent, Hash40::new("d04finalvisualscene02.nuanmb"), false);

@@ -149,14 +149,14 @@ unsafe fn special_hi_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
 pub unsafe extern "C" fn special_hi_start_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
-
+    let scale = PostureModule::scale(fighter.module_accessor);
     let lr = PostureModule::lr(fighter.module_accessor);
     CameraModule::reset_all(fighter.module_accessor);            
     macros::CAM_ZOOM_IN_arg6(
         fighter,
         /*frames to zoom in totally*/10.0,
         /*according to calude the object id?*/0.0,
-        /*the amt of zoom needed, higher the number lower the zoom*/1.1,
+        /*the amt of zoom needed, higher the number lower the zoom*/1.1*scale,
         /*y_rot*/0.1, // up and down
         /*x_rot*/0.2 * lr, //left and right
         true,
@@ -230,7 +230,7 @@ pub unsafe extern "C" fn special_hi_start_end(fighter: &mut L2CFighterCommon) ->
 pub unsafe extern "C" fn special_hi_loop_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
-
+    let scale = PostureModule::scale(fighter.module_accessor);
     macros::CAM_ZOOM_OUT(fighter);
     let lr = PostureModule::lr(fighter.module_accessor);
     CameraModule::reset_all(fighter.module_accessor);            
@@ -238,7 +238,7 @@ pub unsafe extern "C" fn special_hi_loop_main(fighter: &mut L2CFighterCommon) ->
         fighter,
         /*frames to zoom in totally*/90.0,
         /*according to calude the object id?*/0.0,
-        /*the amt of zoom needed, higher the number lower the zoom*/1.1,
+        /*the amt of zoom needed, higher the number lower the zoom*/1.1*scale,
         /*y_rot*/0.1, // up and down
         /*x_rot*/-0.3 * lr, //left and right
         /*this seems to be a quake multiplier*/ true,
@@ -296,6 +296,7 @@ unsafe fn special_hi_loop_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue 
     if MotionModule::is_end(fighter.module_accessor) {
 
         if WorkModule::get_int(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_LOOP_HITS_SPECIAL_HI) <= 0 {
+            let scale = PostureModule::scale(fighter.module_accessor);
             macros::CAM_ZOOM_OUT(fighter);
             let lr = PostureModule::lr(fighter.module_accessor);
             CameraModule::reset_all(fighter.module_accessor);            
@@ -303,8 +304,8 @@ unsafe fn special_hi_loop_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue 
                 fighter,
                 /*frames to zoom in totally*/50.0,
                 /*according to calude the object id?*/0.0,
-                /*the amt of zoom needed, higher the number lower the zoom*/1.7,
-                /*y_rot*/0.2, // up and down
+                /*the amt of zoom needed, higher the number lower the zoom*/2.0*scale,
+                /*y_rot*/0.13, // up and down
                 /*x_rot*/-0.7 * lr, //left and right
                 /*this seems to be a quake multiplier*/ true,
             );

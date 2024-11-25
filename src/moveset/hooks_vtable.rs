@@ -60,8 +60,8 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
     let situation_kind = StatusModule::situation_kind(module_accessor);
     let motion_kind =MotionModule::motion_kind(module_accessor);
     // scales the models of both pot and his articles by -1 on the x axis to mirror (accurate to strive)
-    if ((PostureModule::lr(module_accessor) < 0.0) && (![*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN].contains(&status_kind) || motion_kind != hash40("air_turn")))
-    || ((PostureModule::lr(module_accessor) > 0.0) && ( [*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN].contains(&status_kind) || motion_kind == hash40("air_turn")))
+    if ((PostureModule::lr(module_accessor) < 0.0) && (![*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN].contains(&status_kind) || (motion_kind != hash40("air_turn")) || (motion_kind != hash40("turn")) ) )
+    || ((PostureModule::lr(module_accessor) > 0.0) && ( [*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN].contains(&status_kind) || (motion_kind == hash40("air_turn")) || (motion_kind == hash40("turn")) ) )
     {
             ModelModule::set_joint_scale(module_accessor, Hash40::new("top") , &Vector3f{x:-scale,y:scale,z:scale});
             if ArticleModule::is_exist(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND){
@@ -123,15 +123,13 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
     set_lr_float(lr,module_accessor,status_kind,0);
 
     let lr_1on1 = WorkModule::get_float(module_accessor, *FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1);
-    println!("the lr float: {}",lr_1on1);
+    //println!("the lr float: {}",lr_1on1);
     let lr = PostureModule::lr(module_accessor);
     if lr_1on1 != 0.0 {
         if situation_kind == *SITUATION_KIND_AIR
         && MotionModule::motion_kind(module_accessor) != hash40("air_turn")
         && lr_1on1 != lr
         && [
-            *FIGHTER_STATUS_KIND_FALL,
-            *FIGHTER_STATUS_KIND_FALL_AERIAL,
             *FIGHTER_STATUS_KIND_JUMP,
             *FIGHTER_STATUS_KIND_JUMP_AERIAL,
         ].contains(&status_kind){
@@ -140,7 +138,8 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
         }
     }
 
-
+    ColorBlendModule::off_flash(module_accessor, false);
+    COL_NORMAL(agent);
     /*
     if FighterCutInManager__is_one_on_one(){
         let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
@@ -363,7 +362,7 @@ pub unsafe extern "C" fn kamui_reset_3(vtable: u64, fighter: &mut Fighter) {
 pub unsafe extern "C" fn kamui_on_frame_2_original(vtable: u64, fighter: &mut Fighter);
 
 pub unsafe extern "C" fn kamui_on_frame_2(vtable: u64, fighter: &mut Fighter) {
-    println!("on frame 2 active");
+    println!("unk22 active");
     kamui_on_frame_2_original(vtable,fighter);
 }
 
@@ -371,6 +370,6 @@ pub unsafe extern "C" fn kamui_on_frame_2(vtable: u64, fighter: &mut Fighter) {
 pub unsafe extern "C" fn kamui_on_frame_1_original(vtable: u64, fighter: &mut Fighter);
 
 pub unsafe extern "C" fn kamui_on_frame_1(vtable: u64, fighter: &mut Fighter) {
-    println!("on_frame_1 active");
+    println!("on_final_end active");
     //kamui_on_frame_3_original(vtable,fighter);
 }
