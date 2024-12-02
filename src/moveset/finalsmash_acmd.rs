@@ -113,8 +113,7 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
             if capture_id != 0x50000000 {
                 println!("releasing attack");
                 AttackModule::hit_absolute_joint(agent.module_accessor, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW,capture_id as u32,Hash40::new("throw"), 0, 0);
-                CameraModule::zoom_out(agent.module_accessor, 10);
-
+                macros::CAM_ZOOM_OUT(agent);
             }
 
             for n in 1..21{
@@ -137,7 +136,7 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
             if capture_id != 0x50000000 {
                 println!("releasing attack");
                 AttackModule::hit_absolute_joint(agent.module_accessor, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW,capture_id as u32,Hash40::new("throw"), 0, 0);
-                CameraModule::zoom_out(agent.module_accessor, 10);
+                macros::CAM_ZOOM_OUT(agent);
             }
         }
     }
@@ -176,8 +175,21 @@ pub unsafe extern "C" fn effect_finalend(agent: &mut L2CAgentBase) {
         macros::LAST_EFFECT_SET_RATE(agent, 0.85);
         macros::EFFECT(agent, Hash40::new("sys_bomb_d"), Hash40::new("top"), 0, 0, -20, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, false);
         macros::LAST_EFFECT_SET_RATE(agent, 0.3);
+        macros::EFFECT(agent, Hash40::new("dolly_volcano_ground"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
+        EffectModule::set_scale_last(agent.module_accessor, &Vector3f{x:5.0,y:5.0,z:5.0} );
+
+        macros::EFFECT(agent, Hash40::new("dolly_volcano_base"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
+        EffectModule::set_scale_last(agent.module_accessor, &Vector3f{x:5.0,y:3.0,z:5.0} );
+        macros::LAST_EFFECT_SET_RATE(agent, 0.75);
     }
 
+    for n in 1..10{
+        wait(agent.lua_state_agent, 3.0);
+        if macros::is_excute(agent) {
+            macros::EFFECT(agent, Hash40::new("dolly_volcano_ground"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
+            EffectModule::set_scale_last(agent.module_accessor, &Vector3f{x:5.0,y:1.0,z:5.0} );
+        }
+    }
     
     frame(agent.lua_state_agent, 110.0);
     if macros::is_excute(agent) {

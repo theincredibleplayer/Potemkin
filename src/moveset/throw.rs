@@ -60,19 +60,25 @@ pub unsafe extern "C" fn effect_throw_lw(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         //macros::LANDING_EFFECT(agent, Hash40::new("sys_whirlwind_r"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, false);
         //macros::EFFECT(agent, Hash40::new("demon_heavens_impact"), Hash40::new("top"), 2, 0, 0, 0, 0, 0, 1.5, 0, 0, 0, 0, 0, 0, false);
-        macros::LAST_EFFECT_SET_RATE(agent, 0.5);
+        //macros::LAST_EFFECT_SET_RATE(agent, 0.5);
         macros::EFFECT(agent, Hash40::new("dolly_volcano_ground"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
         EffectModule::set_scale_last(agent.module_accessor, &Vector3f{x:3.0,y:1.0,z:3.0} );
-        macros::LAST_EFFECT_SET_RATE(agent, 0.75);
 
         macros::EFFECT(agent, Hash40::new("dolly_volcano_base"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
         EffectModule::set_scale_last(agent.module_accessor, &Vector3f{x:2.0,y:1.0,z:2.0} );
 
         //macros::EFFECT_FOLLOW(agent, Hash40::new("dolly_volcano_flash"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
     }
+    for n in 1..5{
+        wait(agent.lua_state_agent, 7.0);
+        if macros::is_excute(agent) {
+            macros::EFFECT(agent, Hash40::new("dolly_volcano_ground"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
+            EffectModule::set_scale_last(agent.module_accessor, &Vector3f{x:3.0,y:1.0,z:3.0} );
+        }
+    }
     wait(agent.lua_state_agent, 10.0);
     if macros::is_excute(agent) {
-        EffectModule::kill_kind(agent.module_accessor, Hash40::new("sys_soccer"), false, true);
+        //EffectModule::kill_kind(agent.module_accessor, Hash40::new("sys_soccer"), false, true);
     }
 }
 

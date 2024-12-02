@@ -124,6 +124,29 @@ unsafe fn get_param_float_hook(x0:u64, arg2:u64, arg3:u64) -> f32 {
     original!()(x0, arg2, arg3)
 }
 
+
+
+
+
+/*
+
+#[skyline::hook(offset=0x6955d0)]
+unsafe fn internal_cam(cameramodule: CameraModule, cam_hash: u64, arg3: i32) -> f32 {
+    println!("module : {}\nhash : {:#x}\narg3 : {}",cameramodule, cam_hash ,arg3);
+
+    call_original!(cameramodule, cam_hash, arg3)
+}
+
+*/
+
+
+
+
+
+
+
+
+
 #[skyline::hook(offset=0x454150)]
 unsafe fn get_post_params(effectmodule: u128, hash: u128, arg3: f32, arg4: f32, arg5: f32 ,arg6: f32, arg7: f32, arg8: f32, arg9: i128, arg10: u64, arg11:f32) -> f32 {
     println!("hash : {}\narg3 : {}\narg4 : {}\narg5 : {}\narg6 : {}\narg7 : {}\narg8 : {}\narg9 : {}\narg10 : {}\narg11 : {}", hash ,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11);

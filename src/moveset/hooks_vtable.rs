@@ -60,8 +60,8 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
     let situation_kind = StatusModule::situation_kind(module_accessor);
     let motion_kind =MotionModule::motion_kind(module_accessor);
     // scales the models of both pot and his articles by -1 on the x axis to mirror (accurate to strive)
-    if ((PostureModule::lr(module_accessor) < 0.0) && (![*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN].contains(&status_kind) || (motion_kind != hash40("air_turn")) || (motion_kind != hash40("turn")) ) )
-    || ((PostureModule::lr(module_accessor) > 0.0) && ( [*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN].contains(&status_kind) || (motion_kind == hash40("air_turn")) || (motion_kind == hash40("turn")) ) )
+    if ((PostureModule::lr(module_accessor) < 0.0) && (![*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN].contains(&status_kind) && ((motion_kind != hash40("air_turn")) && (motion_kind != hash40("turn"))) ) )
+    || ((PostureModule::lr(module_accessor) > 0.0) && ( [*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN].contains(&status_kind) && ((motion_kind == hash40("air_turn")) || (motion_kind == hash40("turn"))) ) )
     {
             ModelModule::set_joint_scale(module_accessor, Hash40::new("top") , &Vector3f{x:-scale,y:scale,z:scale});
             if ArticleModule::is_exist(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND){

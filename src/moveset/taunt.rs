@@ -23,14 +23,14 @@ pub unsafe extern "C" fn appeal_end(fighter: &mut L2CFighterCommon) -> L2CValue 
         ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
     }
     macros::CAM_ZOOM_OUT(fighter);
-    set_stage_visibility(fighter.module_accessor, 1);
+    //set_stage_visibility(fighter.module_accessor, true);
     smashline::original_status(End, fighter, *FIGHTER_STATUS_KIND_APPEAL)(fighter)
 }
 
 pub unsafe extern "C" fn appeal_srl(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
-        set_stage_visibility(agent.module_accessor, 0);
+        //set_stage_visibility(agent.module_accessor, false);
         macros::CAM_ZOOM_OUT(agent);
         let lr = PostureModule::lr(agent.module_accessor);
         CameraModule::reset_all(agent.module_accessor);            
@@ -48,7 +48,7 @@ pub unsafe extern "C" fn appeal_srl(agent: &mut L2CAgentBase) {
         *MA_MSC_CMD_CAMERA_CAM_OFFSET,
         /*x*/0.0 * lr,
         /*y*/0.0,
-        /*z*/-2000.0);
+        /*z*/-6000.0);
         smash::app::sv_module_access::camera(agent.lua_state_agent);
 
 

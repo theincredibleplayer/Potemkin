@@ -472,7 +472,7 @@ pub unsafe extern "C" fn special_hi_exit(fighter: &mut L2CFighterCommon) -> L2CV
     if StatusModule::status_kind_next(fighter.module_accessor) != FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_LOOP
     && StatusModule::status_kind_next(fighter.module_accessor) != FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START
     && StatusModule::status_kind_next(fighter.module_accessor) != FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE{
-        
+        CameraModule::zoom_out(fighter.module_accessor, 0);
         fighter.sub_throw_uniq_process_exit();
     }
     return L2CValue::I32(0)
