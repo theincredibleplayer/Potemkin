@@ -323,12 +323,14 @@ unsafe fn handle_layout(layout: *mut Layout) -> *mut Layout {
                             //println!("pos_y = {}", border.pos_y);
                             border.alpha = UiManager::get_bar_out_alpha() as u8;
                             //println!("alpha = {}", border.alpha);
+                            border.flags |= 1 << PaneFlag::IsGlobalMatrixDirty as u8;
                         } else {
                             //println!("bar in");
                             border.pos_y = UiManager::get_bar_in_pos(pane);
                             //println!("pos_y = {}", border.pos_y);
                             border.alpha = UiManager::get_bar_in_alpha() as u8;
                             //println!("alpha = {}", border.alpha);
+                            border.flags |= 1 << PaneFlag::IsGlobalMatrixDirty as u8;
                         }
                     }
                     border.set_visible(UiManager::is_bar_on());

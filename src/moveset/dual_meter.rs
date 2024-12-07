@@ -225,17 +225,17 @@ impl CutInUI {
     }
     pub fn get_bar_in_pos(&mut self, pane: &str) -> f32 {
         if pane == "bar_hi"{
-            if self.bar_hi_pos <= 475.0 {
-                self.bar_hi_pos = 475.0;
+            if self.bar_hi_pos <= 490.0 {
+                self.bar_hi_pos = 490.0;
             }else{
-                self.bar_hi_pos -= (75.0/self.bar_in_out_duration) * self.game_speed;
+                self.bar_hi_pos -= (60.0/self.bar_in_out_duration) * self.game_speed;
             }
             return self.bar_hi_pos;
         }else{
-            if self.bar_low_pos >= -475.0 {
-                self.bar_low_pos = -475.0;
+            if self.bar_low_pos >= -490.0 {
+                self.bar_low_pos = -490.0;
             }else{
-                self.bar_low_pos += (75.0/self.bar_in_out_duration) * self.game_speed;
+                self.bar_low_pos += (60.0/self.bar_in_out_duration) * self.game_speed;
             }
             return self.bar_low_pos;
         }
@@ -247,7 +247,7 @@ impl CutInUI {
                 self.is_bar_out = false;
                 self.bar_hi_pos = 550.0;
             }else{
-                self.bar_hi_pos += (75.0/self.bar_in_out_duration) * self.game_speed;
+                self.bar_hi_pos += (60.0/self.bar_in_out_duration) * self.game_speed;
             }
             return self.bar_hi_pos;
         }else{
@@ -256,7 +256,7 @@ impl CutInUI {
                 self.is_bar_out = false;
                 self.bar_low_pos = -550.0;
             }else{
-                self.bar_low_pos -= (75.0/self.bar_in_out_duration) * self.game_speed;  // move this and similar up later since this doesnt seem entirely correct
+                self.bar_low_pos -= (60.0/self.bar_in_out_duration) * self.game_speed;  // move this and similar up later since this doesnt seem entirely correct
             }
             return self.bar_low_pos;
         }

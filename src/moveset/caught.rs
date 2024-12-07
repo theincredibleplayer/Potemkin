@@ -251,9 +251,11 @@ pub unsafe extern "C" fn thrown_status_common(fighter: &mut L2CFighterCommon) ->
 
 
 pub unsafe extern "C" fn thrown_status_common_end(fighter: &mut L2CFighterCommon) -> L2CValue {
-    if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_GAMEWATCH {
-        let z_scale = WorkModule::get_float(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_GAMEWATCH_Z_SCALE);
-        ModelModule::set_scale_z(fighter.module_accessor,z_scale);
+    if !(is_flat_stage()){
+        if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_GAMEWATCH {
+            let z_scale = WorkModule::get_float(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_GAMEWATCH_Z_SCALE);
+            ModelModule::set_scale_z(fighter.module_accessor,z_scale);
+        }
     }
     return smashline::original_status(End, fighter, *FIGHTER_STATUS_KIND_THROWN)(fighter)
 }

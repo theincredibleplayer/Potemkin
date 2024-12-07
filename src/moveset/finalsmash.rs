@@ -87,8 +87,7 @@ pub unsafe extern "C" fn Final_main(fighter: &mut L2CFighterCommon) -> L2CValue 
         AreaModule::set_whole(fighter.module_accessor, false);
         WorkModule::set_flag(fighter.module_accessor, false, *FIGHTER_INSTANCE_WORK_ID_FLAG_NAME_CURSOR);
         WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
-        macros::REQ_FINAL_START_CAMERA(fighter, Hash40::new("d04finalvisualscene01.nuanmb"), false);
-
+        macros::REQ_FINAL_START_CAMERA_arg3(fighter,Hash40::new("d04finalvisualscene01.nuanmb"), false, false);
         MotionModule::change_motion(fighter.module_accessor,Hash40::new("fake_final_visual_scene_01"),0.0,1.0,false,0.0,false,false);
 
         ArticleModule::generate_article(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND,false,-1);
@@ -327,7 +326,8 @@ pub unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> 
     let module_accessor = fighter.module_accessor;
     grabbed_anim_selector(fighter,"catched_pot_final_scene_03", 1.0);
     WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
-    macros::CAM_ZOOM_OUT(fighter);
+    CAM_ZOOM_OUT_FINAL(fighter);
+    macros::REQ_FINAL_START_CAMERA_arg3(fighter,Hash40::new("d04finalvisualscene03.nuanmb"), false, false);
     PostureModule::set_pos_2d(fighter.module_accessor,&Vector2f{x: 0.0 , y: 0.0});
     return smashline::original_status(Main, fighter, *FIGHTER_KAMUI_STATUS_KIND_FINAL_END)(fighter);
 }
@@ -396,15 +396,14 @@ pub unsafe extern "C" fn finaljump_exit(fighter: &mut L2CFighterCommon) -> L2CVa
 
 pub unsafe extern "C" fn vissceneentry_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
     println!("entry pre");
-    macros::CAM_ZOOM_OUT(fighter);
-
-    fighter.clear_lua_stack();
-    fighter.push_lua_stack(&mut L2CValue::new_int(0x2c49254dfb));
-    sv_battle_object::notify_event_msc_cmd(fighter.lua_state_agent);
-
-    fighter.clear_lua_stack();
-    fighter.push_lua_stack(&mut L2CValue::new_int(0x2c1b582d81));
-    sv_battle_object::notify_event_msc_cmd(fighter.lua_state_agent);
+    CAM_ZOOM_OUT_FINAL(fighter);
+    //fighter.clear_lua_stack();
+    //fighter.push_lua_stack(&mut L2CValue::new_int(0x2c49254dfb));
+    //sv_battle_object::notify_event_msc_cmd(fighter.lua_state_agent);
+//
+    //fighter.clear_lua_stack();
+    //fighter.push_lua_stack(&mut L2CValue::new_int(0x2c1b582d81));
+    //sv_battle_object::notify_event_msc_cmd(fighter.lua_state_agent);
 
 
     StatusModule::set_status_kind_interrupt(fighter.module_accessor, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK);
@@ -418,17 +417,18 @@ pub unsafe extern "C" fn vissceneentry_init(fighter: &mut L2CFighterCommon) -> L
 
 pub unsafe extern "C" fn vissceneattackwait_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
     println!("wait pre");
-    fighter.clear_lua_stack();
-    fighter.push_lua_stack(&mut L2CValue::new_int(0x327bfca840));
-    sv_battle_object::notify_event_msc_cmd(fighter.lua_state_agent);
+    CAM_ZOOM_OUT_FINAL(fighter);
+    //fighter.clear_lua_stack();
+    //fighter.push_lua_stack(&mut L2CValue::new_int(0x327bfca840));
+    //sv_battle_object::notify_event_msc_cmd(fighter.lua_state_agent);
 
-    fighter.clear_lua_stack();
-    fighter.push_lua_stack(&mut L2CValue::new_int(0x3a2bb2496d));
-    sv_battle_object::notify_event_msc_cmd(fighter.lua_state_agent);
+    //fighter.clear_lua_stack();
+    //fighter.push_lua_stack(&mut L2CValue::new_int(0x3a2bb2496d));
+    //sv_battle_object::notify_event_msc_cmd(fighter.lua_state_agent);
 
-    fighter.clear_lua_stack();
-    fighter.push_lua_stack(&mut L2CValue::new_int(0x322981c83a));
-    sv_battle_object::notify_event_msc_cmd(fighter.lua_state_agent);
+    //fighter.clear_lua_stack();
+    //fighter.push_lua_stack(&mut L2CValue::new_int(0x322981c83a));
+    //sv_battle_object::notify_event_msc_cmd(fighter.lua_state_agent);
     
     StatusModule::set_status_kind_interrupt(fighter.module_accessor, *FIGHTER_KAMUI_STATUS_KIND_FINAL_END);
     return 1.into()

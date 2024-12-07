@@ -109,11 +109,11 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
         if DamageModule::damage(enemy, 0) > 100.0 {
             macros::FT_MOTION_RATE(agent, 2.0);
             EffectModule::req_follow(enemy, Hash40::new("sys_explosion_sign"), Hash40::new("hip"), &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, 1.0, false, 0, 0, 0, 0, 0, false, false);
-            notify_event_msc_cmd!(agent, Hash40::new_raw(0x31dbed6513), Hash40::new("throw"), Hash40::new("invalid"));
             if capture_id != 0x50000000 {
                 println!("releasing attack");
                 AttackModule::hit_absolute_joint(agent.module_accessor, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW,capture_id as u32,Hash40::new("throw"), 0, 0);
-                macros::CAM_ZOOM_OUT(agent);
+                CameraModule::reset_all(agent.module_accessor); 
+                CAM_ZOOM_OUT_FINAL(agent);
             }
 
             for n in 1..21{
@@ -132,11 +132,11 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
                 WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_END_EXIT);
             }
         }else{
-            notify_event_msc_cmd!(agent, Hash40::new_raw(0x31dbed6513), Hash40::new("throw"), Hash40::new("invalid"));
             if capture_id != 0x50000000 {
                 println!("releasing attack");
                 AttackModule::hit_absolute_joint(agent.module_accessor, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW,capture_id as u32,Hash40::new("throw"), 0, 0);
-                macros::CAM_ZOOM_OUT(agent);
+                CameraModule::reset_all(agent.module_accessor); 
+                CAM_ZOOM_OUT_FINAL(agent);
             }
         }
     }
@@ -183,8 +183,8 @@ pub unsafe extern "C" fn effect_finalend(agent: &mut L2CAgentBase) {
         macros::LAST_EFFECT_SET_RATE(agent, 0.75);
     }
 
-    for n in 1..10{
-        wait(agent.lua_state_agent, 3.0);
+    for n in 1..5{
+        wait(agent.lua_state_agent, 10.0);
         if macros::is_excute(agent) {
             macros::EFFECT(agent, Hash40::new("dolly_volcano_ground"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
             EffectModule::set_scale_last(agent.module_accessor, &Vector3f{x:5.0,y:1.0,z:5.0} );
@@ -295,12 +295,13 @@ pub unsafe extern "C" fn game_final(agent: &mut L2CAgentBase) {
     wait(agent.lua_state_agent, 3.0);
     if macros::is_excute(agent) {
         AttackModule::clear_all(agent.module_accessor);
+        
         WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_CLEAR_ATTACK);
     }
     frame(agent.lua_state_agent, 60.0);
     if macros::is_excute(agent) {
         //SlowModule::clear_whole(agent.module_accessor);
-        CameraModule::zoom_out(agent.module_accessor, 30);
+        macros::CAM_ZOOM_OUT(agent);
     }
     frame(agent.lua_state_agent, 76.0);
     if macros::is_excute(agent) {
