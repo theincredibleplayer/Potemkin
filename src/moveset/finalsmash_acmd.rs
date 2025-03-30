@@ -74,7 +74,7 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         UiManager::set_bar_out();
         set_vis_hud(true);
-        
+        set_stage_visibility(agent.module_accessor, false);
         HitModule::set_whole(module_accessor, smash::app::HitStatus(*HIT_STATUS_INVINCIBLE), 0);
         WorkModule::on_flag(agent.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
         ArticleModule::remove_exist(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
@@ -83,8 +83,8 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
 
     frame(agent.lua_state_agent, 49.0);
     if macros::is_excute(agent) {
-        macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 20.0, 50, 0, 200, 100, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
-        macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 20.0, 50, 0, 200, 100, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 20.0, 60, 0, 170, 100, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 20.0, 60, 0, 170, 100, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         //HitModule::set_whole(module_accessor, smash::app::HitStatus(*HIT_STATUS_NORMAL), 0);
     }
 
@@ -95,6 +95,7 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
         AttackModule::set_catch_only_all(agent.module_accessor, true, false);
         AttackModule::set_no_dead_all(agent.module_accessor, true, true);
         WorkModule::off_flag(agent.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
+        //SlowModule::set_whole(enemy, 4, 30);
         //MotionModule::change_motion(enemy,Hash40::new("down_wait_d"),0.0,1.0,false,0.0,false,false);
     }
     wait(agent.lua_state_agent, 5.0);
@@ -113,7 +114,21 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
                 println!("releasing attack");
                 AttackModule::hit_absolute_joint(agent.module_accessor, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW,capture_id as u32,Hash40::new("throw"), 0, 0);
                 CameraModule::reset_all(agent.module_accessor); 
+
+                //agent.clear_lua_stack();
+                //agent.push_lua_stack(&mut L2CValue::new_int(0x322981c83a));
+                //sv_battle_object::notify_event_msc_cmd(agent.lua_state_agent);
+//
+                //agent.clear_lua_stack();
+                //agent.push_lua_stack(&mut L2CValue::new_int(0x2488d88d8d));
+                //sv_battle_object::notify_event_msc_cmd(agent.lua_state_agent);
+//
+                //agent.clear_lua_stack();
+                //agent.push_lua_stack(&mut L2CValue::new_int(0x24a7be4746));
+                //sv_battle_object::notify_event_msc_cmd(agent.lua_state_agent);
+
                 CAM_ZOOM_OUT_FINAL(agent);
+                WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_END_EXIT);
             }
 
             for n in 1..21{
@@ -124,18 +139,80 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
                 }
                 SlowModule::set_whole(agent.module_accessor, 3, 100);
             }
-            wait(agent.lua_state_agent, 4.0);
+            wait(agent.lua_state_agent, 1.0);
+            if macros::is_excute(agent) {
+                let common = get_fighter_common_from_accessor(&mut* enemy);
+                set_stage_visibility(agent.module_accessor, false);               ////////////////////////////////problem here
+                macros::QUAKE(common, *CAMERA_QUAKE_KIND_XL);
+                SlowModule::clear_whole(agent.module_accessor);
+                StopModule::set_hit_stop_frame(enemy, 20, true);
+                //StopModule::set_hit_stop_frame(agent.module_accessor, 20, true);
+                //macros::PLAY_SE(agent, Hash40::new("se_common_finishhit"));
+                //EffectModule::req_follow(enemy, Hash40::new("sys_bg_finishhit"), Hash40::new("hip"), &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, 1.0, false, 0, 0, 0, 0, 0, false, false);
+                //EffectModule::req_common(agent.module_accessor, Hash40::new("bg_finish_hit"), 0.0);
+                //SlowModule::set_whole(agent.module_accessor, 255, 3);
+                let handle = EffectModule::req_screen(enemy, Hash40::new("bg_finishhit"), false, true, true);
+                EffectModule::set_billboard(enemy, handle as u32, true);
+                EffectModule::set_disable_render_offset_last(enemy);
+                SoundModule::play_se(enemy, Hash40::new("se_common_finishhit"), false, false, false, false, enSEType(0));
+
+                let scale = PostureModule::scale(enemy);
+                CameraModule::reset_all(enemy);            
+                macros::CAM_ZOOM_IN_arg6(
+                    common,
+                    /*frames to zoom in totally*/12.0,
+                    /*according to calude the object id?*/0.0,
+                    /*the amt of zoom needed, higher the number lower the zoom*/1.3*scale,
+                    /*y_rot*/0.0, // up and down
+                    /*x_rot*/0.0, //left and right
+                    true
+                );
+                
+                SlowModule::set_whole(enemy, 9, 40);
+                EFFECT_GLOBAL_BACK_GROUND(common.lua_state_agent);
+
+
+        
+
+            }
+            wait(agent.lua_state_agent, 1.0);
+            if macros::is_excute(agent) {
+                agent.clear_lua_stack();
+                lua_args!(agent, Hash40::new("sys_bg_finishhit"), false, false);
+                smash::app::sv_animcmd::EFFECT_OFF_KIND(agent.lua_state_agent);
+                agent.pop_lua_stack(1);
+                agent.clear_lua_stack();
+                lua_args!(agent, Hash40::new("sys_bg_black"), false, false);
+                smash::app::sv_animcmd::EFFECT_OFF_KIND(agent.lua_state_agent);
+                agent.pop_lua_stack(1);
+            }
+            wait(agent.lua_state_agent, 6.0);
             //frame(agent.lua_state_agent, 152.0);
             if macros::is_excute(agent) {
+                let common = get_fighter_common_from_accessor(&mut* enemy);
+                set_stage_visibility(agent.module_accessor, true);
                 macros::FT_MOTION_RATE(agent, 1.0);
+                macros::CAM_ZOOM_OUT(common);
                 StatusModule::change_status_request_from_script(enemy, FIGHTER_STATUS_KIND_DEAD.into(), false.into());
-                WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_END_EXIT);
             }
+            
         }else{
             if capture_id != 0x50000000 {
                 println!("releasing attack");
                 AttackModule::hit_absolute_joint(agent.module_accessor, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW,capture_id as u32,Hash40::new("throw"), 0, 0);
-                CameraModule::reset_all(agent.module_accessor); 
+                CameraModule::reset_all(agent.module_accessor);
+                //agent.clear_lua_stack();
+                //agent.push_lua_stack(&mut L2CValue::new_int(0x322981c83a));
+                //sv_battle_object::notify_event_msc_cmd(agent.lua_state_agent);
+//
+                //agent.clear_lua_stack();
+                //agent.push_lua_stack(&mut L2CValue::new_int(0x2488d88d8d));
+                //sv_battle_object::notify_event_msc_cmd(agent.lua_state_agent);
+//
+                //agent.clear_lua_stack();
+                //agent.push_lua_stack(&mut L2CValue::new_int(0x24a7be4746));
+                //sv_battle_object::notify_event_msc_cmd(agent.lua_state_agent);
+                WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_END_EXIT);
                 CAM_ZOOM_OUT_FINAL(agent);
             }
         }
@@ -156,14 +233,13 @@ pub unsafe extern "C" fn sound_finalend(agent: &mut L2CAgentBase) {
   }
   
 pub unsafe extern "C" fn effect_finalend(agent: &mut L2CAgentBase) {
-    for _ in 0..26 {
-        if macros::is_excute(agent) {
-            macros::EFFECT_FOLLOW(agent, Hash40::new("sys_soccer"), Hash40::new("haver"), 0, 0, 0, 0.0, 0.0, 0.0, 1, true);
+    if macros::is_excute(agent) {
+        for _ in 0..2 {
+            macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_buster_fire"), Hash40::new("haver"), 0, -1, 3.5, 0.0, 0.0, 0.0, 1.7, true);
             macros::LAST_EFFECT_SET_RATE(agent, 0.5);
-            macros::EFFECT_FOLLOW(agent, Hash40::new("sys_soccer"), Hash40::new("havel"), 0, 0, 0, 0.0, 0.0, 0.0, 1, true);
+            macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_buster_fire"), Hash40::new("havel"), -0, -1, 3.5, 0.0, 0.0, 0.0, 1.7, true);
             macros::LAST_EFFECT_SET_RATE(agent, 0.5);
         }
-        wait(agent.lua_state_agent, 2.0);
     }
 
 
@@ -175,8 +251,9 @@ pub unsafe extern "C" fn effect_finalend(agent: &mut L2CAgentBase) {
         macros::LAST_EFFECT_SET_RATE(agent, 0.85);
         macros::EFFECT(agent, Hash40::new("sys_bomb_d"), Hash40::new("top"), 0, 0, -20, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, false);
         macros::LAST_EFFECT_SET_RATE(agent, 0.3);
-        macros::EFFECT(agent, Hash40::new("dolly_volcano_ground"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
-        EffectModule::set_scale_last(agent.module_accessor, &Vector3f{x:5.0,y:5.0,z:5.0} );
+        
+        macros::EFFECT(agent, Hash40::new("eflame_promrevolt_firepillar_ground"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 4.0, 0, 0, 0, 0, 0, 0, true);
+        macros::LAST_EFFECT_SET_RATE(agent, 0.2);
 
         macros::EFFECT(agent, Hash40::new("dolly_volcano_base"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
         EffectModule::set_scale_last(agent.module_accessor, &Vector3f{x:5.0,y:3.0,z:5.0} );
@@ -186,14 +263,14 @@ pub unsafe extern "C" fn effect_finalend(agent: &mut L2CAgentBase) {
     for n in 1..5{
         wait(agent.lua_state_agent, 10.0);
         if macros::is_excute(agent) {
-            macros::EFFECT(agent, Hash40::new("dolly_volcano_ground"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
-            EffectModule::set_scale_last(agent.module_accessor, &Vector3f{x:5.0,y:1.0,z:5.0} );
+            //macros::EFFECT(agent, Hash40::new("eflame_promrevolt_firepillar_ground"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 4.0, 0, 0, 0, 0, 0, 0, true);
+            //macros::LAST_EFFECT_SET_RATE(agent, 0.75);
         }
     }
     
     frame(agent.lua_state_agent, 110.0);
     if macros::is_excute(agent) {
-        EffectModule::kill_kind(agent.module_accessor, Hash40::new("sys_soccer"), false, true);
+        EffectModule::kill_kind(agent.module_accessor, Hash40::new("kamui_buster_fire"), false, true);
     }
 }
 
@@ -248,7 +325,7 @@ pub unsafe extern "C" fn game_final(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         CameraModule::reset_all(agent.module_accessor);
         macros::CHECK_VALID_FINAL_START_CAMERA(agent, 0, 7, 20, 0, 0, 0);
-        //macros::SLOW_OPPONENT(agent, 400.0, 70.0);
+        macros::SLOW_OPPONENT(agent, 400.0, 70.0);
         ArticleModule::generate_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
         ArticleModule::change_motion(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("final"),false,-1.0);
     }

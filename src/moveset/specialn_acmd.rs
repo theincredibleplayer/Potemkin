@@ -54,7 +54,7 @@ pub unsafe extern "C" fn effect_regular(agent: &mut L2CAgentBase) {
         } else {
             let mut eff_string = "se_common_fire_m";
         }
-        macros::EFFECT_FLW_POS(agent, Hash40::new("master_bow_arrow2_hit"), Hash40::new("top"), 0.0, 0.0, 0.0, 0, 180, 0, 1, true);
+        macros::EFFECT_FLW_POS(agent, Hash40::new("kamui_fdb_explode"), Hash40::new("top"), 0.0, 0.0, 0.0, 0, 180, 0, 1, true);
         //macros::EFFECT(agent, Hash40::new(eff_string), Hash40::new("top"),0, 0, 0, 0, 0, 0, 1.0 + (smash::app::sv_math::rand(hash40("fighter"), 3) as f32 * 0.5), 0, 0, 0, 0, 0, 0, false);
     }
     for _ in 0..99{
@@ -72,8 +72,8 @@ pub unsafe extern "C" fn effect_regular(agent: &mut L2CAgentBase) {
                 let mut eff_string = "sys_bomb_c";
                 macros::PLAY_SE(agent, Hash40::new("se_common_fire_m"));
             }
-            macros::EFFECT(agent, Hash40::new("master_bow_arrow2_hit"), Hash40::new("top"),0, 5, 0, 0, 180, 0, 1, 0, 0, 0, 0, 0, 0, false);
-            //macros::EFFECT_FLW_POS(agent, Hash40::new("master_bow_arrow2_hit"), Hash40::new("top"), 0.0, 0.0, 0.0, 0, 180, 0, 1, true);
+            macros::EFFECT(agent, Hash40::new("kamui_fdb_explode"), Hash40::new("top"),0, 5, 0, 0, 180, 0, 1, 0, 0, 0, 0, 0, 0, false);
+            //macros::EFFECT_FLW_POS(agent, Hash40::new("kamui_fdb_explode"), Hash40::new("top"), 0.0, 0.0, 0.0, 0, 180, 0, 1, true);
             EffectModule::set_rate_last(agent.module_accessor, 1.0);
             EffectModule::set_scale_last(agent.module_accessor, &Vector3f{x:0.8,y:0.5,z:0.8} )
             //macros::EFFECT(agent, Hash40::new(eff_string), Hash40::new("top"),0, 0, 0, 0, 0, 0, 1.0 + (smash::app::sv_math::rand(hash40("fighter"), 3) as f32 * 0.5), 0, 0, 0, 0, 0, 0, false);

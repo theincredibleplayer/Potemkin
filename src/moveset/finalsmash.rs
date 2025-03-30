@@ -47,12 +47,6 @@ unsafe fn motion_setup(fighter: &mut L2CFighterCommon, situation_change: bool) {
     }
 }
 
-pub unsafe extern "C" fn finalvisscene2_main(fighter: &mut L2CFighterCommon) -> L2CValue {
-    grabbed_anim_selector(fighter,"catched_pot_final_scene_02", 1.0);
-    let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
-    smash::app::lua_bind::FighterManager::start_finalbg(fighter_manager,*FIGHTER_KIND_KAMUI,1.0);
-    return smashline::original_status(Main, fighter, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK)(fighter);
-}
 
 
 pub unsafe extern "C" fn Final_main(fighter: &mut L2CFighterCommon) -> L2CValue {
@@ -156,14 +150,13 @@ pub unsafe extern "C" fn Final_main_loop(fighter: &mut L2CFighterCommon) -> L2CV
         KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
 
         if MotionModule::is_end(fighter.module_accessor) {
-        WorkModule::on_flag(fighter.module_accessor,*FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_SUCCESS);
-        ArticleModule::remove_exist(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
-        fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_FINAL_READY.into(),false.into());
+            WorkModule::on_flag(fighter.module_accessor,*FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_SUCCESS);
+            ArticleModule::remove_exist(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+            fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_FINAL_READY.into(),false.into());
         }
         return L2CValue::I32(0)
     }
 }
-
 
 
 pub unsafe extern "C" fn Final_exit(fighter: &mut L2CFighterCommon) -> L2CValue {
@@ -262,11 +255,10 @@ pub unsafe extern "C" fn finaldashloop_exec(fighter: &mut L2CFighterCommon) -> L
 pub unsafe extern "C" fn finaldashloop_init(fighter: &mut L2CFighterCommon) -> L2CValue {
   return smashline::original_status(Init, fighter, *FIGHTER_STATUS_KIND_FINAL)(fighter);
 }
+
 pub unsafe extern "C" fn finaldashattack_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
   return smashline::original_status(Pre, fighter, *FIGHTER_STATUS_KIND_FINAL)(fighter);
 }
-
-
 pub unsafe extern "C" fn finaldashattack_main(fighter: &mut L2CFighterCommon) -> L2CValue {
   let module_accessor = fighter.module_accessor;
   KineticModule::enable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_STOP);
@@ -283,7 +275,6 @@ pub unsafe extern "C" fn finaldashattack_main(fighter: &mut L2CFighterCommon) ->
   WorkModule::set_float(fighter.module_accessor,0.0,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FINAL_TIMER);
     fighter.sub_shift_status_main(L2CValue::Ptr(finaldashattack_main_loop as *const () as _))
 }
-
 unsafe fn finaldashattack_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     if AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT){
         WorkModule::on_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_HPB_GOTTEM)
@@ -326,16 +317,14 @@ pub unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> 
     let module_accessor = fighter.module_accessor;
     grabbed_anim_selector(fighter,"catched_pot_final_scene_03", 1.0);
     WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
-    CAM_ZOOM_OUT_FINAL(fighter);
+    //CAM_ZOOM_OUT_FINAL(fighter);
     macros::REQ_FINAL_START_CAMERA_arg3(fighter,Hash40::new("d04finalvisualscene03.nuanmb"), false, false);
     PostureModule::set_pos_2d(fighter.module_accessor,&Vector2f{x: 0.0 , y: 0.0});
     return smashline::original_status(Main, fighter, *FIGHTER_KAMUI_STATUS_KIND_FINAL_END)(fighter);
 }
-
 pub unsafe extern "C" fn finalsceneenter_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     return smashline::original_status(Main, fighter, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ENTRY)(fighter);
 }
-
 pub unsafe extern "C" fn finalsceneattack_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
     WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
@@ -350,7 +339,6 @@ pub unsafe extern "C" fn finaljump_main(fighter: &mut L2CFighterCommon) -> L2CVa
     MotionModule::change_motion(fighter.module_accessor,Hash40::new("heavenly_start"),0.0,1.0,false,0.0,false,false);
     fighter.sub_shift_status_main(L2CValue::Ptr(finaljump_main_loop as *const () as _))
 }
-
 unsafe fn finaljump_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
 
@@ -384,7 +372,6 @@ unsafe fn finaljump_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     }
     return L2CValue::I32(0)
 }
-
 pub unsafe extern "C" fn finaljump_exit(fighter: &mut L2CFighterCommon) -> L2CValue {
     if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_SUCCESS){
         JostleModule::set_status(fighter.module_accessor, false);
@@ -396,7 +383,7 @@ pub unsafe extern "C" fn finaljump_exit(fighter: &mut L2CFighterCommon) -> L2CVa
 
 pub unsafe extern "C" fn vissceneentry_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
     println!("entry pre");
-    CAM_ZOOM_OUT_FINAL(fighter);
+    //CAM_ZOOM_OUT_FINAL(fighter);
     //fighter.clear_lua_stack();
     //fighter.push_lua_stack(&mut L2CValue::new_int(0x2c49254dfb));
     //sv_battle_object::notify_event_msc_cmd(fighter.lua_state_agent);
@@ -415,7 +402,7 @@ pub unsafe extern "C" fn vissceneentry_init(fighter: &mut L2CFighterCommon) -> L
     return smashline::original_status(Init, fighter, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ENTRY)(fighter);
 }
 
-pub unsafe extern "C" fn vissceneattackwait_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
+/*pub unsafe extern "C" fn vissceneattackwait_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
     println!("wait pre");
     CAM_ZOOM_OUT_FINAL(fighter);
     //fighter.clear_lua_stack();
@@ -439,4 +426,26 @@ pub unsafe extern "C" fn vissceneattackwait_init(fighter: &mut L2CFighterCommon)
 
     return smashline::original_status(Init, fighter, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK_WAIT)(fighter);
 
+}*/
+
+pub unsafe extern "C" fn finalvisscene2_main(fighter: &mut L2CFighterCommon) -> L2CValue {
+    grabbed_anim_selector(fighter,"catched_pot_final_scene_02", 1.0);
+    //let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
+    //smash::app::lua_bind::FighterManager::start_finalbg(fighter_manager,*FIGHTER_KIND_KAMUI,1.0);
+    return smashline::original_status(Main, fighter, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK)(fighter);
 }
+
+
+
+pub unsafe extern "C" fn vissceneentry_exec(fighter: &mut L2CFighterCommon) -> L2CValue {
+    //CameraModule::zoom_out(fighter.module_accessor, 0);
+    fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK.into(),false.into());
+    return L2CValue::I32(0)
+  }
+  
+  
+  pub unsafe extern "C" fn vissceneattackwait_exec(fighter: &mut L2CFighterCommon) -> L2CValue {
+    //CameraModule::zoom_out(fighter.module_accessor, 0);
+    fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_FINAL_END.into(),false.into());
+    return L2CValue::I32(0)
+  }

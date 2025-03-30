@@ -324,27 +324,27 @@ impl VtableEntry {
     pub const ON_REBIRTH2: usize = 8;
     pub const PERMA_WEAPON_LINK_REMOVE: usize = 9;                  // unsure, only used for bowser jr. from findings
     pub const ON_FRAME_1: usize = 10;
-    pub const CORRECTIVE_FRAME: usize = 11;                         // opff of sorts for some corrective action, like setting shape or detecting distance from ground and taking some action
-    pub const ON_FRAME_2: usize = 12;
-    pub const ON_FRAME_3: usize = 13;                               // some use for Partial Motion
+    pub const ON_FRAME_2: usize = 11;                               // opff of sorts for some corrective action, like setting shape or detecting distance from ground and taking some action
+    pub const ON_FRAME_3: usize = 12;
+    pub const ON_FRAME_4: usize = 13;                               // some use for Partial Motion
     pub const UNK14: usize = 14;
     pub const SOME_KIRBY_RELATED: usize = 15;
     pub const MOUTH_BREATHERS_OBJECT_RESET: usize = 16;             // DDD and kirby related
     pub const ON_PRE_DAMAGE: usize = 17;                            // only ever used by snake, it runs right before going into a damage status it seems
-    pub const ON_FRAME_4: usize = 18;                               // lol, lmao even
-    pub const ON_FRAME_5: usize = 19;                               // seems to be final smash related except on rob and lucario for some reason
+    pub const ON_FRAME_5: usize = 18;                               // lol, lmao even
+    pub const ON_FRAME_6: usize = 19;                               // seems to be final smash related except on rob and lucario for some reason
                                                                     // i am actually not fully convinced of this naming cuz cloud is doing some weird ass shit i wanna  test when this gets called later
                                                                     // its a fucking opff LMFAOOOOOOOOOOOOOOOOOOOOOOOO
-    pub const ON_FRAME_6: usize = 20;                             // this is also a massive guess i should test this later (THIS IS ANOTHER OPFFFF AAAAAAAAAAAAAAAAAAAAAAAAA)
+    pub const ON_FRAME_7: usize = 20;                               // this is also a massive guess i should test this later (THIS IS ANOTHER OPFFFF AAAAAAAAAAAAAAAAAAAAAAAAA)
     pub const ON_PAUSE: usize = 21;
     pub const ON_PAUSE_FRAME: usize = 22;                           // its an on frame while paused
     pub const ON_UNPAUSE: usize = 23;
     pub const ON_MATCH_GO: usize = 24;                              // it runs once when the announcer says GO
     pub const ON_DEATH_RESET_1: usize = 25;
     pub const ON_DEATH_RESET_2: usize = 26;                         // seems to be another on death
-    pub const ON_FRAME_7: usize = 27;                               // you cant make this shit up LMFAO 7 OPFFS
-    pub const ON_FRAME_FOR_KIRBY_1: usize = 28;
-    pub const ON_FRAME_FOR_KIRBY_2: usize = 29;
+    pub const ON_FRAME_8: usize = 27;                               // you cant make this shit up LMFAO 7 OPFFS
+    pub const ON_FRAME_9: usize = 28;                               // only kirby uses this 
+    pub const ON_FRAME_10: usize = 29;                              // only kirby uses this 
     pub const ON_STATUS_CHANGE: usize = 30;
     pub const ON_SITUATION_CHANGE: usize = 31;
     pub const UNK32: usize = 32;

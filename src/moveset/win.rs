@@ -133,3 +133,27 @@ pub unsafe extern "C" fn win_exit(fighter: &mut L2CFighterCommon) -> L2CValue {
     return L2CValue::I32(0)
 
 }
+
+
+
+
+pub unsafe extern "C" fn game_win1a(agent: &mut L2CAgentBase) {
+
+}
+
+pub unsafe extern "C" fn sound_win1a(agent: &mut L2CAgentBase) {
+    frame(agent.lua_state_agent, 5.0);
+    if macros::is_excute(agent) {
+        macros::PLAY_SE(agent, Hash40::new("se_btl_pot_matchwin"));
+    }
+    frame(agent.lua_state_agent, 125.0);
+    if macros::is_excute(agent) {
+        let sound = sound_selector(agent,"vc_pot_win_X_X".to_string(),2,true,false,1);
+        macros::PLAY_SE(agent, Hash40::new_raw(sound));
+    }
+    frame(agent.lua_state_agent, 220.0);
+    if macros::is_excute(agent) {
+        let sound = sound_selector(agent,"vc_pot_win_X_X".to_string(),2,true,true,2);
+        macros::PLAY_SE(agent, Hash40::new_raw(sound));
+    }
+}

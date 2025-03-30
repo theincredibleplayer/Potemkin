@@ -328,7 +328,6 @@ pub unsafe extern "C" fn wait_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
     fighter.sub_wait_common();
     fighter.sub_wait_motion_mtrans();
-    WorkModule::unable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_TURN);
     fighter.sub_shift_status_main(L2CValue::Ptr(wait_main_loop as *const () as _))
 }
 

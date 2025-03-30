@@ -103,8 +103,8 @@ pub unsafe extern "C" fn special_dragon_hi_loop(agent: &mut L2CAgentBase) {
 pub unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         //macros::FT_MOTION_RATE(agent, 0.5);
-        macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 20.0, 361, 100, 0, 50, 1.5, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
-        macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 20.0, 361, 100, 0, 50, 1.5, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 10.0, 361, 90, 0, 60, 1.5, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 10.0, 361, 90, 0, 60, 1.5, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         WorkModule::on_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_HI_FLAG_CAPTURE);
     }
     sv_animcmd::frame(agent.lua_state_agent, 1.0);
@@ -128,7 +128,8 @@ pub unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
     sv_animcmd::frame(agent.lua_state_agent, 3.0);
     if macros::is_excute(agent) {
         macros::QUAKE(agent, *CAMERA_QUAKE_KIND_XL);
-        macros::ATTACK(agent,0,0,Hash40::new("top"),1.0,361,30,10,12,5.0,0.0,28.0,12.0,None,None,None,1.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_none"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_NONE,*ATTACK_REGION_NONE);
+        macros::ATTACK(agent,0,0,Hash40::new("top"),1.0,361,30,10,12,5.0,0.0,28.0,12.0,None,None,None
+        ,1.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_none"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_NONE,*ATTACK_REGION_NONE);
         AttackModule::set_catch_only_all(agent.module_accessor, true, false);
         AttackModule::set_no_dead_all(agent.module_accessor, true, false);
         WorkModule::on_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_HI_FLAG_FINAL_JAB_HIT_MOTION_PLAY);
@@ -137,17 +138,39 @@ pub unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         AttackModule::clear_all(agent.module_accessor);
     }
-
+    //wait(agent.lua_state_agent, 1.0);
+    //if macros::is_excute(agent) {
+    //    let capture_id = LinkModule::get_node_object_id(agent.module_accessor, *LINK_NO_CAPTURE);
+    //    let enemy = sv_battle_object::module_accessor(capture_id as u32);
+    //    set_stage_visibility(agent.module_accessor, false);               ////////////////////////////////problem here
+    //    StopModule::set_hit_stop_frame(enemy, 30, true);
+    //    macros::PLAY_SE(agent, Hash40::new("se_common_finishhit"));
+    //    EffectModule::req_follow(enemy, Hash40::new("sys_bg_finishhit"), Hash40::new("hip"), &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, 1.0, false, 0, 0, 0, 0, 0, false, false);
+//
+    //    //SlowModule::set_whole(agent.module_accessor, 255, 3);
+    //}
+    //wait(agent.lua_state_agent, 4.0);
+    ////frame(agent.lua_state_agent, 152.0);
+    //if macros::is_excute(agent) {
+    //    let capture_id = LinkModule::get_node_object_id(agent.module_accessor, *LINK_NO_CAPTURE);
+    //    let enemy = sv_battle_object::module_accessor(capture_id as u32);
+    //    set_stage_visibility(agent.module_accessor, true);
+    //    macros::FT_MOTION_RATE(agent, 1.0);
+    //    StatusModule::change_status_request_from_script(enemy, FIGHTER_STATUS_KIND_DEAD.into(), false.into());
+    //    WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_END_EXIT);
+    //}
     sv_animcmd::frame(agent.lua_state_agent, 44.0);
     if macros::is_excute(agent) {
         macros::FILL_SCREEN_MODEL_COLOR(agent, 0, 0, 0.0, 0.0, 0.2, 1, 1, 0.8, 1, 1, *smash::lib::lua_const::EffectScreenLayer::GROUND, *EFFECT_SCREEN_PRIO_FINAL);
         macros::CANCEL_FILL_SCREEN(agent, 0, 5);
     }
+    
     sv_animcmd::frame(agent.lua_state_agent, 45.0);
     if macros::is_excute(agent) {
         let entry_id = WorkModule::get_int(agent.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         UiManager::add_tension(entry_id,18.0);
         WorkModule::on_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_HI_FLAG_HIT);
+        
         //let fighter_cutin_manager = *(FIGHTER_CUTIN_MANAGER_ADDR as *mut *mut smash::app::FighterCutInManager);
         //smash::app::lua_bind::FighterCutInManager::set_throw_finish_zoom_rate(fighter_cutin_manager, 1.7);
         macros::PLAY_SE(agent, Hash40::new("se_kamui_special_h02"));
@@ -159,8 +182,8 @@ pub unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
             agent,
             /*frames to zoom in totally*/3.0,
             /*according to calude the object id?*/0.0,
-            /*the amt of zoom needed, higher the number lower the zoom*/1.7*scale,
-            /*y_rot*/0.2, // up and down
+            /*the amt of zoom needed, higher the number lower the zoom*/1.3*scale,
+            /*y_rot*/0.3, // up and down
             /*x_rot*/-0.6 * lr, //left and right
             true
         );
@@ -174,6 +197,7 @@ pub unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
         /*z*/0);
         smash::app::sv_module_access::camera(agent.lua_state_agent);
     }
+    
     sv_animcmd::wait(agent.lua_state_agent, 1.0);
     if macros::is_excute(agent) {
         macros::FT_MOTION_RATE(agent, 2.0);
@@ -183,7 +207,7 @@ pub unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
     sv_animcmd::wait(agent.lua_state_agent, 1.0);
     if macros::is_excute(agent) {
         macros::FILL_SCREEN_MODEL_COLOR(agent, 0, 0, 0.0, 0.0, 0.2, 1, 1, 0.8, 1, 1, *smash::lib::lua_const::EffectScreenLayer::GROUND, *EFFECT_SCREEN_PRIO_FINAL);
-        macros::CANCEL_FILL_SCREEN(agent, 0, 20);
+        macros::CANCEL_FILL_SCREEN(agent, 0, 30);
     }
     sv_animcmd::wait(agent.lua_state_agent, 9.0);
     if macros::is_excute(agent) {
@@ -211,6 +235,7 @@ pub unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
     sv_animcmd::wait(agent.lua_state_agent, 2.0);
     if macros::is_excute(agent) {
         macros::CAM_ZOOM_OUT(agent);
+        
     }
 
 }

@@ -18,22 +18,33 @@ use crate::moveset::*;
 
 pub unsafe extern "C" fn throw_lw(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.0, 50, 150, 0, 40, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
-        macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.0, 80, 140, 0, 80, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 100, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
 
     frame(agent.lua_state_agent, 103.0);
     if macros::is_excute(agent) {
         macros::QUAKE(agent, *CAMERA_QUAKE_KIND_XL);
-        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 30.0, 80, 80, 0, 50, 6.0, 0.0, 20.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F
+        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 30.0, 80, 80, 0, 50,
+         6.0, 0.0, 20.0, 0.0, None, None, None, 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F
         , false, 0, 0.0, 0, 
         false, false, false, 
-        false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_PUNCH);
-        let fighter_cutin_manager = *(FIGHTER_CUTIN_MANAGER_ADDR as *mut *mut smash::app::FighterCutInManager);
-        smash::app::lua_bind::FighterCutInManager::set_throw_finish_zoom_rate(fighter_cutin_manager, 1.5);
+        false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL,
+         false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_PUNCH);
+        AttackModule::set_catch_only_all(agent.module_accessor, true, false);
+        AttackModule::set_no_dead_all(agent.module_accessor, true, false);
+
+
+        
         //smash::app::lua_bind::FighterCutInManager::set_throw_finish_offset(agent_cutin_manager, Vector3f{x: 3.0, y: 6.0, z: 0.0});
     }
-    frame(agent.lua_state_agent, 104.0);
+    frame(agent.lua_state_agent, 133.0);
+    if macros::is_excute(agent){
+        macros::CHECK_FINISH_CAMERA(agent, -5, 18);
+        lua_bind::FighterCutInManager::set_throw_finish_zoom_rate(singletons::FighterCutInManager(), 2.0);
+        //lua_bind::FighterCutInManager::set_throw_finish_offset(singletons::FighterCutInManager(), Vector3f{x: 0.0, y: 5.0, z: 0.0});
+    }
+    frame(agent.lua_state_agent, 134.0);
     if macros::is_excute(agent) {
         let target = WorkModule::get_int64(agent.module_accessor, *FIGHTER_STATUS_THROW_WORK_INT_TARGET_OBJECT);
         let target_group = WorkModule::get_int64(agent.module_accessor, *FIGHTER_STATUS_THROW_WORK_INT_TARGET_HIT_GROUP);
@@ -47,13 +58,16 @@ pub unsafe extern "C" fn effect_throw_lw(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 49.0);
     if macros::is_excute(agent) {
         macros::LANDING_EFFECT(agent, Hash40::new("sys_landing_smoke"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
-        //macros::EFFECT_FOLLOW(agent, Hash40::new("sys_soccer"), Hash40::new("haver"), 3, 0, 4, 0.0, 0.0, 0.0, 1.25, true);
-        //macros::EFFECT_FOLLOW(agent, Hash40::new("sys_soccer"), Hash40::new("havel"), -3, 0, 4, 0.0, 0.0, 0.0, 1.25, true);
+        for _ in 0..2 {
+            macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_buster_fire"), Hash40::new("haver"), 0, -1, 3.5, 0.0, 0.0, 0.0, 1.7, true);
+            macros::LAST_EFFECT_SET_RATE(agent, 0.5);
+            macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_buster_fire"), Hash40::new("havel"), -0, -1, 3.5, 0.0, 0.0, 0.0, 1.7, true);
+            macros::LAST_EFFECT_SET_RATE(agent, 0.5);
+        }
     }
     frame(agent.lua_state_agent, 64.0);
     if macros::is_excute(agent) {
-        //macros::EFFECT_FOLLOW(agent, Hash40::new("sys_soccer"), Hash40::new("haver"), 3, 0, 4, 0.0, 0.0, 0.0, 1.25, true);
-        //macros::EFFECT_FOLLOW(agent, Hash40::new("sys_soccer"), Hash40::new("havel"), -3, 0, 4, 0.0, 0.0, 0.0, 1.25, true);
+
         macros::LANDING_EFFECT(agent, Hash40::new("sys_landing_smoke"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
     }
     frame(agent.lua_state_agent, 104.0);
@@ -61,9 +75,11 @@ pub unsafe extern "C" fn effect_throw_lw(agent: &mut L2CAgentBase) {
         //macros::LANDING_EFFECT(agent, Hash40::new("sys_whirlwind_r"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, false);
         //macros::EFFECT(agent, Hash40::new("demon_heavens_impact"), Hash40::new("top"), 2, 0, 0, 0, 0, 0, 1.5, 0, 0, 0, 0, 0, 0, false);
         //macros::LAST_EFFECT_SET_RATE(agent, 0.5);
-        macros::EFFECT(agent, Hash40::new("dolly_volcano_ground"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
-        EffectModule::set_scale_last(agent.module_accessor, &Vector3f{x:3.0,y:1.0,z:3.0} );
-        macros::LAST_EFFECT_SET_RATE(agent, 0.75);
+        //macros::EFFECT(agent, Hash40::new("dolly_volcano_ground"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
+        //EffectModule::set_scale_last(agent.module_accessor, &Vector3f{x:3.0,y:1.0,z:3.0} );
+        macros::EFFECT(agent, Hash40::new("eflame_promrevolt_firepillar_ground"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 2.5, 0, 0, 0, 0, 0, 0, true);
+
+        macros::LAST_EFFECT_SET_RATE(agent, 0.5);
 
         macros::EFFECT(agent, Hash40::new("dolly_volcano_base"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
         EffectModule::set_scale_last(agent.module_accessor, &Vector3f{x:2.0,y:1.0,z:2.0} );
@@ -72,9 +88,9 @@ pub unsafe extern "C" fn effect_throw_lw(agent: &mut L2CAgentBase) {
         //macros::EFFECT_FOLLOW(agent, Hash40::new("dolly_volcano_flash"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
     }
 
-    wait(agent.lua_state_agent, 10.0);
+    wait(agent.lua_state_agent, 20.0);
     if macros::is_excute(agent) {
-        //EffectModule::kill_kind(agent.module_accessor, Hash40::new("sys_soccer"), false, true);
+        EffectModule::kill_kind(agent.module_accessor, Hash40::new("kamui_buster_fire"), false, true);
     }
 }
 
@@ -91,7 +107,7 @@ pub unsafe extern "C" fn sound_throw_lw(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         let sound = sound_selector(agent,"vc_pot_potemkin_buster_X_X".to_string(),2,true,true,2);
         macros::PLAY_SE(agent, Hash40::new_raw(sound));
-        macros::PLAY_SE(agent, Hash40::new("se_common_bomb_l"));
+        macros::PLAY_SE(agent, Hash40::new("se_btl_pot_landbreak_clay_l"));
     }
 }
 
@@ -247,7 +263,7 @@ pub unsafe extern "C" fn expression_throwlw(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         macros::RUMBLE_HIT(agent, Hash40::new("rbkind_attackl"), 0);
     }
-    wait(agent.lua_state_agent, 10.0);
+    wait(agent.lua_state_agent, 30.0);
     if macros::is_excute(agent) {
         macros::CAM_ZOOM_OUT(agent);
     }
