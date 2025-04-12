@@ -181,105 +181,154 @@ impl TensionMeter {
 #[repr(C)]
 pub struct CutInUI {
     pub is_on: bool,
-    pub bar_low_pos: f32,
-    pub bar_hi_pos: f32,
-    pub bars_alpha: f32,
+    pub is_bar_in: bool,
     pub is_bar_out: bool,
+    pub bar_visibility: bool,
+    pub is_jetpack_on: bool,
+    pub is_explosion_1_on: bool,
+    pub is_explosion_2_on: bool,
     pub game_speed: f32,
-    pub bar_in_out_duration: f32
+    pub jetpack_lr: f32,
+    pub bar_in_frame: f32,
+    pub jetpack_frame: f32,
+    pub explosion_1_frame: f32,
+    pub explosion_2_frame: f32
 }
 impl CutInUI {
     pub fn reset() -> Self {
         Self {
             is_on: false,
-            bar_low_pos: -550.0,
-            bar_hi_pos: 550.0,
-            bars_alpha: 0.0,
+            is_bar_in: false,
             is_bar_out: false,
+            bar_visibility: false,
+            is_jetpack_on: false,
+            is_explosion_1_on: false,
+            is_explosion_2_on: false,
             game_speed: 1.0,
-            bar_in_out_duration: 30.0,
+            jetpack_lr: 1.0,
+            bar_in_frame: 0.0,
+            jetpack_frame: 0.0,
+            explosion_1_frame: 0.0,
+            explosion_2_frame: 0.0
         }
     }
     pub fn reset_all(&mut self) {
         self.is_on= false;
-        self.bar_low_pos = -550.0;
-        self.bar_hi_pos = 550.0;
-        self.bars_alpha = 0.0;
+        self.is_bar_in= false;
         self.is_bar_out= false;
+        self.bar_visibility = false;
+        self.is_jetpack_on = false;
+        self.is_explosion_1_on = false;
+        self.is_explosion_2_on = false;
         self.game_speed = 1.0;
-        self.bar_in_out_duration = 30.0;
+        self.jetpack_lr = 1.0;
+        self.bar_in_frame = 0.0;
+        self.jetpack_frame = 0.0;
+        self.explosion_1_frame = 0.0;
+        self.explosion_2_frame = 0.0;
     }
-    pub fn is_bar_on(&mut self) -> bool {
-        return self.is_on;
+    pub fn set_jetpack_lr(&mut self, lr:f32) {
+        self.jetpack_lr = lr;
     }
-    pub fn set_bar_out(&mut self) -> bool {
-        self.is_bar_out = true;
-        return self.is_bar_out;
+    pub fn get_jetpack_lr(&mut self) ->f32 {
+        return self.jetpack_lr;
     }
-    pub fn is_bar_out(&mut self) -> bool {
-        return self.is_bar_out;
-    }
-    pub fn set_bar(&mut self,state:bool) -> bool {
-        self.is_on = state;
-        return self.is_on;
-    }
-    pub fn get_bar_in_pos(&mut self, pane: &str) -> f32 {
-        if pane == "bar_hi"{
-            if self.bar_hi_pos <= 490.0 {
-                self.bar_hi_pos = 490.0;
-            }else{
-                self.bar_hi_pos -= (60.0/self.bar_in_out_duration) * self.game_speed;
-            }
-            return self.bar_hi_pos;
-        }else{
-            if self.bar_low_pos >= -490.0 {
-                self.bar_low_pos = -490.0;
-            }else{
-                self.bar_low_pos += (60.0/self.bar_in_out_duration) * self.game_speed;
-            }
-            return self.bar_low_pos;
-        }
-    }
-    pub fn get_bar_out_pos(&mut self, pane: &str) -> f32 {
-        if pane == "bar_hi"{
-            if self.bar_hi_pos >= 550.0 {
-                self.set_bar(false);
-                self.is_bar_out = false;
-                self.bar_hi_pos = 550.0;
-            }else{
-                self.bar_hi_pos += (60.0/self.bar_in_out_duration) * self.game_speed;
-            }
-            return self.bar_hi_pos;
-        }else{
-            if self.bar_low_pos <= -550.0 {
-                self.set_bar(false);
-                self.is_bar_out = false;
-                self.bar_low_pos = -550.0;
-            }else{
-                self.bar_low_pos -= (60.0/self.bar_in_out_duration) * self.game_speed;  // move this and similar up later since this doesnt seem entirely correct
-            }
-            return self.bar_low_pos;
-        }
-    }
-    pub fn get_bar_in_alpha(&mut self) -> f32 {
-        if self.bars_alpha >= 255.0 {
-            self.bars_alpha = 255.0;
-        }else{
-            self.bars_alpha += (255.0/self.bar_in_out_duration) * self.game_speed;
-        }
-        return self.bars_alpha;
-    }
-    pub fn get_bar_out_alpha(&mut self) -> f32 {
-        if self.bars_alpha <= 0.0 {
-            self.bars_alpha = 0.0;
-        }else{
-            self.bars_alpha -= (255.0/self.bar_in_out_duration) * self.game_speed;
-        }
-        return self.bars_alpha;
-    }
-
     pub fn set_game_speed(&mut self, speed:f32) {
         self.game_speed = speed;
     }
+    //bar functions
+    pub fn is_bar_on(&mut self) -> bool {
+        return self.bar_visibility;
+    }
+    pub fn set_bar_on(&mut self) -> bool {
+        self.is_bar_in = true;
+        self.bar_visibility = true;
+        return self.is_bar_in;
+    }
+    pub fn set_bar_off(&mut self) -> bool {
+        self.is_bar_out = true;
+        self.is_bar_in = false;
+        return self.is_bar_out;
+    }
+    pub fn get_bar_frame(&mut self) -> f32 {
+        if self.bar_in_frame < 9.0 && self.is_bar_in {
+            self.bar_in_frame += 0.1 * self.game_speed;
+        }else if self.bar_in_frame >= 9.0  && self.is_bar_in {
+            self.bar_in_frame = 9.0;
+        }else if (self.bar_in_frame > 0.0) && (self.is_bar_out) {
+            self.bar_in_frame -= 0.1 * self.game_speed;
+        }else{
+            self.bar_in_frame = 0.0;
+            self.is_bar_out = false;
+        }
 
+        if self.bar_in_frame == 0.0 {
+            self.bar_visibility = false;
+        } else {
+            self.bar_visibility = true;
+        }
+        return self.bar_in_frame;
+    }
+
+
+
+    //jetpack functions
+    pub fn set_jetpack_on(&mut self) -> bool {
+        self.is_jetpack_on = true;
+        return self.is_jetpack_on;
+    }
+    pub fn is_jetpack_on(&mut self) -> bool {
+        return self.is_jetpack_on;
+    }
+    pub fn get_jetpack_frame(&mut self) -> f32 {
+        if self.is_jetpack_on{
+            self.jetpack_frame += 1.0 * self.game_speed;
+            if self.jetpack_frame > 84.0 {
+                self.jetpack_frame = 0.0 ;
+                self.is_jetpack_on = false;
+            }
+        }
+        return self.jetpack_frame;
+    }
+    //explosion_1 functions
+    pub fn set_explosion_1_on(&mut self) -> bool {
+        self.is_explosion_1_on = true;
+        return self.is_explosion_1_on;
+    }
+    pub fn is_explosion_1_on(&mut self) -> bool {
+        return self.is_explosion_1_on;
+    }
+    pub fn get_explosion_1_frame(&mut self) -> f32 {
+        if self.is_explosion_1_on{
+            self.explosion_1_frame += 1.0 * self.game_speed;
+            if self.explosion_1_frame > 16.0 {
+                self.explosion_1_frame = 0.0 ;
+                self.is_explosion_1_on = false;
+            }
+        }
+        return self.explosion_1_frame;
+    }
+    //explosion_2 functions
+    pub fn set_explosion_2_on(&mut self) -> bool {
+        self.is_explosion_2_on = true;
+        return self.is_explosion_2_on;
+    }
+    pub fn is_explosion_2_on(&mut self) -> bool {
+        return self.is_explosion_2_on;
+    }
+    pub fn get_explosion_2_frame(&mut self) -> f32 {
+        if self.is_explosion_2_on{
+            self.explosion_2_frame += 1.0 * self.game_speed;
+            if self.explosion_2_frame > 9.0 {
+                self.explosion_2_frame = 0.0 ;
+                self.is_explosion_2_on = false;
+            }
+        }
+        return self.explosion_2_frame;
+    }
 }
+
+
+
+
+//for jetpack is_jetpack_on for visibility and get_jetpack_frame for frame

@@ -70,6 +70,9 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON : i32 = 0x20000108;
 
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ANIMATED : i32 = 0x20000109;
 
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_FLIP : i32 = 0x2000010a;
+
+
 
 
 
@@ -130,9 +133,14 @@ pub const FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP: i32 = 0x1fa;
 pub const FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE: i32 = 0x1fb;
 pub const FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL: i32 = 0x1fc;
 pub const FIGHTER_KAMUI_STATUS_KIND_WIN: i32 = 0x1fd;
+pub const FIGHTER_KAMUI_STATUS_KIND_AIR_THROW: i32 = 0x1fe;
+
+
+
 pub const FIGHTER_KAMUI_STATUS_KIND_WALK_BACK: i32 = 0x200;
 pub const FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN: i32 = 0x201;
 pub const FIGHTER_KAMUI_STATUS_KIND_WALK_BRAKE_BACK: i32 = 0x202;
+
 
 // for weapon
 pub const WEAPON_KAMUI_RYUSENSYA_STATUS_KIND_BOOM: i32 = 0x1;
@@ -238,32 +246,8 @@ extern "C" {
 }
 
 
-// will be autoturn hopefully (should prolly move to a new rs)
-// am i even using this anymore?
 
-unsafe fn auto_turn_2(fighter: &mut L2CFighterCommon) -> L2CValue {
-    if FighterCutInManager__is_one_on_one()
-    && fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND {
-        let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
-        let entry_id = if utility::get_kind(&mut *fighter.module_accessor) == *FIGHTER_KIND_KAMUI {
-            1
-        }
-        else {
-            0
-        };
-        let entry = smash::app::lua_bind::FighterManager::get_fighter_entry(fighter_manager,FighterEntryID(entry_id));
-        let battle_object = *(entry as *mut u64).add(0x4160/8) as *mut u64;
-        let enemy = *battle_object.add(0x20/8) as *mut BattleObjectModuleAccessor;
-        if PostureModule::pos_x(enemy) > PostureModule::pos_x(fighter.module_accessor) {
-            WorkModule::set_float(fighter.module_accessor, 1.0,*FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1);
-        }
-        else {
-            WorkModule::set_float(fighter.module_accessor, -1.0,*FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1);
-        }
-        PostureModule::update_rot_y_lr(fighter.module_accessor);
-    }
-    return L2CValue::I32(0)
-}
+
 
 
 // used for sound randomization
@@ -325,7 +309,6 @@ pub unsafe extern "C" fn sound_selector(fighter: &mut L2CAgentBase, mut sound_na
                 WorkModule::on_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_THREE);
                 sound_name = [sound_name,"c_1".to_string()].join("");
             }
-            println!("{}",sound_name);
         }else{
             sound_name.pop();
             if random == 0{
@@ -338,7 +321,6 @@ pub unsafe extern "C" fn sound_selector(fighter: &mut L2CAgentBase, mut sound_na
                 WorkModule::on_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_THREE);
                 sound_name = [sound_name,"c".to_string()].join("");
             }
-            println!("{}",sound_name);
         }
     } else {
         for _ in 0..3 {
@@ -353,7 +335,6 @@ pub unsafe extern "C" fn sound_selector(fighter: &mut L2CAgentBase, mut sound_na
         }
         sound_name = [sound_name,sequence_order_number.to_string()].join("");
     }
-    println!("{}",sound_name);
     return hash40(sound_name.as_str())
 }
 
@@ -629,7 +610,12 @@ unsafe extern "C" fn agent_init(fighter: &mut L2CFighterCommon) {
 }
 
 
-
+unsafe extern "C" fn agent_init_global(fighter: &mut L2CFighterCommon) {
+    let fighter_kind = fighter.global_table[KIND].get_i32();
+    if fighter_kind != *FIGHTER_KIND_KAMUI {
+        UiManager::disable_ui(entry_id);
+    }
+}
 
 
 
@@ -706,6 +692,16 @@ pub fn install() {
     .effect_acmd("effect_throwlw", effect_throw_lw, Priority::Low)
     .sound_acmd("sound_throwlw", sound_throw_lw, Priority::Low)
     .expression_acmd("expression_throwlw", expression_throwlw, Priority::Low)
+
+    .game_acmd("game_throwf", game_throwf, Priority::Low)
+    .effect_acmd("effect_throwf", effect_throwf, Priority::Low)
+    .sound_acmd("sound_throwf", sound_throwf, Priority::Low)
+    .expression_acmd("expression_throwf", expression_throwf, Priority::Low)
+
+    .game_acmd("game_throwb", game_throwb, Priority::Low)
+    .effect_acmd("effect_throwb", effect_throwf, Priority::Low)
+    .sound_acmd("sound_throwb", sound_throwf, Priority::Low)
+    .expression_acmd("expression_throwb", expression_throwf, Priority::Low)
 
     //taunt
     .game_acmd("game_appealsr", appeal_srl, Priority::Low)
@@ -846,6 +842,16 @@ pub fn install() {
     .effect_acmd        ("effect_attackairf",             effect_attackairf,                           Priority::Low)
     .expression_acmd    ("expression_attackairf",         expression_attackairf,                        Priority::Low)
 
+
+    .game_acmd          ("game_throwair",             game_throwair,                            Priority::Low)
+    //.sound_acmd         ("sound_throwair",              sound_throwair,                             Priority::Low)
+    //.effect_acmd        ("effect_throwair",             effect_throwair,                           Priority::Low)
+    //.expression_acmd    ("expression_throwair",         expression_throwair,                        Priority::Low)
+
+    .status(Pre, FIGHTER_KAMUI_STATUS_KIND_AIR_THROW, airgrab_pre)
+    .status(Main, FIGHTER_KAMUI_STATUS_KIND_AIR_THROW, airgrab_main)
+    .status(Exit, FIGHTER_KAMUI_STATUS_KIND_AIR_THROW, airgrab_exit)
+
     
     //roman cancel
     .status(Pre  , FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL,                  roman_cancel_pre)
@@ -943,7 +949,7 @@ pub fn install() {
     .game_acmd          ("game_heavenlydashattack",             game_finaldashattack,               Priority::Low)
 
     .game_acmd          ("game_finalend",                       game_finalend,                      Priority::Low)
-    .game_acmd          ("game_finalairlend",                   game_finalend,                      Priority::Low)
+    .game_acmd          ("game_finalairend",                    game_finalend,                      Priority::Low)
     .sound_acmd         ("sound_finalend",                      sound_finalend,                     Priority::Low)
     .sound_acmd         ("sound_finalairend",                   sound_finalend,                     Priority::Low)
     .effect_acmd        ("effect_finalend",                     effect_finalend,                    Priority::Low)
@@ -1062,7 +1068,6 @@ pub fn install() {
 
     .install();
 
-    skyline::nro::add_hook(nro_hook);
 
     skyline::install_hooks!(
         notify_log_event_collision_hit_replace,

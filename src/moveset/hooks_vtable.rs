@@ -132,9 +132,12 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
         && [
             *FIGHTER_STATUS_KIND_JUMP,
             *FIGHTER_STATUS_KIND_JUMP_AERIAL,
+            *FIGHTER_STATUS_KIND_FALL,
+            *FIGHTER_STATUS_KIND_FALL_AERIAL
         ].contains(&status_kind){
             PostureModule::reverse_lr(module_accessor);
             MotionModule::change_motion(module_accessor, Hash40::new("air_turn"), 0.0, 1.0, false, 0.0, false, false);
+            PostureModule::update_rot_y_lr(agent.module_accessor);
         }
     }
     if lr_1on1 != 0.0 {
@@ -381,6 +384,7 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
         hash40("throw_b"),
         hash40("throw_hi"),
         hash40("throw_lw"),
+        hash40("throw_air"),
         //hash40("thrown_f"),
         //hash40("thrown_b"),
         //hash40("thrown_hi"),

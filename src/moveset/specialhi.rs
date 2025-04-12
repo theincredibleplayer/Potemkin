@@ -55,23 +55,23 @@ pub unsafe extern "C" fn grabbed_anim_selector(fighter: &mut L2CFighterCommon,an
             );
         }
 
-
+        //let pre_flip_state = MotionModule::is_flip(capture_boma);
+        //WorkModule::set_flag(capture_boma,boi,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_FLIP);
         // this should flip the opponent if im facing left but it doesnt work for some reason??
-        if PostureModule::lr(fighter.module_accessor) < 0.0 {
-            //println!("flipped allegedly from elsewhere");
-            //PostureModule::set_lr(capture_boma, 1.0);
-            //PostureModule::update_rot_y_lr(capture_boma);
-            //MotionModule::set_flip(capture_boma,true,true,false);
-        } else {
-            //PostureModule::set_lr(capture_boma, -1.0);
-            //PostureModule::update_rot_y_lr(capture_boma);
-            //MotionModule::set_flip(capture_boma,false,true,false);
-        }
+        //if PostureModule::lr(fighter.module_accessor) < 0.0 {
+        //    //println!("flipped allegedly from elsewhere");
+        //    PostureModule::set_lr(capture_boma, 1.0);
+        //    PostureModule::update_rot_y_lr(capture_boma);
+        //    MotionModule::set_flip(capture_boma,true,true,false);
+        //} else {
+        //    PostureModule::set_lr(capture_boma, -1.0);
+        //    PostureModule::update_rot_y_lr(capture_boma);
+        //    MotionModule::set_flip(capture_boma,false,true,false);
+        //}
 
         //plays the anim
         MotionModule::change_motion(capture_boma, Hash40::new_raw(motion), 0.0, mot_rate, false, 0.0, false, false);
-        let boi = MotionModule::is_flip(capture_boma);
-        println!("flipped state: {}", boi);
+        //println!("flipped state: {}", boi);
     }
 }
 
@@ -117,20 +117,6 @@ unsafe fn special_hi_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
         MotionModule::change_motion_inherit_frame(fighter.module_accessor,Hash40::new("special_air_hi"),-1.0,1.0,0.0,false,false);
         KineticModule::change_kinetic(module_accessor,*FIGHTER_KINETIC_TYPE_AIR_STOP);
-    }
-    //deprecated code since its a real grab now i will remove later
-    if WorkModule::is_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_GRABBED_ENEMY) {
-        let enemy_id = WorkModule::get_int(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_GRABBED_ENEMY_ID) as u32;
-        let enemy = sv_battle_object::module_accessor(enemy_id);
-        StatusModule::change_status_request(enemy, *FIGHTER_STATUS_KIND_CAPTURE_WAIT , false);
-        LinkModule::remove_model_constraint(enemy,true);
-        if LinkModule::is_link(enemy,*LINK_NO_CAPTURE) == false {
-            LinkModule::link(enemy,*LINK_NO_CAPTURE,(*(fighter.module_accessor)).battle_object_id);
-            LinkModule::set_model_constraint_pos_ort(enemy,*LINK_NO_CAPTURE,Hash40::new("hip"),Hash40::new("haver"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32,true);
-        }
-        WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_GRABBED_ENEMY);
-        fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START.into(),false.into());
-        return L2CValue::I32(1)
     }
 
     if MotionModule::is_end(fighter.module_accessor) {
@@ -451,13 +437,9 @@ pub unsafe extern "C" fn special_hi_release_end(fighter: &mut L2CFighterCommon) 
 pub unsafe extern "C" fn special_hi_release_exec(fighter: &mut L2CFighterCommon) -> L2CValue {
     //handles releasing since the normal acmd ints arent set properly (i should probably research that later)
     if WorkModule::is_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_HI_FLAG_HIT) {
-        println!("special hi flag hit active");
         if WorkModule::is_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_HI_FLAG_CAPTURE) {
-            println!("special hi flag hit capture");
             let capture_id = LinkModule::get_node_object_id(fighter.module_accessor, *LINK_NO_CAPTURE);
-            //notify_event_msc_cmd!(fighter, Hash40::new_raw(0x31dbed6513), Hash40::new("throw"), Hash40::new("invalid"));
             if capture_id != 0x50000000 {
-                println!("releasing attack");
                 AttackModule::hit_absolute_joint(fighter.module_accessor, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW,capture_id as u32,Hash40::new("throw"), 0, 0);
             }
             WorkModule::off_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_HI_FLAG_HIT);

@@ -200,6 +200,15 @@ pub unsafe extern "C" fn finaldashloop_main(fighter: &mut L2CFighterCommon) -> L
     motion_setup(fighter,false);
     let module_accessor = fighter.module_accessor;
     MotionModule::change_motion(fighter.module_accessor,Hash40::new("heavenly_dash_loop"),0.0,1.0,false,0.0,false,false);
+    //fighter.clear_lua_stack();
+    //lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,30.0,0.0);
+    //sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
+    fighter.clear_lua_stack();
+    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_NONE,  13.0 * PostureModule::lr(module_accessor),0.0,0.0,0.0,0.0);
+    sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
+    fighter.clear_lua_stack();
+    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,0.5,0.0);
+    sv_kinetic_energy::set_brake(fighter.lua_state_agent);
     fighter.sub_shift_status_main(L2CValue::Ptr(finaldashloop_main_loop as *const () as _))
 }
 
@@ -207,18 +216,18 @@ unsafe fn finaldashloop_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     let mut current_speed = WorkModule::get_float(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_SPECIAL_S_ACCEL);
     let module_accessor = fighter.module_accessor;
     let timer = WorkModule::get_float(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FINAL_TIMER);
+    let speed_x = KineticModule::get_sum_speed_x(module_accessor, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_ALL);
+
     KineticModule::enable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_STOP);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_MOTION);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
     
-    fighter.clear_lua_stack();
-    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,7.0,0.0);
-    sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
+
     WorkModule::set_float(fighter.module_accessor, timer + 1.0 ,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FINAL_TIMER);
-    fighter.clear_lua_stack();
-    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_NONE,  5.0 * PostureModule::lr(module_accessor),0.0,0.0,0.0,0.0);
-    sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
+
+
+
 
     if CancelModule::is_enable_cancel(fighter.module_accessor) {
         if fighter.sub_wait_ground_check_common(false.into()).get_bool()
@@ -227,14 +236,14 @@ unsafe fn finaldashloop_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
         }
     }
     if MotionModule::is_end(fighter.module_accessor) {
-        fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP.into(),false.into());
+        MotionModule::change_motion(fighter.module_accessor,Hash40::new("heavenly_dash_loop"),0.0,1.0,false,0.0,false,false);
     }
     if (ControlModule::check_button_trigger(module_accessor, *CONTROL_PAD_BUTTON_SPECIAL) == true)
     && (WorkModule::get_float(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FINAL_TIMER) >= 20.0) {
         fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK.into(),false.into());
         return L2CValue::I32(0)
     }
-    if (WorkModule::get_float(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FINAL_TIMER) >= 60.0) {
+    if ((WorkModule::get_float(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FINAL_TIMER) >= 60.0) || (speed_x == 0.0) ) {
         fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK.into(),false.into());
         return L2CValue::I32(0)
     }
@@ -315,6 +324,8 @@ pub unsafe extern "C" fn finaldashattack_end(fighter: &mut L2CFighterCommon) -> 
 
 pub unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
+    fighter.set_situation(SITUATION_KIND_GROUND.into());
+    GroundModule::correct(module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND_CLIFF_STOP));
     grabbed_anim_selector(fighter,"catched_pot_final_scene_03", 1.0);
     WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
     //CAM_ZOOM_OUT_FINAL(fighter);

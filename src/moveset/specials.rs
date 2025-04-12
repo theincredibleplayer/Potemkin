@@ -167,8 +167,7 @@ unsafe fn side_b_slide_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
     fighter.clear_lua_stack();
     lua_args!(fighter, *FIGHTER_KINETIC_ENERGY_ID_STOP);
-    let speed_x = KineticModule::get_sum_speed_x(module_accessor, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_ALL);
-    println!("speed: {}", speed_x);
+    
     if CancelModule::is_enable_cancel(fighter.module_accessor) {
         if fighter.sub_wait_ground_check_common(false.into()).get_bool()
         || fighter.sub_air_check_fall_common().get_bool() {

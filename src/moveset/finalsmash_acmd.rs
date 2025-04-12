@@ -42,6 +42,7 @@ pub unsafe extern "C" fn game_finaldashattack(agent: &mut L2CAgentBase) {
         JostleModule::set_status(agent.module_accessor, false);
         macros::SLOW_OPPONENT(agent, 400.0, 7.0);
         HitModule::set_whole(agent.module_accessor, smash::app::HitStatus(*HIT_STATUS_INVINCIBLE), 0);
+        UiManager::set_jetpack_lr(PostureModule::lr(agent.module_accessor));
     }
     frame(agent.lua_state_agent, 7.0);
     if macros::is_excute(agent) {
@@ -72,7 +73,7 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
 
 
     if macros::is_excute(agent) {
-        UiManager::set_bar_out();
+        UiManager::set_bar_off();
         set_vis_hud(true);
         set_stage_visibility(agent.module_accessor, false);
         HitModule::set_whole(module_accessor, smash::app::HitStatus(*HIT_STATUS_INVINCIBLE), 0);
@@ -145,17 +146,12 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
                 set_stage_visibility(agent.module_accessor, false);               ////////////////////////////////problem here
                 macros::QUAKE(common, *CAMERA_QUAKE_KIND_XL);
                 SlowModule::clear_whole(agent.module_accessor);
+                
                 StopModule::set_hit_stop_frame(enemy, 20, true);
-                //StopModule::set_hit_stop_frame(agent.module_accessor, 20, true);
-                //macros::PLAY_SE(agent, Hash40::new("se_common_finishhit"));
-                //EffectModule::req_follow(enemy, Hash40::new("sys_bg_finishhit"), Hash40::new("hip"), &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, 1.0, false, 0, 0, 0, 0, 0, false, false);
-                //EffectModule::req_common(agent.module_accessor, Hash40::new("bg_finish_hit"), 0.0);
-                //SlowModule::set_whole(agent.module_accessor, 255, 3);
                 let handle = EffectModule::req_screen(enemy, Hash40::new("bg_finishhit"), false, true, true);
                 EffectModule::set_billboard(enemy, handle as u32, true);
                 EffectModule::set_disable_render_offset_last(enemy);
                 SoundModule::play_se(enemy, Hash40::new("se_common_finishhit"), false, false, false, false, enSEType(0));
-
                 let scale = PostureModule::scale(enemy);
                 CameraModule::reset_all(enemy);            
                 macros::CAM_ZOOM_IN_arg6(
@@ -170,10 +166,6 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
                 
                 SlowModule::set_whole(enemy, 9, 40);
                 EFFECT_GLOBAL_BACK_GROUND(common.lua_state_agent);
-
-
-        
-
             }
             wait(agent.lua_state_agent, 1.0);
             if macros::is_excute(agent) {
@@ -245,12 +237,13 @@ pub unsafe extern "C" fn effect_finalend(agent: &mut L2CAgentBase) {
 
     frame(agent.lua_state_agent, 53.0);
     if macros::is_excute(agent) {
+        UiManager::set_explosion_1_on();
         macros::EFFECT(agent, Hash40::new("tiki_breath_embers"), Hash40::new("top"), 0, 0, 7, 0, 90, 0, 2.5, 0, 0, 0, 0, 0, 0, false);
         macros::LAST_EFFECT_SET_RATE(agent, 0.85);
         macros::EFFECT(agent, Hash40::new("tiki_breath_embers"), Hash40::new("top"), 0, 0, -5, 0, 90, 0, 2.5, 0, 0, 0, 0, 0, 0, false);
         macros::LAST_EFFECT_SET_RATE(agent, 0.85);
-        macros::EFFECT(agent, Hash40::new("sys_bomb_d"), Hash40::new("top"), 0, 0, -20, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, false);
-        macros::LAST_EFFECT_SET_RATE(agent, 0.3);
+        //macros::EFFECT(agent, Hash40::new("sys_bomb_d"), Hash40::new("top"), 0, 0, -20, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, false);
+        //macros::LAST_EFFECT_SET_RATE(agent, 0.3);
         
         macros::EFFECT(agent, Hash40::new("eflame_promrevolt_firepillar_ground"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 4.0, 0, 0, 0, 0, 0, 0, true);
         macros::LAST_EFFECT_SET_RATE(agent, 0.2);
@@ -462,10 +455,14 @@ pub unsafe extern "C" fn sound_finalvisualscene01(agent: &mut L2CAgentBase) {
 pub unsafe extern "C" fn game_fakefinalvisualscene01(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         set_vis_hud(false);
-        UiManager::set_bar(true);
+        UiManager::set_bar_on();
         ArticleModule::generate_article(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, false, -1);
         ArticleModule::set_visibility_whole(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
         ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, Hash40::new("final_visual_scene_01"), false, -1.0);
+    }
+    frame(agent.lua_state_agent, 145.0);
+    if macros::is_excute(agent) {
+        UiManager::set_jetpack_on();
     }
     frame(agent.lua_state_agent, 229.0);
     if macros::is_excute(agent) {

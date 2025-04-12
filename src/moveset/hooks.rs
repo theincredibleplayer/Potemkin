@@ -52,10 +52,10 @@ pub unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, ev
         let capture_event : &mut smash_rs::app::LinkEventCapture = std::mem::transmute(event);
         let module_accessor = fighter.battle_object.module_accessor;
         //test linkmodule (should be removed later)
-        if StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_ATTACK_S3 {
+        if StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_ATTACK_AIR {
             capture_event.result = true;
             capture_event.node = smash_rs::phx::Hash40::new("throw");
-            StatusModule::change_status_request(module_accessor, *FIGHTER_STATUS_KIND_CATCH_PULL, false);
+            StatusModule::change_status_request(module_accessor, FIGHTER_KAMUI_STATUS_KIND_AIR_THROW, false);
             return 0;
         }
         //special_hi's link module
@@ -142,54 +142,6 @@ unsafe fn internal_cam(cameramodule: CameraModule, cam_hash: u64, arg3: i32) -> 
 
 
 
-
-
-
-
-
-#[skyline::hook(offset=0x454150)]
-unsafe fn get_post_params(effectmodule: u128, hash: u128, arg3: f32, arg4: f32, arg5: f32 ,arg6: f32, arg7: f32, arg8: f32, arg9: i128, arg10: u64, arg11:f32) -> f32 {
-    println!("hash : {}\narg3 : {}\narg4 : {}\narg5 : {}\narg6 : {}\narg7 : {}\narg8 : {}\narg9 : {}\narg10 : {}\narg11 : {}", hash ,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11);
-
-    call_original!(effectmodule, hash, arg3, arg4, arg5, arg6, arg7, arg8, arg9,arg10,arg11)
-}
-
-
-
-
-#[skyline::hook(offset = 0x2017e90)]
-pub unsafe extern "C" fn get_params_outside(module_accessor: *mut BattleObjectModuleAccessor, arg2: u64,vec1: *const Vector2f ,vec2: *const Vector2f ,vec3: *const Vector2f,vec4: *const Vector2f ,bool_value:bool,float1:f32,float2:f32) -> u64 {
-    println!("effect hook successful");
-
-    println!("vec1 x : {}\nvec1 y : {}\nvec2 x : {}\nvec2 y : {}\nvec3 x : {}\nvec3 y : {}\nvec4 x : {}\nvec4 y : {}\nbool : {}\nfloat1 : {}\nfloat2: {}", (*vec1).x ,(*vec1).y,(*vec2).x,(*vec2).y,(*vec3).x,(*vec3).y,(*vec4).x,(*vec4).y,bool_value,float1,float2);
-
-
-    call_original!(module_accessor, arg2,vec1,vec2,vec3,vec4,bool_value,float1,float2)
-}
-
-
-pub static mut KILL_YOUR_FUCKING_SELF : usize = 0x403f0;
-
-
-#[skyline::hook(offset = KILL_YOUR_FUCKING_SELF)]
-pub unsafe extern "C" fn get_params(arg1: u64, arg2: u64, arg3: u64,vec1: *const Vector2f ,vec2: *const Vector2f ,vec3: *const Vector2f ,bool_value:bool) -> u64 {
-    println!("effect hook successful");
-
-    println!("vec1 x : {}\nvec1 y : {}\nvec2 x : {}\nvec2 y : {}\nvec3 x : {}\nvec3 y : {}\nbool : {}", (*vec1).x ,(*vec1).y,(*vec2).x,(*vec2).y,(*vec3).x,(*vec3).y,bool_value);
-
-
-    call_original!(arg1, arg2, arg3,vec1,vec2,vec3,bool_value)
-}
-
-
-pub fn nro_hook(info: &skyline::nro::NroInfo) {
-    if info.name == "duckhunt" {
-        unsafe {
-            KILL_YOUR_FUCKING_SELF += (*info.module.ModuleObject).module_base as usize;
-            skyline::install_hook!(get_params);
-        }
-    }
-}
 
 
 /*#[skyline::hook(offset = 0xb5e10)]

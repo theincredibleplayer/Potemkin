@@ -58,6 +58,7 @@ impl UiManager {
         unsafe {
             manager.limit_meter[entry_id].reset();
             manager.tension_meter[entry_id].reset();
+            manager.cutin_ui[0].reset_all();
         }
     }
 
@@ -130,8 +131,16 @@ impl UiManager {
             || name == "limit"
             || name == "limit_bar"{
                 return manager.tension_meter[entry_id].get_flame_frame_2();  
-            }
-            else{
+            } else if name == "bar_hi"
+            || name == "bar_low"{
+                return manager.cutin_ui[0].get_bar_frame();
+            } else if name == "jetpack" {
+                return manager.cutin_ui[0].get_jetpack_frame();
+            } else if name == "explosion_1" {
+                return manager.cutin_ui[0].get_explosion_1_frame();
+            } else if name == "explosion_2" {
+                return manager.cutin_ui[0].get_explosion_2_frame();
+            } else {
                 return 0.0;
             }
         }
@@ -150,58 +159,19 @@ impl UiManager {
             || name == "limit"
             || name == "limit_bar"{
                 return manager.tension_meter[entry_id].is_tension2_available();
+            }else if name == "bar_hi"
+            || name == "bar_low"{
+                return manager.cutin_ui[0].is_bar_on();
+            }else if name == "jetpack"{
+                return manager.cutin_ui[0].is_jetpack_on();
+            }else if name == "explosion_1"{
+                return manager.cutin_ui[0].is_explosion_1_on();
+            }else if name == "explosion_2"{
+                return manager.cutin_ui[0].is_explosion_2_on();
             }
             else {
                 return false;
             }
-        }
-    }
-    pub fn get_bar_out_pos(pane: &str) -> f32{
-        let mut manager = UI_MANAGER.write();
-        unsafe {
-            return manager.cutin_ui[0].get_bar_out_pos(pane);
-        }
-    }
-    pub fn get_bar_in_pos(pane: &str) -> f32{
-        let mut manager = UI_MANAGER.write();
-        unsafe {
-            return manager.cutin_ui[0].get_bar_in_pos(pane);
-        }
-    }
-    pub fn get_bar_in_alpha() -> f32{
-        let mut manager = UI_MANAGER.write();
-        unsafe {
-            return manager.cutin_ui[0].get_bar_in_alpha();
-        }
-    }
-    pub fn get_bar_out_alpha() -> f32{
-        let mut manager = UI_MANAGER.write();
-        unsafe {
-            return manager.cutin_ui[0].get_bar_out_alpha();
-        }
-    }
-    pub fn is_bar_on() -> bool{
-        let mut manager = UI_MANAGER.write();
-        unsafe {
-            return manager.cutin_ui[0].is_bar_on();
-        }
-    }
-    pub fn set_bar_out() {
-        let mut manager = UI_MANAGER.write();
-        unsafe {
-            manager.cutin_ui[0].set_bar_out();
-        }
-    }
-    pub fn is_bar_out() -> bool{
-        let mut manager = UI_MANAGER.write();
-        unsafe {
-            return manager.cutin_ui[0].is_bar_out();
-        }
-    }
-    pub fn set_bar(state: bool) {
-        let mut manager = UI_MANAGER.write();
-        unsafe {
-            manager.cutin_ui[0].set_bar(state);
         }
     }
     pub fn reset_cutin() {
@@ -216,6 +186,68 @@ impl UiManager {
             manager.cutin_ui[0].set_game_speed(speed);
         }
     }
+    pub fn set_jetpack_lr(lr: f32) {
+        let mut manager = UI_MANAGER.write();
+        unsafe {
+            manager.cutin_ui[0].set_jetpack_lr(lr);
+        }
+    }
+    pub fn get_jetpack_lr() ->f32 {
+        let mut manager = UI_MANAGER.write();
+        unsafe {
+            return manager.cutin_ui[0].get_jetpack_lr();
+        }
+    }
+
+    pub fn set_bar_off(){
+        let mut manager = UI_MANAGER.write();
+        unsafe {
+            manager.cutin_ui[0].set_bar_off();
+        }
+    }
+    pub fn set_bar_on() {
+        let mut manager = UI_MANAGER.write();
+        unsafe {
+            manager.cutin_ui[0].set_bar_on();
+        }
+    }
+    pub fn is_bar_on() {
+        let mut manager = UI_MANAGER.write();
+        unsafe {
+            manager.cutin_ui[0].is_bar_on();
+        }
+    }
+    pub fn get_bar_frame() {
+        let mut manager = UI_MANAGER.write();
+        unsafe {
+            manager.cutin_ui[0].get_bar_frame();
+        }
+    }
+    pub fn set_jetpack_on(){
+        let mut manager = UI_MANAGER.write();
+        unsafe {
+            manager.cutin_ui[0].set_jetpack_on();
+        }
+    }
+    pub fn is_jetpack_on() {
+        let mut manager = UI_MANAGER.write();
+        unsafe {
+            manager.cutin_ui[0].is_jetpack_on();
+        }
+    }
+    pub fn set_explosion_1_on(){
+        let mut manager = UI_MANAGER.write();
+        unsafe {
+            manager.cutin_ui[0].set_explosion_1_on();
+        }
+    }
+    pub fn is_explosion_1_on() {
+        let mut manager = UI_MANAGER.write();
+        unsafe {
+            manager.cutin_ui[0].is_explosion_1_on();
+        }
+    }
+
 }
 
 /*#[repr(C)]
@@ -248,22 +280,54 @@ unsafe fn handle_layout(layout: *mut Layout) -> *mut Layout {
     let layout_name = skyline::from_c_str((*layout).layout_name);
     let root_pane = &mut *(*layout).root_pane;
     if layout_name == "info_melee" {
+        if let Some(child) = root_pane.find_pane_by_name_recursive("pot") {
+            let anim_list = &mut (*child.as_parts().layout).anim_trans_list;
+            let mut curr = anim_list as *mut AnimTransformNode;
+            while !curr.is_null() {
+                if curr != (*curr).next {
+                    let anim_transform = (curr as *mut u64).add(2) as *mut AnimTransform;
+                    let res_animation_block_data_start = (*anim_transform).res_animation_block as u64;
+                    let res_animation_block = &(*anim_transform).res_animation_block;
+                    let mut anim_cont_offsets = (res_animation_block_data_start + (*(*res_animation_block)).anim_cont_offsets_offset as u64) as *const u32;
+                    for _ in 0..(*(*res_animation_block)).anim_cont_count {
+                        let anim_cont_offset = *anim_cont_offsets;
+                        let res_animation_cont = (res_animation_block_data_start + anim_cont_offset as u64) as *const ResAnimationContent;
+                        let name = skyline::try_from_c_str((*res_animation_cont).name.as_ptr()).unwrap_or_else(|_| "UNKNOWN".to_string());
+                        println!("name: {}",name);
+                        let name_list = ["bar_hi","bar_low","explosion_1","explosion_2","jetpack"];
+                        for _name in name_list {
+                            if name == _name {
+                                (*anim_transform).enabled = true;
+                                (*anim_transform).frame = UiManager::get_frame_from_name(0,_name);
+                                if name == "jetpack"{
+                                    if let Some(border) = child.find_pane_by_name_recursive(&name) {
+                                        border.scale_x = UiManager::get_jetpack_lr();
+                                        border.flags |= 1 << PaneFlag::IsGlobalMatrixDirty as u8;
+                                    }
+                                }
+                                println!("frame: {}",(*anim_transform).frame);
+                                break;
+                            }
+                        }
+                    }
+                }
+                curr = (*curr).next;
+                if curr == anim_list as *mut AnimTransformNode || curr == (*curr).next {
+                    break;
+                }
+            }
+            let border_list = ["bar_hi","bar_low","explosion_1","explosion_2","jetpack"];
+            for pane in border_list {
+                if let Some(border) = child.find_pane_by_name_recursive(pane) {
+                    border.set_visible(UiManager::get_border_availability_from_name(0,pane));
+                }
+            }
+        }
         let pane_list = ["p1","p2","p3","p4","p5","p6","p7","p8"];
         let mut idx = 0;
         for pane in pane_list {
             if let Some(parent) = root_pane.find_pane_by_name_recursive(pane) {
-                /*if let Some(child) = parent.find_pane_by_name_recursive("set_fxui_heal") {
-                    println!("name: {}",(*child).get_name());
-                    //let usd = (*child).ext_user_data_list as *const ExtUserDataNode;
-                    //println!("usd: {}",(*(*usd).curr).eff_name);
-                    let usd = ((*child).ext_user_data_list as *mut u64).add(4);
-                    let eff_name = std::ffi::CStr::from_ptr(*usd as *const skyline::libc::c_char as _).to_str().unwrap();
-                    println!("eff_name: {}",eff_name);
-                }*/
                 if UiManager::is_enabled(idx) {
-                    if let Some(child) = parent.find_pane_by_name_recursive("limit") {
-                        (*child).alpha = 0;
-                    }
                     if let Some(child) = parent.find_pane_by_name_recursive("cloud") {
                         let anim_list = &mut (*child.as_parts().layout).anim_trans_list;
                         let mut curr = anim_list as *mut AnimTransformNode;
@@ -308,35 +372,9 @@ unsafe fn handle_layout(layout: *mut Layout) -> *mut Layout {
                 idx += 1;
             }
         }
-// ==========================================================================================================================================================================
 //==========================================================================================================================================================================
 //==========================================================================================================================================================================
-        if let Some(child) = root_pane.find_pane_by_name_recursive("pot") {
-            let border_list = ["bar_hi","bar_low"];
-            for pane in border_list {
-                if let Some(border) = child.find_pane_by_name_recursive(pane) {
-                    //println!("bar found: {}", pane);
-                    if UiManager::is_bar_on(){
-                        if UiManager::is_bar_out(){
-                            //println!("bar out");
-                            border.pos_y = UiManager::get_bar_out_pos(pane);
-                            //println!("pos_y = {}", border.pos_y);
-                            border.alpha = UiManager::get_bar_out_alpha() as u8;
-                            //println!("alpha = {}", border.alpha);
-                            border.flags |= 1 << PaneFlag::IsGlobalMatrixDirty as u8;
-                        } else {
-                            //println!("bar in");
-                            border.pos_y = UiManager::get_bar_in_pos(pane);
-                            //println!("pos_y = {}", border.pos_y);
-                            border.alpha = UiManager::get_bar_in_alpha() as u8;
-                            //println!("alpha = {}", border.alpha);
-                            border.flags |= 1 << PaneFlag::IsGlobalMatrixDirty as u8;
-                        }
-                    }
-                    border.set_visible(UiManager::is_bar_on());
-                }
-            }
-        }
+//==========================================================================================================================================================================
     }
     return layout;
 }

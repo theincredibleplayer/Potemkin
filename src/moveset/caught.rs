@@ -146,6 +146,35 @@ pub unsafe extern "C" fn thrown_status_common(fighter: &mut L2CFighterCommon) ->
         WorkModule::set_int64(fighter.module_accessor, motion as i64,*FIGHTER_STATUS_THROWN_WORK_INT_MOTION_KIND);
     }
 
+    if (StatusModule::status_kind(parent_boma) == *FIGHTER_STATUS_KIND_ATTACK_AIR
+    || StatusModule::status_kind(parent_boma) == FIGHTER_KAMUI_STATUS_KIND_AIR_THROW)
+    && (utility::get_kind(&mut *parent_boma) == *FIGHTER_KIND_KAMUI) {
+        let motion_share = WorkModule::get_param_int(fighter.module_accessor,0xcad2ee25e,0xc07d88ea0);
+        let mut motion = hash40("catched_pot_special_hi");
+        let mut share_type = 0;
+        if motion_share == *FIGHTER_MOTION_SHARE_TYPE_TARO {
+            motion = FighterMotionModuleImpl::add_body_type_hash(
+                fighter.module_accessor,
+                Hash40::new_raw(motion),
+                *BODY_TYPE_MOTION_DX
+            );
+        }
+        else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_GIRL {
+            motion = FighterMotionModuleImpl::add_body_type_hash(
+            fighter.module_accessor,
+                Hash40::new_raw(motion),
+                *BODY_TYPE_MOTION_GIRL
+            );
+        }
+        else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_BIG {
+            motion = FighterMotionModuleImpl::add_body_type_hash(
+            fighter.module_accessor,
+                Hash40::new_raw(motion),
+                *BODY_TYPE_MOTION_BIG
+            );
+        }
+        WorkModule::set_int64(fighter.module_accessor, motion as i64,*FIGHTER_STATUS_THROWN_WORK_INT_MOTION_KIND);
+    }
 
     if (StatusModule::status_kind(parent_boma) == *FIGHTER_STATUS_KIND_FINAL
     || StatusModule::status_kind(parent_boma) == FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP)
@@ -225,7 +254,7 @@ pub unsafe extern "C" fn thrown_status_common(fighter: &mut L2CFighterCommon) ->
         }
         fighter.status_Thrown();
         let constraint_flags = LinkModule::get_model_constraint_flag(fighter.module_accessor);
-        LinkModule::set_model_constraint_flag(fighter.module_accessor,(*CONSTRAINT_FLAG_OFFSET_TRANSLATE | *CONSTRAINT_FLAG_FLIP_ROT_X | constraint_flags as i32) as u32);
+        LinkModule::set_model_constraint_flag(fighter.module_accessor,(*CONSTRAINT_FLAG_OFFSET_TRANSLATE | constraint_flags as i32) as u32);
         //WorkModule::set_int64(fighter.module_accessor, motion as i64,*FIGHTER_STATUS_THROWN_WORK_INT_MOTION_KIND);
         MotionModule::change_motion(fighter.module_accessor, Hash40::new_raw(motion), 0.0, 1.0, false, 0.0, false, false);
         LinkModule::set_constraint_translate_offset(fighter.module_accessor, &Vector3f{ x: x_offset, y: y_offset, z: z_offset });
@@ -237,11 +266,15 @@ pub unsafe extern "C" fn thrown_status_common(fighter: &mut L2CFighterCommon) ->
                 ModelModule::set_scale_z(fighter.module_accessor,1.0);
             }
         }
-        if LinkModule::get_parent_lr(fighter.module_accessor,*LINK_NO_CAPTURE) < 0.0{
-            println!("in get lr");
-            MotionModule::set_flip(fighter.module_accessor,true,true,false);
-            println!("flip has been set");
-        }
+
+        //let pre_flip_state = MotionModule::is_flip(capture_boma);
+        //WorkModule::set_flag(capture_boma,fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_FLIP);
+        //
+        //if LinkModule::get_parent_lr(fighter.module_accessor,*LINK_NO_CAPTURE) < 0.0{
+        //    println!("in get lr");
+        //    MotionModule::set_flip(fighter.module_accessor,true,true,false);
+        //    println!("flip has been set");
+        //}
         println!("it happens");
         return 0.into();
     }
