@@ -198,6 +198,12 @@ impl UiManager {
             return manager.cutin_ui[0].get_jetpack_lr();
         }
     }
+    pub fn sync_jetpack(frame:f32) {
+        let mut manager = UI_MANAGER.write();
+        unsafe {
+            manager.cutin_ui[0].set_jetpack_frame_sync(frame);
+        }
+    }
 
     pub fn set_bar_off(){
         let mut manager = UI_MANAGER.write();
@@ -293,7 +299,7 @@ unsafe fn handle_layout(layout: *mut Layout) -> *mut Layout {
                         let anim_cont_offset = *anim_cont_offsets;
                         let res_animation_cont = (res_animation_block_data_start + anim_cont_offset as u64) as *const ResAnimationContent;
                         let name = skyline::try_from_c_str((*res_animation_cont).name.as_ptr()).unwrap_or_else(|_| "UNKNOWN".to_string());
-                        println!("name: {}",name);
+                        //println!("name: {}",name);
                         let name_list = ["bar_hi","bar_low","explosion_1","explosion_2","jetpack"];
                         for _name in name_list {
                             if name == _name {
@@ -305,7 +311,7 @@ unsafe fn handle_layout(layout: *mut Layout) -> *mut Layout {
                                         border.flags |= 1 << PaneFlag::IsGlobalMatrixDirty as u8;
                                     }
                                 }
-                                println!("frame: {}",(*anim_transform).frame);
+                                //rintln!("frame: {}",(*anim_transform).frame);
                                 break;
                             }
                         }

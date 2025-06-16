@@ -322,7 +322,7 @@ impl VtableEntry {
     pub const RESET_3: usize = 6;                                   // maybe not sure, just used for m2 and snake
     pub const ON_DEATH: usize = 7;
     pub const ON_REBIRTH2: usize = 8;
-    pub const PERMA_WEAPON_LINK_REMOVE: usize = 9;                  // unsure, only used for bowser jr. from findings
+    pub const ON_FRAME_11: usize = 9;                               // unsure, only used for bowser jr. from findings, its another opff 
     pub const ON_FRAME_1: usize = 10;
     pub const ON_FRAME_2: usize = 11;                               // opff of sorts for some corrective action, like setting shape or detecting distance from ground and taking some action
     pub const ON_FRAME_3: usize = 12;
@@ -381,7 +381,7 @@ impl VtableEntry {
     pub const UNK63: usize = 63;
     pub const UNK64: usize = 64;
     pub const UNK65: usize = 65;
-    pub const UNK66: usize = 66;
+    pub const ON_GRABBED: usize = 66;                               // triggers once a grabbox connects, it also seems to make you immune to being grabbed if the return value isn't 1
     pub const UNK67: usize = 67;
     pub const ON_DAMAGE: usize = 68;
     pub const UNK69: usize = 69;

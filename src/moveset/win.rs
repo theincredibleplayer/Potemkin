@@ -18,7 +18,7 @@ use crate::FIGHTER_MANAGER;
 use crate::moveset::*;
 
 pub unsafe extern "C" fn win_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
-    println!("win pre status is being used");
+    //println!("win pre status is being used");
     let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as u64;
     let winner = smash::app::lua_bind::FighterManager::get_top_rank_player(fighter_manager, 0);
@@ -35,7 +35,7 @@ pub unsafe extern "C" fn win_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
 }
 
 pub unsafe extern "C" fn win_main(fighter: &mut L2CFighterCommon) -> L2CValue {
-    println!("win main status is being used");
+    //println!("win main status is being used");
     let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as u64;
     let winner = smash::app::lua_bind::FighterManager::get_top_rank_player(fighter_manager, 0);
@@ -69,7 +69,7 @@ pub unsafe extern "C" fn win_main_loop(fighter: &mut L2CFighterCommon) -> L2CVal
 }
 
 pub unsafe extern "C" fn win_init(fighter: &mut L2CFighterCommon) -> L2CValue {
-    println!("win init status is being used");
+    //println!("win init status is being used");
     let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as u64;
     let winner = smash::app::lua_bind::FighterManager::get_top_rank_player(fighter_manager, 0);
@@ -86,7 +86,7 @@ pub unsafe extern "C" fn win_init(fighter: &mut L2CFighterCommon) -> L2CValue {
 }
 
 pub unsafe extern "C" fn win_exec(fighter: &mut L2CFighterCommon) -> L2CValue {
-    println!("win exec status is being used");
+    //println!("win exec status is being used");
     let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as u64;
     let winner = smash::app::lua_bind::FighterManager::get_top_rank_player(fighter_manager, 0);
@@ -102,7 +102,7 @@ pub unsafe extern "C" fn win_exec(fighter: &mut L2CFighterCommon) -> L2CValue {
 
 }
 pub unsafe extern "C" fn win_end(fighter: &mut L2CFighterCommon) -> L2CValue {
-    println!("win end status is being used");
+    //println!("win end status is being used");
     let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as u64;
     let winner = smash::app::lua_bind::FighterManager::get_top_rank_player(fighter_manager, 0);
@@ -118,7 +118,7 @@ pub unsafe extern "C" fn win_end(fighter: &mut L2CFighterCommon) -> L2CValue {
 
 }
 pub unsafe extern "C" fn win_exit(fighter: &mut L2CFighterCommon) -> L2CValue {
-    println!("win exit status is being used");
+    //println!("win exit status is being used");
     let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as u64;
     let winner = smash::app::lua_bind::FighterManager::get_top_rank_player(fighter_manager, 0);

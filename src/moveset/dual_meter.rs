@@ -281,14 +281,16 @@ impl CutInUI {
         return self.is_jetpack_on;
     }
     pub fn get_jetpack_frame(&mut self) -> f32 {
-        if self.is_jetpack_on{
-            self.jetpack_frame += 1.0 * self.game_speed;
-            if self.jetpack_frame > 84.0 {
-                self.jetpack_frame = 0.0 ;
-                self.is_jetpack_on = false;
-            }
-        }
         return self.jetpack_frame;
+    }
+    pub fn set_jetpack_frame_sync(&mut self, frame:f32) {
+        if frame >= 145.0 {
+            self.jetpack_frame = frame - 143.0;
+        }
+        if frame >= 229.0 {
+            self.jetpack_frame = 0.0 ;
+            self.is_jetpack_on = false;
+        }
     }
     //explosion_1 functions
     pub fn set_explosion_1_on(&mut self) -> bool {

@@ -192,7 +192,8 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
             if capture_id != 0x50000000 {
                 println!("releasing attack");
                 AttackModule::hit_absolute_joint(agent.module_accessor, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW,capture_id as u32,Hash40::new("throw"), 0, 0);
-                CameraModule::reset_all(agent.module_accessor);
+                CameraModule::reset_all(agent.module_accessor); 
+
                 //agent.clear_lua_stack();
                 //agent.push_lua_stack(&mut L2CValue::new_int(0x322981c83a));
                 //sv_battle_object::notify_event_msc_cmd(agent.lua_state_agent);
@@ -204,8 +205,9 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
                 //agent.clear_lua_stack();
                 //agent.push_lua_stack(&mut L2CValue::new_int(0x24a7be4746));
                 //sv_battle_object::notify_event_msc_cmd(agent.lua_state_agent);
-                WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_END_EXIT);
+
                 CAM_ZOOM_OUT_FINAL(agent);
+                WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_END_EXIT);
             }
         }
     }

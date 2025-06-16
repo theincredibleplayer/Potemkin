@@ -24,7 +24,7 @@ pub unsafe extern "C" fn game_turn(agent: &mut L2CAgentBase) {
 
 
 
-pub unsafe extern "C" fn attack_s3(agent: &mut L2CAgentBase) {
+pub unsafe extern "C" fn attack_hi3(agent: &mut L2CAgentBase) {
     sv_animcmd::frame(agent.lua_state_agent, 7.0);
     if macros::is_excute(agent) {
         macros::HIT_NODE(agent, Hash40::new("arml"), *HIT_STATUS_XLU);
@@ -51,7 +51,7 @@ pub unsafe extern "C" fn attack_s3(agent: &mut L2CAgentBase) {
     }
 }
 
-pub unsafe extern "C" fn effect_attack_s3(_agent: &mut L2CAgentBase) {}
+pub unsafe extern "C" fn effect_attack_hi3(_agent: &mut L2CAgentBase) {}
 
 pub unsafe extern "C" fn attack_lw3(agent: &mut L2CAgentBase) {
     sv_animcmd::frame(agent.lua_state_agent, 9.0);
@@ -70,7 +70,7 @@ pub unsafe extern "C" fn attack_lw3(agent: &mut L2CAgentBase) {
 
 pub unsafe extern "C" fn effect_attack_lw3(_agent: &mut L2CAgentBase) {}
 
-pub unsafe extern "C" fn attack_dash(agent: &mut L2CAgentBase) {
+pub unsafe extern "C" fn attack_s3(agent: &mut L2CAgentBase) {
     sv_animcmd::frame(agent.lua_state_agent, 6.0);
     if macros::is_excute(agent) {
         macros::ATTACK(agent,0,0,Hash40::new("top"),15.0,50,50,0,80,9.0,0.0,7.0,10.0,Some(0.0),Some(25.0),Some(10.0),1.5,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,true,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_L,*COLLISION_SOUND_ATTR_HEAVY,*ATTACK_REGION_NONE);
@@ -81,7 +81,7 @@ pub unsafe extern "C" fn attack_dash(agent: &mut L2CAgentBase) {
     }
 }
 
-pub unsafe extern "C" fn effect_attack_dash(_agent: &mut L2CAgentBase) {
+pub unsafe extern "C" fn effect_attack_s3(_agent: &mut L2CAgentBase) {
     macros::EFFECT_FOLLOW(_agent, Hash40::new("sys_togezoshell_speedline"), Hash40::new("top"), 0, 15, 8, -90, 0, 0, 1.5, true);
 }
 
@@ -337,7 +337,7 @@ pub unsafe extern "C" fn sound_attackairhi(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 15.0);
     if macros::is_excute(agent) {
         let sound = sound_selector(agent,"vc_pot_busterwhiff_X".to_string(),3,false,false,1);
-        SoundModule::play_status_se(agent.module_accessor, Hash40::new_raw(sound), false, false, false);
+        macros::PLAY_SE(agent, Hash40::new_raw(sound));
     }
 }
 
@@ -521,7 +521,14 @@ pub unsafe extern "C" fn game_throwair(agent: &mut L2CAgentBase) {
     }
 }
 
-
+pub unsafe extern "C" fn sound_throwair(agent: &mut L2CAgentBase) {
+    if macros::is_excute(agent) {
+        macros::STOP_SE(agent, Hash40::new("vc_pot_busterwhiff_a"));
+        macros::STOP_SE(agent, Hash40::new("vc_pot_busterwhiff_b"));
+        macros::STOP_SE(agent, Hash40::new("vc_pot_busterwhiff_c"));
+        macros::PLAY_SE(agent, Hash40::new("se_btl_pot_impact_catch_large"));
+    }
+}
 
 
 

@@ -22,7 +22,9 @@ pub unsafe extern "C" fn appeal_end(fighter: &mut L2CFighterCommon) -> L2CValue 
     if ArticleModule::is_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON) {
         ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
     }
+    FighterCutInManager::request_end(singletons::FighterCutInManager());
     //macros::CAM_ZOOM_OUT(fighter);
+    //CameraModule::zoom_out(fighter.module_accessor, 0);
     //set_stage_visibility(fighter.module_accessor, true);
     smashline::original_status(End, fighter, *FIGHTER_STATUS_KIND_APPEAL)(fighter)
 }
@@ -50,7 +52,7 @@ pub unsafe extern "C" fn appeal_srl(agent: &mut L2CAgentBase) {
         ///*y*/0.0,
         ///*z*/-6000.0);
         //smash::app::sv_module_access::camera(agent.lua_state_agent);
-
+        macros::REQ_MOTION_CAMERA(agent, Hash40::new("d04potemkinbuster.nuanmb"), false);
 
 
 

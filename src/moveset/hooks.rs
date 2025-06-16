@@ -51,11 +51,18 @@ pub unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, ev
     if event.link_event_kind.0 == hash40("capture") {
         let capture_event : &mut smash_rs::app::LinkEventCapture = std::mem::transmute(event);
         let module_accessor = fighter.battle_object.module_accessor;
-        //test linkmodule (should be removed later)
+        //upair linkmodule
         if StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_ATTACK_AIR {
             capture_event.result = true;
             capture_event.node = smash_rs::phx::Hash40::new("throw");
             StatusModule::change_status_request(module_accessor, FIGHTER_KAMUI_STATUS_KIND_AIR_THROW, false);
+            return 0;
+        }
+        //potemkin buster linkmodule
+        if StatusModule::status_kind(module_accessor) == FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF {
+            capture_event.result = true;
+            capture_event.node = smash_rs::phx::Hash40::new("throw");
+            StatusModule::change_status_request(module_accessor, FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER, false);
             return 0;
         }
         //special_hi's link module
@@ -125,6 +132,20 @@ unsafe fn get_param_float_hook(x0:u64, arg2:u64, arg3:u64) -> f32 {
 }
 
 
+#[skyline::hook(offset = 0x6df820, inline)]
+unsafe fn change_motion_hook(ctx: &skyline::hooks::InlineCtx) {
+    println!("motion register: {:#x}",*ctx.registers[1].x.as_ref() as u64);
+
+    if *ctx.registers[1].x.as_ref() as u64 == hash40("win_1") 
+    || *ctx.registers[1].x.as_ref() as u64 == hash40("win_2") 
+    || *ctx.registers[1].x.as_ref() as u64 == hash40("win_3") {
+        println!("return register: {:#x}", *ctx.registers[0].x.as_ref() as u64 - getRegionAddress(Region::Text) as u64);
+        let text = skyline::hooks::getRegionAddress(skyline::hooks::Region::Text) as u64;
+        let mut lr: *const u64;
+        asm!("mov {}, x30", out(reg) lr);
+        println!("Current LR:\t\t{:#x} ({:#x})", (lr as u64) - text, (lr as u64));
+    }
+}
 
 
 

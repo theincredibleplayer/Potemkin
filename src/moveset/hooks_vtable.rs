@@ -54,6 +54,7 @@ pub unsafe extern "C" fn kamui_on_search(_vtable: u64, fighter: &mut Fighter, lo
 }
 
 pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
+    //println!("on_frame");
     let scale = PostureModule::scale(fighter.battle_object.module_accessor); //gets the model's scake
     let module_accessor = fighter.battle_object.module_accessor;
     let status_kind =StatusModule::status_kind(fighter.battle_object.module_accessor) ;
@@ -141,7 +142,11 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
         }
     }
     if lr_1on1 != 0.0 {
-        WorkModule::unable_transition_term(module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_TURN);
+        WorkModule::enable_transition_term_forbid(module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_TURN);
+        println!("turn disabled");
+    }else{
+        WorkModule::unable_transition_term_forbid(module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_TURN);
+        println!("turn enabled");
     }
 
     EffectModule::remove_common(module_accessor, Hash40::new("invincible"));
@@ -199,7 +204,7 @@ pub unsafe extern "C" fn kamui_reset_original(vtable: u64, fighter: &mut Fighter
 
 pub unsafe extern "C" fn kamui_reset(vtable: u64, fighter: &mut Fighter) {
     let module_accessor = (*fighter).battle_object.module_accessor;
-    println!("initialization hook successful");
+    //println!("initialization hook successful");
     WorkModule::on_flag(fighter.battle_object.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_CAN_SPECIAL_COMMAND);
     ShieldModule::set_target_property(fighter.battle_object.module_accessor, *COLLISION_PROPERTY_REFLECT,2);
     let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
@@ -359,6 +364,8 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
         hash40("special_air_lw"),
         hash40("special_air_lw_hit"),
         hash40("special_air_lw_hit_turn"),
+        hash40("potemkin_buster"),
+        hash40("potemkin_buster_whiff"),
         hash40("roman_cancel"),
         hash40("roman_cancel_air"),
         hash40("final"),
@@ -792,11 +799,11 @@ pub unsafe extern "C" fn kamui_on_shield(vtable: u64, fighter: &mut Fighter, col
     let opponent_real_power =collision_event.real_power;
 
 
-    println!("on shield hook successful");
-    println!("the opp id : {}", opponent_id );
-    println!("the col kind category : {}", opponent_cat );
-    println!("the raw power : {}", opponent_raw_power );
-    println!("the real power : {}", opponent_real_power );
+    //println!("on shield hook successful");
+    //println!("the opp id : {}", opponent_id );
+    //println!("the col kind category : {}", opponent_cat );
+    //println!("the raw power : {}", opponent_raw_power );
+    //println!("the real power : {}", opponent_real_power );
     let opponent_accessor = sv_battle_object::module_accessor(opponent_id);
     let opponent_common = get_fighter_common_from_accessor(&mut* opponent_accessor);
 
@@ -832,7 +839,7 @@ pub unsafe extern "C" fn kamui_on_shield(vtable: u64, fighter: &mut Fighter, col
 pub unsafe extern "C" fn kamui_on_damage_og(vtable: u64, fighter: &mut Fighter,damage_log:u64);
 
 pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,damage_log:u64) {
-    println!("on damage hook successful");
+    //println!("on damage hook successful");
     let module_accessor = (*fighter).battle_object.module_accessor;
 
     let module_accessor = fighter.battle_object.module_accessor;
@@ -865,7 +872,7 @@ pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,dama
 pub unsafe extern "C" fn kamui_on_attack_og(vtable: u64, fighter: &mut Fighter,collision_log:CollisionLog);
 
 pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,collision_log:CollisionLog) {
-    println!("on hit hook successful");
+    //println!("on hit hook successful");
     let attack_data = AttackModule::attack_data(fighter.battle_object.module_accessor, collision_log.collider_id as i32, false);
     let module_accessor = (*fighter).battle_object.module_accessor;
     let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;

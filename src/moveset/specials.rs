@@ -82,6 +82,7 @@ pub unsafe extern "C" fn special_s_main(fighter: &mut L2CFighterCommon) -> L2CVa
 unsafe fn special_s_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     let mut current_speed = WorkModule::get_float(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_SPECIAL_S_ACCEL);
     let lua_state = fighter.lua_state_agent;
+    let lr = PostureModule::lr(fighter.module_accessor);
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
     WorkModule::set_float(fighter.module_accessor,0.5 + current_speed,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_SPECIAL_S_ACCEL );
     fighter.clear_lua_stack();
@@ -107,8 +108,9 @@ unsafe fn special_s_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     if MotionModule::is_end(fighter.module_accessor) {
         fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL.into(),false.into());
     }
-    if ControlModule::check_button_on(fighter.module_accessor,*CONTROL_PAD_BUTTON_SPECIAL) == false
-    || GroundModule::is_near_cliff(fighter.module_accessor,PostureModule::pos_x(module_accessor),1.0) {
+    if (ControlModule::check_button_on(fighter.module_accessor,*CONTROL_PAD_BUTTON_SPECIAL) == false
+    && ControlModule::check_button_on(fighter.module_accessor,*CONTROL_PAD_BUTTON_ATTACK_RAW) == false)
+    || GroundModule::is_ottotto_lr(fighter.module_accessor, lr, 1.5) {
         fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_END.into(),false.into());
         return L2CValue::I32(0)
     }
@@ -179,7 +181,8 @@ unsafe fn side_b_slide_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
         fighter.change_status(FIGHTER_STATUS_KIND_FALL.into(),false.into());
         return L2CValue::I32(0)
     }
-    if ControlModule::check_button_on(fighter.module_accessor,*CONTROL_PAD_BUTTON_SPECIAL) == false
+    if (ControlModule::check_button_on(fighter.module_accessor,*CONTROL_PAD_BUTTON_SPECIAL) == false
+    && ControlModule::check_button_on(fighter.module_accessor,*CONTROL_PAD_BUTTON_ATTACK_RAW) == false)
     || GroundModule::is_ottotto_lr(fighter.module_accessor, lr, 1.5) {
         fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_END.into(),false.into());
         return L2CValue::I32(0)

@@ -10,7 +10,7 @@ pub static mut ITEM_MANAGER : usize = 0;
 
 mod moveset;
 
-#[skyline::main(name = "hotpotwithudon")]
+#[skyline::main(name = "hotpot")]
 pub fn main() {
     moveset::install();
 }

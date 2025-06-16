@@ -142,7 +142,7 @@ pub unsafe extern "C" fn Final_main_loop(fighter: &mut L2CFighterCommon) -> L2CV
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_NAME_CURSOR);
         WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
         AreaModule::set_whole(fighter.module_accessor, false);
-
+        UiManager::sync_jetpack(MotionModule::frame(fighter.module_accessor));
 
         KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_STOP);
         KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY);
@@ -330,7 +330,15 @@ pub unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> 
     WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
     //CAM_ZOOM_OUT_FINAL(fighter);
     macros::REQ_FINAL_START_CAMERA_arg3(fighter,Hash40::new("d04finalvisualscene03.nuanmb"), false, false);
-    PostureModule::set_pos_2d(fighter.module_accessor,&Vector2f{x: 0.0 , y: 0.0});
+    PostureModule::set_pos_2d(fighter.module_accessor,&Vector2f{x: 0.0 , y: 5000.0});
+
+    let pos = Vector3f{x: PostureModule::pos_x(fighter.module_accessor), y: PostureModule::pos_y(fighter.module_accessor), z: PostureModule::pos_z(fighter.module_accessor)};
+    let pos2f = Vector2f{x: pos.x, y: pos.y};
+    let check_pos = Vector2f{x: 0.0, y: 9000.0};
+    let mut hit_pos = Vector2f{x: 0.0, y: 0.0};
+    let checkbool = GroundModule::ray_check_hit_pos(fighter.module_accessor,&pos2f,&check_pos,&mut hit_pos,true);
+    println!("hit_pos_x: {}\nhit_pos_y: {}\ncheckbool: {}", hit_pos.x, hit_pos.y, checkbool);
+
     return smashline::original_status(Main, fighter, *FIGHTER_KAMUI_STATUS_KIND_FINAL_END)(fighter);
 }
 pub unsafe extern "C" fn finalsceneenter_main(fighter: &mut L2CFighterCommon) -> L2CValue {
