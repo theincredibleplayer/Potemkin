@@ -92,7 +92,7 @@ pub unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, ev
     original!()(vtable, fighter, event)
 }
 
-#[skyline::hook(offset = 0x3414910)]
+#[skyline::hook(offset = 0x3414930)]
 pub unsafe extern "C" fn noping_the_eff(vtable:u64, weapon: *mut smash::app::Weapon, log: CollisionLog) -> u64 {
     println!("effect done been nop'd");
     *(weapon as *mut bool).add(0x90) = true; //Lets the weapon persist on hit

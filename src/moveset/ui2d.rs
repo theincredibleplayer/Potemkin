@@ -23,7 +23,7 @@ pub unsafe fn pane_remove_child(pane: *mut Pane, child: *const Pane);
 #[skyline::from_offset(0x58250)]
 pub unsafe fn pane_append_child(pane: *mut Pane, child: *const Pane);
 
-#[skyline::from_offset(0x37a1ef0)]
+#[skyline::from_offset(0x37A1F10)]
 pub unsafe fn pane_set_text_string(pane: *mut TextBox, s: *const c_char);
 
 macro_rules! c_str {

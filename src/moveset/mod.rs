@@ -249,10 +249,10 @@ mod autoturn;
 use autoturn::*;
 mod potbuster;
 use potbuster::*;
-mod command_input;
-use command_input::*;
-mod command_input_2;
-use command_input_2::*;
+//mod command_input;
+//use command_input::*;
+//mod command_input_2;
+//use command_input_2::*;
 //this does... something......... probably
 extern "C" {
     #[link_name = "\u{1}_ZN3app19FighterCutInManager13is_one_on_oneEv"]
@@ -685,7 +685,7 @@ pub fn install() {
     //agent frame/opff
     .on_line(Main, kamui)
     .on_start(agent_init)
-    .on_start(on_start)
+    //.on_start(on_start)
 
     //autoturn
     .status(Main      , *FIGHTER_STATUS_KIND_WAIT, wait_main)
