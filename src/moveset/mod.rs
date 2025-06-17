@@ -1173,7 +1173,7 @@ pub fn install() {
 
         //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::PERMA_WEAPON_LINK_REMOVE], kamui_reset_2 as u64);
     }
-    skyline::patching::Patch::in_text(0x3414784).nop();
+    skyline::patching::Patch::in_text(0x34147a4).nop();
 
 
     //for n in (0xb620e4..0xb621c0).step_by(4) {
