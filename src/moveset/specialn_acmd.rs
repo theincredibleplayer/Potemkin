@@ -175,9 +175,13 @@ pub unsafe extern "C" fn game_specialnfire(agent: &mut L2CAgentBase) {
             shield!(agent, *MA_MSC_CMD_SHIELD_ON, *COLLISION_KIND_SHIELD, 0, 2);
         }
     }
-    frame(agent.lua_state_agent, 9.0);
+    frame(agent.lua_state_agent, 11.0);
     if macros::is_excute(agent) {
         shield!(agent, *MA_MSC_CMD_SHIELD_OFF, *COLLISION_KIND_SHIELD, 0, 2);
+        macros::ATTACK(agent,0,0,Hash40::new("top"),15.0,60,100,0,0,8.0,0.0,12.0,11.0,Some(0.0),Some(12.0),Some(19.0),3.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_CUTUP,*ATTACK_REGION_NONE);
+        if StatusModule::situation_kind(agent.module_accessor) != *SITUATION_KIND_GROUND{
+            macros::SET_SPEED_EX(agent, -1.2, 0.25, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
+        }
     }
 }
 

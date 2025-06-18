@@ -54,6 +54,11 @@ pub unsafe extern "C" fn special_lw_main(fighter: &mut L2CFighterCommon) -> L2CV
     else {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
         MotionModule::change_motion(module_accessor,Hash40::new("special_lw"),0.0,1.0,false,0.0,false,false);
+        fighter.clear_lua_stack();
+        fighter.push_lua_stack(&mut L2CValue::I32(*FIGHTER_KINETIC_ENERGY_ID_MOTION));
+        let mut lr = PostureModule::lr(fighter.module_accessor);
+        fighter.push_lua_stack(&mut L2CValue::F32(lr));
+        sv_kinetic_energy::set_chara_dir(fighter.lua_state_agent);
     }
     fighter.sub_shift_status_main(L2CValue::Ptr(special_lw_main_loop as *const () as _))
 }
