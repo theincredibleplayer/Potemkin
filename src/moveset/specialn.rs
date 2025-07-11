@@ -149,6 +149,7 @@ pub unsafe extern "C" fn boom_main_loop(weapon: &mut L2CWeaponCommon) -> L2CValu
 pub unsafe extern "C" fn special_n_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
+    fighter.sub_set_special_start_common_kinetic_setting(hash40("param_special_n").into());
     if fighter.global_table[SITUATION_KIND].get_i32() != *SITUATION_KIND_GROUND {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
         MotionModule::change_motion(module_accessor,Hash40::new("special_air_n_start"),0.0,1.0,false,0.0,false,false);
@@ -156,11 +157,6 @@ pub unsafe extern "C" fn special_n_main(fighter: &mut L2CFighterCommon) -> L2CVa
     else {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
         MotionModule::change_motion(module_accessor,Hash40::new("special_n_start"),0.0,1.0,false,0.0,false,false);
-        fighter.clear_lua_stack();
-        fighter.push_lua_stack(&mut L2CValue::I32(*FIGHTER_KINETIC_ENERGY_ID_MOTION));
-        let mut lr = PostureModule::lr(fighter.module_accessor);
-        fighter.push_lua_stack(&mut L2CValue::F32(lr));
-        sv_kinetic_energy::set_chara_dir(fighter.lua_state_agent);
     }
     fighter.sub_shift_status_main(L2CValue::Ptr(special_n_main_loop as *const () as _))
 }

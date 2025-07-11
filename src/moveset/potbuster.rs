@@ -114,7 +114,7 @@ pub unsafe extern "C" fn potbuster_exit(fighter: &mut L2CFighterCommon) -> L2CVa
 
 
 pub unsafe extern "C" fn potbusterwhiff(agent: &mut L2CAgentBase) {
-    frame(agent.lua_state_agent, 4.0);
+    frame(agent.lua_state_agent, 5.0);
     if macros::is_excute(agent) {
         macros::CATCH(agent, 0, Hash40::new("top"), 10.0, 0.0, 18.0, 8.0, None, None, None, *FIGHTER_STATUS_KIND_THROWN, *COLLISION_SITUATION_MASK_GA);
     }
@@ -184,9 +184,7 @@ pub unsafe extern "C" fn effect_potbuster(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 129.0);
     if macros::is_excute(agent) {
         macros::EFFECT(agent, Hash40::new("eflame_promrevolt_firepillar_ground"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 2.5, 0, 0, 0, 0, 0, 0, true);
-
         macros::LAST_EFFECT_SET_RATE(agent, 0.5);
-
         macros::EFFECT(agent, Hash40::new("dolly_volcano_base"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
         EffectModule::set_scale_last(agent.module_accessor, &Vector3f{x:2.0,y:1.0,z:2.0} );
         macros::LAST_EFFECT_SET_RATE(agent, 0.75);

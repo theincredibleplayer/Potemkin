@@ -19,13 +19,17 @@ use crate::moveset::*;
 pub unsafe extern "C" fn special_lw(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         ArticleModule::generate_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
-        ArticleModule::change_motion(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("special_lw_hit"),false,-1.0);
+        if StatusModule::situation_kind(agent.module_accessor) == *SITUATION_KIND_GROUND {
+            ArticleModule::change_motion(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("special_lw_hit"),false,-1.0);
+        }else{
+            ArticleModule::change_motion(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("special_air_lw"),false,-1.0);
+        }
         macros::HIT_NODE(agent, Hash40::new("arml"), *HIT_STATUS_XLU);
     }
     sv_animcmd::frame(agent.lua_state_agent, 30.0);
     if macros::is_excute(agent) {
         if StatusModule::situation_kind(agent.module_accessor) != *SITUATION_KIND_GROUND{
-            macros::SET_SPEED_EX(agent, -1.2, 0.25, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
+            macros::SET_SPEED_EX(agent, -0.6, 0.25, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
         }
         macros::ATTACK(agent,0,0,Hash40::new("top"),10.0,60,100,0,0,15.0,0.0,10.0,20.0,None,None,None,3.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_saving"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_FIRE,*ATTACK_REGION_NONE);
         AttackModule::set_attack_level(agent.module_accessor,0,*FIGHTER_RYU_SAVING_LV_3 as u8);

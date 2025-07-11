@@ -24,7 +24,6 @@ pub unsafe extern "C" fn notify_log_event_collision_hit_replace(fighter_manager:
     let attacker_boma = sv_battle_object::module_accessor(attacker_id);
     let attacker_kind = sv_battle_object::kind(attacker_id);
     if attacker_kind == *FIGHTER_KIND_KAMUI || attacker_kind == *WEAPON_KIND_KAMUI_WATERDRAGON {
-        println!("notify event log");
         let owner_id = WorkModule::get_int(attacker_boma,*WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER) as u32;
         let owner = sv_battle_object::module_accessor(owner_id);
         /*if WorkModule::is_flag(owner,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_CHECK_ENEMY) {

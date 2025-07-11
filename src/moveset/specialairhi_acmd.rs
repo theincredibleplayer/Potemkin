@@ -1,0 +1,33 @@
+use smash::lib::{L2CValue,lua_const::*};
+use smash::lua2cpp::{L2CAgentBase,L2CFighterCommon};
+use smash::hash40;
+use smash::app::lua_bind::*;
+use smashline::*;
+use smash::app::*;
+use smash_script::macros::*;
+use smash::app::sv_animcmd::*;
+use smash::phx::Hash40;
+use smash::phx::{Vector2f,Vector3f};
+use skyline::nn::ro::LookupSymbol;
+use smash_script::lua_args;
+use smash_script::macros;
+use std::arch::asm;
+use crate::FIGHTER_CUTIN_MANAGER_ADDR;
+use crate::FIGHTER_MANAGER;
+
+use crate::moveset::*;
+
+
+
+pub unsafe extern "C" fn special_air_hi(agent: &mut L2CAgentBase) {
+    if macros::is_excute(agent) {
+        macros::ATTACK(agent, 0, 0, Hash40::new("bust"), 10.0, 70, 60, 0, 70, 12.0, 0.0, 0.0, 0.0, Some(7.0), Some(0.0), Some(0.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_OBJECT);
+    }
+}
+pub unsafe extern "C" fn sound_special_air_hi(agent: &mut L2CAgentBase) {}
+pub unsafe extern "C" fn effect_special_air_hi(agent: &mut L2CAgentBase) {}
+pub unsafe extern "C" fn expression_special_air_hi(agent: &mut L2CAgentBase) {
+    if macros::is_excute(agent) {
+        macros::QUAKE(agent, *CAMERA_QUAKE_KIND_L);
+    }
+}

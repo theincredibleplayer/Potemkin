@@ -43,22 +43,21 @@ unsafe extern "C" fn special_360_input(
         class.state = 0;
         return false;
     }
-
     match class.state {
         0 => {
-            if data.front(lr) {
+            if data.back(lr) {
                 class.state = 1;
                 class.lr = lr as i8;
             }
-            //if data.front(lr) {
-            //    class.state = 7;
-            //    class.lr = lr as i8;
-            //}
+            if data.front(lr) {
+                class.state = 7;
+                class.lr = lr as i8;
+            }
             false
         }
         // Forwards
         1 => {
-            if data.front_down(class.lr as f32) {
+            if data.back_down(class.lr as f32) {
                 class.state = 2;
                 class.command_timer = 0;
             }
@@ -72,23 +71,24 @@ unsafe extern "C" fn special_360_input(
             false
         }
         3 => {
-            if data.back_down(class.lr as f32) {
+            if data.front_down(class.lr as f32) {
                 class.state = 4;
                 class.command_timer = 0;
             }
             false
         }
         4 => {
-            if data.back(class.lr as f32) {
+            if data.front(class.lr as f32) {
                 class.state = 5;
                 class.command_timer = 0;
             }
             false
         }
         5 => {
-            if data.front(class.lr as f32)
-            || data.front_down(class.lr as f32)
-            || data.front_up(class.lr as f32){
+            if data.front_up(class.lr as f32)
+            || data.back(class.lr as f32)
+            || data.back_down(class.lr as f32)
+            || data.back_up(class.lr as f32) {
                 class.state = 6;
                 class.command_timer = 0;
                 return class.input_allow.check(&data);
@@ -96,42 +96,42 @@ unsafe extern "C" fn special_360_input(
             false
         }
         // Backwards
-        //7 => {
-        //    if data.front_down(class.lr as f32) {
-        //        class.state = 8;
-        //        class.command_timer = 0;
-        //    }
-        //    false
-        //}
-        //8 => {
-        //    if data.down() {
-        //        class.state = 9;
-        //        class.command_timer = 0;
-        //    }
-        //    false
-        //}
-        //9 => {
-        //    if data.back_down(class.lr as f32) {
-        //        class.state = 10;
-        //        class.command_timer = 0;
-        //    }
-        //    false
-        //}
-        //10 => {
-        //    if data.back(class.lr as f32) {
-        //        class.state = 11;
-        //        class.command_timer = 0;
-        //    }
-        //    false
-        //}
-        //11 => {
-        //    if data.front(class.lr as f32) {
-        //        class.state = 6;
-        //        class.command_timer = 0;
-        //        return class.input_allow.check(&data);
-        //    }
-        //    false
-        //}
+        7 => {
+            if data.front_down(class.lr as f32) {
+                class.state = 8;
+                class.command_timer = 0;
+            }
+            false
+        }
+        8 => {
+            if data.down() {
+                class.state = 9;
+                class.command_timer = 0;
+            }
+            false
+        }
+        9 => {
+            if data.back_down(class.lr as f32) {
+                class.state = 10;
+                class.command_timer = 0;
+            }
+            false
+        }
+        10 => {
+            if data.back(class.lr as f32) {
+                class.state = 11;
+                class.command_timer = 0;
+            }
+            false
+        }
+        11 => {
+            if data.back_up(class.lr as f32){
+                class.state = 6;
+                class.command_timer = 0;
+                return class.input_allow.check(&data);
+            }
+            false
+        }
         // Finish
         6 => class.input_allow.check(&data),
         _ => {
@@ -153,11 +153,8 @@ unsafe extern "C" fn special_46_input(
         class.command_timer = 0;
         return false;
     }
-    println!("lr:{}",lr);
-    println!("class_lr:{}",class.lr as f32);
     match class.state {
         0 => {
-            println!("case 0");
             if data.back(lr)
             || data.back_down(lr)
             || data.back_up(lr) {
@@ -169,7 +166,6 @@ unsafe extern "C" fn special_46_input(
             false
         }
         1 => {
-            println!("case 1");
             if data.back(class.lr as f32)
             || data.back_down(class.lr as f32)
             || data.back_up(class.lr as f32) {
@@ -177,14 +173,13 @@ unsafe extern "C" fn special_46_input(
                 let timer = class.hold_timer + 1;
                 class.hold_timer = timer;
                 if class.hold_timer_max <= timer {
-                    println!("hold timer max: {}", class.hold_timer_max);
+                    //println!("hold timer max: {}", class.hold_timer_max);
                     class.state = 2;
                 }
             }
             false
         }
         2 => {
-            println!("case 2");
             if data.back(class.lr as f32)
             || data.back_down(class.lr as f32)
             || data.back_up(class.lr as f32) {
@@ -204,7 +199,6 @@ unsafe extern "C" fn special_46_input(
             false
         }
         3 => {
-            println!("case 3");
             if data.front(class.lr as f32)
             || data.front_down(class.lr as f32)
             || data.front_up(class.lr as f32) {
@@ -215,7 +209,6 @@ unsafe extern "C" fn special_46_input(
             false
         }
         4 => {
-            println!("case 4");
             class.input_allow.check(&data)
         },
         _ => {
@@ -226,9 +219,11 @@ unsafe extern "C" fn special_46_input(
 pub unsafe extern "C" fn on_start(fighter: &mut L2CFighterCommon) {
     set_command_input_function(fighter.module_accessor, 0x7, special_46_input); //hammerfall
     set_command_input_function(fighter.module_accessor, 0xA, special_360_input); //pot buster
+    clone_command_input(fighter.module_accessor,0x3,0x6);
     set_command_input_button(fighter.module_accessor, 0x3, 0x2);
     set_command_input_button(fighter.module_accessor, 0x2, 0x2);
     set_command_input_button(fighter.module_accessor, 0x0, 0x2);
     set_command_input_button(fighter.module_accessor, 0x7, 0x3);
     set_command_input_button(fighter.module_accessor, 0xA, 0x1);
+    set_command_input_button(fighter.module_accessor, 0x6, 0x1);
 }

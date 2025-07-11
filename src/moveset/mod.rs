@@ -106,6 +106,8 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_GAMEWATCH_Z_SCALE: i32 = 0x6b;
 
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FIRE_TIME_BASE: i32 = 0x6c;
 
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_HEAT_TACKLE_STICK_X: i32 = 0x6d;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_HEAT_TACKLE_STICK_Y: i32 = 0x6e;
 
 // for weapon
 pub const WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLOAT_BOOM_POWER: i32 = 0x4;
@@ -145,6 +147,9 @@ pub const FIGHTER_KAMUI_STATUS_KIND_WALK_BRAKE_BACK: i32 = 0x202;
 pub const FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF: i32 = 0x203;
 pub const FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER: i32 = 0x204;
 
+pub const FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_HOLD: i32 = 0x205;
+pub const FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE: i32 = 0x206;
+pub const FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_END: i32 = 0x207;
 
 
 
@@ -209,6 +214,10 @@ mod specialhi;
 use specialhi::*;
 mod specialhi_acmd;
 use specialhi_acmd::*;
+mod specialairhi;
+use specialairhi::*;
+mod specialairhi_acmd;
+use specialairhi_acmd::*;
 mod normals;
 use normals::*;
 mod specials;
@@ -515,6 +524,9 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
         ,FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START
         ,FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_LOOP
         ,FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE
+        ,FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE
+        ,FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_HOLD
+        ,FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_END
         //TEST
         ,FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK
         ,FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP
@@ -598,6 +610,12 @@ pub unsafe extern "C" fn pot_check_special_command(fighter: &mut L2CFighterCommo
         fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF.into(), true.into());
         return true.into();
     }
+    // heat tackle input
+    if cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_ATTACK_COMMAND1 != 0
+    && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_HI_COMMAND){
+        fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_HOLD.into(), true.into());
+        return true.into();
+    }
     // heat knuckle input
     if cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_HI_COMMAND  != 0
     && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_HI_COMMAND)
@@ -643,6 +661,14 @@ unsafe extern "C" fn opff_global(fighter: &mut L2CFighterCommon) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     if fighter_kind != *FIGHTER_KIND_KAMUI {
         UiManager::disable_ui(entry_id);
+        // this should handle kill voicelines 
+        //for n in 0..1{
+        //    if n != entry_id{
+                if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_DEATH_PREDICTION) {
+                    EffectModule::req(fighter.module_accessor, Hash40::new("sys_bomb_a"), &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, 1.0, 0, 0, false,0);
+                }
+        //    }
+        //}
     }
 }
 
@@ -776,17 +802,20 @@ pub fn install() {
 
 
     //special_lw
+    .status(Pre, *FIGHTER_STATUS_KIND_SPECIAL_LW, special_lw_pre)
     .status(Main, *FIGHTER_STATUS_KIND_SPECIAL_LW, special_lw_main)
     .status(End, *FIGHTER_STATUS_KIND_SPECIAL_LW, special_lw_end)
+    .status(Init, *FIGHTER_STATUS_KIND_SPECIAL_LW, special_lw_init)
     .game_acmd("game_speciallw", special_lw, Priority::Low)
     .effect_acmd("effect_speciallw", effect_special_lw, Priority::Low)
     .sound_acmd("sound_speciallw", sound_special_lw, Priority::Low)
-    
+
     .game_acmd("game_specialairlw", special_lw, Priority::Low)
     .effect_acmd("effect_specialairlw", effect_special_lw, Priority::Low)
     .sound_acmd("sound_specialairlw", sound_special_lw, Priority::Low)
 
     //special_hi
+    .status(Pre, *FIGHTER_STATUS_KIND_SPECIAL_HI, special_hi_pre)
     .status(Main, *FIGHTER_STATUS_KIND_SPECIAL_HI, special_hi_main)
     .status(Exit, *FIGHTER_STATUS_KIND_SPECIAL_HI, special_hi_exit)
 
@@ -804,6 +833,21 @@ pub fn install() {
     .status(Exec, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE, special_hi_release_exec)
     .status(Exit, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE, special_hi_exit)
 
+    .status(Main, FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE, special_air_hi_main)
+    .status(End, FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE, special_air_hi_end)
+    //.status(Exec, FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_HOLD, special_air_hi_hold_exec)
+    //.status(Exit, FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_HOLD, special_air_hi_hold_exit)
+
+    .status(Main, FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_HOLD, special_air_hi_hold_main)
+
+    .status(Pre, FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_END, special_air_hi_end_pre)
+    .status(Main, FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_END, special_air_hi_end_main)
+
+
+    .game_acmd          ("game_specialairhi",              special_air_hi,                                 Priority::Low)
+    .sound_acmd         ("sound_specialairhi",             sound_special_air_hi,                           Priority::Low)
+    .effect_acmd        ("effect_specialairhi",            effect_special_air_hi,                          Priority::Low)
+    .expression_acmd    ("expression_specialairhi",            expression_special_air_hi,                          Priority::Low)
 
     .game_acmd          ("game_specialhi",              special_hi,                                 Priority::Low)
     .sound_acmd         ("sound_specialhi",             sound_special_hi,                           Priority::Low)
@@ -1145,7 +1189,7 @@ pub fn install() {
         idkman,
         idkman2,
         autoturn_situation_check_hook,
-        change_motion_hook
+        //change_motion_hook
         //internal_cam
         //get_params_outside
         //initialization,

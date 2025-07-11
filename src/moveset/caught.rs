@@ -107,11 +107,9 @@ pub unsafe extern "C" fn thrown_status_common(fighter: &mut L2CFighterCommon) ->
         let position = &mut Vector3f{ x: 0.0, y: 0.0, z: 0.0 };
         ModelModule::joint_global_position(fighter.module_accessor, Hash40::new("hip"), hip_pos, true);
         ModelModule::joint_global_position(fighter.module_accessor, Hash40::new("head"), head_pos, true);
-        position.x = hip_pos.x - head_pos.x;
-        
-        println!("====================offset_x: {}",position.x);
-        //ganon's offset is 8.321199
-        x_offset = (8.321199 - position.x)/3.0;
+        position.x = hip_pos.y - head_pos.y;
+
+        x_offset = (-4.0 - position.x)/3.0;
 
 
 
@@ -179,6 +177,7 @@ pub unsafe extern "C" fn thrown_status_common(fighter: &mut L2CFighterCommon) ->
         }
         return 0.into();
     }
+
     if (StatusModule::status_kind(parent_boma) == *FIGHTER_STATUS_KIND_FINAL
     || StatusModule::status_kind(parent_boma) == FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP)
     && (utility::get_kind(&mut *parent_boma) == *FIGHTER_KIND_KAMUI) {
@@ -201,7 +200,6 @@ pub unsafe extern "C" fn thrown_status_common(fighter: &mut L2CFighterCommon) ->
         ModelModule::joint_global_position(fighter.module_accessor, Hash40::new("head"), head_pos, true);
         position.x = hip_pos.x - head_pos.x;
         
-        println!("====================offset_x: {}",position.x);
         //ganon's offset is 8.321199
         x_offset = (8.321199 - position.x)/3.0;
 

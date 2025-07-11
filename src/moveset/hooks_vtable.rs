@@ -55,7 +55,7 @@ pub unsafe extern "C" fn kamui_on_search(_vtable: u64, fighter: &mut Fighter, lo
 
 pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
     //println!("on_frame");
-    let scale = PostureModule::scale(fighter.battle_object.module_accessor); //gets the model's scake
+    let scale = PostureModule::scale(fighter.battle_object.module_accessor); //gets the model's scale
     let module_accessor = fighter.battle_object.module_accessor;
     let status_kind =StatusModule::status_kind(fighter.battle_object.module_accessor) ;
     let situation_kind = StatusModule::situation_kind(module_accessor);
@@ -143,10 +143,8 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
     }
     if lr_1on1 != 0.0 {
         WorkModule::enable_transition_term_forbid(module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_TURN);
-        println!("turn disabled");
     }else{
         WorkModule::unable_transition_term_forbid(module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_TURN);
-        println!("turn enabled");
     }
 
     EffectModule::remove_common(module_accessor, Hash40::new("invincible"));
@@ -264,10 +262,10 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
         hash40("fall_aerial"),
         hash40("fall_aerial_f"),
         hash40("fall_aerial_b"),
-        //hash40("fall_special"),
-        //hash40("fall_special_f"),
-        //hash40("fall_special_b"),
-        //hash40("landing_fall_special"),
+        hash40("fall_special"),
+        hash40("fall_special_f"),
+        hash40("fall_special_b"),
+        hash40("landing_fall_special"),
         hash40("fall_damage"),
         //hash40("walk_fall_r"),
         //hash40("walk_fall_l"),
@@ -358,6 +356,10 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
         hash40("special_hi_loop"),
         hash40("special_hi_release"),
         hash40("special_air_hi"),
+        hash40("special_air_hi_up"),
+        hash40("special_air_hi_hold"),
+        hash40("special_air_hi_hold_ground"),
+        hash40("special_air_hi_end"),
         hash40("special_lw"),
         hash40("special_lw_hit"),
         hash40("special_lw_hit_turn"),
