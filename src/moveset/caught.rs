@@ -53,6 +53,8 @@ pub unsafe extern "C" fn thrown_status_common(fighter: &mut L2CFighterCommon) ->
                 *BODY_TYPE_MOTION_BIG
             );
         }
+        let constraint_flags = LinkModule::get_model_constraint_flag(fighter.module_accessor);
+        LinkModule::set_model_constraint_flag(fighter.module_accessor,(*CONSTRAINT_FLAG_FLIP_ROT_Y | constraint_flags as i32) as u32);
         WorkModule::set_int64(fighter.module_accessor, motion as i64,*FIGHTER_STATUS_THROWN_WORK_INT_MOTION_KIND);
     }
 
@@ -163,7 +165,7 @@ pub unsafe extern "C" fn thrown_status_common(fighter: &mut L2CFighterCommon) ->
         }
         fighter.status_Thrown();
         let constraint_flags = LinkModule::get_model_constraint_flag(fighter.module_accessor);
-        LinkModule::set_model_constraint_flag(fighter.module_accessor,(*CONSTRAINT_FLAG_OFFSET_TRANSLATE | constraint_flags as i32) as u32);
+        LinkModule::set_model_constraint_flag(fighter.module_accessor,(*CONSTRAINT_FLAG_OFFSET_TRANSLATE | *CONSTRAINT_FLAG_FLIP_ROT_X | constraint_flags as i32) as u32);
         WorkModule::set_int64(fighter.module_accessor, motion as i64,*FIGHTER_STATUS_THROWN_WORK_INT_MOTION_KIND);
         MotionModule::change_motion(fighter.module_accessor, Hash40::new_raw(motion), 0.0, 1.0, false, 0.0, false, false);
         LinkModule::set_constraint_translate_offset(fighter.module_accessor, &Vector3f{ x: x_offset, y: y_offset, z: z_offset });
@@ -255,18 +257,18 @@ pub unsafe extern "C" fn thrown_status_common(fighter: &mut L2CFighterCommon) ->
         }
         fighter.status_Thrown();
         let constraint_flags = LinkModule::get_model_constraint_flag(fighter.module_accessor);
-        LinkModule::set_model_constraint_flag(fighter.module_accessor,(*CONSTRAINT_FLAG_OFFSET_TRANSLATE | constraint_flags as i32) as u32);
+        LinkModule::set_model_constraint_flag(fighter.module_accessor,(*CONSTRAINT_FLAG_OFFSET_TRANSLATE | *CONSTRAINT_FLAG_POSITION | *CONSTRAINT_FLAG_ORIENTATION /*| constraint_flags as i32*/) as u32);
         WorkModule::set_int64(fighter.module_accessor, motion as i64,*FIGHTER_STATUS_THROWN_WORK_INT_MOTION_KIND);
         MotionModule::change_motion(fighter.module_accessor, Hash40::new_raw(motion), 0.0, 1.0, false, 0.0, false, false);
         LinkModule::set_constraint_translate_offset(fighter.module_accessor, &Vector3f{ x: x_offset, y: y_offset, z: z_offset });
         //CaptureModule::set_capture_node_offset(fighter.module_accessor, &Vector3f{ x: 10.0, y: 0.0, z: 0.0 });
-        if !(is_flat_stage()){
+        /*if !(is_flat_stage()){
             if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_GAMEWATCH {
                 let z_scale = ModelModule::scale_z(fighter.module_accessor);
                 WorkModule::set_float(fighter.module_accessor,z_scale,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_GAMEWATCH_Z_SCALE);
                 ModelModule::set_scale_z(fighter.module_accessor,1.0);
             }
-        }
+        }*/
 
         //let pre_flip_state = MotionModule::is_flip(capture_boma);
         //WorkModule::set_flag(capture_boma,fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_FLIP);
@@ -310,7 +312,7 @@ pub unsafe extern "C" fn thrown_status_common_end(fighter: &mut L2CFighterCommon
 
 pub unsafe extern "C" fn game_catchedpotspecialhi(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        MotionModule::set_flip(agent.module_accessor,true,true,false);
+        //MotionModule::set_flip(agent.module_accessor,true,true,false);
         println!("hiiiiiiiiiiiiiiiiii");
     }
 }

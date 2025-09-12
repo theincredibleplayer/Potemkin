@@ -125,7 +125,10 @@ unsafe extern "C" fn special_360_input(
             false
         }
         11 => {
-            if data.back_up(class.lr as f32){
+            if data.back_up(class.lr as f32)
+            || data.front(class.lr as f32)
+            || data.front_down(class.lr as f32)
+            || data.front_up(class.lr as f32) {
                 class.state = 6;
                 class.command_timer = 0;
                 return class.input_allow.check(&data);
@@ -219,11 +222,9 @@ unsafe extern "C" fn special_46_input(
 pub unsafe extern "C" fn on_start(fighter: &mut L2CFighterCommon) {
     set_command_input_function(fighter.module_accessor, 0x7, special_46_input); //hammerfall
     set_command_input_function(fighter.module_accessor, 0xA, special_360_input); //pot buster
-    clone_command_input(fighter.module_accessor,0x3,0x6);
     set_command_input_button(fighter.module_accessor, 0x3, 0x2);
     set_command_input_button(fighter.module_accessor, 0x2, 0x2);
     set_command_input_button(fighter.module_accessor, 0x0, 0x2);
     set_command_input_button(fighter.module_accessor, 0x7, 0x3);
     set_command_input_button(fighter.module_accessor, 0xA, 0x1);
-    set_command_input_button(fighter.module_accessor, 0x6, 0x1);
 }

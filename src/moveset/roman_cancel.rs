@@ -233,7 +233,7 @@ pub unsafe extern "C" fn roman_cancel_end(fighter: &mut L2CFighterCommon) -> L2C
     }
     
 
-
+    //responsible for the slide after fast rc on the ground
     if WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FAST_RC_DETECTED)
     && fighter.global_table[SITUATION_KIND] == *SITUATION_KIND_GROUND{
         KineticModule::enable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_STOP);

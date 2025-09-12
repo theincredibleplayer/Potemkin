@@ -90,7 +90,42 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
         }
     }
 
-    
+    //weapon attaching code
+    if WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ATTACH_WEAPON){
+        let lr = PostureModule::lr(module_accessor);
+        let dragon = ArticleModule::get_article(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON);
+        let dragon_boma = *(dragon as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
+        let pot_bone_names     = &["g_lowarm_weapon_r_attach", "g_lowarm_weapon_l_attach","g_hand_weapon_r_attach", "g_hand_weapon_l_attach"];
+        let article_bone_names = &["g_lowarm_wephigh_r_base" , "g_lowarm_wephigh_l_base" ,"g_hand_wephigh_r_base" ,  "g_hand_wephigh_l_base"];
+        for i in 0..4{
+            let pos   = &mut Vector3f{x:0.0,y:0.0,z:0.0};
+            let rot   = &mut Vector3f{x:0.0,y:0.0,z:0.0};
+            let scale = &mut Vector3f{x:1.0,y:1.0,z:1.0};
+            ModelModule::joint_global_rotation(module_accessor,Hash40::new(pot_bone_names[i]), rot,false);
+            ModelModule::joint_global_position(module_accessor,Hash40::new(pot_bone_names[i]),pos,true);
+            if (i > 1) && (lr > 0.0) { // hand weapons
+            }else if (i <= 1) && (lr > 0.0){ // arm weapons facing right
+                let mut multiplier : f32= 0.0;
+                if (i == 1) {
+                    multiplier = 1.0;
+                }
+                let rot_corrected = &mut Vector3f{x:rot.x + (multiplier * 180.0), y:rot.y + 180.0, z:rot.z};
+                ModelModule::set_joint_rotate(dragon_boma, Hash40::new(article_bone_names[i]), rot_corrected, MotionNodeRotateCompose{_address: *MOTION_NODE_ROTATE_COMPOSE_WORLD as u8}, MotionNodeRotateOrder{_address: *MOTION_NODE_ROTATE_ORDER_XYZ as u8});
+            }else if (i <= 1) && (lr < 0.0){ //arm weapons facing left
+                let mut multiplier : f32= 1.0;
+                if (i == 1) {
+                    multiplier = -1.0;
+                }
+                let rot_corrected = &mut Vector3f{x:-multiplier*(rot.x + 180.0), y:-multiplier*(rot.y+180.0), z:rot.z}; //if facing left his right arm works at x +180 and y+180 
+                ModelModule::set_joint_rotate(dragon_boma, Hash40::new(article_bone_names[i]), rot_corrected, MotionNodeRotateCompose{_address: *MOTION_NODE_ROTATE_COMPOSE_WORLD as u8}, MotionNodeRotateOrder{_address: *MOTION_NODE_ROTATE_ORDER_XYZ as u8});
+            }
+            ModelModule::set_joint_translate(dragon_boma, Hash40::new(article_bone_names[i]), pos, true, false);
+        }
+        // i dont exactly know why this doesnt like fix the rotation like i expected its kinda offset a bit
+    }
+
+
+
     let time_base = WorkModule::get_float(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FIRE_TIME_BASE);
     let agent = get_fighter_common_from_accessor((&mut*module_accessor));
     let fire_timer = WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_FIRE_TIMER);
@@ -101,7 +136,7 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
         macros::BURN_COLOR(agent, 24.0 * ( time_base/((fire_timer as f32)+1.0) ),  1.0 * ( time_base/((fire_timer as f32)+1.0) ),  1.0 * ( time_base/((fire_timer as f32)+1.0) ), (0.5/time_base)*(fire_timer as f32));
     }
 
-
+    // ui stuff
     let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
     if smash::app::lua_bind::FighterManager::is_result_mode(fighter_manager) {
@@ -110,19 +145,22 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
         UiManager::enable_ui(entry_id);
     }
     UiManager::set_game_speed(sv_information::slow_rate()); 
-    //println!("game_speed= {}",sv_information::slow_rate());
 
-
+    // forbids dashing
     WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_RUN);
     WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_DASH_TO_RUN);
     WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_TURN_DASH);
     WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_DASH);
 
+
+    // autoturn value
     let is_damage =StopModule::is_damage(module_accessor);
 
     let lr = get_opponent_lr(module_accessor,is_damage,status_kind,0);
     set_lr_float(lr,module_accessor,status_kind,0);
 
+
+    //air turnaround
     let lr_1on1 = WorkModule::get_float(module_accessor, *FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1);
     //println!("the lr float: {}",lr_1on1);
     let lr = PostureModule::lr(module_accessor);
@@ -136,63 +174,20 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
             *FIGHTER_STATUS_KIND_FALL,
             *FIGHTER_STATUS_KIND_FALL_AERIAL
         ].contains(&status_kind){
-            PostureModule::reverse_lr(module_accessor);
             MotionModule::change_motion(module_accessor, Hash40::new("air_turn"), 0.0, 1.0, false, 0.0, false, false);
+            PostureModule::reverse_lr(module_accessor);
             PostureModule::update_rot_y_lr(agent.module_accessor);
         }
     }
+
+    //forbids turning when in 1on1
     if lr_1on1 != 0.0 {
         WorkModule::enable_transition_term_forbid(module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_TURN);
     }else{
         WorkModule::unable_transition_term_forbid(module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_TURN);
     }
-
-    EffectModule::remove_common(module_accessor, Hash40::new("invincible"));
-
-    /*
-    if FighterCutInManager__is_one_on_one(){
-        let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
-        let entry_id = if WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) == 0 {
-            1
-        }
-        else {
-            0
-        };
-        let entry = smash::app::lua_bind::FighterManager::get_fighter_entry(fighter_manager,FighterEntryID(entry_id));
-        let battle_object = *(entry as *mut u64).add(0x4160/8) as *mut u64;
-        let enemy = *battle_object.add(0x20/8) as *mut BattleObjectModuleAccessor;
-        if PostureModule::pos_x(enemy) > PostureModule::pos_x(module_accessor) {
-            WorkModule::set_float(module_accessor, 1.0,*FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1);
-        }
-        else {
-            WorkModule::set_float(module_accessor, -1.0,*FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1);
-        }
-    }*/
-    //let motion = MotionModule::motion_kind(module_accessor);
-    //let status = StatusModule::status_kind(module_accessor);
-    //println!("Status: {:#x}, Motion: {:#x}", status, motion);
-    //if WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ANIMATED){
-    //    ModelModule::set_mesh_visibility(module_accessor, Hash40::new("low_bodybase"),    false);
-    //    ModelModule::set_mesh_visibility(module_accessor, Hash40::new("low_bodyemi"),     false);
-    //    ModelModule::set_mesh_visibility(module_accessor, Hash40::new("low_bodydecal"),   false);
-    //    ModelModule::set_mesh_visibility(module_accessor, Hash40::new("low_weaponbase"),  false);
-    //    ModelModule::set_mesh_visibility(module_accessor, Hash40::new("low_weapondecal"), false);
-    //    ModelModule::set_mesh_visibility(module_accessor, Hash40::new("low_weaponemi"),   false);
-    //    ModelModule::set_mesh_visibility(module_accessor, Hash40::new("low_headbase"),    false);
-    //    ModelModule::set_mesh_visibility(module_accessor, Hash40::new("low_heademi"),     false);
-    //}else{
-    //    ModelModule::set_mesh_visibility(module_accessor, Hash40::new("body_base"),    false);
-    //    ModelModule::set_mesh_visibility(module_accessor, Hash40::new("body_emi"),     false);
-    //    ModelModule::set_mesh_visibility(module_accessor, Hash40::new("body_decal"),   false);
-    //    ModelModule::set_mesh_visibility(module_accessor, Hash40::new("weapon_base"),  false);
-    //    ModelModule::set_mesh_visibility(module_accessor, Hash40::new("weapon_decal"), false);
-    //    ModelModule::set_mesh_visibility(module_accessor, Hash40::new("weapon_emi"),   false);
-    //    ModelModule::set_mesh_visibility(module_accessor, Hash40::new("head_base"),    false);
-    //    ModelModule::set_mesh_visibility(module_accessor, Hash40::new("head_emi"),     false);
-    //}
-
-
-    
+    // this doesnt work for some reason?
+    EffectModule::remove_common(module_accessor, Hash40::new("invincible"));    
 }
 
 
@@ -856,6 +851,8 @@ pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,dama
         *FIGHTER_STATUS_KIND_ATTACK_LW4_HOLD,
         *FIGHTER_STATUS_KIND_ATTACK_LW4_START,
         *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_ATTACK,
+        FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE,
+        FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF,
         ].contains(&status_kind)
     && WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON) {
         let time_base = 45.0 * (1.0/sv_information::slow_rate());

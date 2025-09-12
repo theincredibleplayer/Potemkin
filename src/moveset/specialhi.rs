@@ -55,6 +55,13 @@ pub unsafe extern "C" fn grabbed_anim_selector(fighter: &mut L2CFighterCommon,an
             );
         }
 
+
+        //plays the anim
+        MotionModule::change_motion(capture_boma, Hash40::new_raw(motion), 0.0, mot_rate, false, 0.0, false, false);
+        //println!("flipped state: {}", boi);
+
+
+        
         //let pre_flip_state = MotionModule::is_flip(capture_boma);
         //WorkModule::set_flag(capture_boma,boi,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_FLIP);
         // this should flip the opponent if im facing left but it doesnt work for some reason??
@@ -62,16 +69,13 @@ pub unsafe extern "C" fn grabbed_anim_selector(fighter: &mut L2CFighterCommon,an
         //    //println!("flipped allegedly from elsewhere");
         //    PostureModule::set_lr(capture_boma, 1.0);
         //    PostureModule::update_rot_y_lr(capture_boma);
-        //    MotionModule::set_flip(capture_boma,true,true,false);
+        //    //MotionModule::set_flip(capture_boma,true,true,false);
         //} else {
         //    PostureModule::set_lr(capture_boma, -1.0);
         //    PostureModule::update_rot_y_lr(capture_boma);
-        //    MotionModule::set_flip(capture_boma,false,true,false);
+        //    //MotionModule::set_flip(capture_boma,false,true,false);
         //}
 
-        //plays the anim
-        MotionModule::change_motion(capture_boma, Hash40::new_raw(motion), 0.0, mot_rate, false, 0.0, false, false);
-        //println!("flipped state: {}", boi);
     }
 }
 

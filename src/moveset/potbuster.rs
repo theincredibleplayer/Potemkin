@@ -114,13 +114,17 @@ pub unsafe extern "C" fn potbuster_exit(fighter: &mut L2CFighterCommon) -> L2CVa
 
 
 pub unsafe extern "C" fn potbusterwhiff(agent: &mut L2CAgentBase) {
-    frame(agent.lua_state_agent, 5.0);
+    frame(agent.lua_state_agent, 6.0);
     if macros::is_excute(agent) {
+        WorkModule::on_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
+        damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0); 
         macros::CATCH(agent, 0, Hash40::new("top"), 10.0, 0.0, 18.0, 8.0, None, None, None, *FIGHTER_STATUS_KIND_THROWN, *COLLISION_SITUATION_MASK_GA);
     }
     wait(agent.lua_state_agent, 4.0);
     if macros::is_excute(agent) {
         grab!(agent, *MA_MSC_CMD_GRAB_CLEAR_ALL);
+        damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_NORMAL, 0);
+        WorkModule::off_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
     }
 }
 

@@ -72,6 +72,7 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ANIMATED : i32 = 0x20000109;
 
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_FLIP : i32 = 0x2000010a;
 
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ATTACH_WEAPON : i32 = 0x2000010b;
 
 
 
@@ -108,6 +109,7 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FIRE_TIME_BASE: i32 = 0x6c;
 
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_HEAT_TACKLE_STICK_X: i32 = 0x6d;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_HEAT_TACKLE_STICK_Y: i32 = 0x6e;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_HEAT_TACKLE_SPEED: i32 = 0x6f;
 
 // for weapon
 pub const WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLOAT_BOOM_POWER: i32 = 0x4;
@@ -368,11 +370,15 @@ pub unsafe extern "C" fn rc_speed_float_setter(fighter: &mut L2CFighterCommon) {
     WorkModule::set_float(fighter.module_accessor, speed_y, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_PRE_RC_Y_SPEED);
 }
 
+//cancels
+pub unsafe extern "C" fn cancels(fighter: &mut L2CFighterCommon) {
+    return;
+}
 // opff
 pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
     unsafe {
         let module_accessor = fighter.module_accessor;
-
+        //cancels(fighter);
 
         if ControlModule::check_button_trigger(module_accessor,*CONTROL_PAD_BUTTON_APPEAL_S_L) {
             println!("{}",WorkModule::get_float(module_accessor,*FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1));
@@ -610,12 +616,12 @@ pub unsafe extern "C" fn pot_check_special_command(fighter: &mut L2CFighterCommo
         fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF.into(), true.into());
         return true.into();
     }
-    // heat tackle input
-    if cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_ATTACK_COMMAND1 != 0
-    && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_HI_COMMAND){
-        fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_HOLD.into(), true.into());
-        return true.into();
-    }
+    //// heat tackle input
+    //if cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_ATTACK_COMMAND1 != 0
+    //&& WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_HI_COMMAND){
+    //    fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_HOLD.into(), true.into());
+    //    return true.into();
+    //}
     // heat knuckle input
     if cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_HI_COMMAND  != 0
     && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_HI_COMMAND)
@@ -664,9 +670,9 @@ unsafe extern "C" fn opff_global(fighter: &mut L2CFighterCommon) {
         // this should handle kill voicelines 
         //for n in 0..1{
         //    if n != entry_id{
-                if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_DEATH_PREDICTION) {
-                    EffectModule::req(fighter.module_accessor, Hash40::new("sys_bomb_a"), &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, 1.0, 0, 0, false,0);
-                }
+                //if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_DEATH_PREDICTION) {
+                //    EffectModule::req(fighter.module_accessor, Hash40::new("sys_bomb_a"), &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, 1.0, 0, 0, false,0);
+                //}
         //    }
         //}
     }
@@ -780,6 +786,7 @@ pub fn install() {
     .status(Init, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL, side_b_slide_init)
     .status(Exit, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL, side_b_slide_exit)
     .status(Exec, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL, side_b_slide_exec)
+    .status(End, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL, side_b_slide_end)
     .sound_acmd("sound_specials", sound_specialsstart, Priority::Low)
     .game_acmd("game_specialsslide", game_specialsloop, Priority::Low)
     .effect_acmd("effect_specialsslide", effect_specialsloop, Priority::Low)
@@ -847,7 +854,7 @@ pub fn install() {
     .game_acmd          ("game_specialairhi",              special_air_hi,                                 Priority::Low)
     .sound_acmd         ("sound_specialairhi",             sound_special_air_hi,                           Priority::Low)
     .effect_acmd        ("effect_specialairhi",            effect_special_air_hi,                          Priority::Low)
-    .expression_acmd    ("expression_specialairhi",            expression_special_air_hi,                          Priority::Low)
+    .expression_acmd    ("expression_specialairhi",        expression_special_air_hi,                      Priority::Low)
 
     .game_acmd          ("game_specialhi",              special_hi,                                 Priority::Low)
     .sound_acmd         ("sound_specialhi",             sound_special_hi,                           Priority::Low)

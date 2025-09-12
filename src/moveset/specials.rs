@@ -150,6 +150,7 @@ pub unsafe extern "C" fn side_b_slide_pre(fighter: &mut L2CFighterCommon) -> L2C
 pub unsafe extern "C" fn side_b_slide(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
     MotionModule::change_motion(fighter.module_accessor,Hash40::new("special_s_slide"),0.0,1.0,false,0.0,false,false);
+    JostleModule::set_status(fighter.module_accessor, false);
     fighter.sub_shift_status_main(L2CValue::Ptr(side_b_slide_loop as *const () as _))
 }
 
@@ -195,7 +196,10 @@ unsafe fn side_b_slide_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     return L2CValue::I32(0)
 }
 
-
+pub unsafe extern "C" fn side_b_slide_end(fighter: &mut L2CFighterCommon) -> L2CValue {
+    JostleModule::set_status(fighter.module_accessor, true);
+    return L2CValue::I32(0)
+}
 
 pub unsafe extern "C" fn side_b_end_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
     StatusModule::init_settings

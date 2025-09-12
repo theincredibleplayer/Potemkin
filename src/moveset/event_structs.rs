@@ -322,7 +322,7 @@ impl VtableEntry {
     pub const RESET_3: usize = 6;                                   // maybe not sure, just used for m2 and snake
     pub const ON_DEATH: usize = 7;
     pub const ON_REBIRTH2: usize = 8;
-    pub const ON_FRAME_11: usize = 9;                               // unsure, only used for bowser jr. from findings, its another opff 
+    pub const ON_FRAME_11: usize = 9;                               // unsure, only used for bowser jr. from findings (its another opff i tested,claude) 
     pub const ON_FRAME_1: usize = 10;
     pub const ON_FRAME_2: usize = 11;                               // opff of sorts for some corrective action, like setting shape or detecting distance from ground and taking some action
     pub const ON_FRAME_3: usize = 12;
@@ -343,8 +343,8 @@ impl VtableEntry {
     pub const ON_DEATH_RESET_1: usize = 25;
     pub const ON_DEATH_RESET_2: usize = 26;                         // seems to be another on death
     pub const ON_FRAME_8: usize = 27;                               // you cant make this shit up LMFAO 7 OPFFS
-    pub const ON_FRAME_9: usize = 28;                               // only kirby uses this 
-    pub const ON_FRAME_10: usize = 29;                              // only kirby uses this 
+    pub const ON_FRAME_9: usize = 28;                               // only kirby uses this (im gonna fucking cry)
+    pub const ON_FRAME_10: usize = 29;                              // only kirby uses this (i couldnt even roman cancel to this, I BURSTED IMMEDIATLEY)
     pub const ON_STATUS_CHANGE: usize = 30;
     pub const ON_SITUATION_CHANGE: usize = 31;
     pub const UNK32: usize = 32;
