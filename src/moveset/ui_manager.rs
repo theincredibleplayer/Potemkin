@@ -65,7 +65,21 @@ impl UiManager {
     pub fn add_tension(entry_id: usize, amount: f32) {
         let mut manager = UI_MANAGER.write();
         unsafe {
-            manager.tension_meter[entry_id].add_meter(amount);
+            manager.tension_meter[entry_id].add_meter(amount,true);
+        }
+    }
+
+    pub fn add_tension_unscaled(entry_id: usize, amount: f32) {
+        let mut manager = UI_MANAGER.write();
+        unsafe {
+            manager.tension_meter[entry_id].add_meter(amount,false);
+        }
+    }
+
+    pub fn set_penalty(entry_id: usize, amount: f32) {
+        let mut manager = UI_MANAGER.write();
+        unsafe {
+            manager.tension_meter[entry_id].set_penalty(amount);
         }
     }
 

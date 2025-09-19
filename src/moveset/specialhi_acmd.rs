@@ -89,6 +89,10 @@ pub unsafe extern "C" fn special_hi_loop(agent: &mut L2CAgentBase) {
         macros::ATTACK(agent,0,0,Hash40::new("top"),1.0,361,30,10,12,5.0,0.0,28.0,12.0,None,None,None,1.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_none"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_NONE,*ATTACK_REGION_NONE);
         AttackModule::set_catch_only_all(agent.module_accessor, true, false);
         AttackModule::set_no_dead_all(agent.module_accessor, true, false);
+        let lr = PostureModule::lr(agent.module_accessor);
+        let pos = Vector3f{x:-10.0, y:25.0, z:9.0};
+        let rot = Vector3f{x:-60.0, y:0.0, z:-20.0*lr};
+        EffectModule::req_follow(agent.module_accessor, Hash40::new("kamui_extender_bullet"), Hash40::new("top"), &pos, &rot, 4.0, true, 0, 0, 0, 0, 0, true, true) as u32;
     }
     sv_animcmd::frame(agent.lua_state_agent, 9.0);
     if macros::is_excute(agent) {
@@ -132,6 +136,10 @@ pub unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
         ,1.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_none"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_NONE,*ATTACK_REGION_NONE);
         AttackModule::set_catch_only_all(agent.module_accessor, true, false);
         AttackModule::set_no_dead_all(agent.module_accessor, true, false);
+        let lr = PostureModule::lr(agent.module_accessor);
+        let pos = Vector3f{x:-10.0, y:25.0, z:9.0};
+        let rot = Vector3f{x:-60.0, y:0.0, z:-20.0*lr};
+        EffectModule::req_follow(agent.module_accessor, Hash40::new("kamui_extender_bullet"), Hash40::new("top"), &pos, &rot, 4.0, true, 0, 0, 0, 0, 0, true, true) as u32;
         WorkModule::on_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_HI_FLAG_FINAL_JAB_HIT_MOTION_PLAY);
     }
     sv_animcmd::wait(agent.lua_state_agent, 1.0);

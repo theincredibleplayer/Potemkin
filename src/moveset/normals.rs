@@ -279,7 +279,7 @@ pub unsafe extern "C" fn game_attacklw4(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 29.0);
     if macros::is_excute(agent) {
         macros::ATTACK(agent, 0, 0, Hash40::new("top"), 22.0, 35, 80, 0, 50, 28.0, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_NONE);
-        macros::ATTACK(agent, 1, 0, Hash40::new("top"), 1.0, 0, 10, 0, 10, 100.0, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 2.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 1.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
+        macros::ATTACK(agent, 1, 0, Hash40::new("top"), 1.0, 0, 10, 0, 10, 100.0, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 2.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 1.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
         macros::QUAKE(agent, *CAMERA_QUAKE_KIND_M);
     }
     wait(agent.lua_state_agent, 3.0);
@@ -293,7 +293,7 @@ pub unsafe extern "C" fn game_attacklw4(agent: &mut L2CAgentBase) {
 pub unsafe extern "C" fn effect_attacklw4(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 29.0);
     if macros::is_excute(agent) {
-        macros::EFFECT(agent, Hash40::new("eflame_promrevolt_firepillar_ground"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 6.0, 0, 0, 0, 0, 0, 0, true);
+        macros::EFFECT(agent, Hash40::new("kamui_floor_crack_slide_head"), Hash40::new("top"), 0, 0, 9, 0, 0, 0, 6.0, 0, 0, 0, 0, 0, 0, true);
         macros::LAST_EFFECT_SET_RATE(agent, 0.6);
     }
 }

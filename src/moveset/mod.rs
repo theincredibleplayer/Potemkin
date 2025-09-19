@@ -74,6 +74,7 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_FLIP : i32 = 0x2000010a;
 
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ATTACH_WEAPON : i32 = 0x2000010b;
 
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RC_CLOCK_EFFECT : i32 = 0x2000010c;
 
 
 
@@ -111,6 +112,9 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_HEAT_TACKLE_STICK_X: i32 = 0x6d;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_HEAT_TACKLE_STICK_Y: i32 = 0x6e;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_HEAT_TACKLE_SPEED: i32 = 0x6f;
 
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_SLOW_MUL: i32 = 0x70;
+
+
 // for weapon
 pub const WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLOAT_BOOM_POWER: i32 = 0x4;
 
@@ -121,6 +125,11 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_LOOP_HITS_SPECIAL_HI: i32 = 0x10000
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_ARTICLE_ID: i32 = 0x100000c4;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_FINAL_MOTION_SHARE: i32 = 0x100000c5;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_FIRE_TIMER: i32 = 0x100000c6;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_FREEZE_DURATION: i32 = 0x100000c7;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_SLOW_START_TIME: i32 = 0x100000c8;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_FAST_RC_TIME: i32 = 0x100000c9;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_PENALTY_TIMER: i32 = 0x100000ca;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_SLOW_CLEAR_TIME: i32 = 0x100000cb;
 
 
 // for weapon
@@ -384,17 +393,6 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
             println!("{}",WorkModule::get_float(module_accessor,*FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1));
         }
         
-        //WorkModule::unable_transition_term(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_RUN);
-        //WorkModule::unable_transition_term(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_DASH);
-        //WorkModule::unable_transition_term(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_DASH_TO_RUN);
-
-        if StatusModule::prev_status_kind(module_accessor, 0) == FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL {        
-
-        }
-        //let speed_x = KineticModule::get_sum_speed_x(module_accessor, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_ALL);
-        //let speed_y = KineticModule::get_sum_speed_y(module_accessor, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_ALL);
-        //let speed_vector = smash::phx::Vector3f { x: speed_x, y: speed_y, z: 0.0 };
-        //KineticModule::add_speed(module_accessor, &speed);
 
         let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
@@ -408,8 +406,26 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
             WorkModule::on_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SELECT_FINAL);
             WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SWITCH_TO_FS_JUMP);
         }
+
+
         let status_kind = StatusModule::status_kind(module_accessor);
         let mut can_rc = true;
+
+        if WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_PENALTY_TIMER) == 0{
+            UiManager::set_penalty(entry_id, 0.0);
+            WorkModule::dec_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_PENALTY_TIMER);
+        }else if WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_PENALTY_TIMER) > 0{
+            UiManager::set_penalty(entry_id, 0.9);
+            WorkModule::dec_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_PENALTY_TIMER);
+        }
+        /*
+        if WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_SLOW_CLEAR_TIMER) == 0{
+            SlowModule::clear_whole(module_accessor);
+            WorkModule::dec_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_SLOW_CLEAR_TIMER);
+            println!("slow cleared")
+        }else if WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_SLOW_CLEAR_TIMER) > 0{
+            WorkModule::dec_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_SLOW_CLEAR_TIMER);
+        }*/
         if !(
         [*FIGHTER_STATUS_KIND_APPEAL
         ,*FIGHTER_STATUS_KIND_ATTACK
@@ -533,12 +549,9 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
         ,FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE
         ,FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_HOLD
         ,FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_END
-        //TEST
-        ,FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK
-        ,FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP
-        ,FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_START
-        ,*FIGHTER_KAMUI_STATUS_KIND_FINAL_END
-        ,*FIGHTER_STATUS_KIND_FINAL
+        ,FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER
+        ,FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF
+        ,FIGHTER_KAMUI_STATUS_KIND_AIR_THROW
         ].contains(&status_kind) )
         || (StatusModule::prev_status_kind(module_accessor, 0) == FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL
             && StatusModule::is_changing(module_accessor)) 
@@ -549,6 +562,11 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
         && (MotionModule::frame(module_accessor) >= 5.0) {
             WorkModule::on_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_YELLOW_RC);
             rc_speed_float_setter(fighter);
+            WorkModule::set_int(module_accessor, 12, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_FREEZE_DURATION);
+            WorkModule::set_int(module_accessor, 9, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_SLOW_CLEAR_TIME);
+            WorkModule::set_int(module_accessor, 9,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_FAST_RC_TIME);
+            WorkModule::set_float(module_accessor, 8.0, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_SLOW_MUL);
+            WorkModule::set_int(module_accessor, 14,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_SLOW_START_TIME);
             StatusModule::change_status_request_from_script(module_accessor, FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL, true);
         } 
 
@@ -576,13 +594,19 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
             ,*FIGHTER_STATUS_KIND_DAMAGE_FALL
             ,*FIGHTER_STATUS_KIND_GUARD
             ,*FIGHTER_STATUS_KIND_GUARD_ON
-            ,*FIGHTER_STATUS_KIND_GUARD_OFF].contains(&status_kind) )
+            ,*FIGHTER_STATUS_KIND_GUARD_OFF].contains(&status_kind) 
+            || MotionModule::frame(module_accessor) <= 2.0 )
             && ControlModule::check_button_on(module_accessor, *CONTROL_PAD_BUTTON_GUARD)
             && ControlModule::check_button_on(module_accessor, *CONTROL_PAD_BUTTON_SPECIAL)
             && !( fighter.global_table[IS_STOP].get_bool() ) {
                 //blue rc
                 WorkModule::on_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_BLUE_RC);
                 rc_speed_float_setter(fighter);
+                WorkModule::set_int(module_accessor, 20, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_FREEZE_DURATION);
+                WorkModule::set_int(module_accessor, 59, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_SLOW_CLEAR_TIME);
+                WorkModule::set_int(module_accessor, 29,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_FAST_RC_TIME);
+                WorkModule::set_float(module_accessor,4.0, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_SLOW_MUL);
+                WorkModule::set_int(module_accessor, 6,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_SLOW_START_TIME);
                 StatusModule::change_status_request_from_script(module_accessor, FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL, true);
             } else if ControlModule::check_button_on(module_accessor, *CONTROL_PAD_BUTTON_GUARD)
             && ControlModule::check_button_on(module_accessor, *CONTROL_PAD_BUTTON_SPECIAL)
@@ -590,6 +614,11 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
                 //purple rc
                 WorkModule::on_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_PURPLE_RC);
                 rc_speed_float_setter(fighter);
+                WorkModule::set_int(module_accessor, 20, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_FREEZE_DURATION);
+                WorkModule::set_int(module_accessor, 19, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_SLOW_CLEAR_TIME);
+                WorkModule::set_int(module_accessor, 9,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_FAST_RC_TIME);
+                WorkModule::set_float(module_accessor,4.0, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_SLOW_MUL);
+                WorkModule::set_int(module_accessor, 6,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_SLOW_START_TIME);
                 StatusModule::change_status_request_from_script(module_accessor, FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL, true);
             }
 
@@ -597,6 +626,11 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
             && !( fighter.global_table[IS_STOP].get_bool() ){
                 //red rc
                 rc_speed_float_setter(fighter);
+                WorkModule::set_int(module_accessor, 25, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_FREEZE_DURATION);
+                WorkModule::set_int(module_accessor, 39, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_SLOW_CLEAR_TIME);
+                WorkModule::set_int(module_accessor, 19,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_FAST_RC_TIME);
+                WorkModule::set_float(module_accessor,4.0, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_SLOW_MUL);
+                WorkModule::set_int(module_accessor, 1,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_SLOW_START_TIME);
                 StatusModule::change_status_request_from_script(module_accessor, FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL, true);
             }
         }
@@ -1117,6 +1151,10 @@ pub fn install() {
     .game_acmd("game_speciallwhit", special_lw_hit, Priority::Low)
     .effect_acmd("effect_speciallwhit", effect_special_lw_hit, Priority::Low)
     .sound_acmd("sound_speciallwhit", sound_special_lw_hit, Priority::Low)
+
+    .game_acmd("game_specialairlw", special_lw_hit, Priority::Low)
+    .effect_acmd("effect_specialairlw", effect_special_lw_hit, Priority::Low)
+    .sound_acmd("sound_specialairlw", sound_special_lw_hit, Priority::Low)
 
     //special_hi
     .game_acmd("game_specialhi", special_dragon_hi, Priority::Low)

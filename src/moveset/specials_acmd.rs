@@ -18,6 +18,9 @@ use crate::FIGHTER_MANAGER;
 use crate::moveset::*;
 
 pub unsafe extern "C" fn sound_specialsstart(agent: &mut L2CAgentBase) {
+    if macros::is_excute(agent) {
+        macros::FT_MOTION_RATE(agent, 0.5);
+    }
     sv_animcmd::frame(agent.lua_state_agent, 2.0);
     if macros::is_excute(agent) {
         let sound = sound_selector(agent,"vc_pot_hammerfall_X".to_string(),2,false,false,0);
@@ -55,7 +58,7 @@ pub unsafe extern "C" fn game_specialsattack(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         WorkModule::on_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
         damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0); 
-        macros::FT_MOTION_RATE(agent, 0.75);
+        macros::FT_MOTION_RATE(agent, 0.5);
     }
     frame(agent.lua_state_agent, 9.0);
     if macros::is_excute(agent) {
@@ -88,6 +91,9 @@ pub unsafe extern "C" fn sound_specialsattack(agent: &mut L2CAgentBase) {
 }
 
 pub unsafe extern "C" fn sound_specialsend(agent: &mut L2CAgentBase) {
+    if macros::is_excute(agent) {
+        macros::FT_MOTION_RATE(agent, 0.7);
+    }
     sv_animcmd::frame(agent.lua_state_agent, 2.0);
     if macros::is_excute(agent) {
         WorkModule::off_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);

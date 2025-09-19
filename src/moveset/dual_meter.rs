@@ -52,6 +52,7 @@ impl LimitMeter {
 #[repr(C)]
 pub struct TensionMeter {
     pub value: f32,
+    pub penalty_factor: f32,
     pub gear_1_frame: f32,
     pub gear_2_frame: f32,
     pub flame_1_frame: f32,
@@ -64,6 +65,7 @@ impl TensionMeter {
     pub fn new() -> Self {
         Self {
             value: 50.0,
+            penalty_factor: 0.0,
             gear_1_frame: 0.0,
             gear_2_frame: 0.0,
             flame_1_frame: 0.0,
@@ -75,6 +77,7 @@ impl TensionMeter {
 
     pub fn reset(&mut self) {
         self.value = 50.0;
+        self.penalty_factor = 0.0;
         self.gear_1_frame = 0.0;
         self.gear_2_frame = 0.0;
         self.flame_1_frame = 0.0;
@@ -83,7 +86,14 @@ impl TensionMeter {
         self.is_available2 = false;
     }
 
-    pub fn add_meter(&mut self, amount: f32) {
+    pub fn set_penalty(&mut self, amount:f32) {
+        self.penalty_factor = amount;
+    }
+
+    pub fn add_meter(&mut self, mut amount: f32, is_scaled: bool) {
+        if is_scaled {
+            amount = amount * (1.0 - self.penalty_factor);
+        }
         if amount >= 0.0{
             if self.value + amount > 100.0 {
                 self.value = 100.0;

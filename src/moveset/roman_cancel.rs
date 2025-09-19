@@ -149,7 +149,7 @@ unsafe fn roman_cancel_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     let timer = WorkModule::get_float(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_ROMAN_CANCEL_METER_DRAIN);
     if timer < 50.0{
-        UiManager::add_tension(entry_id,-2.0);
+        UiManager::add_tension_unscaled(entry_id,-2.0);
         WorkModule::set_float(module_accessor, timer + 2.0, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_ROMAN_CANCEL_METER_DRAIN);
     }
 
@@ -224,12 +224,16 @@ pub unsafe extern "C" fn roman_cancel_end(fighter: &mut L2CFighterCommon) -> L2C
 
     if WorkModule::is_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RED_RC){
         EffectModule::detach_kind(module_accessor, Hash40::new("kamui_red_rc_blast"), -1);
+        WorkModule::set_int(module_accessor,240 , FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_PENALTY_TIMER);
     }else if WorkModule::is_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_PURPLE_RC){
         EffectModule::detach_kind(module_accessor, Hash40::new("kamui_purple_rc_blast"), -1);
+        WorkModule::set_int(module_accessor,240 , FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_PENALTY_TIMER);
     }else if WorkModule::is_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_YELLOW_RC){
         EffectModule::detach_kind(module_accessor, Hash40::new("kamui_yellow_rc_blast"), -1);
+        WorkModule::set_int(module_accessor,480 , FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_PENALTY_TIMER);
     }else if WorkModule::is_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_BLUE_RC){
         EffectModule::detach_kind(module_accessor, Hash40::new("kamui_blue_rc_blast"), -1);
+        WorkModule::set_int(module_accessor,120 , FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_PENALTY_TIMER);
     }
     
 
@@ -280,7 +284,12 @@ pub unsafe extern "C" fn roman_cancel_end(fighter: &mut L2CFighterCommon) -> L2C
         let speed_vector = smash::phx::Vector3f { x: speed_x * direction, y: speed_y, z: 0.0 };
         KineticModule::add_speed(module_accessor, &speed_vector);
     }
-
+    
+    if WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FAST_RC_DETECTED){
+        let clear_time = WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_FAST_RC_TIME);
+        let slow_mul = WorkModule::get_float(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_SLOW_MUL);
+        macros::SLOW_OPPONENT(fighter, slow_mul, clear_time as f32);
+    }
 
     WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FAST_RC_ENABLE);
     WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_PURPLE_RC);
@@ -289,5 +298,7 @@ pub unsafe extern "C" fn roman_cancel_end(fighter: &mut L2CFighterCommon) -> L2C
     WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_BLUE_RC);
     WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FAST_RC_DETECTED);
     WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_RC_DASH);
+    WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RC_CLOCK_EFFECT);
+
     return L2CValue::I32(0)
 }

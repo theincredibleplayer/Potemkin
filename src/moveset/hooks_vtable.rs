@@ -36,8 +36,37 @@ pub unsafe extern "C" fn kamui_on_search(_vtable: u64, fighter: &mut Fighter, lo
         let collision_log = *(log as *const u64).add(0x10 / 0x8);
         let collision_log = collision_log as *const CollisionLogScuffed;
         let opp_boma = sv_battle_object::module_accessor((*collision_log).opponent_object_id);
-        WorkModule::set_float(opp_boma, 0.3, *FIGHTER_STATUS_WORK_ID_FLOAT_REBOUND_MOTION_RATE);
-        StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND, false);
+        let clear_time = WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_SLOW_CLEAR_TIME);
+        let slow_mul = WorkModule::get_float(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_SLOW_MUL) as i32;    
+
+        // the 0x800000 seems to make the effect immune to the user being slowed
+        // also apparently the order of spawning the effects matter in the draw order?
+        EffectModule::req_follow(opp_boma, Hash40::new("rc_clock_base"), Hash40::new("top"), &Vector3f{x: 0.0, y: 23.0, z: 0.0}, &Vector3f{x: 0.0, y: 0.0, z: 0.0}, 0.3, true, 0x800000, 0, -1, 0, 0, false, false);
+        EffectModule::set_rate_last(opp_boma, ( ( 60.0 )/( clear_time as f32 ) ) );
+        EffectModule::req_follow(opp_boma, Hash40::new("rc_clock"), Hash40::new("top"), &Vector3f{x: 0.0, y: 23.0, z: 0.0}, &Vector3f{x: 0.0, y: 0.0, z: 0.0}, 0.3, true, 0x800000, 0, -1, 0, 0, false, false);
+        EffectModule::set_rate_last(opp_boma, ( ( 60.0 )/( clear_time as f32 ) ) );
+
+        if WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_YELLOW_RC){
+            WorkModule::set_float(opp_boma, 0.8, *FIGHTER_STATUS_WORK_ID_FLOAT_REBOUND_MOTION_RATE);
+            StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND, false);
+            SlowModule::set(
+                opp_boma,
+                0,
+                slow_mul,
+                clear_time,
+                false,
+                *BATTLE_OBJECT_ID_INVALID as u32
+            );
+        }else{
+            SlowModule::set(
+                opp_boma,
+                0,
+                slow_mul,
+                clear_time,
+                false,
+                *BATTLE_OBJECT_ID_INVALID as u32
+            );
+        }
     }
     if StatusModule::status_kind(module_accessor) == FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP {
         let collision_log = *(log as *const u64).add(0x10 / 0x8);
@@ -125,7 +154,7 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
     }
 
 
-
+    // armor effect
     let time_base = WorkModule::get_float(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FIRE_TIME_BASE);
     let agent = get_fighter_common_from_accessor((&mut*module_accessor));
     let fire_timer = WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_FIRE_TIMER);
@@ -154,7 +183,7 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
 
 
     // autoturn value
-    let is_damage =StopModule::is_damage(module_accessor);
+    let is_damage = StopModule::is_damage(module_accessor);
 
     let lr = get_opponent_lr(module_accessor,is_damage,status_kind,0);
     set_lr_float(lr,module_accessor,status_kind,0);
@@ -174,9 +203,9 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
             *FIGHTER_STATUS_KIND_FALL,
             *FIGHTER_STATUS_KIND_FALL_AERIAL
         ].contains(&status_kind){
-            MotionModule::change_motion(module_accessor, Hash40::new("air_turn"), 0.0, 1.0, false, 0.0, false, false);
             PostureModule::reverse_lr(module_accessor);
-            PostureModule::update_rot_y_lr(agent.module_accessor);
+            MotionModule::change_motion(module_accessor, Hash40::new("air_turn"), 0.0, 1.0, false, 0.0, false, false);
+            //PostureModule::update_rot_y_lr(agent.module_accessor);
         }
     }
 
@@ -482,7 +511,7 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
         //hash40("fura_sleep_loop"),
         //hash40("fura_sleep_end"),
         //hash40("swallowed"),
-        hash40("camera_hit"),
+        //hash40("camera_hit"),
         //hash40("pass"),
         //hash40("ottotto"),
         //hash40("ottotto_wait"),
@@ -490,7 +519,7 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
         //hash40("stop_wall"),
         //hash40("ceil_damage"),
         //hash40("stop_ceil"),
-        hash40("miss_foot"),
+        //hash40("miss_foot"),
         //hash40("cliff_catch"),
         //hash40("cliff_wait"),
         //hash40("cliff_climb_quick"),
@@ -863,14 +892,14 @@ pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,dama
         macros::BURN_COLOR(agent, 24,  1,  1, 0.5);
         WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
     }
-    UiManager::add_tension(entry_id, dmg);
+    UiManager::add_tension(entry_id, dmg*0.2);
     kamui_on_damage_og(vtable,fighter,damage_log);
 }
 
 #[skyline::from_offset(0xb5e240)]
-pub unsafe extern "C" fn kamui_on_attack_og(vtable: u64, fighter: &mut Fighter,collision_log:CollisionLog);
+pub unsafe extern "C" fn kamui_on_attack_og(vtable: u64, fighter: &mut Fighter,collision_log:CollisionLog, damage: f32);
 
-pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,collision_log:CollisionLog) {
+pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,collision_log:CollisionLog, damage:f32) {
     //println!("on hit hook successful");
     let attack_data = AttackModule::attack_data(fighter.battle_object.module_accessor, collision_log.collider_id as i32, false);
     let module_accessor = (*fighter).battle_object.module_accessor;
@@ -888,9 +917,9 @@ pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,coll
     *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK,
     *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK_WAIT,
     *FIGHTER_STATUS_KIND_FINAL].contains(&status){
-        UiManager::add_tension(entry_id, (*attack_data).power);
+        UiManager::add_tension(entry_id, damage*0.75);
     }
-    kamui_on_attack_og(vtable,fighter,collision_log);
+    kamui_on_attack_og(vtable,fighter,collision_log,damage);
 }
 
 
