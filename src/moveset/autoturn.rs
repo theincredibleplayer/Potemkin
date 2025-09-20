@@ -328,6 +328,11 @@ pub unsafe extern "C" fn wait_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
     fighter.sub_wait_common();
     fighter.sub_wait_motion_mtrans();
+    if StatusModule::prev_status_kind(module_accessor, 0) == FIGHTER_KAMUI_STATUS_KIND_WALK_BACK{
+        MotionModule::change_motion(module_accessor,Hash40::new("walk_stop_b"),0.0,1.0,false,0.0,false,false);
+    }else if StatusModule::prev_status_kind(module_accessor, 0) == FIGHTER_STATUS_KIND_WALK{
+        MotionModule::change_motion(module_accessor,Hash40::new("walk_stop_f"),0.0,1.0,false,0.0,false,false);
+    }
     fighter.sub_shift_status_main(L2CValue::Ptr(wait_main_loop as *const () as _))
 }
 

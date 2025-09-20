@@ -19,6 +19,7 @@ use crate::moveset::*;
 pub unsafe extern "C" fn special_lw(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         ArticleModule::generate_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
+        potemkin_mirror_handler(agent.module_accessor);
         if StatusModule::situation_kind(agent.module_accessor) == *SITUATION_KIND_GROUND {
             ArticleModule::change_motion(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("special_lw_hit"),false,-1.0);
         }else{

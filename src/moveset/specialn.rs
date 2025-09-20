@@ -334,6 +334,7 @@ pub unsafe extern "C" fn special_n_shoot_end(fighter: &mut L2CFighterCommon) -> 
     //    ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
     //}
     ShieldModule::clear_all(module_accessor);
+    ArticleModule::remove_exist(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
     //ShieldModule::clear_all_2
     //WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_N_HAS_REFLECTED);
     //smashline::original_status(End, fighter, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_HOLD)(fighter)

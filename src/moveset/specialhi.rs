@@ -162,6 +162,7 @@ pub unsafe extern "C" fn special_hi_start_main(fighter: &mut L2CFighterCommon) -
 
 
     ArticleModule::generate_article(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
+    potemkin_mirror_handler(module_accessor);
     ArticleModule::change_motion(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("entry_l"),false,-1.0);
 
     if fighter.global_table[SITUATION_KIND].get_i32() != *SITUATION_KIND_GROUND {
@@ -243,6 +244,7 @@ pub unsafe extern "C" fn special_hi_loop_main(fighter: &mut L2CFighterCommon) ->
     smash::app::sv_module_access::camera(fighter.lua_state_agent);
 
     ArticleModule::generate_article(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
+    potemkin_mirror_handler(module_accessor);
     ArticleModule::change_motion(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("entry_r"),false,-1.0);
 
     if fighter.global_table[SITUATION_KIND].get_i32() != *SITUATION_KIND_GROUND {
@@ -354,6 +356,7 @@ pub unsafe extern "C" fn special_hi_release_main(fighter: &mut L2CFighterCommon)
 
 
     ArticleModule::generate_article(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
+    potemkin_mirror_handler(module_accessor);
     ArticleModule::change_motion(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("win_3"),false,0.0);
 
     if fighter.global_table[SITUATION_KIND].get_i32() != *SITUATION_KIND_GROUND {
@@ -461,7 +464,7 @@ pub unsafe extern "C" fn special_hi_exit(fighter: &mut L2CFighterCommon) -> L2CV
     && StatusModule::status_kind_next(fighter.module_accessor) != FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START
     && StatusModule::status_kind_next(fighter.module_accessor) != FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE{
         CameraModule::zoom_out(fighter.module_accessor, 0);
-        fighter.sub_throw_uniq_process_exit();
+        CatchModule::catch_cut(fighter.module_accessor,false,false);
     }
     return L2CValue::I32(0)
 }
