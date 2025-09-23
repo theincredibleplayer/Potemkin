@@ -64,25 +64,25 @@ pub struct TensionMeter {
 impl TensionMeter {
     pub fn new() -> Self {
         Self {
-            value: 50.0,
+            value: 0.0,
             penalty_factor: 0.0,
             gear_1_frame: 0.0,
             gear_2_frame: 0.0,
             flame_1_frame: 0.0,
             flame_2_frame: 0.0,
-            is_available1: true,
+            is_available1: false,
             is_available2: false
         }
     }
 
     pub fn reset(&mut self) {
-        self.value = 50.0;
+        self.value = 0.0;
         self.penalty_factor = 0.0;
         self.gear_1_frame = 0.0;
         self.gear_2_frame = 0.0;
         self.flame_1_frame = 0.0;
         self.flame_2_frame = 0.0;
-        self.is_available1 = true;
+        self.is_available1 = false;
         self.is_available2 = false;
     }
 

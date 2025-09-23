@@ -70,8 +70,6 @@ pub unsafe extern "C" fn game_finaldashattack(agent: &mut L2CAgentBase) {
 
 pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
     let module_accessor = agent.module_accessor;
-
-
     if macros::is_excute(agent) {
         UiManager::set_bar_off();
         set_vis_hud(true);
@@ -190,6 +188,8 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
             }
             
         }else{
+            set_stage_visibility(agent.module_accessor, false);
+            set_stage_visibility(agent.module_accessor, true); //no clue why this works but it does, without it the stages freeze after final smash
             if capture_id != 0x50000000 {
                 println!("releasing attack");
                 AttackModule::hit_absolute_joint(agent.module_accessor, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW,capture_id as u32,Hash40::new("throw"), 0, 0);

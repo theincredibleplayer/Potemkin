@@ -49,6 +49,10 @@ pub unsafe extern "C" fn special_lw(agent: &mut L2CAgentBase) {
         EffectModule::req_follow(agent.module_accessor, Hash40::new("kamui_garuda_blast"), Hash40::new("arml"), &pos, &rot, 4.0, true, 0, 0, 0, 0, 0, true, true) as u32;
         macros::LAST_EFFECT_SET_RATE(agent, 0.6);
         EffectModule::set_scale_last(agent.module_accessor, &Vector3f{x:2.0,y:1.5,z:2.0} );
+        let pos2 = Vector3f{x:11.0, y:-6.0, z:0.0}; //z is left ad right, y is up and down, x is in and out
+        EffectModule::req_follow(agent.module_accessor, Hash40::new("sys_damage_fire"), Hash40::new("arml"), &pos2, &rot, 1.2, true, 0, 0, 0, 0, 0, true, true) as u32;
+        macros::LAST_EFFECT_SET_RATE(agent, 0.6);
+
 
         macros::PLAY_SE(agent, Hash40::new("se_common_bomb_m"));
     }
