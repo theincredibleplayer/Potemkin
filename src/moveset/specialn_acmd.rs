@@ -54,11 +54,14 @@ pub unsafe extern "C" fn effect_regular(agent: &mut L2CAgentBase) {
         } else {
             let mut eff_string = "se_common_fire_m";
         }
+        macros::EFFECT(agent, Hash40::new("kamui_fdb_explode"), Hash40::new("top"),0, 0, 0, 0, 180, 0, 1, 0, 0, 0, 0, 0, 0, false);
+        EffectModule::set_rate_last(agent.module_accessor, 1.5);
+        EffectModule::set_scale_last(agent.module_accessor, &Vector3f{x:0.8,y:0.5,z:0.8} );
         macros::EFFECT_FLW_POS(agent, Hash40::new("kamui_fdb_fire"), Hash40::new("top"), 0.0, 0.0, 0.0, 0, 180, 0, 1, true);
         //macros::EFFECT(agent, Hash40::new(eff_string), Hash40::new("top"),0, 0, 0, 0, 0, 0, 1.0 + (smash::app::sv_math::rand(hash40("fighter"), 3) as f32 * 0.5), 0, 0, 0, 0, 0, 0, false);
     }
     for _ in 0..99{
-        sv_animcmd::wait(agent.lua_state_agent, 5.0/* + (smash::app::sv_math::rand(hash40("fighter"), 3) * 2 ) ) as f32*/);
+        sv_animcmd::wait(agent.lua_state_agent, 10.0/* + (smash::app::sv_math::rand(hash40("fighter"), 3) * 2 ) ) as f32*/);
         if macros::is_excute(agent) {
             let random_number = smash::app::sv_math::rand(hash40("fighter"), 3);
             let mut eff_string = "sys_bomb_a";
@@ -73,8 +76,8 @@ pub unsafe extern "C" fn effect_regular(agent: &mut L2CAgentBase) {
                 macros::PLAY_SE(agent, Hash40::new("se_common_fire_m"));
             }
             macros::EFFECT_FLW_POS(agent, Hash40::new("kamui_fdb_fire"), Hash40::new("top"), 0.0, 0.0, 0.0, 0, 180, 0, 1, true);
-            macros::EFFECT(agent, Hash40::new("kamui_fdb_explode"), Hash40::new("top"),0, 5, 0, 0, 180, 0, 1, 0, 0, 0, 0, 0, 0, false);
-            EffectModule::set_rate_last(agent.module_accessor, 1.0);
+            macros::EFFECT(agent, Hash40::new("kamui_fdb_explode"), Hash40::new("top"),0, 0, 0, 0, 180, 0, 1, 0, 0, 0, 0, 0, 0, false);
+            EffectModule::set_rate_last(agent.module_accessor, 1.5);
             EffectModule::set_scale_last(agent.module_accessor, &Vector3f{x:0.8,y:0.5,z:0.8} );
             //macros::EFFECT(agent, Hash40::new(eff_string), Hash40::new("top"),0, 0, 0, 0, 0, 0, 1.0 + (smash::app::sv_math::rand(hash40("fighter"), 3) as f32 * 0.5), 0, 0, 0, 0, 0, 0, false);
         }
@@ -178,21 +181,26 @@ pub unsafe extern "C" fn game_specialnfire(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 11.0);
     if macros::is_excute(agent) {
         shield!(agent, *MA_MSC_CMD_SHIELD_OFF, *COLLISION_KIND_SHIELD, 0, 2);
+        if !WorkModule::is_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_N_HAS_REFLECTED){
+            ArticleModule::generate_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND,false,-1);
+            potemkin_mirror_handler(agent.module_accessor);
+            ArticleModule::set_visibility_whole(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+            ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, Hash40::new("special_n_fire"), false, -1.0);
+            let plane = ArticleModule::get_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND);
+            let plane_boma = *(plane as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
+            LinkModule::remove_model_constraint(plane_boma,true);
+            LinkModule::set_model_constraint_pos_ort(plane_boma,*WEAPON_LINK_NO_CONSTRAINT,Hash40::new("attach"),Hash40::new("top"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_OFFSET_TRANSLATE as u32 | *CONSTRAINT_FLAG_OFFSET_ROT as u32,true);
+            ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, Hash40::new("special_n_fire"), false, -1.0);
 
-        ArticleModule::generate_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND,false,-1);
-        potemkin_mirror_handler(agent.module_accessor);
-        ArticleModule::set_visibility_whole(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
-        ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, Hash40::new("special_n_fire"), false, -1.0);
-        let plane = ArticleModule::get_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND);
-        let plane_boma = *(plane as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
-        LinkModule::remove_model_constraint(plane_boma,true);
-        LinkModule::set_model_constraint_pos_ort(plane_boma,*WEAPON_LINK_NO_CONSTRAINT,Hash40::new("attach"),Hash40::new("top"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_OFFSET_TRANSLATE as u32 | *CONSTRAINT_FLAG_OFFSET_ROT as u32,true);
-        ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, Hash40::new("special_n_fire"), false, -1.0);
-
-        macros::ATTACK(agent,0,0,Hash40::new("top"),10.0,60,100,0,40,8.0,0.0,12.0,11.0,Some(0.0),Some(12.0),Some(21.0),3.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_CUTUP,*ATTACK_REGION_NONE);
+            macros::ATTACK(agent,0,0,Hash40::new("top"),10.0,60,100,0,40,8.0,0.0,12.0,11.0,Some(0.0),Some(12.0),Some(24.0),3.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_cutup"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_CUTUP,*ATTACK_REGION_NONE);
+        }
         if StatusModule::situation_kind(agent.module_accessor) != *SITUATION_KIND_GROUND{
             macros::SET_SPEED_EX(agent, -0.9, 0.25, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
         }
+    }
+    sv_animcmd::wait(agent.lua_state_agent, 7.0);
+    if macros::is_excute(agent) {
+        AttackModule::clear_all(agent.module_accessor);
     }
 }
 

@@ -1065,7 +1065,9 @@ pub fn install() {
 
     .status(Pre  , FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP,                    finaldashattack_pre)
     .status(Main , FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP,                    finaljump_main)
-    .status(Exit , FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP,                    finaljump_exit) 
+    .status(Exit , FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP,                    finaljump_exit)
+    .status(Exec , FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP,                    finaljump_exec) 
+ 
     .status(Init , FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP,                    finaldashattack_init)
     .status(Exec , FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP,                    finaldashattack_exec)
     .status(End  , FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP,                    finaldashattack_end)
@@ -1156,6 +1158,7 @@ pub fn install() {
     .effect_acmd("effect_specialairlw", effect_special_lw_hit, Priority::Low)
     .sound_acmd("sound_specialairlw", sound_special_lw_hit, Priority::Low)
 
+    
     //special_hi
     .game_acmd("game_specialhi", special_dragon_hi, Priority::Low)
     .game_acmd("game_entryr", special_dragon_hi_loop, Priority::Low)
@@ -1172,6 +1175,15 @@ pub fn install() {
 
 
     .install();
+
+
+    Agent::new("kamui_dragonhand")
+    .game_acmd("game_dhspecialnendmax", special_lw_hit, Priority::Low)
+    .effect_acmd("effect_dhspecialnendmax", effect_special_lw_hit, Priority::Low)
+    .sound_acmd("sound_dhspecialnendmax", sound_special_lw_hit, Priority::Low)
+    .install();
+
+
 
     Agent::new("kamui_spearhand")
     .game_acmd("game_attacks4", spear_attack_s4, Priority::Low)
@@ -1234,6 +1246,7 @@ pub fn install() {
         idkman,
         idkman2,
         autoturn_situation_check_hook,
+        on_pause_test
         //change_motion_hook
         //internal_cam
         //get_params_outside

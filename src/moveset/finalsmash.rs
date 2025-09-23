@@ -163,6 +163,13 @@ pub unsafe extern "C" fn Final_main_loop(fighter: &mut L2CFighterCommon) -> L2CV
 pub unsafe extern "C" fn Final_exit(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
     ArticleModule::remove_exist(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+    if !(StatusModule::status_kind_next(module_accessor) == FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP)
+    {
+        fighter.clear_lua_stack();
+        fighter.push_lua_stack(&mut L2CValue::new_int(0x26e166e7b4));
+        sv_battle_object::notify_event_msc_cmd(fighter.lua_state_agent);
+        fighter.pop_lua_stack(1); 
+    }
     return L2CValue::I32(0)
 }
 
@@ -400,7 +407,9 @@ pub unsafe extern "C" fn finaljump_exit(fighter: &mut L2CFighterCommon) -> L2CVa
         return smashline::original_status(Exit, fighter, *FIGHTER_STATUS_KIND_FINAL)(fighter);
     }
 }
-
+pub unsafe extern "C" fn finaljump_exec(fighter: &mut L2CFighterCommon) -> L2CValue {
+    return smashline::original_status(Exec, fighter, *FIGHTER_STATUS_KIND_FINAL)(fighter);
+  }
 pub unsafe extern "C" fn vissceneentry_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
     println!("entry pre");
     //CAM_ZOOM_OUT_FINAL(fighter);

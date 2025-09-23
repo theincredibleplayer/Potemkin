@@ -142,9 +142,9 @@ pub unsafe extern "C" fn special_air_hi_main(fighter: &mut L2CFighterCommon) -> 
     ArticleModule::generate_article(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
     ArticleModule::change_motion(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("special_air_hi"),false,-1.0);
     special_air_hi_velocity_and_motion_handler(fighter,1.0,true);
+    WorkModule::on_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ATTACH_WEAPON);
     potemkin_mirror_handler(module_accessor);
     potemkin_weapon_attach_handler(module_accessor);
-    WorkModule::on_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ATTACH_WEAPON);
     JostleModule::set_status(fighter.module_accessor, false);
     fighter.sub_shift_status_main(L2CValue::Ptr(special_air_hi_main_loop as *const () as _))
 }

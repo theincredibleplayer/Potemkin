@@ -99,9 +99,7 @@ pub unsafe extern "C" fn kamui_on_search(_vtable: u64, fighter: &mut Fighter, lo
         let collision_log = *(log as *const u64).add(0x10 / 0x8);
         let collision_log = collision_log as *const CollisionLogScuffed;
         let opp_boma = sv_battle_object::module_accessor((*collision_log).opponent_object_id);
-        //if AttackModule::is_attack(opp_boma,(*collision_log).collider_id as i32,false) {
-            StatusModule::change_status_request(module_accessor,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_ATTACK,false);
-        //}
+        StatusModule::change_status_request(module_accessor,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_ATTACK,false);
     }
     if StatusModule::status_kind(module_accessor) == FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL {
         let collision_log = *(log as *const u64).add(0x10 / 0x8);
@@ -118,8 +116,12 @@ pub unsafe extern "C" fn kamui_on_search(_vtable: u64, fighter: &mut Fighter, lo
         EffectModule::set_rate_last(opp_boma, ( ( 60.0 )/( clear_time as f32 ) ) );
 
         if WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_YELLOW_RC){
-            WorkModule::set_float(opp_boma, 0.8, *FIGHTER_STATUS_WORK_ID_FLOAT_REBOUND_MOTION_RATE);
-            StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND, false);
+            WorkModule::set_float(opp_boma, 0.7, *FIGHTER_STATUS_WORK_ID_FLOAT_REBOUND_MOTION_RATE);
+            if StatusModule::situation_kind(opp_boma) != *SITUATION_KIND_GROUND {
+                StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND_JUMP, false);
+            }else{
+                StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND, false);
+            }
             SlowModule::set(
                 opp_boma,
                 0,
@@ -216,9 +218,6 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
             PostureModule::reverse_lr(module_accessor);
             MotionModule::change_motion(module_accessor, Hash40::new("air_turn"), 0.0, 1.0, false, 0.0, false, false);
             //PostureModule::update_rot_y_lr(agent.module_accessor);
-        }
-        if MotionModule::is_end(module_accessor) && motion_kind == hash40("air_turn"){
-            MotionModule::change_motion(module_accessor, Hash40::new("fall"), 0.0, 1.0, false, 0.0, false, false);
         }
     }
 
@@ -912,15 +911,29 @@ pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,dama
 }
 
 #[skyline::from_offset(0xb5e240)]
-pub unsafe extern "C" fn kamui_on_attack_og(vtable: u64, fighter: &mut Fighter,collision_log:CollisionLog, damage: f32);
+pub unsafe extern "C" fn kamui_on_attack_og(vtable: u64, fighter: &mut Fighter,collision_log:CollisionLogScuffed, damage: f32);
 
-pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,collision_log:CollisionLog, damage:f32) {
+pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,collision_log:CollisionLogScuffed, damage:f32) {
     //println!("on hit hook successful");
-    let attack_data = AttackModule::attack_data(fighter.battle_object.module_accessor, collision_log.collider_id as i32, false);
-    
     let module_accessor = (*fighter).battle_object.module_accessor;
     let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     let status = StatusModule::status_kind(module_accessor);
+    //this doesnt work for some reason?
+    let opp_boma = sv_battle_object::module_accessor(collision_log.opponent_object_id as u32);
+
+    if StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_SPECIAL_LW {
+        AttackModule::set_no_uniq_effect_all(module_accessor, true, false);
+        EffectModule::req_common(opp_boma,Hash40::new("fire_hit_l_l"),0.0);
+
+        WorkModule::set_float(opp_boma, 0.4, *FIGHTER_STATUS_WORK_ID_FLOAT_REBOUND_MOTION_RATE);
+        if StatusModule::situation_kind(opp_boma) != *SITUATION_KIND_GROUND {
+            StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND_JUMP, false);
+        }else{
+            StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND, false);
+        }
+    }
+
+
     if 
     ![FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL,
     FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK,
@@ -935,13 +948,17 @@ pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,coll
     *FIGHTER_STATUS_KIND_FINAL].contains(&status){
         UiManager::add_tension(entry_id, damage*0.75);
     }
-    if [*FIGHTER_STATUS_KIND_SPECIAL_LW].contains(&status) {
-        let enemy_boma = sv_battle_object::module_accessor(collision_log.opponent_battle_object_id as u32);
-        EffectModule::req_common(enemy_boma,Hash40::new("fire_hit_l_l"),0.0);
-    }
+    //if [*FIGHTER_STATUS_KIND_SPECIAL_LW].contains(&status) {
+    //}
     kamui_on_attack_og(vtable,fighter,collision_log,damage);
 }
 
+#[skyline::hook(offset = 0x611cd0)]
+pub unsafe extern "C" fn on_pause_test(fighter: &mut Fighter){
+    println!("global on pause activated?");
+
+    call_original!(fighter);
+}
 
 
 

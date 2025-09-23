@@ -130,6 +130,7 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
 
                 CAM_ZOOM_OUT_FINAL(agent);
                 WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_END_EXIT);
+                WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_END_EXIT_FINISH);
             }
 
             for n in 1..21{
@@ -208,6 +209,7 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
 
                 CAM_ZOOM_OUT_FINAL(agent);
                 WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_END_EXIT);
+                WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_END_EXIT_FINISH);
             }
         }
     }
