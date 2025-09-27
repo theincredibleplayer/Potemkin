@@ -99,10 +99,13 @@ unsafe fn potbuster_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     return L2CValue::I32(0)
 }
 
-pub unsafe extern "C" fn potbuster_exit(fighter: &mut L2CFighterCommon) -> L2CValue {
+pub unsafe extern "C" fn potbuster_end(fighter: &mut L2CFighterCommon) -> L2CValue {
     CameraModule::zoom_out(fighter.module_accessor, 0);
     FighterCutInManager::request_end(singletons::FighterCutInManager());
-    CatchModule::catch_cut(fighter.module_accessor,false,false);
+    if CatchModule::is_catch(fighter.module_accessor) {
+        CatchModule::catch_cut(fighter.module_accessor,false,false);
+        println!("catch cut was ran");
+    }    
     return L2CValue::I32(0)
 }
 

@@ -189,9 +189,9 @@ pub unsafe extern "C" fn thrown_status_common(fighter: &mut L2CFighterCommon) ->
         let egg_size = WorkModule::get_param_float(fighter.module_accessor, hash40("egg_collision_size"), 0);
         let fighter_kind = utility::get_kind(&mut (*fighter.module_accessor));
 
-        let mut x_offset = 22.0 - height;
-        let mut z_offset = (7.2 -egg_size)/4.0;
-        let mut y_offset = 0.0;
+        let mut x_offset = 22.0 - height; // this is for left and right
+        let mut z_offset = -(7.2 - egg_size)/2.0; // this is for in and out
+        let mut y_offset = -(7.2 - egg_size)/3.0 + 0.25; // this is for up and down
 
         MotionModule::change_motion(fighter.module_accessor, Hash40::new_raw(motion), 0.0, 1.0, false, 0.0, false, false);
 
@@ -201,9 +201,9 @@ pub unsafe extern "C" fn thrown_status_common(fighter: &mut L2CFighterCommon) ->
         ModelModule::joint_global_position(fighter.module_accessor, Hash40::new("hip"), hip_pos, true);
         ModelModule::joint_global_position(fighter.module_accessor, Hash40::new("head"), head_pos, true);
         position.x = hip_pos.x - head_pos.x;
-        
+        println!("distance: {}",position.x);
         //ganon's offset is 8.321199
-        x_offset = (8.321199 - position.x)/3.0;
+        x_offset = (-7.0 - position.x)/3.0 + 3.5;
 
 
 
@@ -246,6 +246,9 @@ pub unsafe extern "C" fn thrown_status_common(fighter: &mut L2CFighterCommon) ->
         if fighter_kind == *FIGHTER_KIND_ROBOT {
             x_offset = -6.0;
         }
+        if fighter_kind == *FIGHTER_KIND_PIKACHU {
+            x_offset = 4.0;
+        }
         if  [*FIGHTER_KIND_MIIFIGHTER,
             *FIGHTER_KIND_MIIGUNNER,
             *FIGHTER_KIND_MIISWORDSMAN,
@@ -278,10 +281,8 @@ pub unsafe extern "C" fn thrown_status_common(fighter: &mut L2CFighterCommon) ->
         //    MotionModule::set_flip(fighter.module_accessor,true,true,false);
         //    println!("flip has been set");
         //}
-        println!("it happens");
         return 0.into();
     }
-    println!("it goes past");
     return smashline::original_status(Main, fighter, *FIGHTER_STATUS_KIND_THROWN)(fighter)
 }
 
@@ -409,8 +410,6 @@ pub unsafe extern "C" fn caught_final_main(fighter: &mut L2CFighterCommon) -> L2
             }
         }
     }
-    println!("after the if");
-    println!("right before shift status");
     fighter.sub_shift_status_main(L2CValue::Ptr(caught_final_main_loop as *const () as _))
 }
 
@@ -431,3 +430,51 @@ pub unsafe extern "C" fn caught_final_end(fighter: &mut L2CFighterCommon) -> L2C
     return L2CValue::I32(0)
 }
 
+pub unsafe extern "C" fn caught_specialhi_main(fighter: &mut L2CFighterCommon) -> L2CValue {
+    let motion_share = WorkModule::get_param_int(fighter.module_accessor,0xcad2ee25e,0xc07d88ea0);
+    let mut motion = hash40("catched_pot_special_hi");
+    let mut share_type = 0;
+    if motion_share == *FIGHTER_MOTION_SHARE_TYPE_TARO {
+        motion = FighterMotionModuleImpl::add_body_type_hash(
+            fighter.module_accessor,
+            Hash40::new_raw(motion),
+            *BODY_TYPE_MOTION_DX
+        );
+    }
+    else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_GIRL {
+        motion = FighterMotionModuleImpl::add_body_type_hash(
+        fighter.module_accessor,
+            Hash40::new_raw(motion),
+            *BODY_TYPE_MOTION_GIRL
+        );
+    }
+    else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_BIG {
+        motion = FighterMotionModuleImpl::add_body_type_hash(
+        fighter.module_accessor,
+            Hash40::new_raw(motion),
+            *BODY_TYPE_MOTION_BIG
+        );
+    }
+    let constraint_flags = LinkModule::get_model_constraint_flag(fighter.module_accessor);
+    LinkModule::set_model_constraint_flag(fighter.module_accessor,(*CONSTRAINT_FLAG_FLIP_ROT_Y | constraint_flags as i32) as u32);
+    MotionModule::change_motion(fighter.module_accessor, Hash40::new_raw(motion), 0.0, 1.0, false, 0.0, false, false);
+
+    fighter.sub_shift_status_main(L2CValue::Ptr(caught_specialhi_main_loop as *const () as _))
+}
+
+
+
+pub unsafe extern "C" fn caught_specialhi_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
+    println!("before on flag");
+    println!("before 0");
+    return 0.into();
+}
+
+
+pub unsafe extern "C" fn caught_specailhi_end(fighter: &mut L2CFighterCommon) -> L2CValue {
+    if utility::get_kind(&mut (*fighter.module_accessor)) == *FIGHTER_KIND_GAMEWATCH {
+        let z_scale = WorkModule::get_float(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_GAMEWATCH_Z_SCALE);
+        ModelModule::set_scale_z(fighter.module_accessor,z_scale);
+    }
+    return L2CValue::I32(0)
+}

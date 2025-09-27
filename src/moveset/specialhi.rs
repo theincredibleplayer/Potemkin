@@ -212,12 +212,6 @@ unsafe fn special_hi_start_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue
     return L2CValue::I32(0)
 }
 
-pub unsafe extern "C" fn special_hi_start_end(fighter: &mut L2CFighterCommon) -> L2CValue {
-    let lua_state = fighter.lua_state_agent;
-    let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
-    ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
-    fighter.status_end_Throw()
-}
 
 pub unsafe extern "C" fn special_hi_loop_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
@@ -332,12 +326,6 @@ unsafe fn special_hi_loop_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue 
     return L2CValue::I32(0)
 }
 
-pub unsafe extern "C" fn special_hi_loop_end(fighter: &mut L2CFighterCommon) -> L2CValue {
-    let lua_state = fighter.lua_state_agent;
-    let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
-    ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
-    fighter.status_end_Throw()
-}
 
 
 pub unsafe extern "C" fn special_hi_release_main(fighter: &mut L2CFighterCommon) -> L2CValue {
@@ -434,13 +422,7 @@ unsafe fn special_hi_release_main_loop(fighter: &mut L2CFighterCommon) -> L2CVal
     return L2CValue::I32(0)
 }
 
-pub unsafe extern "C" fn special_hi_release_end(fighter: &mut L2CFighterCommon) -> L2CValue {
-    let lua_state = fighter.lua_state_agent;
-    let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
-    ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
-    CameraModule::zoom_out(module_accessor, 0);
-    fighter.status_end_Throw()
-}
+
 
 pub unsafe extern "C" fn special_hi_release_exec(fighter: &mut L2CFighterCommon) -> L2CValue {
     //handles releasing since the normal acmd ints arent set properly (i should probably research that later)
@@ -459,12 +441,17 @@ pub unsafe extern "C" fn special_hi_release_exec(fighter: &mut L2CFighterCommon)
 }
 
 
-pub unsafe extern "C" fn special_hi_exit(fighter: &mut L2CFighterCommon) -> L2CValue {
-    if StatusModule::status_kind_next(fighter.module_accessor) != FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_LOOP
-    && StatusModule::status_kind_next(fighter.module_accessor) != FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START
-    && StatusModule::status_kind_next(fighter.module_accessor) != FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE{
-        CameraModule::zoom_out(fighter.module_accessor, 0);
-        CatchModule::catch_cut(fighter.module_accessor,false,false);
+pub unsafe extern "C" fn special_hi_end(fighter: &mut L2CFighterCommon) -> L2CValue {
+    let module_accessor = fighter.module_accessor;
+    if StatusModule::status_kind_next(module_accessor) != FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_LOOP
+    && StatusModule::status_kind_next(module_accessor) != FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START
+    && StatusModule::status_kind_next(module_accessor) != FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE{
+        ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
+        CameraModule::zoom_out(module_accessor, 0);
+        if CatchModule::is_catch(module_accessor) {
+            CatchModule::catch_cut(module_accessor,false,false);
+            println!("catch cut was ran");
+        }    
     }
     return L2CValue::I32(0)
 }

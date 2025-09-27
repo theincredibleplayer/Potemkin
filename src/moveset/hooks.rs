@@ -68,7 +68,7 @@ pub unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, ev
         if StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_SPECIAL_HI {
             capture_event.result = true;
             capture_event.node = smash_rs::phx::Hash40::new("throw");
-            capture_event.is_motion_hi_lw = false;
+            //capture_event.is_motion_hi_lw = false;
             StatusModule::change_status_request(module_accessor, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START, false);
             return 0;
         }
@@ -80,8 +80,13 @@ pub unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, ev
             capture_event.node = smash_rs::phx::Hash40::new("throw");
             
 
-            WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SELECT_FINAL);
             WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_JUMP);
+
+            WorkModule::off_flag(module_accessor ,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_START);
+            WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_START);
+            WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_ATTACK_START);
+            WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_JUMP_START);
+
             PostureModule::set_pos_2d(module_accessor,&Vector2f{x: 0.0 , y: 0.0});
             StatusModule::change_status_request(module_accessor, *FIGHTER_STATUS_KIND_FINAL, false);      
             return 0;
@@ -93,12 +98,10 @@ pub unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, ev
 
 #[skyline::hook(offset = 0x3414930)]
 pub unsafe extern "C" fn noping_the_eff(vtable:u64, weapon: *mut smash::app::Weapon, log: CollisionLog) -> u64 {
-    println!("effect done been nop'd");
     *(weapon as *mut bool).add(0x90) = true; //Lets the weapon persist on hit
     let mut flag = true;
     let opponent_id = log.opponent_battle_object_id;
     let mut opponent_accessor = sv_battle_object::module_accessor(opponent_id);
-    println!("opponent id: {}", opponent_id);
 
 
 
@@ -142,7 +145,7 @@ unsafe fn change_motion_hook(ctx: &skyline::hooks::InlineCtx) {
         let text = skyline::hooks::getRegionAddress(skyline::hooks::Region::Text) as u64;
         let mut lr: *const u64;
         asm!("mov {}, x30", out(reg) lr);
-        println!("Current LR:\t\t{:#x} ({:#x})", (lr as u64) - text, (lr as u64));
+    println!("Current LR:\t\t{:#x} ({:#x})", (lr as u64) - text, (lr as u64));
     }
 }
 

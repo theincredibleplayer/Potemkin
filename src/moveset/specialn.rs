@@ -236,7 +236,6 @@ pub unsafe extern "C" fn special_n_shoot_main(fighter: &mut L2CFighterCommon) ->
         frame = 10.0;
         WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_N_HAS_REFLECTED);
     }
-    println!("frame: {}",frame);
     if fighter.global_table[SITUATION_KIND].get_i32() != *SITUATION_KIND_GROUND {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
         MotionModule::change_motion(module_accessor,Hash40::new("special_air_n_fire"),frame,1.0,false,0.0,false,false);

@@ -76,6 +76,10 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ATTACH_WEAPON : i32 = 0x2000010b;
 
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RC_CLOCK_EFFECT : i32 = 0x2000010c;
 
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_START : i32 = 0x2000010d;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_START : i32 = 0x2000010e;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_ATTACK_START : i32 = 0x2000010f;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_JUMP_START : i32 = 0x20000110;
 
 
 
@@ -403,8 +407,15 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
         && StatusModule::status_kind(module_accessor) != FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE
         && StatusModule::status_kind(module_accessor) != FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP  
         && StatusModule::status_kind(module_accessor) != FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK {
-            WorkModule::on_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SELECT_FINAL);
+            //WorkModule::on_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_START);
             WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SWITCH_TO_FS_JUMP);
+
+            WorkModule::on_flag(fighter.module_accessor ,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_START);
+            WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_START);
+            WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_ATTACK_START);
+            WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_JUMP_START);
+
+
         }
 
 
@@ -800,12 +811,30 @@ pub fn install() {
     .expression_acmd("expression_throwb", expression_throwf, Priority::Low)
 
     //taunt
-    .game_acmd("game_appealsr", appeal_srl, Priority::Low)
-    .effect_acmd("effect_appealsr", effect_appeal_srl, Priority::Low)
-    .sound_acmd("sound_appealsr", sound_appeal_srl, Priority::Low)
-    .game_acmd("game_appealsl", appeal_srl, Priority::Low)
-    .effect_acmd("effect_appealsl", effect_appeal_srl, Priority::Low)
-    .sound_acmd("sound_appealsl", sound_appeal_srl, Priority::Low)
+    .game_acmd("game_appealsr", appeal_s, Priority::Low)
+    .effect_acmd("effect_appealsr", effect_appeal, Priority::Low)
+    .sound_acmd("sound_appealsr", sound_appeal_s, Priority::Low)
+
+    .game_acmd("game_appealsl", appeal_s, Priority::Low)
+    .effect_acmd("effect_appealsl", effect_appeal, Priority::Low)
+    .sound_acmd("sound_appealsl", sound_appeal_s, Priority::Low)
+
+    
+    .effect_acmd("effect_appealhir", effect_appeal, Priority::Low)
+    .sound_acmd("sound_appealhir", sound_appeal_hi, Priority::Low)
+
+    .effect_acmd("effect_appealhil", effect_appeal, Priority::Low)
+    .sound_acmd("sound_appealhil", sound_appeal_hi, Priority::Low)
+
+    
+    .effect_acmd("effect_appeallwr", effect_appeal, Priority::Low)
+    .sound_acmd("sound_appeallwr", sound_appeal_lw, Priority::Low)
+
+    .effect_acmd("effect_appeallwl", effect_appeal, Priority::Low)
+    .sound_acmd("sound_appeallwl", sound_appeal_lw, Priority::Low)
+
+
+
     .status(End, *FIGHTER_STATUS_KIND_APPEAL, appeal_end)
 
     //special_s
@@ -858,21 +887,18 @@ pub fn install() {
     //special_hi
     .status(Pre, *FIGHTER_STATUS_KIND_SPECIAL_HI, special_hi_pre)
     .status(Main, *FIGHTER_STATUS_KIND_SPECIAL_HI, special_hi_main)
-    .status(Exit, *FIGHTER_STATUS_KIND_SPECIAL_HI, special_hi_exit)
+    .status(End, *FIGHTER_STATUS_KIND_SPECIAL_HI, special_hi_end)
 
     .status(Main, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START, special_hi_start_main)
-    .status(End, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START, special_hi_start_end)
-    .status(Exit, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START, special_hi_exit)
+    .status(End, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START, special_hi_end)
 
     .status(Main, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_LOOP, special_hi_loop_main)
-    .status(End, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_LOOP, special_hi_loop_end)
-    .status(Exit, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_LOOP, special_hi_exit)
+    .status(End, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_LOOP, special_hi_end)
 
 
     .status(Main, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE, special_hi_release_main)
-    .status(End, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE, special_hi_release_end)
+    .status(End, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE, special_hi_end)
     .status(Exec, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE, special_hi_release_exec)
-    .status(Exit, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE, special_hi_exit)
 
     .status(Main, FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE, special_air_hi_main)
     .status(End, FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE, special_air_hi_end)
@@ -972,7 +998,7 @@ pub fn install() {
 
     .status(Pre, FIGHTER_KAMUI_STATUS_KIND_AIR_THROW, airgrab_pre)
     .status(Main, FIGHTER_KAMUI_STATUS_KIND_AIR_THROW, airgrab_main)
-    .status(Exit, FIGHTER_KAMUI_STATUS_KIND_AIR_THROW, airgrab_exit)
+    .status(End, FIGHTER_KAMUI_STATUS_KIND_AIR_THROW, airgrab_end)
 
     
     //roman cancel
@@ -988,7 +1014,7 @@ pub fn install() {
     .status(Main, FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF, potbusterwhiff_main)
 
     .status(Main, FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER, potbuster_main)
-    .status(Exit, FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER, potbuster_exit)
+    .status(End, FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER, potbuster_end)
 
     .game_acmd          ("game_potemkinbuster",             potbuster,                            Priority::Low)
     .sound_acmd         ("sound_potemkinbuster",              sound_potbuster,                             Priority::Low)
@@ -1044,18 +1070,6 @@ pub fn install() {
     .status(Main , *FIGHTER_STATUS_KIND_FINAL,                              Final_main)
     .status(Exit , *FIGHTER_STATUS_KIND_FINAL,                              Final_exit)
 
-    .status(Pre  , FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP,               finaldashloop_pre)
-    .status(Main , FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP,               finaldashloop_main)
-    //.status(Exit, FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP, finaldashloop_exit)
-    .status(Init , FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP,               finaldashloop_init)
-    .status(Exec , FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP,               finaldashloop_exec)
-
-    .status(Pre  , FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK,             finaldashattack_pre)
-    .status(Main , FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK,             finaldashattack_main)
-    .status(Exit , FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK,             finaldashattack_exit)
-    .status(Exec , FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK,             finaldashattack_exec)
-    .status(Init , FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK,             finaldashattack_init)
-    .status(End  , FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK,             finaldashattack_end)
 
     .status(Main , *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ENTRY,            finalsceneenter_main)
 
@@ -1063,14 +1077,6 @@ pub fn install() {
 
     .status(Main , *FIGHTER_KAMUI_STATUS_KIND_FINAL_END,                    finalsceneexit_main)
 
-    .status(Pre  , FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP,                    finaldashattack_pre)
-    .status(Main , FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP,                    finaljump_main)
-    .status(Exit , FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP,                    finaljump_exit)
-    .status(Exec , FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP,                    finaljump_exec) 
- 
-    .status(Init , FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP,                    finaldashattack_init)
-    .status(Exec , FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP,                    finaldashattack_exec)
-    .status(End  , FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP,                    finaldashattack_end)
 
     .status(Main , *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK,           finalvisscene2_main)
     
@@ -1290,6 +1296,10 @@ pub fn install() {
         skyline::patching::Patch::in_text(0xb620f0).nop();
     //}
 
+    skyline::patching::Patch::in_text(0xb616d0).nop(); // nops the set pos at the end of final smash
+
+    //skyline::patching::Patch::in_text(0xb601e4).nop(); // nops the set lr
+    //skyline::patching::Patch::in_text(0xb60570).nop(); // nops the set lr
 
 
     //skyline::patching::Patch::in_text(0x51d3ad8).nop();

@@ -141,22 +141,16 @@ pub unsafe extern "C" fn kamui_on_search(_vtable: u64, fighter: &mut Fighter, lo
             );
         }
     }
-    if StatusModule::status_kind(module_accessor) == FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP {
+    if StatusModule::status_kind(module_accessor) == FIGHTER_STATUS_KIND_FINAL {
         let collision_log = *(log as *const u64).add(0x10 / 0x8);
         let collision_log = collision_log as *const CollisionLogScuffed;
         let opp_boma = sv_battle_object::module_accessor((*collision_log).opponent_object_id);
-        StatusModule::change_status_request_from_script(module_accessor, FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK, false);
-    }
-    if StatusModule::status_kind(module_accessor) == FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP {
-        let collision_log = *(log as *const u64).add(0x10 / 0x8);
-        let collision_log = collision_log as *const CollisionLogScuffed;
-        let opp_boma = sv_battle_object::module_accessor((*collision_log).opponent_object_id);
+        WorkModule::on_flag(module_accessor,*FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_SUCCESS);
         StatusModule::change_status_request_from_script(module_accessor, FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK, false);
     }
 }
 
 pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
-    //println!("on_frame");
     let scale = PostureModule::scale(fighter.battle_object.module_accessor); //gets the model's scale
     let module_accessor = fighter.battle_object.module_accessor;
     let status_kind =StatusModule::status_kind(fighter.battle_object.module_accessor) ;
@@ -203,7 +197,6 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
 
     //air turnaround
     let lr_1on1 = WorkModule::get_float(module_accessor, *FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1);
-    //println!("the lr float: {}",lr_1on1);
     let lr = PostureModule::lr(module_accessor);
     if lr_1on1 != 0.0 {
         if situation_kind == *SITUATION_KIND_AIR
@@ -238,7 +231,6 @@ pub unsafe extern "C" fn kamui_reset_original(vtable: u64, fighter: &mut Fighter
 
 pub unsafe extern "C" fn kamui_reset(vtable: u64, fighter: &mut Fighter) {
     let module_accessor = (*fighter).battle_object.module_accessor;
-    //println!("initialization hook successful");
     WorkModule::on_flag(fighter.battle_object.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_CAN_SPECIAL_COMMAND);
     ShieldModule::set_target_property(fighter.battle_object.module_accessor, *COLLISION_PROPERTY_REFLECT,2);
     let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
@@ -837,13 +829,6 @@ pub unsafe extern "C" fn kamui_on_shield(vtable: u64, fighter: &mut Fighter, col
     let opponent_cat =(*collision_event.collision_log).opponent_object_category;
     let opponent_raw_power =collision_event.raw_power;
     let opponent_real_power =collision_event.real_power;
-
-
-    //println!("on shield hook successful");
-    //println!("the opp id : {}", opponent_id );
-    //println!("the col kind category : {}", opponent_cat );
-    //println!("the raw power : {}", opponent_raw_power );
-    //println!("the real power : {}", opponent_real_power );
     let opponent_accessor = sv_battle_object::module_accessor(opponent_id);
     let opponent_common = get_fighter_common_from_accessor(&mut* opponent_accessor);
 
@@ -859,15 +844,9 @@ pub unsafe extern "C" fn kamui_on_shield(vtable: u64, fighter: &mut Fighter, col
             }
             WorkModule::on_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_N_HAS_REFLECTED);
             notify_event_msc_cmd!(opponent_common, Hash40::new_raw(0x199c462b5d));
-            //WorkModule::set_float(module_accessor, opponent_real_power, WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLOAT_BOOM_POWER);
-            //ArticleModule::generate_article(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_RYUSENSYA, false, 0);
             ShieldModule::clear_all(module_accessor);
             WorkModule::set_float(module_accessor, opponent_real_power, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_REAL_POWER_REFLECT);
             ArticleModule::generate_article(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_RYUSENSYA, false, -1);
-            //let article = ArticleModule::get_article(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_RYUSENSYA);
-            //let object_id = smash::app::lua_bind::Article::get_battle_object_id(article) as u32;
-            //println!("article id : {}", object_id );
-            //WorkModule::set_float(sv_battle_object::module_accessor(object_id), opponent_real_power, WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLOAT_BOOM_POWER);
             StatusModule::change_status_request(module_accessor, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_SHOOT ,false);
         }
     }
@@ -879,7 +858,6 @@ pub unsafe extern "C" fn kamui_on_shield(vtable: u64, fighter: &mut Fighter, col
 pub unsafe extern "C" fn kamui_on_damage_og(vtable: u64, fighter: &mut Fighter,damage_log:u64);
 
 pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,damage_log:u64) {
-    //println!("on damage hook successful");
     let module_accessor = (*fighter).battle_object.module_accessor;
 
     let module_accessor = fighter.battle_object.module_accessor;
@@ -914,7 +892,6 @@ pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,dama
 pub unsafe extern "C" fn kamui_on_attack_og(vtable: u64, fighter: &mut Fighter,collision_log:CollisionLogScuffed, damage: f32);
 
 pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,collision_log:CollisionLogScuffed, damage:f32) {
-    //println!("on hit hook successful");
     let module_accessor = (*fighter).battle_object.module_accessor;
     let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     let status = StatusModule::status_kind(module_accessor);
@@ -950,7 +927,7 @@ pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,coll
     }
     //if [*FIGHTER_STATUS_KIND_SPECIAL_LW].contains(&status) {
     //}
-    kamui_on_attack_og(vtable,fighter,collision_log,damage);
+    //kamui_on_attack_og(vtable,fighter,collision_log,damage);
 }
 
 #[skyline::hook(offset = 0x611cd0)]
