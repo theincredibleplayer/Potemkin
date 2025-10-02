@@ -51,6 +51,12 @@ unsafe fn motion_setup(fighter: &mut L2CFighterCommon, situation_change: bool) {
 
 pub unsafe extern "C" fn Final_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     if WorkModule::is_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_START) {
+        ArticleModule::generate_article(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
+        potemkin_mirror_handler(fighter.module_accessor);
+        ArticleModule::change_motion(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("final"),false,-1.0);
+
+
+
         fighter.clear_lua_stack();
         fighter.push_lua_stack(&mut L2CValue::new_int(0x201bc9217c));
         sv_battle_object::notify_event_msc_cmd(fighter.lua_state_agent);
@@ -72,6 +78,7 @@ pub unsafe extern "C" fn Final_main(fighter: &mut L2CFighterCommon) -> L2CValue 
         motion_setup(fighter,false);
         let module_accessor = fighter.module_accessor;
         MotionModule::change_motion(fighter.module_accessor,Hash40::new("heavenly_dash_loop"),0.0,1.0,false,0.0,false,false);
+
         //fighter.clear_lua_stack();
         //lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,30.0,0.0);
         //sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
@@ -100,6 +107,9 @@ pub unsafe extern "C" fn Final_main(fighter: &mut L2CFighterCommon) -> L2CValue 
         KineticModule::clear_speed_all(fighter.module_accessor);
         MotionModule::change_motion(fighter.module_accessor,Hash40::new("heavenly_start"),0.0,1.0,false,0.0,false,false);    
     } else {
+        let z_scale = ModelModule::scale_z(fighter.module_accessor);
+        WorkModule::set_float(fighter.module_accessor,z_scale,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_POTEMKIN_Z_SCALE);
+        ModelModule::set_scale_z(fighter.module_accessor,1.0);
         KineticModule::clear_speed_all(fighter.module_accessor);
         let module_accessor = fighter.module_accessor;
         AreaModule::set_whole(fighter.module_accessor, false);
@@ -120,6 +130,17 @@ pub unsafe extern "C" fn Final_main(fighter: &mut L2CFighterCommon) -> L2CValue 
         let plane_boma = *(plane as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
         LinkModule::remove_model_constraint(plane_boma,true);
         LinkModule::set_model_constraint_pos_ort(plane_boma,*WEAPON_LINK_NO_CONSTRAINT,Hash40::new("attach"),Hash40::new("top"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_OFFSET_TRANSLATE as u32 | *CONSTRAINT_FLAG_OFFSET_ROT as u32,true);
+        ModelModule::set_scale_z(plane_boma,1.0);
+
+        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, false, -1);
+        potemkin_mirror_handler(fighter.module_accessor);
+        ArticleModule::set_visibility_whole(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+        ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, Hash40::new("final_visual_scene_01"), false, -1.0);
+        let article = ArticleModule::get_article(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON);
+        let article_boma = *(article as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
+        ModelModule::set_scale_z(article_boma,1.0);
+
+
     }
     fighter.sub_shift_status_main(L2CValue::Ptr(Final_main_loop as *const () as _))
 
@@ -293,7 +314,8 @@ pub unsafe extern "C" fn Final_main_loop(fighter: &mut L2CFighterCommon) -> L2CV
 pub unsafe extern "C" fn Final_exit(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
     ArticleModule::remove_exist(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
-    if StatusModule::status_kind_next(module_accessor) != FIGHTER_STATUS_KIND_FINAL{
+
+    if StatusModule::status_kind_next(module_accessor) != FIGHTER_STATUS_KIND_FINAL {
         println!("final exit og was ran");
         return smashline::original_status(Exit, fighter, *FIGHTER_STATUS_KIND_FINAL)(fighter);
     }
@@ -315,6 +337,12 @@ pub unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> 
     grabbed_anim_selector(fighter,"catched_pot_final_scene_03", 1.0);
     WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
     //CAM_ZOOM_OUT_FINAL(fighter);
+    let capture_id = LinkModule::get_node_object_id(fighter.module_accessor, *LINK_NO_CAPTURE);
+    let enemy = sv_battle_object::module_accessor(capture_id as u32);
+
+
+
+
     KineticModule::enable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY);
     fighter.clear_lua_stack();
     lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,15.0);
@@ -324,7 +352,8 @@ pub unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> 
     sv_kinetic_energy::set_accel(fighter.lua_state_agent);
     WorkModule::set_float(module_accessor, 3.0, *FIGHTER_INSTANCE_WORK_ID_FLOAT_CHECK_DEAD_OFFSET_Y);
     let check_distance:f32 = 500.0;
-    PostureModule::set_pos_2d(fighter.module_accessor,&Vector2f{x: 0.0 , y: check_distance});
+    PostureModule::set_pos(module_accessor,&Vector3f{x: 0.0 , y: check_distance, z: 0.0});
+
     let pos2f = Vector2f{x: PostureModule::pos_x(fighter.module_accessor), y: PostureModule::pos_y(fighter.module_accessor)};
     let check_pos = Vector2f{x: 0.0, y: check_distance};
     let mut hit_pos = Vector2f{x: 0.0, y: 0.0};
@@ -334,9 +363,9 @@ pub unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> 
     if distance_to_ground != -1.0 {
         macros::REQ_FINAL_START_CAMERA_arg3(fighter,Hash40::new("d04finalvisualscene03.nuanmb"), false, false);
         let new_pos_y = check_distance - distance_to_ground;
-        PostureModule::set_pos_2d(fighter.module_accessor,&Vector2f{x: 0.0 , y: new_pos_y});
+        PostureModule::set_pos(module_accessor,&Vector3f{x: 0.0 , y: new_pos_y, z: 0.0});
     }else{
-        PostureModule::set_pos_2d(fighter.module_accessor,&Vector2f{x: 0.0 , y: 40.0});
+        PostureModule::set_pos(module_accessor,&Vector3f{x: 0.0 , y: 40.0, z: 0.0});
     }
     let pos = Vector3f{x: PostureModule::pos_x(fighter.module_accessor), y: PostureModule::pos_y(fighter.module_accessor), z: PostureModule::pos_z(fighter.module_accessor)};
     //let checkbool = GroundModule::ray_check_hit_pos(fighter.module_accessor,&pos2f,&check_pos,&mut hit_pos,true);

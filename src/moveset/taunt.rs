@@ -30,7 +30,7 @@ pub unsafe extern "C" fn appeal_s(agent: &mut L2CAgentBase) {
         ArticleModule::generate_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
         potemkin_mirror_handler(agent.module_accessor);
         ArticleModule::change_motion(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("appeal_s"),false,-1.0);
-
+        /*
         let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
         let entry_id = WorkModule::get_int(agent.module_accessor,*FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID);
         smash::app::lua_bind::FighterManager::set_final(
@@ -38,7 +38,7 @@ pub unsafe extern "C" fn appeal_s(agent: &mut L2CAgentBase) {
             FighterEntryID(entry_id), 
             smash::app::FighterAvailableFinal { _address: *(smash::lib::lua_const::FighterAvailableFinal::DEFAULT) as u8 },
             0
-        );
+        );*/
     }
     frame(agent.lua_state_agent, 46.0);
     if macros::is_excute(agent) {

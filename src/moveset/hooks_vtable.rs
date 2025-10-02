@@ -249,6 +249,7 @@ pub unsafe extern "C" fn kamui_reset(vtable: u64, fighter: &mut Fighter) {
 pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fighter) {
     let module_accessor = (*fighter).battle_object.module_accessor;
     let motion = MotionModule::motion_kind(module_accessor);
+    potemkin_mirror_handler(module_accessor);
     if [
         hash40("wait"),
         hash40("wait_2"),
@@ -317,11 +318,11 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
         hash40("guard_off"),
         hash40("just_shield_off"),
         hash40("guard_damage"),
-        //hash40("escape"),
-        //hash40("escape_f"),
+        hash40("escape"),
+        hash40("escape_f"),
         hash40("escape_b"),
-        //hash40("escape_air"),
-        //hash40("escape_air_slide"),
+        hash40("escape_air"),
+        hash40("escape_air_slide"),
         hash40("rebound"),
         hash40("attack_11"),
         //hash40("attack_12"),
@@ -447,8 +448,8 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
         hash40("capture_wait_lw"),
         hash40("capture_damage_lw"),
         hash40("capture_cut"),
-        //hash40("entry_r"),
-        //hash40("entry_l"),
+        hash40("entry_r"),
+        hash40("entry_l"),
         hash40("appeal_hi_r"),
         hash40("appeal_hi_l"),
         hash40("appeal_s_r"),
@@ -501,13 +502,13 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
         hash40("down_forward_d"),
         hash40("down_back_d"),
         hash40("down_spot_d"),
-        //hash40("passive"),
-        //hash40("passive_stand_f"),
-        //hash40("passive_stand_b"),
-        //hash40("passive_wall"),
-        //hash40("passive_wall_jump"),
-        //hash40("passive_ceil"),
-        //hash40("shield_break_fly"),
+        hash40("passive"),
+        hash40("passive_stand_f"),
+        hash40("passive_stand_b"),
+        hash40("passive_wall"),
+        hash40("passive_wall_jump"),
+        hash40("passive_ceil"),
+        hash40("shield_break_fly"),
         hash40("furafura"),
         //hash40("bind"),
         hash40("furafura_start_u"),
@@ -533,13 +534,13 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
         //hash40("cliff_escape_quick"),
         //hash40("cliff_jump_quick1"),
         //hash40("cliff_jump_quick2"),
-        //hash40("slip_down"),
-        //hash40("slip"),
-        //hash40("slip_wait"),
-        //hash40("slip_stand"),
-        //hash40("slip_attack"),
-        //hash40("slip_escape_f"),
-        //hash40("slip_escape_b"),
+        hash40("slip_down"),
+        hash40("slip"),
+        hash40("slip_wait"),
+        hash40("slip_stand"),
+        hash40("slip_attack"),
+        hash40("slip_escape_f"),
+        hash40("slip_escape_b"),
         //hash40("item_light_get"),
         //hash40("item_light_walk_get"),
         //hash40("item_light_eat"),
@@ -892,24 +893,25 @@ pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,dama
 pub unsafe extern "C" fn kamui_on_attack_og(vtable: u64, fighter: &mut Fighter,collision_log:CollisionLogScuffed, damage: f32);
 
 pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,collision_log:CollisionLogScuffed, damage:f32) {
+    let attack_data = AttackModule::attack_data(fighter.battle_object.module_accessor, collision_log.collider_id as i32, false);
     let module_accessor = (*fighter).battle_object.module_accessor;
     let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     let status = StatusModule::status_kind(module_accessor);
     //this doesnt work for some reason?
     let opp_boma = sv_battle_object::module_accessor(collision_log.opponent_object_id as u32);
-
-    if StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_SPECIAL_LW {
-        AttackModule::set_no_uniq_effect_all(module_accessor, true, false);
-        EffectModule::req_common(opp_boma,Hash40::new("fire_hit_l_l"),0.0);
-
-        WorkModule::set_float(opp_boma, 0.4, *FIGHTER_STATUS_WORK_ID_FLOAT_REBOUND_MOTION_RATE);
-        if StatusModule::situation_kind(opp_boma) != *SITUATION_KIND_GROUND {
-            StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND_JUMP, false);
-        }else{
-            StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND, false);
+    let category = sv_battle_object::category(collision_log.opponent_object_id);
+    if category == *BATTLE_OBJECT_CATEGORY_FIGHTER {
+        if StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_SPECIAL_LW {
+            AttackModule::set_no_uniq_effect_all(module_accessor, true, false);
+            EffectModule::req_common(opp_boma,Hash40::new("fire_hit_l_l"),0.0);
+            WorkModule::set_float(opp_boma, 0.6, *FIGHTER_STATUS_WORK_ID_FLOAT_REBOUND_MOTION_RATE);
+            if StatusModule::situation_kind(opp_boma) != *SITUATION_KIND_GROUND {
+                StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND_JUMP, false);
+            }else{
+                StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND, false);
+            }
         }
     }
-
 
     if 
     ![FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL,

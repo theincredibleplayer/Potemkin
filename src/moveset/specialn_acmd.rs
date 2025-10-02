@@ -117,7 +117,6 @@ pub unsafe extern "C" fn sound_shotmax(agent: &mut L2CAgentBase) {
 
 
 pub unsafe extern "C" fn effect_specialnstart(agent: &mut L2CAgentBase) {
-    frame(agent.lua_state_agent, 1.0);
     if macros::is_excute(agent) {
     }
 }

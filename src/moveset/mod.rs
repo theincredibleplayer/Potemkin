@@ -108,7 +108,7 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_REAL_POWER_REFLECT: i32 = 0x69;
 
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_ROMAN_CANCEL_METER_DRAIN: i32 = 0x6a;
 
-pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_GAMEWATCH_Z_SCALE: i32 = 0x6b;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_OPPONENT_Z_SCALE: i32 = 0x6b;
 
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FIRE_TIME_BASE: i32 = 0x6c;
 
@@ -118,6 +118,7 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_HEAT_TACKLE_SPEED: i32 = 0x6f;
 
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_SLOW_MUL: i32 = 0x70;
 
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_POTEMKIN_Z_SCALE: i32 = 0x71;
 
 // for weapon
 pub const WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLOAT_BOOM_POWER: i32 = 0x4;
@@ -810,6 +811,11 @@ pub fn install() {
     .sound_acmd("sound_throwb", sound_throwf, Priority::Low)
     .expression_acmd("expression_throwb", expression_throwf, Priority::Low)
 
+    .game_acmd("game_throwhi", game_throwhi, Priority::Low)
+    .effect_acmd("effect_throwhi", effect_throwhi, Priority::Low)
+    .sound_acmd("sound_throwhi", sound_throwhi, Priority::Low)
+    //.expression_acmd("expression_throwhi", expression_throwlw, Priority::Low)
+
     //taunt
     .game_acmd("game_appealsr", appeal_s, Priority::Low)
     .effect_acmd("effect_appealsr", effect_appeal, Priority::Low)
@@ -832,6 +838,15 @@ pub fn install() {
 
     .effect_acmd("effect_appeallwl", effect_appeal, Priority::Low)
     .sound_acmd("sound_appeallwl", sound_appeal_lw, Priority::Low)
+
+
+    .game_acmd("game_entryl", game_entryl, Priority::Low)
+    .effect_acmd("effect_entryl", effect_entryl, Priority::Low)
+    .sound_acmd("sound_entryl", sound_entryl, Priority::Low)
+
+    .game_acmd("game_entryr", game_entryl, Priority::Low)
+    .effect_acmd("effect_entryr", effect_entryl, Priority::Low)
+    .sound_acmd("sound_entryr", sound_entryl, Priority::Low)
 
 
 
@@ -949,6 +964,9 @@ pub fn install() {
     .game_acmd          ("game_catchdash",              catchdash,                                  Priority::Low)
 
     .game_acmd          ("game_catchturn",              catchturn,                                  Priority::Low)
+
+    .game_acmd          ("game_catchattack",            game_catchattack,                           Priority::Low)
+
 
     .game_acmd          ("game_attackhi4",              attack_hi4,                                 Priority::Low)
     .sound_acmd         ("sound_attackhi4",             sound_attackhi4,                            Priority::Low)

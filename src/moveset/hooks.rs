@@ -61,6 +61,7 @@ pub unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, ev
         if StatusModule::status_kind(module_accessor) == FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF {
             capture_event.result = true;
             capture_event.node = smash_rs::phx::Hash40::new("throw");
+            capture_event.ignore_distance = true;
             StatusModule::change_status_request(module_accessor, FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER, false);
             return 0;
         }
@@ -87,7 +88,7 @@ pub unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, ev
             WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_ATTACK_START);
             WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_JUMP_START);
 
-            PostureModule::set_pos_2d(module_accessor,&Vector2f{x: 0.0 , y: 0.0});
+            PostureModule::set_pos(module_accessor,&Vector3f{x: 0.0 , y: 0.0, z: 50.0});
             StatusModule::change_status_request(module_accessor, *FIGHTER_STATUS_KIND_FINAL, false);      
             return 0;
         }

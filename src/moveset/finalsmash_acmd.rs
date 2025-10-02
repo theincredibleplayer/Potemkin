@@ -71,6 +71,7 @@ pub unsafe extern "C" fn game_finaldashattack(agent: &mut L2CAgentBase) {
 pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
     let module_accessor = agent.module_accessor;
     if macros::is_excute(agent) {
+        ModelModule::set_scale_z(agent.module_accessor,1.0);
         PostureModule::update_rot_y_lr(agent.module_accessor);
         UiManager::set_bar_off();
         set_vis_hud(true);
@@ -113,6 +114,9 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         let capture_id = LinkModule::get_node_object_id(agent.module_accessor, *LINK_NO_CAPTURE);
         let enemy = sv_battle_object::module_accessor(capture_id as u32);
+        let z_scale = WorkModule::get_float(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_POTEMKIN_Z_SCALE);
+        ModelModule::set_scale_z(agent.module_accessor,z_scale);
+
         if DamageModule::damage(enemy, 0) > 100.0 {
             macros::FT_MOTION_RATE(agent, 2.0);
             EffectModule::req_follow(enemy, Hash40::new("sys_explosion_sign"), Hash40::new("hip"), &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, 1.0, false, 0, 0, 0, 0, 0, false, false);
@@ -313,9 +317,6 @@ pub unsafe extern "C" fn game_final(agent: &mut L2CAgentBase) {
         CameraModule::reset_all(agent.module_accessor);
         macros::CHECK_VALID_FINAL_START_CAMERA(agent, 0, 7, 20, 0, 0, 0);
         macros::SLOW_OPPONENT(agent, 400.0, 70.0);
-        ArticleModule::generate_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
-        potemkin_mirror_handler(agent.module_accessor);
-        ArticleModule::change_motion(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("final"),false,-1.0);
     }
     if WorkModule::is_flag(agent.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_DISABLE_FINAL_START_CAMERA) == false {
         frame(agent.lua_state_agent, 5.0);
@@ -415,10 +416,6 @@ pub unsafe extern "C" fn sound_final(agent: &mut L2CAgentBase) {
 pub unsafe extern "C" fn game_finalvisualscene01(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         CameraModule::zoom_out(agent.module_accessor, 0);
-        ArticleModule::generate_article(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, false, -1);
-        potemkin_mirror_handler(agent.module_accessor);
-        ArticleModule::set_visibility_whole(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
-        ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, Hash40::new("final_visual_scene_01"), false, -1.0);
     }
 }
 pub unsafe extern "C" fn sound_finalvisualscene01(agent: &mut L2CAgentBase) {

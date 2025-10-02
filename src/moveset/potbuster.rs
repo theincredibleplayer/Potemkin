@@ -121,7 +121,8 @@ pub unsafe extern "C" fn potbusterwhiff(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         WorkModule::on_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
         damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0); 
-        macros::CATCH(agent, 0, Hash40::new("top"), 10.0, 0.0, 18.0, 8.0, None, None, None, *FIGHTER_STATUS_KIND_THROWN, *COLLISION_SITUATION_MASK_GA);
+        macros::CATCH(agent, 0, Hash40::new("top"), 6.1, 0.0, 9.0, 7.0, Some(0.0), Some(9.0), Some(12.7), *FIGHTER_STATUS_KIND_THROWN, *COLLISION_SITUATION_MASK_G);
+        macros::CATCH(agent, 1, Hash40::new("top"), 4.55, 0.0, 9.0, 5.45, Some(0.0), Some(9.0), Some(15.25), *FIGHTER_STATUS_KIND_THROWN, *COLLISION_SITUATION_MASK_A);
     }
     wait(agent.lua_state_agent, 4.0);
     if macros::is_excute(agent) {
@@ -229,9 +230,31 @@ pub unsafe extern "C" fn sound_potbuster(agent: &mut L2CAgentBase) {
 
 pub unsafe extern "C" fn expression_potbuster(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
+        macros::CAM_ZOOM_OUT(agent);
+        let scale = PostureModule::scale(agent.module_accessor);
+        let lr = PostureModule::lr(agent.module_accessor);
+        CameraModule::reset_all(agent.module_accessor);            
+        macros::CAM_ZOOM_IN_arg6(
+            agent,
+            /*frames to zoom in totally*/4.0,
+            /*according to calude the object id?*/0.0,
+            /*the amt of zoom needed, higher the number lower the zoom*/1.1*scale,
+            /*y_rot*/0.0, // up and down
+            /*x_rot*/0.0, //left and right
+            true
+        );
+        agent.clear_lua_stack();
+        lua_args!(agent,
+        *MA_MSC_CMD_CAMERA_CAM_OFFSET,
+        /*x*/10.6619 * lr,
+        /*y*/5.0,
+        /*z*/0);
+        smash::app::sv_module_access::camera(agent.lua_state_agent);
+
     }
     frame(agent.lua_state_agent, 5.0);
     if macros::is_excute(agent) {
+        macros::CAM_ZOOM_OUT(agent);
         macros::REQ_MOTION_CAMERA(agent, Hash40::new("d04potemkinbuster.nuanmb"), false);
     }
     frame(agent.lua_state_agent, 103.0);
