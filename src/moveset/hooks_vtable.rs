@@ -25,9 +25,10 @@ pub unsafe extern "C" fn potemkin_mirror_handler(module_accessor: *mut BattleObj
     let scale = PostureModule::scale(module_accessor); //gets the model's scale
     let situation_kind = StatusModule::situation_kind(module_accessor);
     let motion_kind =MotionModule::motion_kind(module_accessor);
+    let lr = PostureModule::lr(module_accessor);
     // scales the models of both pot and his articles by -1 on the x axis to mirror (accurate to strive)
-    if ((PostureModule::lr(module_accessor) < 0.0) && (![*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN].contains(&status_kind) && !((motion_kind == hash40("air_turn")) || (motion_kind == hash40("turn"))) ) )
-    || ((PostureModule::lr(module_accessor) > 0.0) && ( [*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN].contains(&status_kind) || ((motion_kind == hash40("air_turn")) || (motion_kind == hash40("turn"))) ) )
+    if ((lr < 0.0) && (![*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN].contains(&status_kind) && !((motion_kind == hash40("air_turn")) || (motion_kind == hash40("turn"))) ) )
+    || (((lr > 0.0) && ( [*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN].contains(&status_kind) || ((motion_kind == hash40("air_turn")) || (motion_kind == hash40("turn"))) ) ) )
     {
             ModelModule::set_joint_scale(module_accessor, Hash40::new("top") , &Vector3f{x:-scale,y:scale,z:scale});
             if ArticleModule::is_exist(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND){
@@ -156,10 +157,12 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
     let status_kind =StatusModule::status_kind(fighter.battle_object.module_accessor) ;
     let situation_kind = StatusModule::situation_kind(module_accessor);
     let motion_kind =MotionModule::motion_kind(module_accessor);
+
+
+
     potemkin_mirror_handler(module_accessor);
     //weapon attaching code
     potemkin_weapon_attach_handler(module_accessor);
-
     // armor effect
     let time_base = WorkModule::get_float(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FIRE_TIME_BASE);
     let agent = get_fighter_common_from_accessor((&mut*module_accessor));
@@ -208,8 +211,9 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
             *FIGHTER_STATUS_KIND_FALL,
             *FIGHTER_STATUS_KIND_FALL_AERIAL
         ].contains(&status_kind){
-            PostureModule::reverse_lr(module_accessor);
-            MotionModule::change_motion(module_accessor, Hash40::new("air_turn"), 0.0, 1.0, false, 0.0, false, false);
+            //PostureModule::reverse_lr(module_accessor);
+            StatusModule::change_status_request(module_accessor, FIGHTER_KAMUI_STATUS_KIND_AIR_AUTO_TURN ,false);
+            //MotionModule::change_motion(module_accessor, Hash40::new("air_turn"), 0.0, 1.0, false, 0.0, false, false);
             //PostureModule::update_rot_y_lr(agent.module_accessor);
         }
     }
@@ -240,6 +244,14 @@ pub unsafe extern "C" fn kamui_reset(vtable: u64, fighter: &mut Fighter) {
     WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_DASH_TO_RUN);
     WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_TURN_DASH);
     WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_DASH);
+
+
+    WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SWITCH_TO_FS_JUMP);
+    WorkModule::on_flag(module_accessor ,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_START);
+    WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_START);
+    WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_ATTACK_START);
+    WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_JUMP_START);
+
     //ModelModule::set_depth_offset(module_accessor, 10.0);
 
     kamui_reset_original(vtable,fighter);
@@ -342,7 +354,7 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
         hash40("attack_hi4_hold"),
         hash40("attack_lw4"),
         hash40("attack_lw4_hold"),
-        //hash40("attack_air_n"),
+        hash40("attack_air_n"),
         hash40("attack_air_f"),
         hash40("attack_air_b"),
         hash40("attack_air_hi"),
@@ -441,12 +453,12 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
         //hash40("thrown_b_girl"),
         //hash40("thrown_hi_girl"),
         //hash40("thrown_lw_girl"),
-        hash40("capture_pulled_hi"),
-        hash40("capture_wait_hi"),
-        hash40("capture_damage_hi"),
-        hash40("capture_pulled_lw"),
-        hash40("capture_wait_lw"),
-        hash40("capture_damage_lw"),
+        //hash40("capture_pulled_hi"),
+        //hash40("capture_wait_hi"),
+        //hash40("capture_damage_hi"),
+        //hash40("capture_pulled_lw"),
+        //hash40("capture_wait_lw"),
+        //hash40("capture_damage_lw"),
         hash40("capture_cut"),
         hash40("entry_r"),
         hash40("entry_l"),
@@ -522,18 +534,18 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
         //hash40("pass"),
         //hash40("ottotto"),
         //hash40("ottotto_wait"),
-        //hash40("wall_damage"),
+        hash40("wall_damage"),
         //hash40("stop_wall"),
         //hash40("ceil_damage"),
         //hash40("stop_ceil"),
         //hash40("miss_foot"),
-        //hash40("cliff_catch"),
-        //hash40("cliff_wait"),
-        //hash40("cliff_climb_quick"),
-        //hash40("cliff_attack_quick"),
-        //hash40("cliff_escape_quick"),
-        //hash40("cliff_jump_quick1"),
-        //hash40("cliff_jump_quick2"),
+        hash40("cliff_catch"),
+        hash40("cliff_wait"),
+        hash40("cliff_climb_quick"),
+        hash40("cliff_attack_quick"),
+        hash40("cliff_escape_quick"),
+        hash40("cliff_jump_quick1"),
+        hash40("cliff_jump_quick2"),
         hash40("slip_down"),
         hash40("slip"),
         hash40("slip_wait"),
@@ -932,49 +944,3 @@ pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,coll
     //kamui_on_attack_og(vtable,fighter,collision_log,damage);
 }
 
-#[skyline::hook(offset = 0x611cd0)]
-pub unsafe extern "C" fn on_pause_test(fighter: &mut Fighter){
-    println!("global on pause activated?");
-
-    call_original!(fighter);
-}
-
-
-
-
-// testing section ==============================================================================
-
-
-
-#[skyline::from_offset(0xb5caf0)]
-pub unsafe extern "C" fn kamui_reset_2_original(vtable: u64, fighter: &mut Fighter);
-
-pub unsafe extern "C" fn kamui_reset_2(vtable: u64, fighter: &mut Fighter) {
-    println!("reset 2 active");
-    kamui_reset_2_original(vtable,fighter);
-}
-
-#[skyline::from_offset(0x68D600)]
-pub unsafe extern "C" fn kamui_reset_3_original(vtable: u64, fighter: &mut Fighter);
-
-pub unsafe extern "C" fn kamui_reset_3(vtable: u64, fighter: &mut Fighter) {
-    println!("reset 3 active");
-    //kamui_reset_3_original(vtable,fighter);
-}
-
-
-#[skyline::from_offset(0x68D660)]
-pub unsafe extern "C" fn kamui_on_frame_2_original(vtable: u64, fighter: &mut Fighter);
-
-pub unsafe extern "C" fn kamui_on_frame_2(vtable: u64, fighter: &mut Fighter) {
-    println!("unk22 active");
-    kamui_on_frame_2_original(vtable,fighter);
-}
-
-#[skyline::from_offset(0xB5CDB0)]
-pub unsafe extern "C" fn kamui_on_frame_1_original(vtable: u64, fighter: &mut Fighter);
-
-pub unsafe extern "C" fn kamui_on_frame_1(vtable: u64, fighter: &mut Fighter) {
-    println!("on_final_end active");
-    //kamui_on_frame_3_original(vtable,fighter);
-}

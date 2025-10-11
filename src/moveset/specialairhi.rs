@@ -89,6 +89,10 @@ pub unsafe extern "C" fn special_air_hi_hold_main(fighter: &mut L2CFighterCommon
     else {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
         MotionModule::change_motion(module_accessor,Hash40::new("special_air_hi_hold_ground"),0.0,1.0,false,0.0,false,false);
+        fighter.clear_lua_stack();
+        lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_AIR, 0.0,0.0,0.0,0.0,0.0);
+        sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
+
     }
     fighter.sub_shift_status_main(L2CValue::Ptr(special_air_hi_hold_main_loop as *const () as _))
 }
@@ -126,6 +130,34 @@ unsafe fn special_air_hi_hold_main_loop(fighter: &mut L2CFighterCommon) -> L2CVa
 }
 
 
+pub unsafe extern "C" fn special_air_hi_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
+    StatusModule::init_settings
+        (fighter.module_accessor,
+        SituationKind(*SITUATION_KIND_AIR),
+        *FIGHTER_KINETIC_TYPE_FALL,
+        *GROUND_CORRECT_KIND_AIR as u32,
+        GroundCliffCheckKind(*GROUND_CLIFF_CHECK_KIND_ALWAYS),
+        true,
+        *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_FLAG,
+        *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_INT,
+        *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_FLOAT,
+        0);
+    FighterStatusModuleImpl::set_fighter_status_data
+        (fighter.module_accessor,
+        false,
+        *FIGHTER_TREADED_KIND_NO_REAC,
+        false,
+        false,
+        false,
+        (*FIGHTER_LOG_MASK_FLAG_ATTACK_KIND_SPECIAL_HI) as u64,
+        (0) as u32,
+        (*FIGHTER_POWER_UP_ATTACK_BIT_SPECIAL_HI) as u32,
+        0);
+    return L2CValue::I32(0)
+}
+
+
+
 pub unsafe extern "C" fn special_air_hi_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
@@ -156,6 +188,9 @@ unsafe fn special_air_hi_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
 
     special_air_hi_velocity_and_motion_handler(fighter,0.975,true);
     WorkModule::on_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ATTACH_WEAPON);
+    if fighter.sub_transition_group_check_air_cliff().get_bool() {
+        return 1.into()
+    }
 
     if fighter.sub_transition_group_check_air_cliff().get_bool() {
         return 1.into()
@@ -191,7 +226,7 @@ pub unsafe extern "C" fn special_air_hi_end_pre(fighter: &mut L2CFighterCommon) 
         SituationKind(*SITUATION_KIND_AIR),
         *FIGHTER_KINETIC_TYPE_FALL,
         *GROUND_CORRECT_KIND_AIR as u32,
-        GroundCliffCheckKind(*GROUND_CLIFF_CHECK_KIND_NONE),
+        GroundCliffCheckKind(*GROUND_CLIFF_CHECK_KIND_ALWAYS),
         true,
         *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_FLAG,
         *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_INT,

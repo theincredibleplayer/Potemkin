@@ -129,7 +129,6 @@ pub unsafe extern "C" fn auto_turn(fighter: &mut L2CFighterCommon) -> L2CValue {
                         *FIGHTER_STATUS_KIND_ATTACK_LW4_START,
                         *FIGHTER_STATUS_KIND_CATCH,
                         *FIGHTER_STATUS_KIND_ITEM_SWING,
-                        *FIGHTER_STATUS_KIND_FINAL,
                         *FIGHTER_RYU_STATUS_KIND_WALK_BACK,
                     ].contains(&status_kind){
                         update_lr(fighter);
@@ -389,6 +388,44 @@ pub unsafe extern "C" fn autoturn_end(fighter: &mut L2CFighterCommon) -> L2CValu
     fighter.status_end_Wait();
     return 0.into();
 }
+
+pub unsafe extern "C" fn air_autoturn_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
+    fighter.status_pre_Fall();
+    return 0.into();
+}
+
+pub unsafe extern "C" fn air_autoturn_main(fighter: &mut L2CFighterCommon) -> L2CValue {
+    fighter.status_Fall();
+    PostureModule::reverse_lr(fighter.module_accessor);
+    MotionModule::change_motion(fighter.module_accessor, Hash40::new("air_turn"), 0.0, 1.0, false, 0.0, false, false);
+    fighter.sub_shift_status_main(L2CValue::Ptr(air_autoturn_main_loop as *const () as _))
+}
+
+pub unsafe extern "C" fn air_autoturn_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
+    fighter.status_Fall_Main();
+    if MotionModule::is_end(fighter.module_accessor) {
+        if StatusModule::prev_status_kind(fighter.module_accessor, 0) == *FIGHTER_STATUS_KIND_FALL{
+            fighter.change_status(FIGHTER_STATUS_KIND_FALL.into(),false.into());
+        }else if StatusModule::prev_status_kind(fighter.module_accessor, 0) == *FIGHTER_STATUS_KIND_FALL_AERIAL{
+            fighter.change_status(FIGHTER_STATUS_KIND_FALL_AERIAL.into(),false.into());
+        }else{
+            fighter.change_status(FIGHTER_STATUS_KIND_FALL.into(),false.into());
+        }
+    }
+    
+    return 0.into();
+}
+
+pub unsafe extern "C" fn air_autoturn_end(fighter: &mut L2CFighterCommon) -> L2CValue {
+    fighter.status_end_Fall();
+    return 0.into();
+}
+
+
+
+
+
+
 
 
 pub unsafe extern "C" fn walk_back_brake_exec(fighter: &mut L2CFighterCommon) -> L2CValue {

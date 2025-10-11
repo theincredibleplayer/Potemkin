@@ -42,7 +42,6 @@ pub unsafe extern "C" fn game_finaldashattack(agent: &mut L2CAgentBase) {
         JostleModule::set_status(agent.module_accessor, false);
         macros::SLOW_OPPONENT(agent, 400.0, 7.0);
         HitModule::set_whole(agent.module_accessor, smash::app::HitStatus(*HIT_STATUS_INVINCIBLE), 0);
-        UiManager::set_jetpack_lr(PostureModule::lr(agent.module_accessor));
     }
     frame(agent.lua_state_agent, 7.0);
     if macros::is_excute(agent) {
@@ -145,7 +144,7 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
             wait(agent.lua_state_agent, 1.0);
             if macros::is_excute(agent) {
                 let common = get_fighter_common_from_accessor(&mut* enemy);
-                set_stage_visibility(agent.module_accessor, false);               ////////////////////////////////problem here
+                //set_stage_visibility(agent.module_accessor, false);               ////////////////////////////////problem here
                 macros::QUAKE(common, *CAMERA_QUAKE_KIND_XL);
                 SlowModule::clear_whole(agent.module_accessor);
                 
@@ -184,7 +183,7 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
             //frame(agent.lua_state_agent, 152.0);
             if macros::is_excute(agent) {
                 let common = get_fighter_common_from_accessor(&mut* enemy);
-                set_stage_visibility(agent.module_accessor, true);
+                //set_stage_visibility(agent.module_accessor, true);
                 macros::FT_MOTION_RATE(agent, 1.0);
                 macros::CAM_ZOOM_OUT(common);
                 StatusModule::change_status_request_from_script(enemy, FIGHTER_STATUS_KIND_DEAD.into(), false.into());

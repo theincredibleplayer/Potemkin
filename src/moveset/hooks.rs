@@ -121,7 +121,7 @@ pub unsafe extern "C" fn noping_the_eff(vtable:u64, weapon: *mut smash::app::Wea
 
 
 
-#[skyline::hook(offset=0x4E53E0)]
+#[skyline::hook(offset = 0x4E53E0)]
 unsafe fn get_param_float_hook(x0:u64, arg2:u64, arg3:u64) -> f32 {
     let mut boma = *((x0 as *mut u64).offset(1)) as *mut BattleObjectModuleAccessor;
     let boma_reference = &mut *boma;
@@ -152,45 +152,11 @@ unsafe fn change_motion_hook(ctx: &skyline::hooks::InlineCtx) {
 
 
 
-/*
-
-#[skyline::hook(offset=0x6955d0)]
-unsafe fn internal_cam(cameramodule: CameraModule, cam_hash: u64, arg3: i32) -> f32 {
-    println!("module : {}\nhash : {:#x}\narg3 : {}",cameramodule, cam_hash ,arg3);
-
-    call_original!(cameramodule, cam_hash, arg3)
-}
-
-*/
 
 
 
 
 
-
-/*#[skyline::hook(offset = 0xb5e10)]
-pub unsafe extern "C" fn caught_status_hook(fighter: &mut L2CFighterCommon) {
-    let parent_id = LinkModule::get_parent_id(fighter.module_accessor,*LINK_NO_CAPTURE,true);
-    let parent_boma = sv_battle_object::module_accessor(parent_id as u32);
-    println!("caught status hook successful probably");
-    if LinkModule::get_parent_status_kind(fighter.module_accessor,*FIGHTER_LINK_NO_CONSTRAINT) as i32 == *FIGHTER_STATUS_KIND_SPECIAL_HI
-    || LinkModule::get_parent_status_kind(fighter.module_accessor,*FIGHTER_LINK_NO_CONSTRAINT) as i32 == FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START{
-        grabbed_anim_selector(fighter,"catched_pot_special_hi",1.0);
-    }
-    original!()(fighter)
-}*/
-
-
-/*#[skyline::hook(replace = STATUS_ADDR)]
-unsafe fn thrown_hook(fighter: &mut L2CFighterCommon) {
-
-}
-
-#[skyline::hook(replace = L2CFighterCommon_status_Walk_Main_common)]
-unsafe extern "C" fn status_walk_main_common(fighter: &mut L2CFighterCommon, arg1: L2CValue, arg2: L2CValue, arg3: L2CValue, arg4: L2CValue) -> L2CValue {
-
-    call_original!(fighter, arg1, arg2, arg3, arg4)
-}*/
 
 
 
@@ -212,10 +178,4 @@ pub static OFFSET_SEARCH_CODE: &[u8] = &[
     0xfb, 0x03, 0x00, 0xaa  //.text:0000007100675A44                 MOV             X27, X0
 ];
 
-/*#[skyline::hook(offset = 0x4a0f90)]
-pub unsafe extern "C" fn motion_hook(unk: u64, unk2: u64) -> u64 {
-    let filepath = (unk + 0x148) as *mut *mut u64;
-    println!("filepath: {:#x}",**filepath);
-    original!()(unk,unk2)
-}*/
 

@@ -167,6 +167,7 @@ pub const FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_HOLD: i32 = 0x205;
 pub const FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE: i32 = 0x206;
 pub const FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_END: i32 = 0x207;
 
+pub const FIGHTER_KAMUI_STATUS_KIND_AIR_AUTO_TURN: i32 = 0x208;
 
 
 // for weapon
@@ -236,6 +237,14 @@ mod specialairhi_acmd;
 use specialairhi_acmd::*;
 mod normals;
 use normals::*;
+mod tilts;
+use tilts::*;
+mod smash_attacks;
+use smash_attacks::*;
+mod aerials;
+use aerials::*;
+mod air_throw;
+use air_throw::*;
 mod specials;
 use specials::*;
 mod specials_acmd;
@@ -386,13 +395,167 @@ pub unsafe extern "C" fn rc_speed_float_setter(fighter: &mut L2CFighterCommon) {
 
 //cancels
 pub unsafe extern "C" fn cancels(fighter: &mut L2CFighterCommon) {
+    let module_accessor = fighter.module_accessor;
+    let status = StatusModule::status_kind(module_accessor);
+    let motion_kind = MotionModule::motion_kind(module_accessor);
+
+    let cat1 = ControlModule::get_command_flag_cat(module_accessor, 0);
+    let cat2 = ControlModule::get_command_flag_cat(module_accessor, 1);
+    let cat3 = ControlModule::get_command_flag_cat(module_accessor, 2);
+    let cat4 = ControlModule::get_command_flag_cat(module_accessor, 3);
+
+
+    if CancelModule::is_enable_cancel(module_accessor) 
+    || fighter.global_table[IS_STOP].get_bool()
+    || !AttackModule::is_infliction_status(module_accessor, *COLLISION_KIND_MASK_HIT | *COLLISION_KIND_MASK_SHIELD){
+        return;
+    }
+
+
+
+    if [
+    *FIGHTER_STATUS_KIND_ATTACK
+    ,*FIGHTER_STATUS_KIND_ATTACK_100
+    ,*FIGHTER_STATUS_KIND_ATTACK_HI3
+    ,*FIGHTER_STATUS_KIND_ATTACK_HI4
+    ,*FIGHTER_STATUS_KIND_ATTACK_LW3
+    ,*FIGHTER_STATUS_KIND_ATTACK_S3
+    ,*FIGHTER_STATUS_KIND_ATTACK_S4
+    ,*FIGHTER_STATUS_KIND_ATTACK_AIR
+    ].contains(&status){
+        if (cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SUPER_SPECIAL2_COMMAND) != 0
+        && smash::app::lua_bind::FighterManager::is_final(singletons::FighterManager()){
+            WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_START);
+            WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_START);
+            WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_ATTACK_START);
+            WorkModule::on_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_JUMP_START);
+            fighter.clear_lua_stack();
+            fighter.push_lua_stack(&mut L2CValue::new_int(0x201bc9217c));
+            sv_battle_object::notify_event_msc_cmd(fighter.lua_state_agent);
+            fighter.pop_lua_stack(1);
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_FINAL, false);
+            return;
+        }
+        if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_SPECIAL_N) != 0 {
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_SPECIAL_N, false);
+            return;
+        }
+        if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_SPECIAL_S) != 0  {
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_SPECIAL_S, false);
+            return;
+        }
+        if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_SPECIAL_HI) != 0  {
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_SPECIAL_HI, false);
+            return;
+        }
+        if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_SPECIAL_LW) != 0 {
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_SPECIAL_LW, false);
+            return;
+        }
+        if (cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SUPER_SPECIAL_COMMAND) != 0{
+            StatusModule::change_status_request_from_script(fighter.module_accessor, FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF, false);
+            return;
+        }
+        if (cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_HI_COMMAND) != 0
+        && fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND {
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_SPECIAL_HI, false);
+            return;
+        }
+        if (cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_N_COMMAND) != 0{
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F, false);
+            return;
+        }
+        if (cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_S_COMMAND) != 0{
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_B, false);
+            return;
+        }
+        let jump_count = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_JUMP_COUNT);
+        let max_jump_count = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_JUMP_COUNT_MAX);
+        let remaining_jumps= max_jump_count - jump_count;
+        if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_JUMP_BUTTON) != 0 {
+            if remaining_jumps > 0{
+                if fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND{
+                    StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_JUMP_SQUAT, false);
+                }else{
+                    StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_JUMP, false);
+                }
+                return;
+            }
+        }
+    }
+    if [*FIGHTER_STATUS_KIND_ATTACK_AIR
+    ].contains(&status){
+        if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_N) != 0 {
+            let control = ControlModule::get_attack_air_kind(module_accessor);
+            let aerials = [*FIGHTER_COMMAND_ATTACK_AIR_KIND_B,*FIGHTER_COMMAND_ATTACK_AIR_KIND_F,*FIGHTER_COMMAND_ATTACK_AIR_KIND_LW,*FIGHTER_COMMAND_ATTACK_AIR_KIND_HI,*FIGHTER_COMMAND_ATTACK_AIR_KIND_N];
+            for attack_air in aerials{
+                if control == attack_air{
+                    if !(motion_kind == hash40("attack_air_lw")
+                    && control == *FIGHTER_COMMAND_ATTACK_AIR_KIND_LW){
+                        ControlModule::set_attack_air_kind(module_accessor,attack_air);
+                        StatusModule::change_status_force(fighter.module_accessor, *FIGHTER_STATUS_KIND_ATTACK_AIR, false);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+    if [*FIGHTER_STATUS_KIND_ATTACK
+    ].contains(&status){
+        if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_HI4) != 0 {
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_ATTACK_HI4_START, false);
+            return;
+        }
+        if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_S4 ) != 0 {
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_ATTACK_S4_START, false);
+            return;
+        }
+        if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_LW4) != 0  {
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_ATTACK_LW4_START, false);
+            return;
+        }
+        if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_HI3) != 0 {
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_ATTACK_HI3, false);
+            return;
+        }
+        if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_S3 ) != 0 {
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_ATTACK_S3, false);
+            return;
+        }
+        if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_LW3) != 0  {
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_ATTACK_LW3, false);
+            return;
+        }
+        if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_N) != 0  {
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_ATTACK, false);
+            return;
+        }
+    }
+    if [
+    *FIGHTER_STATUS_KIND_ATTACK_HI3
+    ,*FIGHTER_STATUS_KIND_ATTACK_LW3
+    ,*FIGHTER_STATUS_KIND_ATTACK_S3
+    ].contains(&status){
+        if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_HI4) != 0 {
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_ATTACK_HI4_START, false);
+            return;
+        }
+        if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_S4 ) != 0 {
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_ATTACK_S4_START, false);
+            return;
+        }
+        if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_LW4) != 0  {
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_ATTACK_LW4_START, false);
+            return;
+        }
+    }
     return;
 }
 // opff
 pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
     unsafe {
         let module_accessor = fighter.module_accessor;
-        //cancels(fighter);
+        cancels(fighter);
 
         if ControlModule::check_button_trigger(module_accessor,*CONTROL_PAD_BUTTON_APPEAL_S_L) {
             println!("{}",WorkModule::get_float(module_accessor,*FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1));
@@ -402,22 +565,7 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
         let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
 
-        if StatusModule::status_kind(module_accessor) != *FIGHTER_STATUS_KIND_FINAL
-        && StatusModule::status_kind(module_accessor) != FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_START
-        && StatusModule::status_kind(module_accessor) != FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP
-        && StatusModule::status_kind(module_accessor) != FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE
-        && StatusModule::status_kind(module_accessor) != FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP  
-        && StatusModule::status_kind(module_accessor) != FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK {
-            //WorkModule::on_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_START);
-            WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SWITCH_TO_FS_JUMP);
 
-            WorkModule::on_flag(fighter.module_accessor ,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_START);
-            WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_START);
-            WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_ATTACK_START);
-            WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_JUMP_START);
-
-
-        }
 
 
         let status_kind = StatusModule::status_kind(module_accessor);
@@ -656,12 +804,27 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
 pub unsafe extern "C" fn pot_check_special_command(fighter: &mut L2CFighterCommon) -> L2CValue {
     let cat4 = fighter.global_table[CMD_CAT4].get_i32();
     // potemkin buster input
-    if cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SUPER_SPECIAL2_COMMAND != 0
+    if cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SUPER_SPECIAL_COMMAND != 0
     && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_N_COMMAND)
     && fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND{
         fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF.into(), true.into());
         return true.into();
     }
+    if cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SUPER_SPECIAL2_COMMAND != 0
+    && smash::app::lua_bind::FighterManager::is_final(singletons::FighterManager())
+    && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_N_COMMAND){
+        WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_START);
+        WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_START);
+        WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_ATTACK_START);
+        WorkModule::on_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_JUMP_START);
+        fighter.clear_lua_stack();
+        fighter.push_lua_stack(&mut L2CValue::new_int(0x201bc9217c));
+        sv_battle_object::notify_event_msc_cmd(fighter.lua_state_agent);
+        fighter.pop_lua_stack(1);
+        fighter.change_status(FIGHTER_STATUS_KIND_FINAL.into(), true.into());
+        return true.into();
+    }
+
     //// heat tackle input
     //if cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_ATTACK_COMMAND1 != 0
     //&& WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_HI_COMMAND){
@@ -688,12 +851,12 @@ pub unsafe extern "C" fn pot_check_special_command(fighter: &mut L2CFighterCommo
         return true.into();
     }
     //hammerfall input
-    if cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_HI2_COMMAND != 0
-    && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_HI_COMMAND)
-    && fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND{
-        fighter.change_status(FIGHTER_STATUS_KIND_SPECIAL_S.into(), true.into());
-        return true.into();
-    }
+    //if cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_HI2_COMMAND != 0
+    //&& WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_HI_COMMAND)
+    //&& fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND{
+    //    fighter.change_status(FIGHTER_STATUS_KIND_SPECIAL_S.into(), true.into());
+    //    return true.into();
+    //}
     return false.into();
 }
 
@@ -794,6 +957,11 @@ pub fn install() {
     .status(Pre       ,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN, autoturn_pre)
     .status(Main      ,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN, autoturn_main)
     .status(End       ,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN, autoturn_end)
+
+
+    .status(Pre       ,FIGHTER_KAMUI_STATUS_KIND_AIR_AUTO_TURN, air_autoturn_pre)
+    .status(Main      ,FIGHTER_KAMUI_STATUS_KIND_AIR_AUTO_TURN, air_autoturn_main)
+    .status(End       ,FIGHTER_KAMUI_STATUS_KIND_AIR_AUTO_TURN, air_autoturn_end)
 
     //throw
     .game_acmd("game_throwlw", throw_lw, Priority::Low)
@@ -915,6 +1083,7 @@ pub fn install() {
     .status(End, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE, special_hi_end)
     .status(Exec, FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE, special_hi_release_exec)
 
+    .status(Pre, FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE, special_air_hi_pre)
     .status(Main, FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE, special_air_hi_main)
     .status(End, FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE, special_air_hi_end)
     //.status(Exec, FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_HOLD, special_air_hi_hold_exec)
@@ -947,17 +1116,22 @@ pub fn install() {
 
 
     //normals
-    .game_acmd          ("game_attacks3",               attack_s3,                                  Priority::Low)
-    .effect_acmd        ("effect_attacks3",             effect_attack_s3,                           Priority::Low)
+    .game_acmd          ("game_attacks3",               game_attacks3,                                  Priority::Low)
+    .effect_acmd        ("effect_attacks3",             effect_attacks3,                           Priority::Low)
 
-    .game_acmd          ("game_attackhi3",               attack_hi3,                                Priority::Low)
-    .effect_acmd        ("effect_attackhi3",             effect_attack_hi3,                         Priority::Low)
+    .game_acmd          ("game_attackhi3",               game_attackhi3,                                Priority::Low)
+    .effect_acmd        ("effect_attackhi3",             effect_attackhi3,                         Priority::Low)
 
-    .game_acmd          ("game_attacklw3",              attack_lw3,                                 Priority::Low)
-    .effect_acmd        ("effect_attacklw3",            effect_attack_lw3,                          Priority::Low)
+    .game_acmd          ("game_attacklw3",              game_attacklw3,                                 Priority::Low)
+    .effect_acmd        ("effect_attacklw3",            effect_attacklw3,                          Priority::Low)
 
     //.game_acmd          ("game_attackdash",             attack_dash,                                Priority::Low)
     //.effect_acmd        ("effect_attackdash",           effect_attack_dash,                         Priority::Low)
+
+    .game_acmd          ("game_attack11",               game_attack11,                              Priority::Low)
+    .effect_acmd        ("effect_attack11",             effect_attack11,                            Priority::Low)
+    .sound_acmd         ("sound_attack11",              sound_attack11,                             Priority::Low)
+
 
     .game_acmd          ("game_catch",                  catch,                                      Priority::Low)
 
@@ -967,24 +1141,40 @@ pub fn install() {
 
     .game_acmd          ("game_catchattack",            game_catchattack,                           Priority::Low)
 
+    .game_acmd          ("game_cliffattack",              game_cliffattack,                                 Priority::Low)
+    .effect_acmd        ("effect_cliffattack",            effect_cliffattack,                          Priority::Low)
 
-    .game_acmd          ("game_attackhi4",              attack_hi4,                                 Priority::Low)
+    .game_acmd          ("game_attackhi4",              game_attackhi4,                                 Priority::Low)
     .sound_acmd         ("sound_attackhi4",             sound_attackhi4,                            Priority::Low)
-    .effect_acmd        ("effect_attackhi4",            effect_attack_hi4,                          Priority::Low)
+    .effect_acmd        ("effect_attackhi4",            effect_attackhi4,                          Priority::Low)
     .expression_acmd    ("expression_attackhi4",        expression_attackhi4,                       Priority::Low)
 
-    .effect_acmd        ("effect_attackshi4charge",     effect_attack_hi4_charge,                   Priority::Low)
-    .sound_acmd         ("sound_attacks4charge",        sound_attacks4charge,                       Priority::Low)
-    .effect_acmd        ("effect_attacks4charge",       effect_attack_s4_charge,                    Priority::Low)
+    .sound_acmd         ("sound_attackhi4",             sound_attackhi4charge,                            Priority::Low)
+    .effect_acmd        ("effect_attackhi4",            effect_attackhi4charge,                          Priority::Low)
+    .expression_acmd    ("expression_attackhi4",        expression_attackhi4charge,                       Priority::Low)
 
-    .game_acmd          ("game_attacks4",               attack_s4,                                  Priority::Low)
+    .sound_acmd         ("sound_attacks4charge",        sound_attacks4charge,                       Priority::Low)
+    .effect_acmd        ("effect_attacks4charge",       effect_attacks4charge,                    Priority::Low)
+
+    .game_acmd          ("game_attacks4",               game_attacks4,                                  Priority::Low)
     .sound_acmd         ("sound_attacks4",              sound_attacks4,                             Priority::Low)
-    .effect_acmd        ("effect_attacks4",             effect_attack_s4,                           Priority::Low)
+    .effect_acmd        ("effect_attacks4",             effect_attacks4,                           Priority::Low)
     .expression_acmd    ("expression_attacks4",         expression_attacks4,                        Priority::Low)
+
+    .game_acmd          ("game_attacks4charge",               game_attacks4charge,                                  Priority::Low)
+    .sound_acmd         ("sound_attacks4charge",              sound_attacks4charge,                             Priority::Low)
+    .effect_acmd        ("effect_attacks4charge",             effect_attacks4charge,                           Priority::Low)
+    .expression_acmd    ("expression_attacks4charge",         expression_attacks4charge,                        Priority::Low)
+
 
     .game_acmd          ("game_attacklw4",              game_attacklw4,                             Priority::Low)
     .sound_acmd         ("sound_attacklw4",             sound_attacklw4,                            Priority::Low)
     .effect_acmd        ("effect_attacklw4",            effect_attacklw4,                           Priority::Low)
+
+    .sound_acmd         ("sound_attacklw4charge",              sound_attacklw4charge,                             Priority::Low)
+    .effect_acmd        ("effect_attacklw4charge",             effect_attacklw4charge,                           Priority::Low)
+    .expression_acmd    ("expression_attacklw4charge",         expression_attacklw4charge,                        Priority::Low)
+
 
     .game_acmd          ("game_win1a",                  game_win1a,                                 Priority::Low)
     .sound_acmd         ("sound_win1a",                 sound_win1a,                                Priority::Low)
@@ -994,8 +1184,12 @@ pub fn install() {
     .effect_acmd          ("effect_attackairhi",            effect_attackairhi,                           Priority::Low)
 
     .game_acmd          ("game_attackairlw",            game_attackairlw,                           Priority::Low)
-    .sound_acmd         ("sound_attacklw4",             sound_attackairlw,                          Priority::Low)
-    .effect_acmd        ("effect_attacklw4",            effect_attackairlw,                         Priority::Low)
+    .sound_acmd         ("sound_attackairlw",             sound_attackairlw,                          Priority::Low)
+    .effect_acmd        ("effect_attackairlw",            effect_attackairlw,                         Priority::Low)
+
+    .game_acmd          ("game_attackairn",            game_attackairn,                           Priority::Low)
+    .sound_acmd         ("sound_attackairn",             sound_attackairn,                          Priority::Low)
+    .effect_acmd        ("effect_attackairn",            effect_attackairn,                         Priority::Low)
 
 
     .game_acmd          ("game_attackairb",             game_attackairb,                            Priority::Low)
@@ -1210,8 +1404,8 @@ pub fn install() {
 
 
     Agent::new("kamui_spearhand")
-    .game_acmd("game_attacks4", spear_attack_s4, Priority::Low)
-    .effect_acmd("effect_attacks4charge", effect_attack_s4_charge_spear, Priority::Low)
+    .game_acmd("game_attacks4", spear_attacks4, Priority::Low)
+    .effect_acmd("effect_attacks4charge", effect_attacks4_charge_spear, Priority::Low)
     .install();
 
     Agent::new("kamui_ryusensya")

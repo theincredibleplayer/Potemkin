@@ -295,7 +295,7 @@ pub unsafe extern "C" fn Final_main_loop(fighter: &mut L2CFighterCommon) -> L2CV
         WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
         AreaModule::set_whole(fighter.module_accessor, false);
         UiManager::sync_jetpack(MotionModule::frame(fighter.module_accessor));
-
+        UiManager::set_jetpack_lr(PostureModule::lr(fighter.module_accessor));
         KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_STOP);
         KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY);
         KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_MOTION);
@@ -317,6 +317,11 @@ pub unsafe extern "C" fn Final_exit(fighter: &mut L2CFighterCommon) -> L2CValue 
 
     if StatusModule::status_kind_next(module_accessor) != FIGHTER_STATUS_KIND_FINAL {
         println!("final exit og was ran");
+        WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SWITCH_TO_FS_JUMP);
+        WorkModule::on_flag(fighter.module_accessor ,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_START);
+        WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_START);
+        WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_ATTACK_START);
+        WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_JUMP_START);
         return smashline::original_status(Exit, fighter, *FIGHTER_STATUS_KIND_FINAL)(fighter);
     }
     return L2CValue::I32(0)
