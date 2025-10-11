@@ -1464,14 +1464,9 @@ pub fn install() {
         idkman,
         idkman2,
         autoturn_situation_check_hook,
-        on_pause_test
-        //change_motion_hook
-        //internal_cam
-        //get_params_outside
-        //initialization,
     );
     unsafe {
-        KAMUI_VTABLE_ENTRIES[0] = 0x4fc9b50;
+        KAMUI_VTABLE_ENTRIES[0] = 0x4FC8B50;
         for i in 1..146 {
             KAMUI_VTABLE_ENTRIES[i] = KAMUI_VTABLE_ENTRIES[0] + (0x8 * (i as usize));
         }
