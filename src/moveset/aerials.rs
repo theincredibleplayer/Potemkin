@@ -99,17 +99,10 @@ pub unsafe extern "C" fn effect_attackairlw(agent: &mut L2CAgentBase) {
 }
 
 pub unsafe extern "C" fn sound_attackairlw(agent: &mut L2CAgentBase) {
-    frame(agent.lua_state_agent, 3.0);
+    frame(agent.lua_state_agent, 11.0);
     if macros::is_excute(agent) {
-    }
-    frame(agent.lua_state_agent, 9.0);
-    if macros::is_excute(agent) {
-    }
-    frame(agent.lua_state_agent, 10.0);
-    if macros::is_excute(agent) {
-    }
-    frame(agent.lua_state_agent, 29.0);
-    if macros::is_excute(agent) {
+        macros::PLAY_SE(agent, Hash40::new("se_btl_pot_16"));
+        attack_sound_randomizer(agent,"mid");
     }
 }
 
@@ -131,7 +124,11 @@ pub unsafe extern "C" fn effect_attackairn(agent: &mut L2CAgentBase) {
 }
 
 pub unsafe extern "C" fn sound_attackairn(agent: &mut L2CAgentBase) {
-
+    frame(agent.lua_state_agent, 6.0);
+    if macros::is_excute(agent) {
+        attack_sound_randomizer(agent,"light");
+        macros::PLAY_SE(agent, Hash40::new("se_btl_pot_14"));
+    }
 }
 
 
@@ -152,16 +149,10 @@ pub unsafe extern "C" fn game_attackairb(agent: &mut L2CAgentBase) {
 }
 
 pub unsafe extern "C" fn effect_attackairb(agent: &mut L2CAgentBase) {
+    frame(agent.lua_state_agent, 8.0);
     if macros::is_excute(agent) {
-    }
-    frame(agent.lua_state_agent, 12.0);
-    if macros::is_excute(agent) {
-    }
-    frame(agent.lua_state_agent, 13.0);
-    if macros::is_excute(agent) {
-    }
-    frame(agent.lua_state_agent, 39.0);
-    if macros::is_excute(agent) {
+        attack_sound_randomizer(agent,"heavy");
+        macros::PLAY_SE(agent, Hash40::new("se_btl_pot_16"));
     }
 }
 
@@ -197,10 +188,11 @@ pub unsafe extern "C" fn effect_attackairf(agent: &mut L2CAgentBase) {
 pub unsafe extern "C" fn sound_attackairf(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 6.0);
     if macros::is_excute(agent) {
-        macros::PLAY_SEQUENCE(agent, Hash40::new("seq_kamui_rnd_attack_air"));
+        attack_sound_randomizer(agent,"mid");
     }
-    wait(agent.lua_state_agent, 2.0);
+    frame(agent.lua_state_agent, 12.0);
     if macros::is_excute(agent) {
+        macros::PLAY_SE(agent, Hash40::new("se_btl_pot_15"));
     }
 }
 

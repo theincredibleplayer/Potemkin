@@ -140,24 +140,25 @@ pub unsafe extern "C" fn special_hi_start_main(fighter: &mut L2CFighterCommon) -
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
     let scale = PostureModule::scale(fighter.module_accessor);
     let lr = PostureModule::lr(fighter.module_accessor);
-    CameraModule::reset_all(fighter.module_accessor);            
-    macros::CAM_ZOOM_IN_arg6(
-        fighter,
-        /*frames to zoom in totally*/10.0,
-        /*according to calude the object id?*/0.0,
-        /*the amt of zoom needed, higher the number lower the zoom*/1.1*scale,
-        /*y_rot*/0.1, // up and down
-        /*x_rot*/0.2 * lr, //left and right
-        true,
-    );
-    fighter.clear_lua_stack();
-    lua_args!(fighter,
-    *MA_MSC_CMD_CAMERA_CAM_OFFSET,
-    /*x*/12.0 * lr,
-    /*y*/14.0,
-    /*z*/0);
-    smash::app::sv_module_access::camera(fighter.lua_state_agent);
-
+    if camera_checks(fighter){
+        CameraModule::reset_all(fighter.module_accessor);            
+        macros::CAM_ZOOM_IN_arg6(
+            fighter,
+            /*frames to zoom in totally*/10.0,
+            /*according to calude the object id?*/0.0,
+            /*the amt of zoom needed, higher the number lower the zoom*/1.1*scale,
+            /*y_rot*/0.1, // up and down
+            /*x_rot*/0.2 * lr, //left and right
+            true,
+        );
+        fighter.clear_lua_stack();
+        lua_args!(fighter,
+        *MA_MSC_CMD_CAMERA_CAM_OFFSET,
+        /*x*/12.0 * lr,
+        /*y*/14.0,
+        /*z*/0);
+        smash::app::sv_module_access::camera(fighter.lua_state_agent);
+    }
 
     ArticleModule::generate_article(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
     potemkin_mirror_handler(module_accessor);
@@ -212,26 +213,27 @@ pub unsafe extern "C" fn special_hi_loop_main(fighter: &mut L2CFighterCommon) ->
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
     let scale = PostureModule::scale(fighter.module_accessor);
-    macros::CAM_ZOOM_OUT(fighter);
-    let lr = PostureModule::lr(fighter.module_accessor);
-    CameraModule::reset_all(fighter.module_accessor);            
-    macros::CAM_ZOOM_IN_arg6(
-        fighter,
-        /*frames to zoom in totally*/90.0,
-        /*according to calude the object id?*/0.0,
-        /*the amt of zoom needed, higher the number lower the zoom*/1.1*scale,
-        /*y_rot*/0.1, // up and down
-        /*x_rot*/-0.3 * lr, //left and right
-        /*this seems to be a quake multiplier*/ true,
-    );
-    fighter.clear_lua_stack();
-    lua_args!(fighter,
-    *MA_MSC_CMD_CAMERA_CAM_OFFSET,
-    /*x*/12.0 * lr,
-    /*y*/17.0,
-    /*z*/0.0);
-    smash::app::sv_module_access::camera(fighter.lua_state_agent);
-
+    if camera_checks(fighter){
+        macros::CAM_ZOOM_OUT(fighter);
+        let lr = PostureModule::lr(fighter.module_accessor);
+        CameraModule::reset_all(fighter.module_accessor);            
+        macros::CAM_ZOOM_IN_arg6(
+            fighter,
+            /*frames to zoom in totally*/90.0,
+            /*according to calude the object id?*/0.0,
+            /*the amt of zoom needed, higher the number lower the zoom*/1.1*scale,
+            /*y_rot*/0.1, // up and down
+            /*x_rot*/-0.3 * lr, //left and right
+            /*this seems to be a quake multiplier*/ true,
+        );
+        fighter.clear_lua_stack();
+        lua_args!(fighter,
+        *MA_MSC_CMD_CAMERA_CAM_OFFSET,
+        /*x*/12.0 * lr,
+        /*y*/17.0,
+        /*z*/0.0);
+        smash::app::sv_module_access::camera(fighter.lua_state_agent);
+    }
     ArticleModule::generate_article(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
     potemkin_mirror_handler(module_accessor);
     ArticleModule::change_motion(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("entry_r"),false,-1.0);
@@ -275,26 +277,28 @@ unsafe fn special_hi_loop_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue 
     if MotionModule::is_end(fighter.module_accessor) {
 
         if WorkModule::get_int(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_LOOP_HITS_SPECIAL_HI) <= 0 {
-            let scale = PostureModule::scale(fighter.module_accessor);
-            macros::CAM_ZOOM_OUT(fighter);
-            let lr = PostureModule::lr(fighter.module_accessor);
-            CameraModule::reset_all(fighter.module_accessor);            
-            macros::CAM_ZOOM_IN_arg6(
-                fighter,
-                /*frames to zoom in totally*/50.0,
-                /*according to calude the object id?*/0.0,
-                /*the amt of zoom needed, higher the number lower the zoom*/2.0*scale,
-                /*y_rot*/0.13, // up and down
-                /*x_rot*/-0.7 * lr, //left and right
-                /*this seems to be a quake multiplier*/ true,
-            );
-            fighter.clear_lua_stack();
-            lua_args!(fighter,
-            *MA_MSC_CMD_CAMERA_CAM_OFFSET,
-            /*x*/12.0 * lr,
-            /*y*/17.0,
-            /*z*/0.0);
-            smash::app::sv_module_access::camera(fighter.lua_state_agent);
+            if camera_checks(fighter){
+                let scale = PostureModule::scale(fighter.module_accessor);
+                macros::CAM_ZOOM_OUT(fighter);
+                let lr = PostureModule::lr(fighter.module_accessor);
+                CameraModule::reset_all(fighter.module_accessor);            
+                macros::CAM_ZOOM_IN_arg6(
+                    fighter,
+                    /*frames to zoom in totally*/50.0,
+                    /*according to calude the object id?*/0.0,
+                    /*the amt of zoom needed, higher the number lower the zoom*/2.0*scale,
+                    /*y_rot*/0.13, // up and down
+                    /*x_rot*/-0.7 * lr, //left and right
+                    /*this seems to be a quake multiplier*/ true,
+                );
+                fighter.clear_lua_stack();
+                lua_args!(fighter,
+                *MA_MSC_CMD_CAMERA_CAM_OFFSET,
+                /*x*/12.0 * lr,
+                /*y*/17.0,
+                /*z*/0.0);
+                smash::app::sv_module_access::camera(fighter.lua_state_agent);
+            }
             fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE.into(),false.into());
         } else {
             if WorkModule::get_int(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_LOOP_HITS_SPECIAL_HI) == 1 {
@@ -437,6 +441,7 @@ pub unsafe extern "C" fn special_hi_end(fighter: &mut L2CFighterCommon) -> L2CVa
         ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
         CameraModule::zoom_out(module_accessor, 0);
         if CatchModule::is_catch(module_accessor) {
+            CatchModule::set_send_cut_event(module_accessor, true);
             CatchModule::catch_cut(module_accessor,false,false);
             println!("catch cut was ran");
         }    

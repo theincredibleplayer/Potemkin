@@ -127,7 +127,7 @@ macro_rules! primitives {
 primitives![i8 u8 i16 u16 i32 u32 i64 u64 f32 f64];
 
 
-pub const LOWERCASE_FIGHTER_NAMES: StaticArrayAccessor<&'static str> = StaticArrayAccessor::new(0x4f81e20, 118);
+pub const LOWERCASE_FIGHTER_NAMES: StaticArrayAccessor<&'static str> = StaticArrayAccessor::new(0x4f80e20, 118);
 
 
 

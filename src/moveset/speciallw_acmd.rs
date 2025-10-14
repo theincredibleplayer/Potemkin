@@ -71,8 +71,14 @@ pub unsafe extern "C" fn effect_special_lw(agent: &mut L2CAgentBase) {}
 pub unsafe extern "C" fn sound_special_lw(agent: &mut L2CAgentBase) {
     sv_animcmd::wait(agent.lua_state_agent, 5.0);
     if macros::is_excute(agent) {
+        macros::PLAY_SE(agent, Hash40::new("se_btl_pot_10"));
         let sound = sound_selector(agent,"vc_pot_garuda_impact_X".to_string(),2,false,false,0);
         macros::PLAY_SE(agent, Hash40::new_raw(sound));
+    }
+    frame(agent.lua_state_agent, 14.0);
+    if macros::is_excute(agent) {
+        macros::PLAY_SE(agent, Hash40::new("se_btl_pot_12"));
+        macros::PLAY_SE(agent, Hash40::new("se_btl_pot_16"));
     }
 }
 

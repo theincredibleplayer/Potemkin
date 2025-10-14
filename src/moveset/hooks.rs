@@ -100,14 +100,6 @@ pub unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, ev
 #[skyline::hook(offset = 0x34146C0)]
 pub unsafe extern "C" fn noping_the_eff(vtable:u64, weapon: *mut smash::app::Weapon, log: CollisionLog) -> u64 {
     *(weapon as *mut bool).add(0x90) = true; //Lets the weapon persist on hit
-    let mut flag = true;
-    let opponent_id = log.opponent_battle_object_id;
-    let mut opponent_accessor = sv_battle_object::module_accessor(opponent_id);
-
-
-
-
-
     if (AttackModule::is_infliction((*weapon).battle_object.module_accessor, *COLLISION_KIND_MASK_HIT) || AttackModule::is_infliction((*weapon).battle_object.module_accessor, *COLLISION_KIND_MASK_SHIELD) || AttackModule::is_infliction((*weapon).battle_object.module_accessor, *COLLISION_KIND_MASK_ATTACK) )
     {
         if WorkModule::is_flag((*weapon).battle_object.module_accessor,WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_DID_IT_HIT){
@@ -119,10 +111,13 @@ pub unsafe extern "C" fn noping_the_eff(vtable:u64, weapon: *mut smash::app::Wea
 }
 
 
-
+pub unsafe fn param_config_ig() {
+    let all: Vec<i32> = vec![-1];
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, all.clone(), (smash::hash40("param_private"), 0x19996b81b6, 1200.0));
+}
 
 #[skyline::hook(offset = 0x4E53E0)]
-unsafe fn get_param_float_hook(x0:u64, arg2:u64, arg3:u64) -> f32 {
+unsafe fn get_param_float_hook_pot(x0:u64, arg2:u64, arg3:u64) -> f32 {
     let mut boma = *((x0 as *mut u64).offset(1)) as *mut BattleObjectModuleAccessor;
     let boma_reference = &mut *boma;
     let fighter_kind = utility::get_kind(boma_reference);

@@ -94,6 +94,7 @@ unsafe fn airgrab_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
 
 pub unsafe extern "C" fn airgrab_end(fighter: &mut L2CFighterCommon) -> L2CValue {
     if CatchModule::is_catch(fighter.module_accessor) {
+        CatchModule::set_send_cut_event(fighter.module_accessor, true);
         CatchModule::catch_cut(fighter.module_accessor,false,false);
     }    
     return L2CValue::I32(0)

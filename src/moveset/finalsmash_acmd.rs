@@ -428,6 +428,11 @@ pub unsafe extern "C" fn game_fakefinalvisualscene01(agent: &mut L2CAgentBase) {
         potemkin_mirror_handler(agent.module_accessor);
         ArticleModule::set_visibility_whole(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
         ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, Hash40::new("final_visual_scene_01"), false, -1.0);
+        
+        let enemy_id = LinkModule::get_node_object_id(agent.module_accessor, *LINK_NO_CAPTURE);
+        let enemy = sv_battle_object::module_accessor(enemy_id as u32);
+        macros::SLOW_OPPONENT(agent, 400.0, 400.0);
+        SlowModule::clear(enemy);
     }
     frame(agent.lua_state_agent, 145.0);
     if macros::is_excute(agent) {
@@ -441,7 +446,7 @@ pub unsafe extern "C" fn game_fakefinalvisualscene01(agent: &mut L2CAgentBase) {
                 macros::LAST_EFFECT_SET_RATE(agent, 0.8);
                 macros::EFFECT_FOLLOW(agent, Hash40::new("robot_atk_lw_jet"), Hash40::new("hip"), -10, -2, 15, -90, 90, 0, 0.8, true);
                 macros::LAST_EFFECT_SET_RATE(agent, 1.0);
-              }
+            }
             wait(agent.lua_state_agent, 7.0);
         }
     }

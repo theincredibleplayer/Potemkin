@@ -103,9 +103,10 @@ pub unsafe extern "C" fn potbuster_end(fighter: &mut L2CFighterCommon) -> L2CVal
     CameraModule::zoom_out(fighter.module_accessor, 0);
     FighterCutInManager::request_end(singletons::FighterCutInManager());
     if CatchModule::is_catch(fighter.module_accessor) {
+        CatchModule::set_send_cut_event(fighter.module_accessor, true);
         CatchModule::catch_cut(fighter.module_accessor,false,false);
         println!("catch cut was ran");
-    }    
+    }
     return L2CValue::I32(0)
 }
 
@@ -234,32 +235,35 @@ pub unsafe extern "C" fn sound_potbuster(agent: &mut L2CAgentBase) {
 
 pub unsafe extern "C" fn expression_potbuster(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        macros::CAM_ZOOM_OUT(agent);
-        let scale = PostureModule::scale(agent.module_accessor);
-        let lr = PostureModule::lr(agent.module_accessor);
-        CameraModule::reset_all(agent.module_accessor);            
-        macros::CAM_ZOOM_IN_arg6(
-            agent,
-            /*frames to zoom in totally*/4.0,
-            /*according to calude the object id?*/0.0,
-            /*the amt of zoom needed, higher the number lower the zoom*/1.1*scale,
-            /*y_rot*/0.0, // up and down
-            /*x_rot*/0.0, //left and right
-            true
-        );
-        agent.clear_lua_stack();
-        lua_args!(agent,
-        *MA_MSC_CMD_CAMERA_CAM_OFFSET,
-        /*x*/10.6619 * lr,
-        /*y*/5.0,
-        /*z*/0);
-        smash::app::sv_module_access::camera(agent.lua_state_agent);
-
+        if camera_checks(agent){
+            macros::CAM_ZOOM_OUT(agent);
+            let scale = PostureModule::scale(agent.module_accessor);
+            let lr = PostureModule::lr(agent.module_accessor);
+            CameraModule::reset_all(agent.module_accessor);            
+            macros::CAM_ZOOM_IN_arg6(
+                agent,
+                /*frames to zoom in totally*/4.0,
+                /*according to calude the object id?*/0.0,
+                /*the amt of zoom needed, higher the number lower the zoom*/1.1*scale,
+                /*y_rot*/0.0, // up and down
+                /*x_rot*/0.0, //left and right
+                true
+            );
+            agent.clear_lua_stack();
+            lua_args!(agent,
+            *MA_MSC_CMD_CAMERA_CAM_OFFSET,
+            /*x*/10.6619 * lr,
+            /*y*/5.0,
+            /*z*/0);
+            smash::app::sv_module_access::camera(agent.lua_state_agent);
+        }
     }
     frame(agent.lua_state_agent, 5.0);
     if macros::is_excute(agent) {
-        macros::CAM_ZOOM_OUT(agent);
-        macros::REQ_MOTION_CAMERA(agent, Hash40::new("d04potemkinbuster.nuanmb"), false);
+        if camera_checks(agent){
+            macros::CAM_ZOOM_OUT(agent);
+            macros::REQ_MOTION_CAMERA(agent, Hash40::new("d04potemkinbuster.nuanmb"), false);
+        }
     }
     frame(agent.lua_state_agent, 103.0);
     if macros::is_excute(agent) {
