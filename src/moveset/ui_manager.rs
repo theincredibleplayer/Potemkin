@@ -9,7 +9,7 @@ use smashline::*;
 use smash::app::*;
 use smash::phx::*;
 use skyline::nn::ro::LookupSymbol;
-use skyline::nn::ui2d::*;
+//use skyline::nn::ui2d::*;
 use skyline::libc::c_void;
 use parking_lot::RwLock;
 
@@ -292,8 +292,8 @@ pub fn get_usd(usd: [skyline::libc::c_char; 9]) -> String {
 
 #[skyline::hook(offset = 0x4b638, inline)]
 pub unsafe fn handle_draw(ctx: &mut skyline::hooks::InlineCtx) {
-    let layout = *ctx.registers[0].x.as_ref() as *mut Layout;
-    *ctx.registers[0].x.as_mut() = handle_layout(layout) as u64;    
+    let layout = ctx.registers[0].x() as *mut Layout;
+    ctx.registers[0].set_x(handle_layout(layout) as u64);    
 }
 
 unsafe fn handle_layout(layout: *mut Layout) -> *mut Layout {

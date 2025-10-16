@@ -130,22 +130,6 @@ unsafe fn get_param_float_hook_pot(x0:u64, arg2:u64, arg3:u64) -> f32 {
 }
 
 
-#[skyline::hook(offset = 0x6df820, inline)]
-unsafe fn change_motion_hook(ctx: &skyline::hooks::InlineCtx) {
-    println!("motion register: {:#x}",*ctx.registers[1].x.as_ref() as u64);
-
-    if *ctx.registers[1].x.as_ref() as u64 == hash40("win_1") 
-    || *ctx.registers[1].x.as_ref() as u64 == hash40("win_2") 
-    || *ctx.registers[1].x.as_ref() as u64 == hash40("win_3") {
-        println!("return register: {:#x}", *ctx.registers[0].x.as_ref() as u64 - getRegionAddress(Region::Text) as u64);
-        let text = skyline::hooks::getRegionAddress(skyline::hooks::Region::Text) as u64;
-        let mut lr: *const u64;
-        asm!("mov {}, x30", out(reg) lr);
-    println!("Current LR:\t\t{:#x} ({:#x})", (lr as u64) - text, (lr as u64));
-    }
-}
-
-
 
 
 

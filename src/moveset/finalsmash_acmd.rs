@@ -235,9 +235,9 @@ pub unsafe extern "C" fn effect_finalend(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 53.0);
     if macros::is_excute(agent) {
         UiManager::set_explosion_1_on();
-        macros::EFFECT(agent, Hash40::new("tiki_breath_embers"), Hash40::new("top"), 0, 0, 7, 0, 90, 0, 2.5, 0, 0, 0, 0, 0, 0, false);
+        macros::EFFECT(agent, Hash40::new("kamui_heavenly_fire"), Hash40::new("top"), 0, 0, 7, 0, 90, 0, 2.5, 0, 0, 0, 0, 0, 0, false);
         macros::LAST_EFFECT_SET_RATE(agent, 0.85);
-        macros::EFFECT(agent, Hash40::new("tiki_breath_embers"), Hash40::new("top"), 0, 0, -5, 0, 90, 0, 2.5, 0, 0, 0, 0, 0, 0, false);
+        macros::EFFECT(agent, Hash40::new("kamui_heavenly_fire"), Hash40::new("top"), 0, 0, -5, 0, 90, 0, 2.5, 0, 0, 0, 0, 0, 0, false);
         macros::LAST_EFFECT_SET_RATE(agent, 0.85);
         //macros::EFFECT(agent, Hash40::new("sys_bomb_d"), Hash40::new("top"), 0, 0, -20, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, false);
         //macros::LAST_EFFECT_SET_RATE(agent, 0.3);
@@ -245,9 +245,11 @@ pub unsafe extern "C" fn effect_finalend(agent: &mut L2CAgentBase) {
         macros::EFFECT(agent, Hash40::new("kamui_floor_crack_buster"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 4.0, 0, 0, 0, 0, 0, 0, true);
         macros::LAST_EFFECT_SET_RATE(agent, 0.2);
 
-        macros::EFFECT(agent, Hash40::new("dolly_volcano_base"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
+        macros::EFFECT(agent, Hash40::new("kamui_buster_land"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
         EffectModule::set_scale_last(agent.module_accessor, &Vector3f{x:5.0,y:3.0,z:5.0} );
         macros::LAST_EFFECT_SET_RATE(agent, 0.75);
+        macros::EFFECT(agent, Hash40::new("kamui_heavenly_land"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, true);
+        macros::LAST_EFFECT_SET_RATE(agent, 0.5);
     }
 
     for n in 1..5{
@@ -434,6 +436,16 @@ pub unsafe extern "C" fn game_fakefinalvisualscene01(agent: &mut L2CAgentBase) {
         macros::SLOW_OPPONENT(agent, 400.0, 400.0);
         SlowModule::clear(enemy);
     }
+    frame(agent.lua_state_agent, 30.0);
+    if macros::is_excute(agent) {
+        let lr = PostureModule::lr(agent.module_accessor);
+        macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_heavenly_wind"), Hash40::new("bust"), 7, 0, 0, 0, 0, -90.0*lr, 2.5, true);
+        macros::LAST_EFFECT_SET_RATE(agent, 0.2);
+        EffectModule::set_alpha_last(agent.module_accessor, 0.5);
+        macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_heavenly_wind"), Hash40::new("bust"), 7, 0, 0, 0, 180, -90.0*lr, 2.5, true);
+        macros::LAST_EFFECT_SET_RATE(agent, 0.2);
+        EffectModule::set_alpha_last(agent.module_accessor, 0.5);
+    }
     frame(agent.lua_state_agent, 145.0);
     if macros::is_excute(agent) {
         UiManager::set_jetpack_on();
@@ -442,9 +454,9 @@ pub unsafe extern "C" fn game_fakefinalvisualscene01(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         for _ in 0..6 {
             if macros::is_excute(agent) {
-                macros::EFFECT_FOLLOW(agent, Hash40::new("robot_atk_lw_jet"), Hash40::new("hip"), -10, -2, -15, -90, 90, 0, 0.8, true);
+                macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_jetpack"), Hash40::new("hip"), -10, -2, -15, -90, 90, 0, 0.8, true);
                 macros::LAST_EFFECT_SET_RATE(agent, 0.8);
-                macros::EFFECT_FOLLOW(agent, Hash40::new("robot_atk_lw_jet"), Hash40::new("hip"), -10, -2, 15, -90, 90, 0, 0.8, true);
+                macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_jetpack"), Hash40::new("hip"), -10, -2, 15, -90, 90, 0, 0.8, true);
                 macros::LAST_EFFECT_SET_RATE(agent, 1.0);
             }
             wait(agent.lua_state_agent, 7.0);

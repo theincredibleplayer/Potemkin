@@ -1,3 +1,4 @@
+use skyline_smash::app::sv_fighter_util::get_kirifuda_position;
 use smash::lib::{L2CValue,lua_const::*};
 use smash::lua2cpp::{L2CAgentBase,L2CFighterCommon};
 use smash::hash40;
@@ -283,5 +284,74 @@ pub unsafe extern "C" fn expression_walkslowb(agent: &mut L2CAgentBase) {
         agent.clear_lua_stack();
         sv_animcmd::wait_loop_sync_mot(agent.lua_state_agent);
         agent.pop_lua_stack(1);
+    }
+}
+
+
+
+
+pub unsafe extern "C" fn game_slipattack(agent: &mut L2CAgentBase) {
+    frame(agent.lua_state_agent, 20.0);
+    if macros::is_excute(agent) {
+        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 5.0, 361, 50, 0, 60, 4.5, 0.0, 4.5, 16.0, Some(0.0), Some(4.5), Some(-16.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 8, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_SWORD);
+        macros::ATTACK(agent, 1, 0, Hash40::new("top"), 5.0, 361, 50, 0, 60, 6.0, 0.0, 9.0, 10.0, Some(0.0), Some(9.0), Some(-10.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 8, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_SWORD);
+    }
+    wait(agent.lua_state_agent, 2.0);
+    if macros::is_excute(agent) {
+        AttackModule::clear_all(agent.module_accessor);
+    }
+}
+
+pub unsafe extern "C" fn effect_slipattack(agent: &mut L2CAgentBase) {
+    frame(agent.lua_state_agent, 20.0);
+    if macros::is_excute(agent) {
+        macros::LANDING_EFFECT(agent, Hash40::new("sys_v_smoke_a"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, false);
+        macros::LAST_EFFECT_SET_RATE(agent, 1.4);
+    }
+}
+
+pub unsafe extern "C" fn sound_slipattack(agent: &mut L2CAgentBase) {
+    frame(agent.lua_state_agent, 18.0);
+    if macros::is_excute(agent) {
+        macros::PLAY_SE(agent, Hash40::new("se_btl_pot_14"));
+    }
+    frame(agent.lua_state_agent, 20.0);
+    if macros::is_excute(agent) {
+        macros::PLAY_SE(agent, Hash40::new("se_btl_pot_09"));
+    }
+}
+
+pub unsafe extern "C" fn expression_slipattack(agent: &mut L2CAgentBase) {
+    if macros::is_excute(agent) {
+        slope!(agent, *MA_MSC_CMD_SLOPE_SLOPE_INTP, *SLOPE_STATUS_TOP, 6, true);
+    }
+    frame(agent.lua_state_agent, 18.0);
+    if macros::is_excute(agent) {
+        ControlModule::set_rumble(agent.module_accessor, Hash40::new("rbkind_nohitl"), 0, false, *BATTLE_OBJECT_ID_INVALID as u32);
+    }
+    frame(agent.lua_state_agent, 20.0);
+    if macros::is_excute(agent) {
+        macros::RUMBLE_HIT(agent, Hash40::new("rbkind_slashs"), 0);
+    }
+    frame(agent.lua_state_agent, 40.0);
+    if macros::is_excute(agent) {
+        slope!(agent, *MA_MSC_CMD_SLOPE_SLOPE_INTP, *SLOPE_STATUS_LR, 6);
+    }
+}
+
+
+
+pub unsafe extern "C" fn sound_wait2(agent: &mut L2CAgentBase) {
+    frame(agent.lua_state_agent, 25.0);
+    if macros::is_excute(agent) {
+        macros::PLAY_SE(agent, Hash40::new("se_btl_pot_08"));
+    }
+    frame(agent.lua_state_agent, 42.0);
+    if macros::is_excute(agent) {
+        macros::PLAY_SE(agent, Hash40::new("se_btl_pot_08"));
+    }
+    frame(agent.lua_state_agent, 76.0);
+    if macros::is_excute(agent) {
+        macros::PLAY_SE(agent, Hash40::new("se_btl_pot_08"));
     }
 }

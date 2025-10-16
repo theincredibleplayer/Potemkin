@@ -267,7 +267,7 @@ pub unsafe extern "C" fn Final_main_loop(fighter: &mut L2CFighterCommon) -> L2CV
             lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,10.0);
             sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
             fighter.clear_lua_stack();
-            lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,10.0);
+            lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,20.0);
             sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
             fighter.clear_lua_stack();
             lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,*ENERGY_STOP_RESET_TYPE_AIR, 0.0,    3.0   ,0.0,0.0,0.0);

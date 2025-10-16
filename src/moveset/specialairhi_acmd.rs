@@ -40,9 +40,9 @@ pub unsafe extern "C" fn effect_special_air_hi(agent: &mut L2CAgentBase) {
 
         for _ in 0..5 {
             if macros::is_excute(agent) {
-                macros::EFFECT_FOLLOW(agent, Hash40::new("robot_atk_lw_jet"), Hash40::new("arml"), 0, 0, 0, -90, 90, 0, 0.7, true);
+                macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_jetpack"), Hash40::new("arml"), 0, 0, 0, -90, 90, 0, 0.7, true);
                 macros::LAST_EFFECT_SET_RATE(agent, 1.0);
-                macros::EFFECT_FOLLOW(agent, Hash40::new("robot_atk_lw_jet"), Hash40::new("armr"), 0, 0, 0, -90, 90, 0, 0.7, true);
+                macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_jetpack"), Hash40::new("armr"), 0, 0, 0, -90, 90, 0, 0.7, true);
                 macros::LAST_EFFECT_SET_RATE(agent, 1.0);
               }
             wait(agent.lua_state_agent, 5.0);

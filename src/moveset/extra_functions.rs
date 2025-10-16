@@ -52,22 +52,22 @@ pub unsafe extern "C" fn internal_final_cam(module: CameraModule, status_kind: H
 
 #[skyline::hook(offset = 0x69a728, inline)]
 unsafe extern "C" fn autoturn_situation_check_hook(ctx: &mut skyline::hooks::InlineCtx) {
-    let module_accessor = *ctx.registers[21].x.as_ref() as *mut BattleObjectModuleAccessor;
+    let module_accessor = ctx.registers[21].x() as *mut BattleObjectModuleAccessor;
     let fighter_kind = utility::get_kind(&mut *(module_accessor));
     if fighter_kind == *FIGHTER_KIND_KAMUI {
-        *ctx.registers[0].x.as_mut() = 0;
+        ctx.registers[0].set_x(0);
     }
 }
 
 #[skyline::hook(offset = 0x2017ea0, inline)]
 unsafe fn idkman(ctx: &mut skyline::hooks::InlineCtx) {
-    println!("register: {}",*ctx.registers[3].w.as_ref() as u64 - getRegionAddress(Region::Text) as u64);
+    println!("register: {}",ctx.registers[3].w() as u64 - getRegionAddress(Region::Text) as u64);
 }
 
 
 #[skyline::hook(offset = 0x126b538, inline)]
 unsafe fn idkman2(ctx: &mut skyline::hooks::InlineCtx) {
-    let register = *ctx.registers[8].w.as_ref();
+    let register = ctx.registers[8].w();
     println!("the first arg: {}",register);
 }
 

@@ -1108,6 +1108,8 @@ pub fn install() {
 
 
     //normals
+    .sound_acmd         ("sound_wait2",             sound_wait2,                            Priority::Low)
+
 
     .sound_acmd         ("sound_walkslow",             sound_walkslow,                            Priority::Low)
     .effect_acmd        ("effect_walkslow",            effect_walkslow,                          Priority::Low)
@@ -1135,7 +1137,20 @@ pub fn install() {
     .expression_acmd    ("expression_walkfastb",        expression_walkslowb,                       Priority::Low)
 
 
+    .game_acmd          ("game_slipattack",               game_slipattack,                                  Priority::Low)
+    .sound_acmd         ("sound_slipattack",              sound_slipattack,                             Priority::Low)
+    .effect_acmd        ("effect_slipattack",             effect_slipattack,                           Priority::Low)
+    .expression_acmd    ("expression_slipattack",         expression_slipattack,                        Priority::Low)
 
+    .game_acmd          ("game_downattacku",               game_slipattack,                                  Priority::Low)
+    .sound_acmd         ("sound_downattacku",              sound_slipattack,                             Priority::Low)
+    .effect_acmd        ("effect_downattacku",             effect_slipattack,                           Priority::Low)
+    .expression_acmd    ("expression_downattacku",         expression_slipattack,                        Priority::Low)
+
+    .game_acmd          ("game_downattackd",               game_slipattack,                                  Priority::Low)
+    .sound_acmd         ("sound_downattackd",              sound_slipattack,                             Priority::Low)
+    .effect_acmd        ("effect_downattackd",             effect_slipattack,                           Priority::Low)
+    .expression_acmd    ("expression_downattackd",         expression_slipattack,                        Priority::Low)
 
 
     .game_acmd          ("game_attacks3",               game_attacks3,                                  Priority::Low)

@@ -121,8 +121,8 @@ pub unsafe extern "C" fn game_throwb(agent: &mut L2CAgentBase) {
 
 pub unsafe extern "C" fn game_throwhi(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 10.0, 280, 80, 0, 80, 1.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_THROW);
-        macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 10.0, 280, 110, 0, 40, 1.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 10.0, 70, 75, 0, 70, 1.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 10.0, 70, 75, 0, 70, 1.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_THROW);
     }
     frame(agent.lua_state_agent, 15.0);
     if macros::is_excute(agent) {
@@ -131,8 +131,8 @@ pub unsafe extern "C" fn game_throwhi(agent: &mut L2CAgentBase) {
     }
     wait(agent.lua_state_agent, 1.0);
     if macros::is_excute(agent) {
-        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 9.0, 60, 100, 0, 96, 11.0, 0.0, 8.0, 2.0, Some(0.0), Some(8.0), Some(-2.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, true, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
-        macros::ATTACK(agent, 1, 0, Hash40::new("top"), 9.0, 60, 100, 0, 96, 11.0, 0.0, 25.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, true, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 7.0, 60, 100, 0, 96, 11.0, 0.0, 8.0, 2.0, Some(0.0), Some(8.0), Some(-2.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, true, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(agent, 1, 0, Hash40::new("top"), 7.0, 60, 100, 0, 96, 11.0, 0.0, 25.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, true, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
         AttackModule::set_catch_only_all(agent.module_accessor, true, false);
         let target = WorkModule::get_int64(agent.module_accessor, *FIGHTER_STATUS_THROW_WORK_INT_TARGET_OBJECT);
         let target_group = WorkModule::get_int64(agent.module_accessor, *FIGHTER_STATUS_THROW_WORK_INT_TARGET_HIT_GROUP);
@@ -142,9 +142,9 @@ pub unsafe extern "C" fn game_throwhi(agent: &mut L2CAgentBase) {
     }
     wait(agent.lua_state_agent, 4.0);
     if macros::is_excute(agent) {
-        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 5.0, 60, 100, 0, 90, 11.0, 0.0, 8.0, 2.0, Some(0.0), Some(8.0), Some(-2.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, true, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
-        macros::ATTACK(agent, 1, 0, Hash40::new("top"), 5.0, 60, 100, 0, 90, 11.0, 0.0, 25.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, true, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
-        macros::ATTACK(agent, 2, 0, Hash40::new("top"), 4.0, 60, 100, 0, 80, 7.0, 0.0, 40.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, true, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 3.0, 60, 100, 0, 90, 11.0, 0.0, 8.0, 2.0, Some(0.0), Some(8.0), Some(-2.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, true, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(agent, 1, 0, Hash40::new("top"), 3.0, 60, 100, 0, 90, 11.0, 0.0, 25.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, true, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(agent, 2, 0, Hash40::new("top"), 2.0, 60, 100, 0, 80, 7.0, 0.0, 40.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, true, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
     }
     wait(agent.lua_state_agent, 2.0);
     if macros::is_excute(agent) {
@@ -157,16 +157,16 @@ pub unsafe extern "C" fn effect_throwhi(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 6.0);
     if macros::is_excute(agent) {
         let zeros = Vector3f {x: 0.0,y: 0.0,z: 0.0};
-        effect_id_because_im_lazy = EffectModule::req_on_joint(agent.module_accessor,Hash40::new("eflame_promrevolt_firepillar_ground"), Hash40::new("top"), &zeros,&zeros,3.4,&zeros,&zeros,false, 0, 0, 0) as u32;
+        effect_id_because_im_lazy = EffectModule::req_on_joint(agent.module_accessor,Hash40::new("kamui_floor_crack_buster"), Hash40::new("top"), &zeros,&zeros,3.4,&zeros,&zeros,false, 0, 0, 0) as u32;
         //effect_id_because_im_lazy = macros::EFFECT(agent, Hash40::new("eflame_promrevolt_firepillar_ground"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 3.4, 0, 0, 0, 0, 0, 0, true);
         macros::LAST_EFFECT_SET_RATE(agent, 0.04);
     }
     frame(agent.lua_state_agent, 16.0);
     if macros::is_excute(agent) {
-        macros::EFFECT(agent, Hash40::new("eflame_promrevolt_firepillar_ground"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 3.4, 0, 0, 0, 0, 0, 0, true);
-        macros::EFFECT(agent, Hash40::new("eflame_promrevolt_firepillar"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 3.7, 0, 0, 0, 0, 0, 0, true);
+        macros::EFFECT(agent, Hash40::new("kamui_floor_crack_buster"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 3.4, 0, 0, 0, 0, 0, 0, true);
+        macros::EFFECT(agent, Hash40::new("kamui_trishula_firepillar"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 3.7, 0, 0, 0, 0, 0, 0, true);
         macros::LAST_EFFECT_SET_RATE(agent, 1.0);
-        macros::EFFECT(agent, Hash40::new("eflame_promrevolt_firepillar_impact"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 3.7, 0, 0, 0, 0, 0, 0, true);
+        macros::EFFECT(agent, Hash40::new("kamui_trishula_firepillar_impact"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 3.7, 0, 0, 0, 0, 0, 0, true);
         macros::LAST_EFFECT_SET_RATE(agent, 1.0);
     }
     wait(agent.lua_state_agent, 3.0);

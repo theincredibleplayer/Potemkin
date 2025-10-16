@@ -98,6 +98,7 @@ impl TensionMeter {
             if self.value + amount > 100.0 {
                 self.value = 100.0;
                 self.is_available2 = true;
+                self.is_available1 = true;
             }
             else {
                 self.value += amount;

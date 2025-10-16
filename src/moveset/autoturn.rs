@@ -130,6 +130,7 @@ pub unsafe extern "C" fn auto_turn(fighter: &mut L2CFighterCommon) -> L2CValue {
                         *FIGHTER_STATUS_KIND_CATCH,
                         *FIGHTER_STATUS_KIND_ITEM_SWING,
                         *FIGHTER_RYU_STATUS_KIND_WALK_BACK,
+                        *FIGHTER_STATUS_KIND_ATTACK,
                     ].contains(&status_kind){
                         update_lr(fighter);
                         return 0.into();
@@ -181,7 +182,6 @@ pub unsafe extern "C" fn auto_turn(fighter: &mut L2CFighterCommon) -> L2CValue {
                     var90 = true;
                 }
                 if var90 {
-                    println!("update_lr 7");
                     update_lr(fighter);
                 }
             }

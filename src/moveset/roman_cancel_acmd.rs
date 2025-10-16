@@ -92,7 +92,7 @@ pub unsafe extern "C" fn game_romancancel(agent: &mut L2CAgentBase) {
         //WorkModule::on_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RC_CLOCK_EFFECT);
         //macros::SEARCH(agent, 0, 0, Hash40::new("top"), 30.0, -2.0, 16.0, 0.0, Some(0.0), Some(0.0), Some(0.0), *COLLISION_KIND_MASK_HIT, *HIT_STATUS_MASK_NORMAL, 1, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false);
         if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RED_RC){
-            macros::ATTACK(agent,0,0,Hash40::new("top"),5.0,65,70,20,70,30.0,-2.0,16.0,0.0,None,None,None,1.0,0.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,true,0.0,0.0,0.0,false,false,false,false,true,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_PUNCH,*ATTACK_REGION_NONE);
+            macros::ATTACK(agent,0,0,Hash40::new("top"),5.0,65,70,20,70,30.0,0.0,16.0,0.0,None,None,None,1.0,0.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,true,0.0,0.0,0.0,false,false,false,false,true,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_PUNCH,*ATTACK_REGION_NONE);
             macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_red_rc_blast"), Hash40::new("top"), 10, 16, -2, 0, 0, 0, 5, true);
         }else if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_PURPLE_RC){
             macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_purple_rc_blast"), Hash40::new("top"), 10, 16, -2, 0, 0, 0, 5, true);
