@@ -1,20 +1,3 @@
-use smash::lib::{L2CValue,lua_const::*};
-use smash::lua2cpp::{L2CAgentBase,L2CFighterCommon};
-use smash::hash40;
-use smash::app::lua_bind::*;
-use smashline::*;
-use smash::app::*;
-use smash_script::macros::*;
-use smash::app::sv_animcmd::*;
-use smash::phx::Hash40;
-use smash::phx::{Vector2f,Vector3f};
-use skyline::nn::ro::LookupSymbol;
-use smash_script::lua_args;
-use smash_script::macros;
-use std::arch::asm;
-use crate::FIGHTER_CUTIN_MANAGER_ADDR;
-use crate::FIGHTER_MANAGER;
-
 use crate::moveset::*;
 
 
@@ -101,7 +84,7 @@ unsafe fn potbuster_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
 
 pub unsafe extern "C" fn potbuster_end(fighter: &mut L2CFighterCommon) -> L2CValue {
     CameraModule::zoom_out(fighter.module_accessor, 0);
-    FighterCutInManager::request_end(singletons::FighterCutInManager());
+    lua_bind::FighterCutInManager::request_end(singletons::FighterCutInManager());
     if CatchModule::is_catch(fighter.module_accessor) {
         CatchModule::set_send_cut_event(fighter.module_accessor, true);
         CatchModule::catch_cut(fighter.module_accessor,false,false);

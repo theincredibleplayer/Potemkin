@@ -1,22 +1,3 @@
-use smash::lib::{L2CValue,lua_const::*};
-use smash::lua2cpp::{L2CAgentBase,L2CFighterCommon};
-use smash::hash40;
-use smash::app::lua_bind::*;
-use smashline::*;
-use smash::app::*;
-use smash_script::macros::*;
-use smash::app::sv_animcmd::*;
-use smash::phx::Hash40;
-use smash::phx::{Vector2f,Vector3f};
-use skyline::nn::ro::LookupSymbol;
-use smash_script::lua_args;
-use smash_script::macros;
-use std::arch::asm;
-use smash_script::{*, macros::*};
-
-use crate::FIGHTER_CUTIN_MANAGER_ADDR;
-use crate::FIGHTER_MANAGER;
-
 use crate::moveset::*;
 
 pub unsafe extern "C" fn game_finaldash(agent: &mut L2CAgentBase) {
@@ -122,7 +103,7 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
             if capture_id != 0x50000000 {
                 AttackModule::hit_absolute_joint(agent.module_accessor, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW,capture_id as u32,Hash40::new("throw"), 0, 0);
                 CameraModule::reset_all(agent.module_accessor); 
-                CAM_ZOOM_OUT_FINAL(agent);
+                macros::CAM_ZOOM_OUT_FINAL(agent);
                 WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_END_EXIT);
                 wait(agent.lua_state_agent, 1.0);
                 if macros::is_excute(agent) {
@@ -193,7 +174,7 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
             if capture_id != 0x50000000 {
                 AttackModule::hit_absolute_joint(agent.module_accessor, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW,capture_id as u32,Hash40::new("throw"), 0, 0);
                 CameraModule::reset_all(agent.module_accessor); 
-                CAM_ZOOM_OUT_FINAL(agent);
+                macros::CAM_ZOOM_OUT_FINAL(agent);
                 WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_END_EXIT);
                 wait(agent.lua_state_agent, 1.0);
                 if macros::is_excute(agent) {

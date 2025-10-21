@@ -1,19 +1,3 @@
-use smash::lib::{L2CValue,lua_const::*};
-use smash::lua2cpp::{L2CAgentBase,L2CFighterCommon};
-use smash::hash40;
-use smash::app::lua_bind::*;
-use smashline::*;
-use smash::app::*;
-use smash_script::macros::*;
-use smash::app::sv_animcmd::*;
-use smash::phx::Hash40;
-use smash::phx::{Vector2f,Vector3f};
-use skyline::nn::ro::LookupSymbol;
-use smash_script::lua_args;
-use smash_script::macros;
-use std::arch::asm;
-use crate::FIGHTER_CUTIN_MANAGER_ADDR;
-use crate::FIGHTER_MANAGER;
 use crate::moveset::*;
 
 pub unsafe extern "C" fn game_attackairhi(agent: &mut L2CAgentBase) {

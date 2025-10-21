@@ -1,20 +1,3 @@
-use smash::lib::{L2CValue,lua_const::*};
-use smash::lua2cpp::{L2CAgentBase,L2CFighterCommon};
-use smash::hash40;
-use smash::app::lua_bind::*;
-use smashline::*;
-use smash::app::*;
-use smash_script::macros::*;
-use smash::app::sv_animcmd::*;
-use smash::phx::Hash40;
-use smash::phx::{Vector2f,Vector3f};
-use skyline::nn::ro::LookupSymbol;
-use smash_script::lua_args;
-use smash_script::macros;
-use std::arch::asm;
-use crate::FIGHTER_CUTIN_MANAGER_ADDR;
-use crate::FIGHTER_MANAGER;
-
 use crate::moveset::*;
 
 pub unsafe extern "C" fn win_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
@@ -138,7 +121,10 @@ pub unsafe extern "C" fn win_exit(fighter: &mut L2CFighterCommon) -> L2CValue {
 
 
 pub unsafe extern "C" fn game_win1a(agent: &mut L2CAgentBase) {
-
+    if macros::is_excute(agent) {
+        ArticleModule::generate_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
+        ArticleModule::change_motion(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("win_1"),false,-1.0);
+    }
 }
 
 pub unsafe extern "C" fn sound_win1a(agent: &mut L2CAgentBase) {

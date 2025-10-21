@@ -1,30 +1,5 @@
-use smash::lib::{L2CValue,lua_const::*};
-use smash::lua2cpp::{L2CAgentBase,L2CFighterCommon};
-use smash::hash40;
-use smash::app::lua_bind::*;
-use smashline::*;
-use smash::app::*;
-use smash_script::macros::*;
-use smash::app::sv_animcmd::*;
-use smash::phx::Hash40;
-use smash::phx::{Vector2f,Vector3f};
-use skyline::nn::ro::LookupSymbol;
-use smash_script::lua_args;
-use smash_script::macros;
-use std::arch::asm;
-use skyline::hooks::{Region,getRegionAddress};
-use {
-    smash::{
-        lua2cpp::*,
-        phx::*,
-        app::{sv_animcmd::*, lua_bind::*, *},
-        lib::{lua_const::*, L2CAgent},
-    },
-    smash_script::*,
-    smashline::{*, Priority::*}
-};
-use nnsdk::ui2d::*;
-use skyline::libc::c_void;
+use crate::moveset::*;
+
 
 
 /*#[skyline::from_offset(0xb5f380)]

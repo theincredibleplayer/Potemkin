@@ -1,7 +1,9 @@
-use crate::moveset::*;
+//use crate::moveset::*;
+use nnsdk::ui2d::*;
 use smash::ui2d::SmashPane;
-use skyline::libc::c_void;use parking_lot::RwLock;
-
+use parking_lot::RwLock;
+use crate::moveset::TensionMeter;
+use crate::moveset::CutInUI;
 
 use once_cell::sync::Lazy;
 pub static UI_MANAGER: Lazy<RwLock<UiManager>> = Lazy::new(|| RwLock::new(UiManager { 

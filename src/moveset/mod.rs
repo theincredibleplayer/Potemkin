@@ -23,7 +23,6 @@ use {
     smash_script::*,
     smashline::{*, Priority::*}
 };
-use nnsdk::ui2d::*;
 use skyline::libc::c_void;
 use crate::FIGHTER_CUTIN_MANAGER_ADDR;
 use crate::FIGHTER_MANAGER;
@@ -1382,12 +1381,12 @@ pub fn install() {
 
 
     //.status(Main, *FIGHTER_STATUS_KIND_DEMO, win_pre)
-    .status(Pre, *FIGHTER_STATUS_KIND_DEMO, win_pre)
-    .status(Main,*FIGHTER_STATUS_KIND_DEMO, win_main)
-    .status(Exit,*FIGHTER_STATUS_KIND_DEMO, win_exit)
-    .status(Init,*FIGHTER_STATUS_KIND_DEMO, win_init)
-    .status(Exec,*FIGHTER_STATUS_KIND_DEMO, win_exec)
-    .status(End, *FIGHTER_STATUS_KIND_DEMO, win_end)
+    //.status(Pre, *FIGHTER_STATUS_KIND_DEMO, win_pre)
+    //.status(Main,*FIGHTER_STATUS_KIND_DEMO, win_main)
+    //.status(Exit,*FIGHTER_STATUS_KIND_DEMO, win_exit)
+    //.status(Init,*FIGHTER_STATUS_KIND_DEMO, win_init)
+    //.status(Exec,*FIGHTER_STATUS_KIND_DEMO, win_exec)
+    //.status(End, *FIGHTER_STATUS_KIND_DEMO, win_end)
     //.status(Pre, FIGHTER_KAMUI_STATUS_KIND_WIN, win_new_pre)
     //.status(Main, FIGHTER_KAMUI_STATUS_KIND_WIN, win_new_main)
     

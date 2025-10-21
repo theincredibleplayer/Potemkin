@@ -1,19 +1,3 @@
-use smash::lib::{L2CValue,lua_const::*};
-use smash::lua2cpp::{L2CAgentBase,L2CFighterCommon};
-use smash::hash40;
-use smash::app::lua_bind::*;
-use smashline::*;
-use smash::app::*;
-use smash_script::macros::*;
-use smash::app::sv_animcmd::*;
-use smash::phx::Hash40;
-use smash::phx::{Vector2f,Vector3f};
-use skyline::nn::ro::LookupSymbol;
-use smash_script::lua_args;
-use smash_script::macros;
-use std::arch::asm;
-use crate::FIGHTER_CUTIN_MANAGER_ADDR;
-use crate::FIGHTER_MANAGER;
 use crate::moveset::*;
 
 
@@ -81,7 +65,7 @@ pub unsafe extern "C" fn sound_attackhi4charge(agent: &mut L2CAgentBase) {
 
 pub unsafe extern "C" fn expression_attackhi4charge(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        AREA_WIND_2ND_arg10(agent,0, 0.5, 210, 2, 0.5, -10, 5, 20, 10, 10);
+        macros::AREA_WIND_2ND_arg10(agent,0, 0.5, 210, 2, 0.5, -10, 5, 20, 10, 10);
         physics!(agent,*MA_MSC_CMD_PHYSICS_START_CHARGE, 0.9, 0.8, -1, 0.9, 0.8, -1, Hash40::new("invalid"));
         ItemModule::set_have_item_visibility(agent.module_accessor, false, 0);
         slope!(agent, *MA_MSC_CMD_SLOPE_SLOPE, *SLOPE_STATUS_LR);
@@ -162,7 +146,7 @@ pub unsafe extern "C" fn sound_attacks4charge(agent: &mut L2CAgentBase) {
 
 pub unsafe extern "C" fn expression_attacks4charge(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        AREA_WIND_2ND_arg10(agent, 0, 0.5, 210, 2, 0.5, -10, 5, 20, 10, 10);
+        macros::AREA_WIND_2ND_arg10(agent, 0, 0.5, 210, 2, 0.5, -10, 5, 20, 10, 10);
         physics!(agent,*MA_MSC_CMD_PHYSICS_START_CHARGE, 0.8, 0.6, -1, 0.8, 0.8, -1, Hash40::new("invalid"));
         ItemModule::set_have_item_visibility(agent.module_accessor, false, 0);
         slope!(agent, *MA_MSC_CMD_SLOPE_SLOPE, *SLOPE_STATUS_LR);
@@ -251,7 +235,7 @@ pub unsafe extern "C" fn sound_attacklw4charge(agent: &mut L2CAgentBase) {
 
 pub unsafe extern "C" fn expression_attacklw4charge(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        AREA_WIND_2ND_arg10(agent,0, 0.5, 210, 2, 0.5, -10, 5, 20, 10, 10);
+        macros::AREA_WIND_2ND_arg10(agent,0, 0.5, 210, 2, 0.5, -10, 5, 20, 10, 10);
         physics!(agent,*MA_MSC_CMD_PHYSICS_START_CHARGE, 1, 0.5, -1, 0.8, 0.3, 0.1, Hash40::new("invalid"));
         slope!(agent, *MA_MSC_CMD_SLOPE_SLOPE, *SLOPE_STATUS_R);
         ControlModule::set_rumble(agent.module_accessor, Hash40::new("rbkind_smashhold1"), 0, true, *BATTLE_OBJECT_ID_INVALID as u32);
