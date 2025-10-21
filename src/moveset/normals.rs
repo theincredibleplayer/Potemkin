@@ -171,7 +171,6 @@ pub unsafe extern "C" fn game_attack11(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         AttackModule::clear_all(agent.module_accessor);
     }
-
 }
 
 pub unsafe extern "C" fn effect_attack11(agent: &mut L2CAgentBase) {

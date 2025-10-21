@@ -194,6 +194,16 @@ pub unsafe extern "C" fn effect_potbuster(agent: &mut L2CAgentBase) {
 
         macros::LANDING_EFFECT(agent, Hash40::new("sys_landing_smoke"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
     }
+    frame(agent.lua_state_agent, 74.0);
+    if macros::is_excute(agent) {
+        if camera_checks(agent){
+            let vec1 = smash_rs::cpp::simd::Vector2{vec: [0.0, 0.0]}; //
+            let vec2 = smash_rs::cpp::simd::Vector2{vec: [0.0, 1.0]}; //both of these seem to be angle related but i cant put my finger on how exactly
+            let vec3 = smash_rs::cpp::simd::Vector2{vec: [1.0 , 1.0]}; // effect width related
+            let vec4 = smash_rs::cpp::simd::Vector2{vec: [1.0 , 1.0]}; // effect width related
+            let speedlines = EffectModule::request_post_effect_line_parallel_2d(agent.module_accessor,Hash40::new("dead_area_out"),vec1,vec2,vec3,vec4,true,3.0/sv_information::slow_rate() /*duration*/,15.0/sv_information::slow_rate() /*fade out*/);
+        }
+    }
     frame(agent.lua_state_agent, 129.0);
     if macros::is_excute(agent) {
         macros::EFFECT(agent, Hash40::new("kamui_floor_crack_buster"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 2.5, 0, 0, 0, 0, 0, 0, true);

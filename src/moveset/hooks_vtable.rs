@@ -184,6 +184,16 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
     }
     UiManager::set_game_speed(sv_information::slow_rate()); 
 
+    //post_effect line
+    if WorkModule::is_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SET_ADJUST_POST_CIRCLE){
+        let agent = get_fighter_common_from_accessor((&mut*module_accessor));
+        let radius = 20.0;
+        let vec1 = smash_rs::cpp::simd::Vector2{vec: [radius /* radius x */, radius /* radius y */]}; 
+        let vec2 = smash_rs::cpp::simd::Vector3{vec: [0.0 /* y offset */, 0.0 /* x offset */, 0.0 /* z offset */]}; 
+        EffectModule::set_post_effect_line_circle_target(module_accessor,Hash40::new("hip"),vec1,vec2,true);
+    }
+
+
     // forbids dashing
     WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_RUN);
     WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_DASH_TO_RUN);
@@ -240,6 +250,9 @@ pub unsafe extern "C" fn kamui_reset(vtable: u64, fighter: &mut Fighter) {
     let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     UiManager::reset_on_rebirth(entry_id);
     UiManager::reset_cutin();
+    if smashball::is_training_mode(){
+        UiManager::add_tension_unscaled(entry_id,150.0);
+    }
     WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_RUN);
     WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_DASH_TO_RUN);
     WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_TURN_DASH);
@@ -871,12 +884,13 @@ pub unsafe extern "C" fn kamui_on_shield(vtable: u64, fighter: &mut Fighter, col
 pub unsafe extern "C" fn kamui_on_damage_og(vtable: u64, fighter: &mut Fighter,damage_log:u64);
 
 pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,damage_log:u64) {
-    let module_accessor = (*fighter).battle_object.module_accessor;
-
     let module_accessor = fighter.battle_object.module_accessor;
     let entry_id = WorkModule::get_int(module_accessor,*FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     let dmg = *((*(((damage_log as u64) + 0x10) as *const u64) + 0x4) as *const f32);
     let status_kind =StatusModule::status_kind(fighter.battle_object.module_accessor);
+    let collision_log = *((damage_log as *const u64).add(0x28 / 0x8)) as *const CollisionLog;
+    let opponent_id = *(*(damage_log as *mut u64).add(0x10 / 0x8) as *mut u32).add(0x44 / 0x4);
+    let category = sv_battle_object::category(opponent_id);
 
     if [*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL,
         *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_END,
@@ -888,7 +902,8 @@ pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,dama
         FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE,
         FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF,
         ].contains(&status_kind)
-    && WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON) {
+    && WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON)
+    && (*collision_log).collision_kind == *COLLISION_KIND_HIT as u8 {
         let time_base = 45.0 * (1.0/sv_information::slow_rate());
         WorkModule::set_float(module_accessor, time_base, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FIRE_TIME_BASE);
         WorkModule::set_int(module_accessor, time_base as i32, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_FIRE_TIMER);
@@ -897,7 +912,10 @@ pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,dama
         macros::BURN_COLOR(agent, 24,  1,  1, 0.5);
         WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
     }
-    UiManager::add_tension(entry_id, dmg*0.2);
+
+    if  HitModule::get_status(module_accessor, (*collision_log).receiver_id as i32, 0) == 0 {
+        UiManager::add_tension(entry_id, dmg*0.2);
+    }
     kamui_on_damage_og(vtable,fighter,damage_log);
 }
 
@@ -909,36 +927,42 @@ pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,coll
     let module_accessor = (*fighter).battle_object.module_accessor;
     let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     let status = StatusModule::status_kind(module_accessor);
-    //this doesnt work for some reason?
-    let opp_boma = sv_battle_object::module_accessor(collision_log.opponent_object_id as u32);
     let category = sv_battle_object::category(collision_log.opponent_object_id);
-    if category == *BATTLE_OBJECT_CATEGORY_FIGHTER {
+
+    if category == *BATTLE_OBJECT_CATEGORY_FIGHTER
+    && collision_log.collision_kind == *COLLISION_KIND_HIT as u8 {
+        let opp_boma = sv_battle_object::module_accessor(collision_log.opponent_object_id as u32);
         if StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_SPECIAL_LW {
-            AttackModule::set_no_uniq_effect_all(module_accessor, true, false);
-            EffectModule::req_common(opp_boma,Hash40::new("fire_hit_l_l"),0.0);
-            WorkModule::set_float(opp_boma, 0.6, *FIGHTER_STATUS_WORK_ID_FLOAT_REBOUND_MOTION_RATE);
-            if StatusModule::situation_kind(opp_boma) != *SITUATION_KIND_GROUND {
-                StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND_JUMP, false);
-            }else{
-                StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND, false);
+            if HitModule::get_status(opp_boma, collision_log.receiver_id as i32, 0) == 0 {
+                AttackModule::set_no_uniq_effect_all(module_accessor, true, false);
+                EffectModule::req_common(opp_boma,Hash40::new("fire_hit_l_l"),0.0);
+                WorkModule::set_float(opp_boma, 0.6, *FIGHTER_STATUS_WORK_ID_FLOAT_REBOUND_MOTION_RATE);
+                if StatusModule::situation_kind(opp_boma) != *SITUATION_KIND_GROUND {
+                    StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND_JUMP, false);
+                }else{
+                    StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND, false);
+                }
+            }
+        }
+        if 
+        ![FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL,
+        FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK,
+        FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP,
+        FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_START,
+        *FIGHTER_KAMUI_STATUS_KIND_FINAL_END,
+        FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP,
+        FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE,
+        *FIGHTER_KAMUI_STATUS_KIND_FINAL_READY,
+        *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK,
+        *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK_WAIT,
+        *FIGHTER_STATUS_KIND_FINAL].contains(&status){
+            if HitModule::get_status(opp_boma, collision_log.receiver_id as i32, 0) == 0 {
+                UiManager::add_tension(entry_id, damage*0.75);
             }
         }
     }
 
-    if 
-    ![FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL,
-    FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK,
-    FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP,
-    FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_START,
-    *FIGHTER_KAMUI_STATUS_KIND_FINAL_END,
-    FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP,
-    FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE,
-    *FIGHTER_KAMUI_STATUS_KIND_FINAL_READY,
-    *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK,
-    *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK_WAIT,
-    *FIGHTER_STATUS_KIND_FINAL].contains(&status){
-        UiManager::add_tension(entry_id, damage*0.75);
-    }
+
     //if [*FIGHTER_STATUS_KIND_SPECIAL_LW].contains(&status) {
     //}
     //kamui_on_attack_og(vtable,fighter,collision_log,damage);

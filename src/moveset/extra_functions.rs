@@ -59,19 +59,6 @@ unsafe extern "C" fn autoturn_situation_check_hook(ctx: &mut skyline::hooks::Inl
     }
 }
 
-#[skyline::hook(offset = 0x2017ea0, inline)]
-unsafe fn idkman(ctx: &mut skyline::hooks::InlineCtx) {
-    println!("register: {}",ctx.registers[3].w() as u64 - getRegionAddress(Region::Text) as u64);
-}
-
-
-#[skyline::hook(offset = 0x126b538, inline)]
-unsafe fn idkman2(ctx: &mut skyline::hooks::InlineCtx) {
-    let register = ctx.registers[8].w();
-    println!("the first arg: {}",register);
-}
-
-
 extern "C" {
     #[link_name = "\u{1}_ZN3app16kiiladarzmanager15set_visible_hudEb"]
     pub fn set_vis_hud(param_1: bool);

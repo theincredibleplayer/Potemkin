@@ -97,7 +97,7 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 53.0);
     if macros::is_excute(agent) {
         KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY);
-        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 50.0, 35, 50, 0, 50, 25, 0.0, 10.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 5.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_NONE);
+        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 50.0, 35, 50, 0, 50, 25, 0.0, 10.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 5.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_NONE);
         AttackModule::set_catch_only_all(agent.module_accessor, true, false);
         AttackModule::set_no_dead_all(agent.module_accessor, true, true);
         WorkModule::off_flag(agent.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
@@ -223,12 +223,17 @@ pub unsafe extern "C" fn sound_finalend(agent: &mut L2CAgentBase) {
   
 pub unsafe extern "C" fn effect_finalend(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        for _ in 0..2 {
-            macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_buster_fire"), Hash40::new("haver"), 0, -1, 3.5, 0.0, 0.0, 0.0, 1.7, true);
-            macros::LAST_EFFECT_SET_RATE(agent, 0.5);
-            macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_buster_fire"), Hash40::new("havel"), -0, -1, 3.5, 0.0, 0.0, 0.0, 1.7, true);
-            macros::LAST_EFFECT_SET_RATE(agent, 0.5);
-        }
+        EffectModule::remove_post_effect_line(agent.module_accessor, 6, true);
+        let radius = 20.0;
+        let vec1 = smash_rs::cpp::simd::Vector2{vec: [radius /* radius x */, radius /* radius y */]}; 
+        let vec2 = smash_rs::cpp::simd::Vector3{vec: [0.0 /* y offset */, 0.0 /* x offset */, 0.0 /* z offset */]}; 
+
+        EffectModule::request_post_effect_line_circle(agent.module_accessor,Hash40::new("dead_camera_hit"),Hash40::new("hip"),vec1,vec2,true,44.0/sv_information::slow_rate() /*duration*/,0.0 /* fade */);
+        WorkModule::on_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SET_ADJUST_POST_CIRCLE);
+        macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_buster_fire"), Hash40::new("haver"), 0, -1, 3.5, 0.0, 0.0, 0.0, 1.7, true);
+        macros::LAST_EFFECT_SET_RATE(agent, 0.5);
+        macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_buster_fire"), Hash40::new("havel"), -0, -1, 3.5, 0.0, 0.0, 0.0, 1.7, true);
+        macros::LAST_EFFECT_SET_RATE(agent, 0.5);
     }
 
 
@@ -250,6 +255,7 @@ pub unsafe extern "C" fn effect_finalend(agent: &mut L2CAgentBase) {
         macros::LAST_EFFECT_SET_RATE(agent, 0.75);
         macros::EFFECT(agent, Hash40::new("kamui_heavenly_land"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, true);
         macros::LAST_EFFECT_SET_RATE(agent, 0.5);
+        WorkModule::off_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SET_ADJUST_POST_CIRCLE);
     }
 
     for n in 1..5{
@@ -436,15 +442,15 @@ pub unsafe extern "C" fn game_fakefinalvisualscene01(agent: &mut L2CAgentBase) {
         macros::SLOW_OPPONENT(agent, 400.0, 400.0);
         SlowModule::clear(enemy);
     }
-    frame(agent.lua_state_agent, 30.0);
+    frame(agent.lua_state_agent, 18.0);
     if macros::is_excute(agent) {
         let lr = PostureModule::lr(agent.module_accessor);
-        macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_heavenly_wind"), Hash40::new("bust"), 7, 0, 0, 0, 0, -90.0*lr, 2.5, true);
+        macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_heavenly_wind"), Hash40::new("bust"), 7, 0, 0, 0, 0, -90.0, 2.5, true);
         macros::LAST_EFFECT_SET_RATE(agent, 0.2);
-        EffectModule::set_alpha_last(agent.module_accessor, 0.5);
-        macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_heavenly_wind"), Hash40::new("bust"), 7, 0, 0, 0, 180, -90.0*lr, 2.5, true);
+        EffectModule::set_alpha_last(agent.module_accessor, 0.35);
+        macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_heavenly_wind"), Hash40::new("bust"), 7, 0, 0, 0, 180, -90.0, 2.5, true);
         macros::LAST_EFFECT_SET_RATE(agent, 0.2);
-        EffectModule::set_alpha_last(agent.module_accessor, 0.5);
+        EffectModule::set_alpha_last(agent.module_accessor, 0.35);
     }
     frame(agent.lua_state_agent, 145.0);
     if macros::is_excute(agent) {
@@ -462,6 +468,17 @@ pub unsafe extern "C" fn game_fakefinalvisualscene01(agent: &mut L2CAgentBase) {
             wait(agent.lua_state_agent, 7.0);
         }
     }
+    frame(agent.lua_state_agent, 265.0);
+    if macros::is_excute(agent) {
+        let lr = PostureModule::lr(agent.module_accessor);
+        let vec1 = smash_rs::cpp::simd::Vector2{vec: [0.0, 0.0]}; //
+        let vec2 = smash_rs::cpp::simd::Vector2{vec: [lr*0.5, 0.5]}; //both of these seem to be angle related but i cant put my finger on how exactly
+        let vec3 = smash_rs::cpp::simd::Vector2{vec: [0.5 , 1.5]}; // unsure
+        let vec4 = smash_rs::cpp::simd::Vector2{vec: [0.5 , 1.5]}; // unsure
+        let speedlines = EffectModule::request_post_effect_line_parallel_2d(agent.module_accessor,Hash40::new("dead_area_out"),vec1,vec2,vec3,vec4,true,-1.0 /*duration*/,0.0 /*fade out*/);
+
+    }
+
 }
 
 pub unsafe extern "C" fn sound_fakefinalvisualscene01(agent: &mut L2CAgentBase) {
@@ -485,7 +502,7 @@ pub unsafe extern "C" fn sound_fakefinalvisualscene01(agent: &mut L2CAgentBase) 
 
 pub unsafe extern "C" fn game_finalvisualscene02(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        
+        EffectModule::remove_post_effect_line(agent.module_accessor, 6, true);
         //JostleModule::set_status(agent.module_accessor, false);
         ArticleModule::generate_article(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, false, -1);
         potemkin_mirror_handler(agent.module_accessor);
@@ -503,8 +520,11 @@ pub unsafe extern "C" fn game_finalvisualscene02(agent: &mut L2CAgentBase) {
     }
     frame(agent.lua_state_agent, 71.0);
     if macros::is_excute(agent) {
-        //VisibilityModule::set_whole(agent.module_accessor, false);
-        WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_OFF_EFFECT_SWORD_AURA);
+        let vec1 = smash_rs::cpp::simd::Vector2{vec: [0.0, 0.0]}; //
+        let vec2 = smash_rs::cpp::simd::Vector2{vec: [0.0, 1.0]}; //both of these seem to be angle related but i cant put my finger on how exactly
+        let vec3 = smash_rs::cpp::simd::Vector2{vec: [0.5 , 1.5]}; // effect width related
+        let vec4 = smash_rs::cpp::simd::Vector2{vec: [0.5 , 1.5]}; // effect width related
+        let speedlines = EffectModule::request_post_effect_line_parallel_2d(agent.module_accessor,Hash40::new("dead_area_out"),vec1,vec2,vec3,vec4,true,-1.0 /*duration*/,0.0 /*fade out*/);
     }
 }
 
@@ -526,6 +546,13 @@ pub unsafe extern "C" fn sound_finalvisualscene02(agent: &mut L2CAgentBase) {
     SoundModule::set_se_vol(enemy, pac_handle as i32, 2.0, 0);
 
 
+
+
+    }
+
+    frame(agent.lua_state_agent, 77.0);
+    if macros::is_excute(agent) {
+    
     }
     frame(agent.lua_state_agent, 130.0);
     if macros::is_excute(agent) {

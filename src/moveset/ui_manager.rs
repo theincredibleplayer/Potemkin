@@ -1,23 +1,10 @@
 use crate::moveset::*;
-use smash::lib::{L2CValue,lua_const::*};
-use smash::lua2cpp::{L2CFighterCommon,L2CAgentBase,L2CFighterBase};
-use smash::hash40;
-use smash::app::lua_bind::*;
-use smash_script::macros::*;
-use smash_script::lua_args;
-use smashline::*;
-use smash::app::*;
-use smash::phx::*;
-use skyline::nn::ro::LookupSymbol;
-//use skyline::nn::ui2d::*;
-use skyline::libc::c_void;
-use parking_lot::RwLock;
-
+use smash::ui2d::SmashPane;
+use skyline::libc::c_void;use parking_lot::RwLock;
 
 
 use once_cell::sync::Lazy;
 pub static UI_MANAGER: Lazy<RwLock<UiManager>> = Lazy::new(|| RwLock::new(UiManager { 
-    limit_meter: [LimitMeter::default(); 8],
     tension_meter: [TensionMeter::default(); 8],
     cutin_ui: [CutInUI::default(); 8],
     is_enabled: [false; 8]
@@ -25,7 +12,6 @@ pub static UI_MANAGER: Lazy<RwLock<UiManager>> = Lazy::new(|| RwLock::new(UiMana
 
 #[repr(C)]
 pub struct UiManager {
-    pub limit_meter: [LimitMeter; 8],
     pub tension_meter: [TensionMeter; 8],
     pub cutin_ui: [CutInUI; 8],
     pub is_enabled: [bool; 8]
@@ -56,7 +42,6 @@ impl UiManager {
     pub fn reset_on_rebirth(entry_id: usize) {
         let mut manager = UI_MANAGER.write();
         unsafe {
-            manager.limit_meter[entry_id].reset();
             manager.tension_meter[entry_id].reset();
             manager.cutin_ui[0].reset_all();
         }
@@ -101,27 +86,6 @@ impl UiManager {
         let mut manager = UI_MANAGER.write();
         unsafe {
             manager.tension_meter[entry_id].consume_tension();
-        }
-    }
-
-    pub fn add_limit(entry_id: usize, amount: f32) {
-        let mut manager = UI_MANAGER.write();
-        unsafe {
-            manager.limit_meter[entry_id].add_meter(amount);
-        }
-    }
-
-    pub fn is_limit_available(entry_id: usize) -> bool {
-        let mut manager = UI_MANAGER.write();
-        unsafe {
-            manager.limit_meter[entry_id].is_available()
-        }
-    }
-
-    pub fn reset_limit(entry_id: usize) {
-        let mut manager = UI_MANAGER.write();
-        unsafe {
-            manager.limit_meter[entry_id].reset();
         }
     }
 
@@ -291,12 +255,12 @@ pub fn get_usd(usd: [skyline::libc::c_char; 9]) -> String {
 }*/
 
 #[skyline::hook(offset = 0x4b638, inline)]
-pub unsafe fn handle_draw(ctx: &mut skyline::hooks::InlineCtx) {
+pub unsafe fn handle_draw_potemkin(ctx: &mut skyline::hooks::InlineCtx) {
     let layout = ctx.registers[0].x() as *mut Layout;
-    ctx.registers[0].set_x(handle_layout(layout) as u64);    
+    ctx.registers[0].set_x(handle_layout_potemkin(layout) as u64);    
 }
 
-unsafe fn handle_layout(layout: *mut Layout) -> *mut Layout {
+unsafe fn handle_layout_potemkin(layout: *mut Layout) -> *mut Layout {
     let layout_name = skyline::from_c_str((*layout).layout_name);
     let root_pane = &mut *(*layout).root_pane;
     if layout_name == "info_melee" {
