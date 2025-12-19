@@ -148,8 +148,8 @@ pub unsafe extern "C" fn potbuster(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 158.0);
     if macros::is_excute(agent){
         WorkModule::off_flag(agent.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
-        macros::CHECK_FINISH_CAMERA(agent, -5, 18);
-        lua_bind::FighterCutInManager::set_throw_finish_zoom_rate(singletons::FighterCutInManager(), 2.0);
+        macros::CHECK_FINISH_CAMERA(agent, 14, 0);
+        lua_bind::FighterCutInManager::set_throw_finish_zoom_rate(singletons::FighterCutInManager(), 1.5);
         lua_bind::FighterCutInManager::set_throw_finish_offset(singletons::FighterCutInManager(), Vector3f{x: 0.0, y: 0.0, z: 0.0});
     }
     frame(agent.lua_state_agent, 159.0);
@@ -235,7 +235,7 @@ pub unsafe extern "C" fn expression_potbuster(agent: &mut L2CAgentBase) {
             CameraModule::reset_all(agent.module_accessor);            
             macros::CAM_ZOOM_IN_arg6(
                 agent,
-                /*frames to zoom in totally*/4.0,
+                /*frames to zoom in totally*/5.0,
                 /*according to calude the object id?*/0.0,
                 /*the amt of zoom needed, higher the number lower the zoom*/1.1*scale,
                 /*y_rot*/0.0, // up and down

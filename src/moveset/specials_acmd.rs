@@ -21,12 +21,12 @@ pub unsafe extern "C" fn game_specialsloop(agent: &mut L2CAgentBase) {
 }
 
 pub unsafe extern "C" fn effect_specialsloop(agent: &mut L2CAgentBase) {
-    for n in 1..99{
-    if macros::is_excute(agent) {
-        macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_hammerfall_dash"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1.5, true);
-        EffectModule::set_rate_last(agent.module_accessor, 0.5);
-    }
-    wait(agent.lua_state_agent, 30.0);
+    loop{
+        if macros::is_excute(agent) {
+            macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_hammerfall_dash"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1.5, true);
+            EffectModule::set_rate_last(agent.module_accessor, 0.5);
+        }
+        wait(agent.lua_state_agent, 30.0);
     }
 }
 pub unsafe extern "C" fn effect_specials(agent: &mut L2CAgentBase) {

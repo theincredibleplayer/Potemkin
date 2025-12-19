@@ -292,6 +292,13 @@ pub unsafe extern "C" fn game_heavenlystart(agent: &mut L2CAgentBase) {
         EffectModule::kill_kind(agent.module_accessor, Hash40::new("sys_genesis_bg"), false, true);
         macros::FT_MOTION_RATE(agent, 1.0);
         SlowModule::clear_whole(agent.module_accessor);
+        let lr = PostureModule::lr(agent.module_accessor);
+        let stick_x = ControlModule::get_stick_x(agent.module_accessor);
+        if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_FINAL_CANCELLED_INTO){
+            WorkModule::set_float(agent.module_accessor, stick_x * lr, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FINAL_X_JUMP_SPEED);
+        }else{
+            WorkModule::set_float(agent.module_accessor, 0.0, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FINAL_X_JUMP_SPEED);
+        }
         WorkModule::on_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_JUMP);
         macros::CATCH(agent, 0, Hash40::new("hip"), 20.0,0.0,0.0,0.0, None, None, None, *FIGHTER_STATUS_KIND_THROWN, *COLLISION_SITUATION_MASK_A);
         macros::CAM_ZOOM_OUT(agent);

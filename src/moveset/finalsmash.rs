@@ -243,18 +243,24 @@ pub unsafe extern "C" fn Final_main_loop(fighter: &mut L2CFighterCommon) -> L2CV
             KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_MOTION);
             KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
             GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
-            KineticModule::change_kinetic(module_accessor, *FIGHTER_KINETIC_TYPE_FALL);
+            KineticModule::change_kinetic(module_accessor, *FIGHTER_KINETIC_TYPE_AIR_STOP);
+            let speed_x = 3.0 + WorkModule::get_float(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FINAL_X_JUMP_SPEED)*2.0;
+            let speed_limit_x = 10.0 + WorkModule::get_float(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FINAL_X_JUMP_SPEED)*4.0;
+
+            println!("speed_x = {}",speed_x);
             fighter.clear_lua_stack();
             lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,10.0);
             sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
+            sv_kinetic_energy::set_limit_speed(fighter.lua_state_agent);
             fighter.clear_lua_stack();
-            lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,20.0);
+            lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,speed_limit_x);
             sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
+            sv_kinetic_energy::set_limit_speed(fighter.lua_state_agent);
             fighter.clear_lua_stack();
-            lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,*ENERGY_STOP_RESET_TYPE_AIR, 0.0,    3.0   ,0.0,0.0,0.0);
+            lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,*ENERGY_STOP_RESET_TYPE_AIR, 0.0,2.0,0.0,0.0,0.0);
             sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
             fighter.clear_lua_stack();
-            lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_AIR, 10.0 * PostureModule::lr(module_accessor),0.0,0.0,0.0,0.0);
+            lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_AIR, speed_x * PostureModule::lr(module_accessor),0.0,0.0,0.0,0.0);
             sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
             fighter.clear_lua_stack();
             lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY, 0.0, 0.0);
@@ -303,6 +309,8 @@ pub unsafe extern "C" fn Final_exit(fighter: &mut L2CFighterCommon) -> L2CValue 
         WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_START);
         WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_ATTACK_START);
         WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_JUMP_START);
+        WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_FINAL_CANCELLED_INTO);
+
         return smashline::original_status(Exit, fighter, *FIGHTER_STATUS_KIND_FINAL)(fighter);
     }
     return L2CValue::I32(0)

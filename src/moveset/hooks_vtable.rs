@@ -214,8 +214,6 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
     }else{
         WorkModule::unable_transition_term_forbid(module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_TURN);
     }
-    // this doesnt work for some reason?
-    EffectModule::remove_common(module_accessor, Hash40::new("invincible"));    
 }
 
 
@@ -882,8 +880,7 @@ pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,dama
         FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE,
         FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF,
         ].contains(&status_kind)
-    && WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON)
-    && (*collision_log).collision_kind == *COLLISION_KIND_HIT as u8 {
+    && WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON) {
         let time_base = 45.0 * (1.0/sv_information::slow_rate());
         WorkModule::set_float(module_accessor, time_base, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FIRE_TIME_BASE);
         WorkModule::set_int(module_accessor, time_base as i32, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_FIRE_TIMER);
@@ -893,9 +890,11 @@ pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,dama
         WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
     }
 
-    if  HitModule::get_status(module_accessor, (*collision_log).receiver_id as i32, 0) == 0 {
-        UiManager::add_tension(entry_id, dmg*0.2);
-    }
+    //if (*collision_log).collision_kind == *COLLISION_KIND_HIT as u8 {
+    //    if HitModule::get_status(module_accessor, (*collision_log).receiver_id as i32, 0) == 0{
+            UiManager::add_tension(entry_id, dmg*0.2);
+    //    }
+    //}
     kamui_on_damage_og(vtable,fighter,damage_log);
 }
 

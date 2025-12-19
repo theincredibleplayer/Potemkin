@@ -93,13 +93,10 @@ pub unsafe extern "C" fn game_entryl(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 7.0);
     if macros::is_excute(agent) {
         macros::QUAKE(agent, *CAMERA_QUAKE_KIND_L);
-        macros::LANDING_EFFECT(agent, Hash40::new("sys_v_smoke_a"), Hash40::new("g_head_root"), 0, -3, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, false);
-        macros::LAST_EFFECT_SET_RATE(agent, 0.6);
     }
     frame(agent.lua_state_agent, 38.0);
     if macros::is_excute(agent) {
         macros::QUAKE(agent, *CAMERA_QUAKE_KIND_M);
-        macros::LANDING_EFFECT(agent, Hash40::new("sys_v_smoke_a"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
     }
     frame(agent.lua_state_agent, 100.0);
     if macros::is_excute(agent) {
@@ -108,11 +105,25 @@ pub unsafe extern "C" fn game_entryl(agent: &mut L2CAgentBase) {
 }
 
 pub unsafe extern "C" fn effect_entryl(agent: &mut L2CAgentBase) {
-
+    frame(agent.lua_state_agent, 7.0);
+    if macros::is_excute(agent) {
+        macros::LANDING_EFFECT(agent, Hash40::new("sys_v_smoke_a"), Hash40::new("g_head_root"), 0, -3, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, false);
+        macros::LAST_EFFECT_SET_RATE(agent, 0.6);
+    }
+    frame(agent.lua_state_agent, 38.0);
+    if macros::is_excute(agent) {
+        macros::LANDING_EFFECT(agent, Hash40::new("sys_v_smoke_a"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
+    }
 }
 
 pub unsafe extern "C" fn sound_entryl(agent: &mut L2CAgentBase) {
-
+    if macros::is_excute(agent) {
+        macros::PLAY_SE(agent, Hash40::new("se_btl_pot_entry_2p_00"));
+    }
+    frame(agent.lua_state_agent, 27.0);
+    if macros::is_excute(agent) {
+        attack_sound_randomizer(agent,"heavy");
+    }
 }
 
 
@@ -146,7 +157,7 @@ pub unsafe extern "C" fn effect_cliffattack(agent: &mut L2CAgentBase) {
 pub unsafe extern "C" fn game_attack11(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 5.0);
     if macros::is_excute(agent) {
-        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 2.5, 60, 80, 0, 25, 7.0, 0.0, 9.0, 15.0, Some(0.0), Some(20.0), Some(15.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 2.5, 60, 220, 0, 30, 7.0, 0.0, 9.0, 15.0, Some(0.0), Some(20.0), Some(15.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
         AttackModule::set_add_reaction_frame(agent.module_accessor, 0, 2.0, false);
     }
     wait(agent.lua_state_agent, 4.0);

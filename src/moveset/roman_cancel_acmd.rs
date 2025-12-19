@@ -6,7 +6,7 @@ pub unsafe extern "C" fn game_romancancel(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
 
         let stop_time = WorkModule::get_int(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_FREEZE_DURATION);
-        macros::SLOW_OPPONENT(agent, 255.0, stop_time as f32);
+        macros::SLOW_OPPONENT(agent, 255.0, (stop_time+4) as f32);
         HitModule::set_whole(agent.module_accessor, smash::app::HitStatus(*HIT_STATUS_XLU), 0);
 
         macros::FILL_SCREEN_MODEL_COLOR(agent, 0, 10, 0.3, 0.3, 0.3, 0, 0, 0, 1, 1, *smash::lib::lua_const::EffectScreenLayer::GROUND, *EFFECT_SCREEN_PRIO_FINAL);
@@ -57,19 +57,9 @@ pub unsafe extern "C" fn game_romancancel(agent: &mut L2CAgentBase) {
         }
     }
 
-    sv_animcmd::frame(agent.lua_state_agent, 26.0);
-    if macros::is_excute(agent) {
-        macros::SEARCH(agent, 0, 0, Hash40::new("top"), 45.0, -2.0, 16.0, 0.0, None, None, None, *COLLISION_KIND_MASK_HIT, *HIT_STATUS_MASK_NORMAL, 1, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false);
-        //let clear_time = WorkModule::get_int(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_SLOW_CLEAR_TIME);
-        //let slow_mul = WorkModule::get_float(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_SLOW_MUL);
-        //macros::SLOW_OPPONENT(agent, slow_mul, stop_time as f32);
-    }
-    sv_animcmd::wait(agent.lua_state_agent, 1.0);
-    if macros::is_excute(agent) {
-        search!(agent, *MA_MSC_CMD_SEARCH_SEARCH_SCH_CLR_ALL);
-    }
     sv_animcmd::frame(agent.lua_state_agent, 30.0);
     if macros::is_excute(agent) {
+        macros::SEARCH(agent, 0, 0, Hash40::new("top"), 45.0, -2.0, 16.0, 0.0, None, None, None, *COLLISION_KIND_MASK_HIT, *HIT_STATUS_MASK_NORMAL, 1, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false);
         //WorkModule::on_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RC_CLOCK_EFFECT);
         //macros::SEARCH(agent, 0, 0, Hash40::new("top"), 30.0, -2.0, 16.0, 0.0, Some(0.0), Some(0.0), Some(0.0), *COLLISION_KIND_MASK_HIT, *HIT_STATUS_MASK_NORMAL, 1, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false);
         if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RED_RC){
