@@ -36,5 +36,3 @@ opt-level = 'z'
 panic = "abort"
 lto = true
 codegen-units = 1
-
-
