@@ -58,7 +58,8 @@ pub struct TensionMeter {
     pub flame_1_frame: f32,
     pub flame_2_frame: f32,
     pub is_available1: bool,
-    pub is_available2: bool
+    pub is_available2: bool,
+    pub player_count_over_4: bool
 }
 
 impl TensionMeter {
@@ -71,7 +72,8 @@ impl TensionMeter {
             flame_1_frame: 0.0,
             flame_2_frame: 0.0,
             is_available1: false,
-            is_available2: false
+            is_available2: false,
+            player_count_over_4: false
         }
     }
 
@@ -84,8 +86,15 @@ impl TensionMeter {
         self.flame_2_frame = 0.0;
         self.is_available1 = false;
         self.is_available2 = false;
+        self.player_count_over_4 = false;
     }
 
+    pub fn player_count_over_4(&mut self, is_it:bool) {
+        self.player_count_over_4 = is_it;
+    }
+    pub fn is_player_count_over_4(&mut self) -> bool {
+        self.player_count_over_4
+    }
     pub fn set_penalty(&mut self, amount:f32) {
         self.penalty_factor = amount;
     }

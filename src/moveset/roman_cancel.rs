@@ -130,7 +130,7 @@ unsafe fn roman_cancel_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     let timer = WorkModule::get_float(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_ROMAN_CANCEL_METER_DRAIN);
     if timer < 50.0{
-        UiManager::add_tension_unscaled(entry_id,-2.0);
+        UiManager::add_tension_unscaled(get_ui_index_from_entry_id(entry_id),-2.0);
         WorkModule::set_float(module_accessor, timer + 2.0, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_ROMAN_CANCEL_METER_DRAIN);
     }
 

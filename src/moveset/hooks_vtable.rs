@@ -158,9 +158,9 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
     let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
     if smash::app::lua_bind::FighterManager::is_result_mode(fighter_manager) {
-        UiManager::disable_ui(entry_id);
+        UiManager::disable_ui(get_ui_index_from_entry_id(entry_id));
     }else{
-        UiManager::enable_ui(entry_id);
+        UiManager::enable_ui(get_ui_index_from_entry_id(entry_id));
     }
     UiManager::set_game_speed(sv_information::slow_rate()); 
 
@@ -226,10 +226,10 @@ pub unsafe extern "C" fn kamui_reset(vtable: u64, fighter: &mut Fighter) {
     WorkModule::on_flag(fighter.battle_object.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_CAN_SPECIAL_COMMAND);
     ShieldModule::set_target_property(fighter.battle_object.module_accessor, *COLLISION_PROPERTY_REFLECT,2);
     let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
-    UiManager::reset_on_rebirth(entry_id);
+    UiManager::reset_on_rebirth(get_ui_index_from_entry_id(entry_id));
     UiManager::reset_cutin();
     if smashball::is_training_mode(){
-        UiManager::add_tension_unscaled(entry_id,150.0);
+        UiManager::add_tension_unscaled(get_ui_index_from_entry_id(entry_id),150.0);
     }
     WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_RUN);
     WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_DASH_TO_RUN);
@@ -311,10 +311,10 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
         hash40("squat_rv"),
         hash40("landing_light"),
         hash40("landing_heavy"),
-        hash40("step_jump"),
-        hash40("step_pose"),
-        hash40("step_pose_back"),
-        hash40("step_pose_air"),
+        //hash40("step_jump"),
+        //hash40("step_pose"),
+        //hash40("step_pose_back"),
+        //hash40("step_pose_air"),
         hash40("step_fall"),
         hash40("guard_on"),
         hash40("guard"),
@@ -514,9 +514,9 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
         hash40("shield_break_fly"),
         hash40("furafura"),
         //hash40("bind"),
-        hash40("furafura_start_u"),
-        hash40("furafura_start_d"),
-        hash40("furafura_end"),
+        //hash40("furafura_start_u"),
+        //hash40("furafura_start_d"),
+        //hash40("furafura_end"),
         //hash40("fura_sleep_start"),
         //hash40("fura_sleep_loop"),
         //hash40("fura_sleep_end"),
@@ -788,8 +788,6 @@ pub unsafe extern "C" fn kamui_init_og(vtable: u64, fighter: &mut Fighter);
 
 pub unsafe extern "C" fn kamui_init(vtable: u64, fighter: &mut Fighter) {
     let module_accessor = (*fighter).battle_object.module_accessor;
-
-
     if (*fighter).battle_object.kind == *FIGHTER_KIND_KAMUI as u32 {
         let shield_data = ShieldDataResource::new(
             0.0,
@@ -892,7 +890,7 @@ pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,dama
 
     //if (*collision_log).collision_kind == *COLLISION_KIND_HIT as u8 {
     //    if HitModule::get_status(module_accessor, (*collision_log).receiver_id as i32, 0) == 0{
-            UiManager::add_tension(entry_id, dmg*0.2);
+            UiManager::add_tension(get_ui_index_from_entry_id(entry_id), dmg*0.2);
     //    }
     //}
     kamui_on_damage_og(vtable,fighter,damage_log);
@@ -936,7 +934,7 @@ pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,coll
         *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK_WAIT,
         *FIGHTER_STATUS_KIND_FINAL].contains(&status){
             if HitModule::get_status(opp_boma, collision_log.receiver_id as i32, 0) == 0 {
-                UiManager::add_tension(entry_id, damage*0.75);
+                UiManager::add_tension(get_ui_index_from_entry_id(entry_id), damage*0.75);
             }
         }
     }

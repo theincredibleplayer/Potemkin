@@ -125,7 +125,7 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
             wait(agent.lua_state_agent, 1.0);
             if macros::is_excute(agent) {
                 let common = get_fighter_common_from_accessor(&mut* enemy);
-                //set_stage_visibility(agent.module_accessor, false);               ////////////////////////////////problem here
+                set_stage_visibility(agent.module_accessor, false);               ////////////////////////////////problem here
                 macros::QUAKE(common, *CAMERA_QUAKE_KIND_XL);
                 SlowModule::clear_whole(agent.module_accessor);
                 
@@ -164,7 +164,7 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
             //frame(agent.lua_state_agent, 152.0);
             if macros::is_excute(agent) {
                 let common = get_fighter_common_from_accessor(&mut* enemy);
-                //set_stage_visibility(agent.module_accessor, true);
+                set_stage_visibility(agent.module_accessor, true);
                 macros::FT_MOTION_RATE(agent, 1.0);
                 macros::CAM_ZOOM_OUT(common);
                 StatusModule::change_status_request_from_script(enemy, FIGHTER_STATUS_KIND_DEAD.into(), false.into());
@@ -294,6 +294,7 @@ pub unsafe extern "C" fn game_heavenlystart(agent: &mut L2CAgentBase) {
         SlowModule::clear_whole(agent.module_accessor);
         let lr = PostureModule::lr(agent.module_accessor);
         let stick_x = ControlModule::get_stick_x(agent.module_accessor);
+        let stick_y = ControlModule::get_stick_y(agent.module_accessor);
         if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_FINAL_CANCELLED_INTO){
             WorkModule::set_float(agent.module_accessor, stick_x * lr, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FINAL_X_JUMP_SPEED);
         }else{

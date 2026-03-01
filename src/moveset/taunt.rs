@@ -7,7 +7,7 @@ pub unsafe extern "C" fn appeal_end(fighter: &mut L2CFighterCommon) -> L2CValue 
     ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND,ArticleOperationTarget(0));
     if smashball::is_training_mode(){
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
-        UiManager::add_tension_unscaled(entry_id,150.0);
+        UiManager::add_tension_unscaled(get_ui_index_from_entry_id(entry_id),150.0);
     }
     smashline::original_status(End, fighter, *FIGHTER_STATUS_KIND_APPEAL)(fighter)
 }

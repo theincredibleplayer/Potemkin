@@ -133,3 +133,13 @@ pub unsafe extern "C" fn post_circle_effect_params_again(effectmodule:u64, effha
 
     call_original!(effectmodule, effhash, bonehash, vec1, vec2, arg, float1, float2)
 }
+
+
+#[skyline::hook(offset = 0x69a728, inline)]
+unsafe extern "C" fn autoturn_situation_check_hook(ctx: &mut skyline::hooks::InlineCtx) {
+    let module_accessor = ctx.registers[21].x() as *mut BattleObjectModuleAccessor;
+    let fighter_kind = utility::get_kind(&mut *(module_accessor));
+    if fighter_kind == *FIGHTER_KIND_KAMUI {
+        ctx.registers[0].set_x(0);
+    }
+}

@@ -42,7 +42,7 @@ pub unsafe extern "C" fn game_throwf(agent: &mut L2CAgentBase) {
         let lr = PostureModule::lr(agent.module_accessor);
         let is_ground = GroundModule::ray_check(
             agent.module_accessor, 
-            &Vector2f{ x: PostureModule::pos_x(agent.module_accessor)+13.0*lr, y: PostureModule::pos_y(agent.module_accessor)+33.0}, 
+            &Vector2f{ x: PostureModule::pos_x(agent.module_accessor)+11.0*lr, y: PostureModule::pos_y(agent.module_accessor)+22.0}, 
             &Vector2f{ x: 14.0*lr, y: -66.0},
             true
         ) == 1;
@@ -101,7 +101,7 @@ pub unsafe extern "C" fn game_throwb(agent: &mut L2CAgentBase) {
         let lr = PostureModule::lr(agent.module_accessor);
         let is_ground = GroundModule::ray_check(
             agent.module_accessor, 
-            &Vector2f{ x: PostureModule::pos_x(agent.module_accessor)+13.0*lr, y: PostureModule::pos_y(agent.module_accessor)+33.0}, 
+            &Vector2f{ x: PostureModule::pos_x(agent.module_accessor)+11.0*lr, y: PostureModule::pos_y(agent.module_accessor)+22.0}, 
             &Vector2f{ x: 14.0*lr, y: -66.0},
             true
         ) == 1;

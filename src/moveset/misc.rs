@@ -1,5 +1,14 @@
 use crate::moveset::*;
-
+use {
+    smash::{
+        lua2cpp::*,
+        phx::*,
+        app::{sv_animcmd::*, lua_bind::*, *},
+        lib::{lua_const::*, L2CAgent},
+    },
+    smash_script::*,
+    smashline::{*, Priority::*}
+};
 
 
 
@@ -46,3 +55,30 @@ pub fn get_fighter_common_from_accessor<'a>(boma: &'a mut BattleObjectModuleAcce
     }
 }
 
+pub fn is_valid_entry_id(entry_id: i32) -> bool {
+    unsafe {
+        let entry = smash::app::lua_bind::FighterManager::get_fighter_entry(singletons::FighterManager(), smash::app::FighterEntryID(entry_id)) as *mut smash::app::FighterEntry;
+        if entry.is_null() {
+            false
+        } else {
+            true
+        }
+    }
+}
+
+pub fn get_ui_index_from_entry_id(entry_id: usize) -> usize {
+    // start at index 0
+    let mut index = 0;
+
+    // check all of the possible entry IDs less than or equal to this one,
+    // and see how many "slots" should be filled, counting up from 0.
+    for n in 0..entry_id {
+        if is_valid_entry_id(n as i32) {
+            // this is a valid fighter in this match, which means they will
+            // be occupying a UI slot. Thus, we cannot take that slot.
+            index += 1;
+        }
+    }
+    println!("index={}",index);
+    return index;
+}

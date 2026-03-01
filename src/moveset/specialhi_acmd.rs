@@ -43,7 +43,11 @@ pub unsafe extern "C" fn sound_special_hi(agent: &mut L2CAgentBase) {
     }
 }
 
-pub unsafe extern "C" fn special_hi_start(agent: &mut L2CAgentBase) {}
+pub unsafe extern "C" fn special_hi_start(agent: &mut L2CAgentBase) {
+    if macros::is_excute(agent) {
+        grab!(agent, *MA_MSC_CMD_GRAB_CLEAR_ALL);
+    }
+}
 
 pub unsafe extern "C" fn sound_special_hi_start(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
@@ -175,7 +179,7 @@ pub unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
     sv_animcmd::frame(agent.lua_state_agent, 45.0);
     if macros::is_excute(agent) {
         let entry_id = WorkModule::get_int(agent.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
-        UiManager::add_tension(entry_id,18.0);
+        UiManager::add_tension(get_ui_index_from_entry_id(entry_id),18.0);
         WorkModule::on_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_HI_FLAG_HIT);
     }
     sv_animcmd::wait(agent.lua_state_agent, 1.0);

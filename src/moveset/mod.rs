@@ -394,8 +394,8 @@ pub unsafe extern "C" fn cancels(fighter: &mut L2CFighterCommon) {
 
 
     if CancelModule::is_enable_cancel(module_accessor) 
-    || fighter.global_table[IS_STOP].get_bool()
-    || !AttackModule::is_infliction_status(module_accessor, *COLLISION_KIND_MASK_HIT | *COLLISION_KIND_MASK_SHIELD){
+    || fighter.global_table[IS_STOP].get_bool() // cant cancel during hitstop
+    || !AttackModule::is_infliction_status(module_accessor, *COLLISION_KIND_MASK_HIT | *COLLISION_KIND_MASK_SHIELD){ // cancels only if hit or collided with a shield
         return;
     }
 
@@ -520,6 +520,9 @@ pub unsafe extern "C" fn cancels(fighter: &mut L2CFighterCommon) {
             return;
         }
         if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_N) != 0  {
+            if (status == *FIGHTER_STATUS_KIND_ATTACK_100) && AttackModule::is_infliction_status(module_accessor,*COLLISION_KIND_MASK_SHIELD){ // disable jab from cancelling into itself when colliding with a shield
+                return;
+            }
             StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_ATTACK, false);
             return;
         }
@@ -555,10 +558,10 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
         let mut can_rc = true;
 
         if WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_PENALTY_TIMER) == 0{
-            UiManager::set_penalty(entry_id, 0.0);
+            UiManager::set_penalty(get_ui_index_from_entry_id(entry_id), 0.0);
             WorkModule::dec_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_PENALTY_TIMER);
         }else if WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_PENALTY_TIMER) > 0{
-            UiManager::set_penalty(entry_id, 0.9);
+            UiManager::set_penalty(get_ui_index_from_entry_id(entry_id), 0.9);
             WorkModule::dec_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_PENALTY_TIMER);
         }
         if !(
@@ -690,7 +693,7 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
         ].contains(&status_kind) )
         || (StatusModule::prev_status_kind(module_accessor, 0) == FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL
             && StatusModule::is_changing(module_accessor)) 
-        || !UiManager::is_tension_available(entry_id){
+        || !UiManager::is_tension_available(get_ui_index_from_entry_id(entry_id)){
             can_rc = false;
         }
 
@@ -861,7 +864,7 @@ unsafe extern "C" fn opff_global(fighter: &mut L2CFighterCommon) {
     let fighter_kind = fighter.global_table[KIND].get_i32();
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     if fighter_kind != *FIGHTER_KIND_KAMUI {
-        UiManager::disable_ui(entry_id);
+        UiManager::disable_ui(get_ui_index_from_entry_id(entry_id));
         // this should handle kill voicelines 
         //for n in 0..1{
         //    if n != entry_id{
@@ -873,7 +876,13 @@ unsafe extern "C" fn opff_global(fighter: &mut L2CFighterCommon) {
     }
 }
 
-
+unsafe extern "C" fn agent_init_global(fighter: &mut L2CFighterCommon) {
+    if smash::app::lua_bind::FighterManager::entry_count(singletons::FighterManager() as _) > 4 {
+        UiManager::player_count_over_4(true);
+    }else{
+        UiManager::player_count_over_4(false);
+    }
+}
 
 
 
@@ -1462,6 +1471,7 @@ pub fn install() {
 
     Agent::new("fighter")
     .on_line(Main, opff_global)
+    .on_start(agent_init_global)
 
 
     //.status(Pre, FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_upb_pre)
@@ -1507,35 +1517,21 @@ pub fn install() {
         for i in 1..102 {
             KAMUI_WEAPON_VTABLE_ENTRIES[i] = KAMUI_WEAPON_VTABLE_ENTRIES[0] + (0x8 * (i as usize));
         }
-
         patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_FRAME_3],kamui_on_frame as u64);
         patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_SEARCH],kamui_on_search as u64);
         patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::RESET_1], kamui_reset as u64);
         patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::INITIALIZE], kamui_init as u64);
         patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_SHIELD_COLLISION], kamui_on_shield as u64);
-        //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_FINAL_END], kamui_on_frame_2 as u64);
-        //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_FINAL_END], kamui_on_frame_1 as u64);
-        //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::RESET_2], kamui_reset_2 as u64);
-        //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::RESET_3], kamui_reset_3 as u64);
         patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_DAMAGE], kamui_on_damage as u64);
         patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_ATTACK], kamui_on_attack as u64);
         patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_CHANGE_MOTION], kamui_on_change_motion as u64);
 
-
-
-        //patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::PERMA_WEAPON_LINK_REMOVE], kamui_reset_2 as u64);
     }
+
     skyline::patching::Patch::in_text(0x3414534).nop(); // nops the waterball effect
-
-
-
-
     skyline::patching::Patch::in_text(0xb616d0).nop(); // nops the set pos at the end of final smash
-
-    //skyline::patching::Patch::in_text(0xb601e4).nop(); // nops the set lr
-    //skyline::patching::Patch::in_text(0xb60570).nop(); // nops the set lr
-
     skyline::patching::Patch::in_text(0xb5ccc0).nop().expect("Failed to patch 0xb5ccc0"); // nops the sword effect
+
     unsafe{
         param_config_ig();
     }

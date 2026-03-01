@@ -20,97 +20,108 @@ pub struct UiManager {
 }
 
 impl UiManager {
-    pub fn enable_ui(entry_id: usize) {
+    pub fn enable_ui(ui_id: usize) {
         let mut manager = UI_MANAGER.write();
         unsafe {
-            manager.is_enabled[entry_id] = true;
+            manager.is_enabled[ui_id] = true;
         }
     }
 
-    pub fn disable_ui(entry_id: usize) {
+    pub fn disable_ui(ui_id: usize) {
         let mut manager = UI_MANAGER.write();
         unsafe {
-            manager.is_enabled[entry_id] = false;
+            manager.is_enabled[ui_id] = false;
         }
     }
 
-    pub fn is_enabled(entry_id: usize) -> bool {
+    pub fn is_enabled(ui_id: usize) -> bool {
         let mut manager = UI_MANAGER.write();
         unsafe {
-            manager.is_enabled[entry_id]
+            manager.is_enabled[ui_id]
         }
     }
 
-    pub fn reset_on_rebirth(entry_id: usize) {
+    pub fn reset_on_rebirth(ui_id: usize) {
         let mut manager = UI_MANAGER.write();
         unsafe {
-            manager.tension_meter[entry_id].reset();
+            manager.tension_meter[ui_id].reset();
             manager.cutin_ui[0].reset_all();
         }
     }
 
-    pub fn add_tension(entry_id: usize, amount: f32) {
+    pub fn add_tension(ui_id: usize, amount: f32) {
         let mut manager = UI_MANAGER.write();
         unsafe {
-            manager.tension_meter[entry_id].add_meter(amount,true);
+            manager.tension_meter[ui_id].add_meter(amount,true);
         }
     }
 
-    pub fn add_tension_unscaled(entry_id: usize, amount: f32) {
+    pub fn add_tension_unscaled(ui_id: usize, amount: f32) {
         let mut manager = UI_MANAGER.write();
         unsafe {
-            manager.tension_meter[entry_id].add_meter(amount,false);
+            manager.tension_meter[ui_id].add_meter(amount,false);
         }
     }
 
-    pub fn set_penalty(entry_id: usize, amount: f32) {
+    pub fn set_penalty(ui_id: usize, amount: f32) {
         let mut manager = UI_MANAGER.write();
         unsafe {
-            manager.tension_meter[entry_id].set_penalty(amount);
+            manager.tension_meter[ui_id].set_penalty(amount);
         }
     }
 
-    pub fn is_tension_available(entry_id: usize) -> bool {
+    pub fn is_tension_available(ui_id: usize) -> bool {
         let mut manager = UI_MANAGER.write();
         unsafe {
-            manager.tension_meter[entry_id].is_available()
+            manager.tension_meter[ui_id].is_available()
         }
     }
 
-    pub fn is_tension_full(entry_id: usize) -> bool {
+    pub fn is_tension_full(ui_id: usize) -> bool {
         let mut manager = UI_MANAGER.write();
         unsafe {
-            manager.tension_meter[entry_id].is_tension2_available()
+            manager.tension_meter[ui_id].is_tension2_available()
         }
     }
 
-    pub fn consume_tension(entry_id: usize) {
+    pub fn consume_tension(ui_id: usize) {
         let mut manager = UI_MANAGER.write();
         unsafe {
-            manager.tension_meter[entry_id].consume_tension();
+            manager.tension_meter[ui_id].consume_tension();
         }
     }
-
-    pub fn get_frame_from_name(entry_id: usize, name: &str) -> f32 {
+    pub fn is_player_count_over_4() -> bool{
+        let mut manager = UI_MANAGER.write();
+        unsafe {
+            manager.tension_meter[0].is_player_count_over_4()
+        }
+    }
+    pub fn player_count_over_4(is_it: bool) {
+        let mut manager = UI_MANAGER.write();
+        unsafe {
+            manager.tension_meter[0].player_count_over_4(is_it);
+        }
+    }
+    pub fn get_frame_from_name(ui_id: usize, name: &str) -> f32 {
         let mut manager = UI_MANAGER.write();
         unsafe {
             if name == "atb" {
-                return manager.tension_meter[entry_id].get_meter_frame();
+                return manager.tension_meter[ui_id].get_meter_frame();
             }
             else if name == "atb_border1"{
-                return manager.tension_meter[entry_id].get_gear_frame_1();
+                return manager.tension_meter[ui_id].get_gear_frame_1();
             }
             else if name == "limit_border"{
-                return manager.tension_meter[entry_id].get_flame_frame_1();
+                return manager.tension_meter[ui_id].get_flame_frame_1();
             }
             else if name == "atb_border2"{
-                return manager.tension_meter[entry_id].get_gear_frame_2();  
+                return manager.tension_meter[ui_id].get_gear_frame_2();  
             }
             else if name == "limit_guage"
             || name == "gear_2_frame"
             || name == "limit"
             || name == "limit_bar"{
-                return manager.tension_meter[entry_id].get_flame_frame_2();  
+                return manager.tension_meter[ui_id].get_flame_frame_2();  
             } else if name == "bar_hi"
             || name == "bar_low"{
                 return manager.cutin_ui[0].get_bar_frame();
@@ -126,19 +137,19 @@ impl UiManager {
         }
     }
 
-    pub fn get_border_availability_from_name(entry_id: usize, name: &str) -> bool {
+    pub fn get_border_availability_from_name(ui_id: usize, name: &str) -> bool {
         let mut manager = UI_MANAGER.write();
         unsafe {
             if name == "atb_border1" 
             || name == "limit_border"{
-                return manager.tension_meter[entry_id].is_tension1_available();
+                return manager.tension_meter[ui_id].is_tension1_available();
             }
             else if name == "atb_border2" 
             || name == "gear_2_frame"
             || name == "limit_guage"
             || name == "limit"
             || name == "limit_bar"{
-                return manager.tension_meter[entry_id].is_tension2_available();
+                return manager.tension_meter[ui_id].is_tension2_available();
             }else if name == "bar_hi"
             || name == "bar_low"{
                 return manager.cutin_ui[0].is_bar_on();
@@ -309,11 +320,18 @@ unsafe fn handle_layout_potemkin(layout: *mut Layout) -> *mut Layout {
                 }
             }
         }
-        let pane_list = ["p1","p2","p3","p4","p5","p6","p7","p8"];
+        let player_smash_8 = UiManager::is_player_count_over_4();
+        let mut pane_list;
+        if !player_smash_8{
+            pane_list = ["p1","p2","p3","p4","p5","p6","p7","p8"];
+        }else{
+            pane_list = ["p1_2","p2_2","p3_2","p4_2","p5","p6","p7","p8"];
+        }
         let mut idx = 0;
         for pane in pane_list {
             if let Some(parent) = root_pane.find_pane_by_name_recursive(pane) {
-                if UiManager::is_enabled(idx) {
+                if idx < 8
+                && UiManager::is_enabled(idx) {
                     if let Some(child) = parent.find_pane_by_name_recursive("cloud") {
                         let anim_list = &mut (*child.as_parts().layout).anim_trans_list;
                         let mut curr = anim_list as *mut AnimTransformNode;
