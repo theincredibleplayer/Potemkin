@@ -79,6 +79,5 @@ pub fn get_ui_index_from_entry_id(entry_id: usize) -> usize {
             index += 1;
         }
     }
-    println!("index={}",index);
     return index;
 }

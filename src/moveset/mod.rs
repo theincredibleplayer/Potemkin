@@ -729,7 +729,12 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
             ,*FIGHTER_STATUS_KIND_DAMAGE_FALL
             ,*FIGHTER_STATUS_KIND_GUARD
             ,*FIGHTER_STATUS_KIND_GUARD_ON
-            ,*FIGHTER_STATUS_KIND_GUARD_OFF];
+            ,*FIGHTER_STATUS_KIND_GUARD_OFF
+            ,*FIGHTER_STATUS_KIND_SQUAT
+            ,*FIGHTER_STATUS_KIND_SQUAT_B
+            ,*FIGHTER_STATUS_KIND_SQUAT_F
+            ,*FIGHTER_STATUS_KIND_SQUAT_RV
+            ,*FIGHTER_STATUS_KIND_SQUAT_WAIT];
 
 
             if fighter.global_table[IS_STOP].get_bool()
@@ -852,27 +857,19 @@ pub unsafe extern "C" fn pot_check_special_command(fighter: &mut L2CFighterCommo
 
 // agent init
 unsafe extern "C" fn agent_init(fighter: &mut L2CFighterCommon) {
+    let module_accessor = fighter.module_accessor;
     let fighter_kind = fighter.global_table[KIND].get_i32();
-    if fighter_kind == *FIGHTER_KIND_KAMUI {
-        fighter.global_table[0x3E].assign(&L2CValue::Ptr(auto_turn as *const () as _));
-        fighter.global_table[CHECK_SPECIAL_COMMAND].assign(&L2CValue::Ptr(pot_check_special_command as *const () as _));
-    }
+    fighter.global_table[0x3E].assign(&L2CValue::Ptr(auto_turn as *const () as _));
+    fighter.global_table[CHECK_SPECIAL_COMMAND].assign(&L2CValue::Ptr(pot_check_special_command as *const () as _));
+    WorkModule::on_flag(module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_CAN_SPECIAL_COMMAND);
 }
 
 
 unsafe extern "C" fn opff_global(fighter: &mut L2CFighterCommon) {
     let fighter_kind = fighter.global_table[KIND].get_i32();
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
-    if fighter_kind != *FIGHTER_KIND_KAMUI {
+    if !is_potemkin(fighter.module_accessor) {
         UiManager::disable_ui(get_ui_index_from_entry_id(entry_id));
-        // this should handle kill voicelines 
-        //for n in 0..1{
-        //    if n != entry_id{
-                //if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_DEATH_PREDICTION) {
-                //    EffectModule::req(fighter.module_accessor, Hash40::new("sys_bomb_a"), &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, 1.0, 0, 0, false,0);
-                //}
-        //    }
-        //}
     }
 }
 
@@ -885,7 +882,10 @@ unsafe extern "C" fn agent_init_global(fighter: &mut L2CFighterCommon) {
 }
 
 
-
+pub unsafe extern "C" fn is_potemkin(module_accessor: *mut BattleObjectModuleAccessor) -> bool {
+    let color = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_COLOR);
+    crate::MARKED_COLORS[color as usize]
+}
 
 
 
@@ -914,8 +914,15 @@ pub fn install() {
             .as_ptr(),
         );
     }
-
-    Agent::new("kamui")
+    let mut costume = &mut Vec::new();
+    unsafe {
+        for i in 0..crate::MARKED_COLORS.len() {
+            if crate::MARKED_COLORS[i] {
+                costume.push(i);
+            }
+        }
+    }
+    Agent::new("kamui").set_costume(costume.to_vec())
     //agent frame/opff
     .on_line(Main, kamui)
     .on_start(agent_init)
@@ -1409,7 +1416,7 @@ pub fn install() {
     
     .install();
 
-    Agent::new("kamui_waterdragon")
+    Agent::new("kamui_waterdragon").set_costume(costume.to_vec())
     //special_lw
     .game_acmd("game_speciallwhit", special_lw_hit, Priority::Low)
     .effect_acmd("effect_speciallwhit", effect_special_lw_hit, Priority::Low)
@@ -1439,7 +1446,7 @@ pub fn install() {
     .install();
 
 
-    Agent::new("kamui_dragonhand")
+    Agent::new("kamui_dragonhand").set_costume(costume.to_vec())
     .game_acmd("game_dhspecialnendmax", special_lw_hit, Priority::Low)
     .effect_acmd("effect_dhspecialnendmax", effect_special_lw_hit, Priority::Low)
     .sound_acmd("sound_dhspecialnendmax", sound_special_lw_hit, Priority::Low)
@@ -1447,12 +1454,12 @@ pub fn install() {
 
 
 
-    Agent::new("kamui_spearhand")
+    Agent::new("kamui_spearhand").set_costume(costume.to_vec())
     .game_acmd("game_attacks4", spear_attacks4, Priority::Low)
     .effect_acmd("effect_attacks4charge", effect_attacks4_charge_spear, Priority::Low)
     .install();
 
-    Agent::new("kamui_ryusensya")
+    Agent::new("kamui_ryusensya").set_costume(costume.to_vec())
     .status(Main,*WEAPON_KAMUI_RYUSENSYA_STATUS_KIND_REGULAR, fly_main)
     .status(Pre, WEAPON_KAMUI_RYUSENSYA_STATUS_KIND_BOOM, boom_pre)
     .status(Main,WEAPON_KAMUI_RYUSENSYA_STATUS_KIND_BOOM, boom_main)
@@ -1531,8 +1538,4 @@ pub fn install() {
     skyline::patching::Patch::in_text(0x3414534).nop(); // nops the waterball effect
     skyline::patching::Patch::in_text(0xb616d0).nop(); // nops the set pos at the end of final smash
     skyline::patching::Patch::in_text(0xb5ccc0).nop().expect("Failed to patch 0xb5ccc0"); // nops the sword effect
-
-    unsafe{
-        param_config_ig();
-    }
 }
