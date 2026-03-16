@@ -88,35 +88,49 @@ pub unsafe extern "C" fn kamui_on_search(_vtable: u64, fighter: &mut Fighter, lo
             let opp_boma = sv_battle_object::module_accessor((*collision_log).opponent_object_id);
             let clear_time = WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_SLOW_CLEAR_TIME);
             let slow_mul = WorkModule::get_float(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_SLOW_MUL) as i32;    
+            let stop_time = WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_FREEZE_DURATION);
 
-            // the 0x800000 seems to make the effect immune to the user being slowed
-            // also apparently the order of spawning the effects matter in the draw order?
-            EffectModule::req_follow(opp_boma, Hash40::new("rc_clock_base"), Hash40::new("top"), &Vector3f{x: 0.0, y: 23.0, z: 0.0}, &Vector3f{x: 0.0, y: 0.0, z: 0.0}, 0.3, true, 0x800000, 0, -1, 0, 0, false, false);
-            EffectModule::set_rate_last(opp_boma, ( ( 60.0 )/( clear_time as f32 ) ) );
-            EffectModule::req_follow(opp_boma, Hash40::new("rc_clock"), Hash40::new("top"), &Vector3f{x: 0.0, y: 23.0, z: 0.0}, &Vector3f{x: 0.0, y: 0.0, z: 0.0}, 0.3, true, 0x800000, 0, -1, 0, 0, false, false);
-            EffectModule::set_rate_last(opp_boma, ( ( 60.0 )/( clear_time as f32 ) ) );
 
-            if WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_YELLOW_RC){
-                WorkModule::set_float(opp_boma, 0.7, *FIGHTER_STATUS_WORK_ID_FLOAT_REBOUND_MOTION_RATE);
-                if StatusModule::situation_kind(opp_boma) != *SITUATION_KIND_GROUND {
-                    StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND_JUMP, false);
+
+            if WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RC_END_SLOW){
+                // the 0x800000 seems to make the effect immune to the user being slowed
+                // also apparently the order of spawning the effects matter in the draw order?
+                EffectModule::req_follow(opp_boma, Hash40::new("rc_clock_base"), Hash40::new("top"), &Vector3f{x: 0.0, y: 23.0, z: 0.0}, &Vector3f{x: 0.0, y: 0.0, z: 0.0}, 0.3, true, 0x800000, 0, -1, 0, 0, false, false);
+                EffectModule::set_rate_last(opp_boma, ( ( 60.0 )/( clear_time as f32 ) ) );
+                EffectModule::req_follow(opp_boma, Hash40::new("rc_clock"), Hash40::new("top"), &Vector3f{x: 0.0, y: 23.0, z: 0.0}, &Vector3f{x: 0.0, y: 0.0, z: 0.0}, 0.3, true, 0x800000, 0, -1, 0, 0, false, false);
+                EffectModule::set_rate_last(opp_boma, ( ( 60.0 )/( clear_time as f32 ) ) );
+
+                if WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_YELLOW_RC){
+                    WorkModule::set_float(opp_boma, 0.7, *FIGHTER_STATUS_WORK_ID_FLOAT_REBOUND_MOTION_RATE);
+                    if StatusModule::situation_kind(opp_boma) != *SITUATION_KIND_GROUND {
+                        StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND_JUMP, false);
+                    }else{
+                        StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND, false);
+                    }
+                    SlowModule::set(
+                        opp_boma,
+                        0,
+                        slow_mul,
+                        clear_time,
+                        false,
+                        *BATTLE_OBJECT_ID_INVALID as u32
+                    );
                 }else{
-                    StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND, false);
+                    SlowModule::set(
+                        opp_boma,
+                        0,
+                        slow_mul,
+                        clear_time,
+                        false,
+                        *BATTLE_OBJECT_ID_INVALID as u32
+                    );
                 }
+            }else if WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RC_INITIAL_SLOW){
                 SlowModule::set(
                     opp_boma,
                     0,
-                    slow_mul,
-                    clear_time,
-                    false,
-                    *BATTLE_OBJECT_ID_INVALID as u32
-                );
-            }else{
-                SlowModule::set(
-                    opp_boma,
-                    0,
-                    slow_mul,
-                    clear_time,
+                    255,
+                    stop_time,
                     false,
                     *BATTLE_OBJECT_ID_INVALID as u32
                 );

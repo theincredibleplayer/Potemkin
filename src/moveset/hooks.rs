@@ -55,19 +55,6 @@ pub unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, ev
     original!()(vtable, fighter, event)
 }
 
-#[skyline::hook(offset = 0x34146C0)]
-pub unsafe extern "C" fn noping_the_eff(vtable:u64, weapon: *mut smash::app::Weapon, log: CollisionLog) -> u64 {
-    
-    *(weapon as *mut bool).add(0x90) = true; //Lets the weapon persist on hit
-    if (AttackModule::is_infliction((*weapon).battle_object.module_accessor, *COLLISION_KIND_MASK_HIT) || AttackModule::is_infliction((*weapon).battle_object.module_accessor, *COLLISION_KIND_MASK_SHIELD) || AttackModule::is_infliction((*weapon).battle_object.module_accessor, *COLLISION_KIND_MASK_ATTACK) )
-    {
-        if WorkModule::is_flag((*weapon).battle_object.module_accessor,WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_DID_IT_HIT){
-            WorkModule::off_flag((*weapon).battle_object.module_accessor,WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_DID_IT_HIT);
-            StatusModule::change_status_request_from_script((*weapon).battle_object.module_accessor, WEAPON_KAMUI_RYUSENSYA_STATUS_KIND_BOOM, false);
-        }
-    }
-    call_original!(vtable, weapon, log)
-}
 
 
 #[skyline::hook(offset = 0x69a728, inline)]
@@ -78,5 +65,50 @@ unsafe extern "C" fn autoturn_situation_check_hook(ctx: &mut skyline::hooks::Inl
         if is_potemkin(module_accessor){
             ctx.registers[0].set_x(0);
         }
+    }
+}
+
+
+#[skyline::hook(offset = 0x3414310)]
+pub unsafe extern "C" fn noping_the_waterball_eff(unk0:u64, weapon: *mut smash::app::Weapon, unk2: u64) -> u64 {
+    let module_accessor = (*weapon).battle_object.module_accessor;
+    let owner_id = WorkModule::get_int((*weapon).battle_object.module_accessor,*WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER);
+    let owner_accessor = sv_battle_object::module_accessor(owner_id as u32);
+    if is_potemkin(owner_accessor){
+        GroundModule::set_correct(module_accessor, GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
+        GroundModule::set_cliff_check(module_accessor,GroundCliffCheckKind(*GROUND_CLIFF_CHECK_KIND_NONE));
+        GroundModule::set_attach_ground(module_accessor, false);
+        PostureModule::set_scale(module_accessor, 0.45, false);
+        return 0;
+    }else{
+        call_original!(unk0, weapon, unk2)
+    }
+}
+
+#[skyline::hook(offset = 0xb5cbf0)]
+pub unsafe extern "C" fn noping_the_sword_eff(fighter: &mut Fighter) -> u64 {
+    if is_potemkin(fighter.battle_object.module_accessor){
+        return 0;
+    }else{
+        call_original!(fighter)
+    }
+}
+
+#[skyline::hook(offset = 0x34146c0)]
+pub unsafe extern "C" fn waterball_on_hit(vtable:u64, weapon: *mut smash::app::Weapon, log: CollisionLog) -> u64 {
+    let owner_id = WorkModule::get_int((*weapon).battle_object.module_accessor,*WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER);
+    let owner_accessor = sv_battle_object::module_accessor(owner_id as u32);
+    if is_potemkin(owner_accessor){
+        *(weapon as *mut bool).add(0x90) = true; //Lets the weapon persist on hit
+        if (AttackModule::is_infliction((*weapon).battle_object.module_accessor, *COLLISION_KIND_MASK_HIT) || AttackModule::is_infliction((*weapon).battle_object.module_accessor, *COLLISION_KIND_MASK_SHIELD) || AttackModule::is_infliction((*weapon).battle_object.module_accessor, *COLLISION_KIND_MASK_ATTACK) )
+        {
+            if WorkModule::is_flag((*weapon).battle_object.module_accessor,WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_DID_IT_HIT){
+                WorkModule::off_flag((*weapon).battle_object.module_accessor,WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_DID_IT_HIT);
+                StatusModule::change_status_request_from_script((*weapon).battle_object.module_accessor, WEAPON_KAMUI_RYUSENSYA_STATUS_KIND_BOOM, false);
+            }
+        }
+        call_original!(vtable, weapon, log)
+    }else{
+        call_original!(vtable, weapon, log)
     }
 }

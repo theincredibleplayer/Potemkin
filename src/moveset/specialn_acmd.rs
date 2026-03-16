@@ -4,7 +4,6 @@ use crate::moveset::*;
 pub unsafe extern "C" fn game_regular(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         let owner_id = WorkModule::get_int(agent.module_accessor,*WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER);
-        println!("owner id: {}",owner_id);
         let owner_accessor = sv_battle_object::module_accessor(owner_id as u32);
         let mut damage = WorkModule::get_float(owner_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_REAL_POWER_REFLECT);
         if damage < 10.0{

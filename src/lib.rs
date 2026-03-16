@@ -1,10 +1,9 @@
-#![feature(concat_idents)]
 #![feature(proc_macro_hygiene)]
 #![feature(asm)]
 #![allow(warnings)]
 #![feature(simd_ffi)]
 use std::collections::HashMap;
-use smash::lib::lua_const::{FIGHTER_KIND_KAMUI};
+use smash::lib::lua_const::{FIGHTER_KIND_KAMUI, FIGHTER_SIZE_LL, FIGHTER_MOTION_SHARE_TYPE_BIG, FIGHTER_WAIST_SIZE_L, HIT_HEIGHT_HIGH};
 use motion_lib::{self, mlist::{Animation, Extra}, hash40::WriteHash40};
 use arcropolis_api::arc_callback;
 use motion_lib::{hash40, mlist::Flags};
@@ -47,8 +46,6 @@ pub fn check_deps() -> bool {
 }
 
 extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
-    // EVERYTHING HERE IS UNIQUE THAT'S MEANT TO BE MODIFIED FOR YOUR SPECIFIC PLUGIN.
-
     const FIGHTER_NAME: &str = "kamui";
     const MARKER_FILE: &str = "potemkin.marker";
     let mut lowest_color: i32 = -1;
@@ -85,29 +82,78 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
     };
 
 
+
+
+
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("param_private"), 0x19996b81b6, 1200.0));
 
+
+    // fighter_param
+	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("walk_speed_max"), 0, 0.7));
+	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("walk_slow_speed_mul"), 0, 0.25));
+	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("walk_fast_ratio"), 0, 0.9));
+	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("dash_speed"), 0, 1.0));
+	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("run_speed_max"), 0, 0.8));
+	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("weight"), 0, 145.0));
+	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("scale"), 0, 1.0));                          // doesnt work
+	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("shield_radius"), 0, 20.0));
+    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("attack_combo_max"), 0, 1));
+    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("attack100_type"), 0, 1));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("height"), 0, 24.0));                        // no idea
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("jack_final_target_scale"), 0, 0.8));        // no idea
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("effect_scale"), 0, 2.0));                   // no idea
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("camera_range_center_y"), 0, 12.0));         // all of these dont work
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("camera_range_up"), 0, 18.0));               // all of these dont work
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("camera_range_down"), 0, -12.0));            // all of these dont work
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("camera_range_2nd_center_y"), 0, 12.0));     // all of these dont work
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("camera_range_2nd_up"), 0, 16.0));           // all of these dont work
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("camera_range_2nd_down"), 0, -12.0));        // all of these dont work
+    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("size"),0, *FIGHTER_SIZE_LL));               // all of these dont work
+    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("bury_motion_height"),0, *HIT_HEIGHT_HIGH));
+    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("bury_r_motion_height"),0, *HIT_HEIGHT_HIGH));
+    
+    // fighter_param_motion
+    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("motion_share"),0, *FIGHTER_MOTION_SHARE_TYPE_BIG));
+    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("waist_size"),0, *FIGHTER_WAIST_SIZE_L));
+
+    // vl.prc
+    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("param_private"),smash::hash40("final_ready_frame"), 1));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("param_special_n"),smash::hash40("shoot_offset_x"), 20.0));           // all of these dont work
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("param_special_n"),smash::hash40("shoot_offset_y"), 17.0));        // all of these dont work
 
 
 
     // Preform csk collection calls here (allow online, narration characall entry, add chara db, add layout db, w/e)
+    the_csk_collection_api::add_series_db_entry_info(the_csk_collection_api::SeriesDatabaseEntry { 
+        ui_series_id: smash::hash40("ui_series_guiltygear"), 
+        name_id: the_csk_collection_api::StringType::Optional(Some(the_csk_collection_api::CStrCSK::new("guiltygear"))), 
+        disp_order: the_csk_collection_api::SignedByteType::Overwrite(40), 
+        disp_order_sound: the_csk_collection_api::SignedByteType::Overwrite(40), 
+        save_no: the_csk_collection_api::SignedByteType::Optional(Some(55)), 
+        shown_as_series_in_directory: the_csk_collection_api::BoolType::Optional(Some(true)), 
+        is_dlc: the_csk_collection_api::BoolType::Optional(Some(false)), 
+        is_patch: the_csk_collection_api::BoolType::Optional(Some(false)), 
+        dlc_chara_id: the_csk_collection_api::Hash40Type::Optional(Some(0x0)), 
+        is_use_amiibo_bg: the_csk_collection_api::BoolType::Optional(Some(true)), 
+        ..Default::default()
+    });
 
     the_csk_collection_api::add_chara_db_entry_info(the_csk_collection_api::CharacterDatabaseEntry {
         ui_chara_id: smash::hash40("ui_chara_potemkin"),
-        name_id: the_csk_collection_api::StringType::Optional(Some(the_csk_collection_api::CStrCSK::new("potemkin"))), 
+        name_id: the_csk_collection_api::StringType::Overwrite(the_csk_collection_api::CStrCSK::new("potemkin")), 
         fighter_kind: the_csk_collection_api::Hash40Type::Optional(Some(0x12C30E8564 /* Hash40 of fighter_kind_kamui */)), 
         fighter_kind_corps: the_csk_collection_api::Hash40Type::Optional(Some(0x12C30E8564 /* Hash40 of fighter_kind_kamui */)), 
-        ui_series_id: the_csk_collection_api::Hash40Type::Optional(Some(0x142be617be)), 
+        ui_series_id: the_csk_collection_api::Hash40Type::Overwrite(0x142be617be), 
         fighter_type: the_csk_collection_api::Hash40Type::Optional(Some(0x1353795179 /* Hash40 of fighter_type_normal */)), 
         alt_chara_id: the_csk_collection_api::Hash40Type::Optional(Some(0x0)), 
         exhibit_year: the_csk_collection_api::ShortType::Optional(Some(2015)), 
         exhibit_day_order: the_csk_collection_api::IntType::Optional(Some(62501)), 
-        ext_skill_page_num: the_csk_collection_api::SignedByteType::Optional(Some(0)), 
-        is_img_ext_skill_page0: the_csk_collection_api::BoolType::Optional(Some(false)), 
-        is_img_ext_skill_page1: the_csk_collection_api::BoolType::Optional(Some(false)), 
-        is_img_ext_skill_page2: the_csk_collection_api::BoolType::Optional(Some(false)), 
-        skill_list_order: the_csk_collection_api::SignedByteType::Optional(Some(67)), 
-        disp_order: the_csk_collection_api::SignedByteType::Optional(Some(84)), 
+        ext_skill_page_num: the_csk_collection_api::SignedByteType::Overwrite(4), 
+        is_img_ext_skill_page0: the_csk_collection_api::BoolType::Overwrite(true), // command inputs
+        is_img_ext_skill_page1: the_csk_collection_api::BoolType::Overwrite(false),
+        is_img_ext_skill_page2: the_csk_collection_api::BoolType::Overwrite(true), // roman cancel
+        skill_list_order: the_csk_collection_api::SignedByteType::Optional(Some(83)), 
+        disp_order: the_csk_collection_api::SignedByteType::Optional(Some(83)), 
         save_no: the_csk_collection_api::SignedByteType::Optional(Some(62)), 
         chara_count: the_csk_collection_api::SignedByteType::Optional(Some(1)), 
         can_select: the_csk_collection_api::BoolType::Optional(Some(true)), 
@@ -125,7 +171,7 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
         result_pf0: the_csk_collection_api::BoolType::Optional(Some(true)), 
         result_pf1: the_csk_collection_api::BoolType::Optional(Some(true)), 
         result_pf2: the_csk_collection_api::BoolType::Optional(Some(true)), 
-        color_num: the_csk_collection_api::UnsignedByteType::Optional(Some(17)), 
+        color_num: the_csk_collection_api::UnsignedByteType::Overwrite(17), 
         shop_item_tag: the_csk_collection_api::Hash40Type::Optional(Some(0x0)), 
         extra_hash_maps: the_csk_collection_api::Hash40Map::Overwrite(HashMap::from([
             (0x1337FC912E /* Hash40 of characall_label_c00 */, the_csk_collection_api::Hash40Type::Optional(Some(smash::hash40("vc_narration_characall_potemkin")))), 
@@ -179,11 +225,11 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
         ui_layout_id: smash::hash40("ui_chara_potemkin_00"), 
         ui_chara_id: the_csk_collection_api::Hash40Type::Overwrite(smash::hash40("ui_chara_potemkin")), 
         chara_color: the_csk_collection_api::UnsignedByteType::Optional(Some(0)), 
-        eye_0_flash_count: the_csk_collection_api::UnsignedByteType::Optional(Some(2)), 
-        eye_0_flash0_pos_x: the_csk_collection_api::FloatType::Optional(Some(-88.0)), 
-        eye_0_flash0_pos_y: the_csk_collection_api::FloatType::Optional(Some(232.0)), 
-        eye_0_flash1_pos_x: the_csk_collection_api::FloatType::Optional(Some(62.0)), 
-        eye_0_flash1_pos_y: the_csk_collection_api::FloatType::Optional(Some(220.0)), 
+        eye_0_flash_count: the_csk_collection_api::UnsignedByteType::Overwrite(2), 
+        eye_0_flash0_pos_x: the_csk_collection_api::FloatType::Overwrite(-7.0), 
+        eye_0_flash0_pos_y: the_csk_collection_api::FloatType::Overwrite(219.0), 
+        eye_0_flash1_pos_x: the_csk_collection_api::FloatType::Overwrite(72.0), 
+        eye_0_flash1_pos_y: the_csk_collection_api::FloatType::Overwrite(220.0), 
         eye_0_flash2_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
         eye_0_flash2_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
         eye_0_flash3_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
@@ -191,10 +237,10 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
         eye_0_flash4_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
         eye_0_flash4_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
         eye_1_flash_count: the_csk_collection_api::UnsignedByteType::Optional(Some(2)), 
-        eye_1_flash0_pos_x: the_csk_collection_api::FloatType::Optional(Some(-52.0)), 
-        eye_1_flash0_pos_y: the_csk_collection_api::FloatType::Optional(Some(218.0)), 
-        eye_1_flash1_pos_x: the_csk_collection_api::FloatType::Optional(Some(78.0)), 
-        eye_1_flash1_pos_y: the_csk_collection_api::FloatType::Optional(Some(210.0)), 
+        eye_1_flash0_pos_x: the_csk_collection_api::FloatType::Overwrite(-52.0), 
+        eye_1_flash0_pos_y: the_csk_collection_api::FloatType::Overwrite(218.0), 
+        eye_1_flash1_pos_x: the_csk_collection_api::FloatType::Overwrite(78.0), 
+        eye_1_flash1_pos_y: the_csk_collection_api::FloatType::Overwrite(210.0), 
         eye_1_flash2_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
         eye_1_flash2_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
         eye_1_flash3_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
@@ -202,18 +248,18 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
         eye_1_flash4_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
         eye_1_flash4_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
         eye_2_flash_count: the_csk_collection_api::UnsignedByteType::Optional(Some(2)), 
-        eye_2_flash0_pos_x: the_csk_collection_api::FloatType::Optional(Some(-27.0)), 
-        eye_2_flash0_pos_y: the_csk_collection_api::FloatType::Optional(Some(93.0)), 
-        eye_2_flash1_pos_x: the_csk_collection_api::FloatType::Optional(Some(69.0)), 
-        eye_2_flash1_pos_y: the_csk_collection_api::FloatType::Optional(Some(85.0)), 
+        eye_2_flash0_pos_x: the_csk_collection_api::FloatType::Overwrite(-27.0), 
+        eye_2_flash0_pos_y: the_csk_collection_api::FloatType::Overwrite(93.0), 
+        eye_2_flash1_pos_x: the_csk_collection_api::FloatType::Overwrite(69.0), 
+        eye_2_flash1_pos_y: the_csk_collection_api::FloatType::Overwrite(85.0), 
         eye_2_flash2_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
         eye_2_flash2_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
         eye_2_flash3_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
         eye_2_flash3_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
         eye_2_flash4_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
         eye_2_flash4_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        eye_flash_info_pos_x: the_csk_collection_api::FloatType::Optional(Some(27.0)), 
-        eye_flash_info_pos_y: the_csk_collection_api::FloatType::Optional(Some(2.0)), 
+        eye_flash_info_pos_x: the_csk_collection_api::FloatType::Overwrite(-7.5), 
+        eye_flash_info_pos_y: the_csk_collection_api::FloatType::Overwrite(11.5), 
         spirits_eye_visible: the_csk_collection_api::BoolType::Optional(Some(true)), 
         chara_1_offset_x: the_csk_collection_api::FloatType::Optional(Some(-6.0)), 
         chara_1_offset_y: the_csk_collection_api::FloatType::Optional(Some(-62.0)), 
@@ -275,13 +321,23 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
         ..Default::default()
     });
     //the_csk_collection_api::add_narration_characall_entry("vc_narration_characall_potemkin");
-
-
-
     moveset::install();
+
+    const MAX_FILE_SIZE: usize = 0x10000;
+    pub const fighters: [&str; 97] = ["bayonetta", "brave", "buddy", "captain", "chrom", "cloud", "daisy", "dedede", "demon", "diddy", "dolly", "donkey", "duckhunt", "edge", "eflame", "element", "elight", "falco", "fox", "gamewatch", "ganon", "gaogaen", "gekkouga", "ike", "inkling", "jack", "kamui", "ken", "kirby", "koopa", "koopag", "koopajr", "krool", "link", "littlemac", "lucario", "lucas", "lucina", "luigi", "mario", "mariod", "marth", "master", "metaknight", "mewtwo", "miienemyf", "miienemyg", "miienemys", "miifighter", "miigunner", "miiswordsman", "murabito", "nana", "ness", "packun", "pacman", "palutena", "peach", "pfushigisou", "pichu", "pickel", "pikachu", "pikmin", "pit", "pitb", "plizardon", "popo", "ptrainer", "ptrainer_low", "purin", "pzenigame", "reflet", "richter", "ridley", "robot", "rockman", "rosetta", "roy", "ryu", "samus", "samusd", "sheik", "shizue", "shulk", "simon", "snake", "sonic", "szerosuit", "tantan", "toonlink", "trail", "wario", "wiifit", "wolf", "yoshi", "younglink", "zelda"];
+    for fighter in fighters.iter() {
+        for color in 0..8 {
+            unsafe{
+                if !(*fighter == "kamui" && MARKED_COLORS[color as usize]){
+                    my_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE);
+                }
+            }
+        }
+    }
+
 }
 
-
+// patches every motion list in the game to add the thrown motion_list entries, earth's arcroplois is quite advanced
 #[arc_callback]
 fn my_callback(hash: u64, data: &mut [u8]) -> Option<usize> {
     arcropolis_api::load_original_file(hash, &mut *data);
@@ -296,14 +352,18 @@ fn my_callback(hash: u64, data: &mut [u8]) -> Option<usize> {
                 "catched_pot_final_scene_03","catched_pot_final_scene_03_girl","catched_pot_final_scene_03_big","catched_pot_final_scene_03_dx"
             ];
             for entry in motions_to_add{
-                let script_name = entry.replace("_", "").replace("girl", "").replace("big", "").replace("dx", "");
                 let new_entry_name = motion_lib::hash40::hash40(entry);
+                /*let anim = motion_lib::mlist::Animation{
+                    name: motion_lib::hash40::hash40("a00wait2.nuanmb"),
+                    unk: 0
+                };*/
                 let extras = std::option::Option::Some(motion_lib::mlist::Extra{
                     xlu_start:0,
                     xlu_end:0,
                     cancel_frame:0,
                     no_stop_intp:false,
                 });
+                let script_name = entry.replace("_girl", "").replace("_big", "").replace("_dx", "").replace("_", "");
                 let new_motion = motion_lib::mlist::Motion {
                     game_script: motion_lib::hash40::hash40(["game_",script_name.as_str()].join("").as_str()),
                     flags: Flags{
@@ -338,6 +398,8 @@ fn my_callback(hash: u64, data: &mut [u8]) -> Option<usize> {
             let vec_res = writer.into_inner();
             let slice = vec_res.as_slice();
             data[..slice.len()].copy_from_slice(slice);
+            std::fs::write("sd:/tmp.bin", &slice).unwrap(); 
+            std::fs::write("sd:/tmp2.bin", &data).unwrap();
             Some(data.len())
         }
         Err(_) => {
@@ -347,24 +409,110 @@ fn my_callback(hash: u64, data: &mut [u8]) -> Option<usize> {
     }
 }
 
+#[skyline::hook(offset = 0x39a4b14, inline)]
+unsafe extern "C" fn motlist_patch(ctx: &mut skyline::hooks::InlineCtx) {
+    if *(ctx.registers[1].x() as *const u32) == 0xE8A1FEF5
+    {
+        println!("this shit is a motion list get his ass");
+        let ptr = ctx.registers[1].x() as *mut u8;
+        let size = ctx.registers[2].x() as usize;    
+        let data = unsafe {
+            std::slice::from_raw_parts_mut(ptr, 0x10000)
+        };
+        let mut reader = std::io::Cursor::new(&mut *data);
+
+        match motion_lib::read_stream(&mut reader) {
+            Ok(mut motion_list) => {
+                let motions_to_add = [
+                    "catched_pot_special_hi","catched_pot_special_hi_girl","catched_pot_special_hi_big","catched_pot_special_hi_dx",
+                    "catched_potemkin_buster","catched_potemkin_buster_girl","catched_potemkin_buster_big","catched_potemkin_buster_dx",
+                    "catched_pot_final_scene_01","catched_pot_final_scene_01_girl","catched_pot_final_scene_01_big","catched_pot_final_scene_01_dx",
+                    "catched_pot_final_scene_02","catched_pot_final_scene_02_girl","catched_pot_final_scene_02_big","catched_pot_final_scene_02_dx",
+                    "catched_pot_final_scene_03","catched_pot_final_scene_03_girl","catched_pot_final_scene_03_big","catched_pot_final_scene_03_dx"
+                ];
+                for entry in motions_to_add{
+                    let new_entry_name = motion_lib::hash40::hash40(entry);
+                    /*let anim = motion_lib::mlist::Animation{
+                        name: motion_lib::hash40::hash40("a00wait2.nuanmb"),
+                        unk: 0
+                    };*/
+                    let extras = std::option::Option::Some(motion_lib::mlist::Extra{
+                        xlu_start:0,
+                        xlu_end:0,
+                        cancel_frame:0,
+                        no_stop_intp:false,
+                    });
+                    let script_name = entry.replace("_girl", "").replace("_big", "").replace("_dx", "").replace("_", "");
+                    let new_motion = motion_lib::mlist::Motion {
+                        game_script: motion_lib::hash40::hash40(["game_",script_name.as_str()].join("").as_str()),
+                        flags: Flags{
+                            turn: false,
+                            r#loop: false,
+                            r#move: false,
+                            fix_trans: true,
+                            fix_rot: false,
+                            fix_scale: true,
+                            unk_40: false,
+                            unk_80: true,
+                            unk_100: false,
+                            unk_200: false,
+                            unk_400: false,
+                            unk_800: false,
+                            unk_1000: false,
+                            unk_2000: false
+                        },
+                        blend_frames: 0,
+                        animations: vec![],
+                        scripts: vec![
+                            motion_lib::hash40::hash40(["expression_",script_name.as_str()].join("").as_str()),
+                            motion_lib::hash40::hash40(["effect_",script_name.as_str()].join("").as_str()),
+                            motion_lib::hash40::hash40(["sound_",script_name.as_str()].join("").as_str())
+                        ],
+                        extra: extras,
+                    };
+                    motion_list.list.insert(new_entry_name, new_motion);
+                }
+                let mut writer = std::io::Cursor::new(Vec::<u8>::new());
+                motion_lib::write_stream(&mut writer, &motion_list).unwrap();
+                let vec_res = writer.into_inner();
+                let slice = vec_res.as_slice();
+                data[..slice.len()].copy_from_slice(slice);
+                println!("patch successful");
+                //std::fs::write("sd:/tmp.bin", &slice).unwrap(); 
+                //std::fs::write("sd:/tmp2.bin", &data).unwrap();
+            }
+            Err(_) => {
+                println!("Failed to patch ");
+            },
+        }
+    }
+}
+
+#[skyline::hook(offset = 0x39bfb30)]
+unsafe extern "C" fn mempy_hook_kill_me(dest:u64,src:u64,n:u64) {
+    println!("derefrenced once: {:x}",*(src as *const  u32));
+    println!("derefrenced twice: {:x}",**(src as *const *const u32));
+    if **(src as *const *const u32) == 0xE8A1FEF5
+    {
+        println!("this shit is a motion list get his ass");
+    }
+    call_original!(dest, src, n)
+}
+
+
+
+#[arc_callback]
+fn debug_callback(hash: u64, data: &mut [u8]) -> Option<usize> {
+    println!("Buffer Ptr: {:p}", data);
+    std::thread::sleep(std::time::Duration::from_secs(20));
+    return None;
+}
 
 #[skyline::main(name = "hotpot")]
 pub fn main() {
     if !check_deps() {
         return;
     }
-    const MAX_FILE_SIZE: usize = 0x10000;
-    pub const fighters: [&str; 97] = ["bayonetta", "brave", "buddy", "captain", "chrom", "cloud", "daisy", "dedede", "demon", "diddy", "dolly", "donkey", "duckhunt", "edge", "eflame", "element", "elight", "falco", "fox", "gamewatch", "ganon", "gaogaen", "gekkouga", "ike", "inkling", "jack", "kamui", "ken", "kirby", "koopa", "koopag", "koopajr", "krool", "link", "littlemac", "lucario", "lucas", "lucina", "luigi", "mario", "mariod", "marth", "master", "metaknight", "mewtwo", "miienemyf", "miienemyg", "miienemys", "miifighter", "miigunner", "miiswordsman", "murabito", "nana", "ness", "packun", "pacman", "palutena", "peach", "pfushigisou", "pichu", "pickel", "pikachu", "pikmin", "pit", "pitb", "plizardon", "popo", "ptrainer", "ptrainer_low", "purin", "pzenigame", "reflet", "richter", "ridley", "robot", "rockman", "rosetta", "roy", "ryu", "samus", "samusd", "sheik", "shizue", "shulk", "simon", "snake", "sonic", "szerosuit", "tantan", "toonlink", "trail", "wario", "wiifit", "wolf", "yoshi", "younglink", "zelda"];
-    for fighter in fighters.iter() {
-        for color in 0..256 {
-            unsafe{
-                if !(*fighter == "kamui" && MARKED_COLORS[color as usize]){
-                    my_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE);
-                }
-            }
-        }
-    }
-    
     unsafe {
         extern "C" {
             fn arcrop_register_event_callback(
@@ -374,4 +522,7 @@ pub fn main() {
         }
         arcrop_register_event_callback(arcropolis_api::Event::ModFilesystemMounted, mods_mounted);
     }
+    skyline::install_hooks!(
+        //mempy_hook_kill_me,
+    );
 }

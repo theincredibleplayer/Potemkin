@@ -82,6 +82,10 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SET_ADJUST_POST_CIRCLE : i32 = 0x2
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_FINAL_CANCELLED_INTO : i32 = 0x20000112;
 
 
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RC_INITIAL_SLOW : i32 = 0x20000113;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RC_END_SLOW : i32 = 0x20000114;
+
+
 // for weapon
 pub const WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_ATTACK : i32 = 0x20000007;
 pub const WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_HIT_WALL : i32 = 0x20000008;
@@ -181,6 +185,8 @@ pub const WEAPON_KAMUI_RYUSENSYA_STATUS_KIND_BOOM: i32 = 0x1;
 // new common statuses
 pub const FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT: i32 = 0x555;
 pub const FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT: i32 = 0x556;
+pub const FIGHTER_STATUS_KIND_POT_BUSTER_CAUGHT: i32 = 0x557;
+pub const FIGHTER_STATUS_KIND_POT_AIR_THROW_CAUGHT: i32 = 0x558;
 
 
 // global table consts
@@ -557,6 +563,34 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
         let prev_status_kind = StatusModule::prev_status_kind(module_accessor,0);
         let mut can_rc = true;
 
+
+        if status_kind == *FIGHTER_STATUS_KIND_ENTRY || !smash::app::sv_information::is_ready_go() {
+            let custom_hurtboxes = [
+                //["bone", x1, y1, z1, x2, y2, z2, scale, collision_part, hit height]
+                [hash40("hip") as f64, -0.3, 0.0, 0.0, -0.3, 0.0, 0.0, 6.0, *COLLISION_PART_BODY as f64,*HIT_HEIGHT_CENTER as f64],
+                [hash40("waist") as f64, 8.0, 0.0, 0.0, 0.0, 0.0, 0.0, 7.0, *COLLISION_PART_BODY as f64,*HIT_HEIGHT_CENTER as f64],
+                [hash40("head") as f64, 0.6, 0.0, 0.0, 0.9, 0.0, 0.0, 1.6, *COLLISION_PART_HEAD as f64,*HIT_HEIGHT_HIGH as f64],
+                [hash40("shoulderl") as f64, 0.3, 0.0, 0.0, 7.75, 0.0, 0.0, 4.0, *COLLISION_PART_BODY as f64,*HIT_HEIGHT_CENTER as f64],
+                [hash40("shoulderr") as f64, 0.3, 0.0, 0.0, 7.75, 0.0, 0.0, 4.0, *COLLISION_PART_BODY as f64,*HIT_HEIGHT_CENTER as f64],
+                [hash40("arml") as f64, 0.0, 0.0, 0.0, 7.75, 0.0, 0.0, 4.0, *COLLISION_PART_ETC as f64,*HIT_HEIGHT_CENTER as f64],
+                [hash40("armr") as f64, 0.0, 0.0, 0.0, 7.75, 0.0, 0.0, 4.0, *COLLISION_PART_ETC as f64,*HIT_HEIGHT_CENTER as f64],
+                [hash40("legl") as f64, 0.2, 0.0, 0.0, 3.8, 0.0, 0.0, 3.4, *COLLISION_PART_LEGS as f64,*HIT_HEIGHT_LOW as f64],
+                [hash40("legr") as f64, 0.2, 0.0, 0.0, 3.8, 0.0, 0.0, 3.4, *COLLISION_PART_LEGS as f64,*HIT_HEIGHT_LOW as f64],
+                [hash40("kneel") as f64, 0.2, 0.0, 0.0, 4.6, 0.0, 0.0, 2.4, *COLLISION_PART_LEGS as f64,*HIT_HEIGHT_LOW as f64],
+                [hash40("kneer") as f64, 0.2, 0.0, 0.0, 4.6, 0.0, 0.0, 2.4, *COLLISION_PART_LEGS as f64,*HIT_HEIGHT_LOW as f64]
+            ];
+            let mut f = 0;
+            for i in custom_hurtboxes {
+                let mut vec1 = Vector3f{x: i[1] as f32, y: i[2] as f32, z: i[3] as f32};
+                let mut vec2 = Vector3f{x: i[4] as f32, y: i[5] as f32, z: i[6] as f32};
+                FighterUtil::set_hit_data(module_accessor,f,0,&vec1,&vec2,i[7] as f32,Hash40::new_raw(i[0] as u64),smash::app::CollisionPart(i[8] as i32),smash::app::HitHeight(i[9] as i32),smash::app::HitStatus(*HIT_STATUS_NORMAL),smash::app::CollisionShapeType(*COLLISION_SHAPE_TYPE_CAPSULE));    
+                f += 1;
+            }
+        }
+
+
+
+
         if WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_PENALTY_TIMER) == 0{
             UiManager::set_penalty(get_ui_index_from_entry_id(entry_id), 0.0);
             WorkModule::dec_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_PENALTY_TIMER);
@@ -883,10 +917,13 @@ unsafe extern "C" fn agent_init_global(fighter: &mut L2CFighterCommon) {
 
 
 pub unsafe extern "C" fn is_potemkin(module_accessor: *mut BattleObjectModuleAccessor) -> bool {
-    let color = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_COLOR);
-    crate::MARKED_COLORS[color as usize]
+    if utility::get_kind(&mut *module_accessor) == *FIGHTER_KIND_KAMUI{
+        let color = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_COLOR);
+        crate::MARKED_COLORS[color as usize]    
+    }else{
+        false
+    }
 }
-
 
 
 
@@ -915,6 +952,7 @@ pub fn install() {
         );
     }
     let mut costume = &mut Vec::new();
+
     unsafe {
         for i in 0..crate::MARKED_COLORS.len() {
             if crate::MARKED_COLORS[i] {
@@ -1475,41 +1513,97 @@ pub fn install() {
 
     .install();
 
+    let mut all = &mut Vec::new();
+    for k in 8..256{
+        all.push(k);
+    }
+    Agent::new("fighter").set_costume(all.to_vec())
+    .on_line(Main, opff_global)
+    .on_start(agent_init_global)
+
+
+    .status(Pre,            FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_pre)
+    .status(Main,           FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_specialhi_main)
+    .status(Exit,           FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_exit)
+    .status(Init,           FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_init)
+    .status(Exec,           FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_exec)
+    .status(End,            FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_end)
+    .status(CheckDamage,    FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_checkdmg)
+
+    .status(Pre,            FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_pre)
+    .status(Main,           FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_final_main)
+    .status(Exit,           FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_exit)
+    .status(Init,           FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_init)
+    .status(Exec,           FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_exec)
+    .status(End,            FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_final_end)
+    .status(CheckDamage,    FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_checkdmg)
+
+    .status(Pre,            FIGHTER_STATUS_KIND_POT_BUSTER_CAUGHT, caught_pre)
+    .status(Main,           FIGHTER_STATUS_KIND_POT_BUSTER_CAUGHT, caught_buster_main)
+    .status(Exit,           FIGHTER_STATUS_KIND_POT_BUSTER_CAUGHT, caught_exit)
+    .status(Init,           FIGHTER_STATUS_KIND_POT_BUSTER_CAUGHT, caught_init)
+    .status(Exec,           FIGHTER_STATUS_KIND_POT_BUSTER_CAUGHT, caught_exec)
+    .status(End,            FIGHTER_STATUS_KIND_POT_BUSTER_CAUGHT, caught_end)
+    .status(CheckDamage,    FIGHTER_STATUS_KIND_POT_BUSTER_CAUGHT, caught_checkdmg)
+
+    .status(Pre,            FIGHTER_STATUS_KIND_POT_AIR_THROW_CAUGHT, caught_pre)
+    .status(Main,           FIGHTER_STATUS_KIND_POT_AIR_THROW_CAUGHT, caught_airthrow_main)
+    .status(Exit,           FIGHTER_STATUS_KIND_POT_AIR_THROW_CAUGHT, caught_exit)
+    .status(Init,           FIGHTER_STATUS_KIND_POT_AIR_THROW_CAUGHT, caught_init)
+    .status(Exec,           FIGHTER_STATUS_KIND_POT_AIR_THROW_CAUGHT, caught_exec)
+    .status(End,            FIGHTER_STATUS_KIND_POT_AIR_THROW_CAUGHT, caught_end)
+    .status(CheckDamage,    FIGHTER_STATUS_KIND_POT_AIR_THROW_CAUGHT, caught_checkdmg)
+
+    
+
+    .install();
 
     Agent::new("fighter")
     .on_line(Main, opff_global)
     .on_start(agent_init_global)
 
 
-    //.status(Pre, FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_upb_pre)
-    //.status(Main,FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_upb_main)
-    //.status(Exit,FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_upb_exit)
-    //.status(Init,FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_upb_init)
-    //.status(Exec,FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_upb_exec)
-    //.status(End, FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_upb_end)
+    .status(Pre,            FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_pre)
+    .status(Main,           FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_specialhi_main)
+    .status(Exit,           FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_exit)
+    .status(Init,           FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_init)
+    .status(Exec,           FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_exec)
+    .status(End,            FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_end)
+    .status(CheckDamage,    FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_checkdmg)
 
-    
-    .status(Main, *FIGHTER_STATUS_KIND_THROWN, thrown_status_common)
-    .status(End, *FIGHTER_STATUS_KIND_THROWN, thrown_status_common_end)
+    .status(Pre,            FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_pre)
+    .status(Main,           FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_final_main)
+    .status(Exit,           FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_exit)
+    .status(Init,           FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_init)
+    .status(Exec,           FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_exec)
+    .status(End,            FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_final_end)
+    .status(CheckDamage,    FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_checkdmg)
 
+    .status(Pre,            FIGHTER_STATUS_KIND_POT_BUSTER_CAUGHT, caught_pre)
+    .status(Main,           FIGHTER_STATUS_KIND_POT_BUSTER_CAUGHT, caught_buster_main)
+    .status(Exit,           FIGHTER_STATUS_KIND_POT_BUSTER_CAUGHT, caught_exit)
+    .status(Init,           FIGHTER_STATUS_KIND_POT_BUSTER_CAUGHT, caught_init)
+    .status(Exec,           FIGHTER_STATUS_KIND_POT_BUSTER_CAUGHT, caught_exec)
+    .status(End,            FIGHTER_STATUS_KIND_POT_BUSTER_CAUGHT, caught_end)
+    .status(CheckDamage,    FIGHTER_STATUS_KIND_POT_BUSTER_CAUGHT, caught_checkdmg)
 
-    //.game_acmd("game_catchedpotspecialhi", game_catchedpotspecialhi, Priority::Low)
+    .status(Pre,            FIGHTER_STATUS_KIND_POT_AIR_THROW_CAUGHT, caught_pre)
+    .status(Main,           FIGHTER_STATUS_KIND_POT_AIR_THROW_CAUGHT, caught_airthrow_main)
+    .status(Exit,           FIGHTER_STATUS_KIND_POT_AIR_THROW_CAUGHT, caught_exit)
+    .status(Init,           FIGHTER_STATUS_KIND_POT_AIR_THROW_CAUGHT, caught_init)
+    .status(Exec,           FIGHTER_STATUS_KIND_POT_AIR_THROW_CAUGHT, caught_exec)
+    .status(End,            FIGHTER_STATUS_KIND_POT_AIR_THROW_CAUGHT, caught_end)
+    .status(CheckDamage,    FIGHTER_STATUS_KIND_POT_AIR_THROW_CAUGHT, caught_checkdmg)
 
-
-    //.status(Pre, FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_upb_pre)
-    //.status(Main, FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_final_main)
-    //.status(End, FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_final_end)
-    //.status(Init, FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_upb_init)
-    //.status(Exec, FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_upb_exec)
-    //.status(End, FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, caught_upb_end)
 
 
     .install();
 
-
     skyline::install_hooks!(
         kamui_link_event,
-        noping_the_eff,
+        waterball_on_hit,
+        noping_the_waterball_eff,
+        noping_the_sword_eff,
         //get_param_float_hook,
         handle_draw_potemkin,
         autoturn_situation_check_hook,
@@ -1535,7 +1629,7 @@ pub fn install() {
 
     }
 
-    skyline::patching::Patch::in_text(0x3414534).nop(); // nops the waterball effect
+    //skyline::patching::Patch::in_text(0x3414534).nop(); // nops the waterball effect
     skyline::patching::Patch::in_text(0xb616d0).nop(); // nops the set pos at the end of final smash
-    skyline::patching::Patch::in_text(0xb5ccc0).nop().expect("Failed to patch 0xb5ccc0"); // nops the sword effect
+    //skyline::patching::Patch::in_text(0xb5ccc0).nop().expect("Failed to patch 0xb5ccc0"); // nops the sword effect
 }

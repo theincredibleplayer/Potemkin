@@ -301,7 +301,7 @@ pub unsafe extern "C" fn game_heavenlystart(agent: &mut L2CAgentBase) {
             WorkModule::set_float(agent.module_accessor, 0.0, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FINAL_X_JUMP_SPEED);
         }
         WorkModule::on_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_JUMP);
-        macros::CATCH(agent, 0, Hash40::new("hip"), 20.0,0.0,0.0,0.0, None, None, None, *FIGHTER_STATUS_KIND_THROWN, *COLLISION_SITUATION_MASK_A);
+        macros::CATCH(agent, 0, Hash40::new("hip"), 20.0,0.0,0.0,0.0, None, None, None, FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, *COLLISION_SITUATION_MASK_A);
         macros::CAM_ZOOM_OUT(agent);
     }
 }
