@@ -105,22 +105,19 @@ impl UiManager {
     pub fn get_frame_from_name(ui_id: usize, name: &str) -> f32 {
         let mut manager = UI_MANAGER.write();
         unsafe {
-            if name == "atb" {
+            if name == "tension_meter" {
                 return manager.tension_meter[ui_id].get_meter_frame();
             }
-            else if name == "atb_border1"{
+            else if name == "gear1"{
                 return manager.tension_meter[ui_id].get_gear_frame_1();
             }
-            else if name == "limit_border"{
+            else if name == "fire1"{
                 return manager.tension_meter[ui_id].get_flame_frame_1();
             }
-            else if name == "atb_border2"{
+            else if name == "gear2"{
                 return manager.tension_meter[ui_id].get_gear_frame_2();  
             }
-            else if name == "limit_guage"
-            || name == "gear_2_frame"
-            || name == "limit"
-            || name == "limit_bar"{
+            else if name == "fire2"{
                 return manager.tension_meter[ui_id].get_flame_frame_2();  
             } else if name == "bar_hi"
             || name == "bar_low"{
@@ -140,15 +137,12 @@ impl UiManager {
     pub fn get_border_availability_from_name(ui_id: usize, name: &str) -> bool {
         let mut manager = UI_MANAGER.write();
         unsafe {
-            if name == "atb_border1" 
-            || name == "limit_border"{
+            if name == "gear1" 
+            || name == "fire1"{
                 return manager.tension_meter[ui_id].is_tension1_available();
             }
-            else if name == "atb_border2" 
-            || name == "gear_2_frame"
-            || name == "limit_guage"
-            || name == "limit"
-            || name == "limit_bar"{
+            else if name == "fire2" 
+            || name == "gear2"{
                 return manager.tension_meter[ui_id].is_tension2_available();
             }else if name == "bar_hi"
             || name == "bar_low"{
@@ -332,7 +326,7 @@ unsafe fn handle_layout_potemkin(layout: *mut Layout) -> *mut Layout {
             if let Some(parent) = root_pane.find_pane_by_name_recursive(pane) {
                 if idx < 8
                 && UiManager::is_enabled(idx) {
-                    if let Some(child) = parent.find_pane_by_name_recursive("cloud") {
+                    if let Some(child) = parent.find_pane_by_name_recursive("tension") {
                         let anim_list = &mut (*child.as_parts().layout).anim_trans_list;
                         let mut curr = anim_list as *mut AnimTransformNode;
                         while !curr.is_null() {
@@ -345,7 +339,7 @@ unsafe fn handle_layout_potemkin(layout: *mut Layout) -> *mut Layout {
                                     let anim_cont_offset = *anim_cont_offsets;
                                     let res_animation_cont = (res_animation_block_data_start + anim_cont_offset as u64) as *const ResAnimationContent;
                                     let name = skyline::try_from_c_str((*res_animation_cont).name.as_ptr()).unwrap_or_else(|_| "UNKNOWN".to_string());
-                                    let name_list = ["limit","atb","atb_border1","atb_border2","limit_border","limit_guage","gear_2_frame","limit","limit_bar"];
+                                    let name_list = ["gear1","gear2","fire1","fire2","tension_meter"];
                                     for _name in name_list {
                                         if name == _name {
                                             (*anim_transform).enabled = true;
@@ -360,7 +354,7 @@ unsafe fn handle_layout_potemkin(layout: *mut Layout) -> *mut Layout {
                                 break;
                             }
                         }
-                        let border_list = ["atb_border1","atb_border2","limit_border","limit","gear_2_frame","limit_guage","limit_bar"];
+                        let border_list = ["gear1","gear2","fire1","fire2"];
                         for pane in border_list {
                             if let Some(border) = child.find_pane_by_name_recursive(pane) {
                                 border.set_visible(UiManager::get_border_availability_from_name(idx,pane));
@@ -369,7 +363,7 @@ unsafe fn handle_layout_potemkin(layout: *mut Layout) -> *mut Layout {
                     }
                 }
                 else {
-                    if let Some(child) = parent.find_pane_by_name_recursive("cloud") {
+                    if let Some(child) = parent.find_pane_by_name_recursive("tension") {
                         (*child).alpha = 0;
                     }
                 }

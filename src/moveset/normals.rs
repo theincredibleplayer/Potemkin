@@ -347,3 +347,42 @@ pub unsafe extern "C" fn sound_wait2(agent: &mut L2CAgentBase) {
         macros::PLAY_SE(agent, Hash40::new("se_btl_pot_08"));
     }
 }
+
+
+pub unsafe extern "C" fn sound_landinglight(agent: &mut L2CAgentBase) {
+    frame(agent.lua_state_agent, 2.0);
+    if macros::is_excute(agent) {
+        macros::PLAY_LANDING_SE(agent, Hash40::new("se_btl_pot_09"));
+    }
+}
+
+pub unsafe extern "C" fn expression_landinglight(agent: &mut L2CAgentBase) {
+    let expression_common : &mut smash::lua2cpp::L2CFighterAnimcmdExpressionCommon = std::mem::transmute(&mut *agent);
+    expression_common.expression_LandingLightRumble();
+    if macros::is_excute(agent) {
+        slope!(agent, *MA_MSC_CMD_SLOPE_SLOPE, *SLOPE_STATUS_LR);
+        macros::QUAKE(agent, *CAMERA_QUAKE_KIND_S);
+    }
+}
+
+
+pub unsafe extern "C" fn sound_landingheavy(agent: &mut L2CAgentBase) {
+    frame(agent.lua_state_agent, 1.0);
+    if macros::is_excute(agent) {
+        macros::PLAY_LANDING_SE(agent, Hash40::new("se_btl_pot_09"));
+        macros::PLAY_LANDING_SE(agent, Hash40::new("se_btl_pot_08"));
+    }
+}
+
+pub unsafe extern "C" fn expression_landingheavy(agent: &mut L2CAgentBase) {
+    let expression_common : &mut smash::lua2cpp::L2CFighterAnimcmdExpressionCommon = std::mem::transmute(&mut *agent);
+    expression_common.expression_LandingHeavyRumble();
+    if macros::is_excute(agent) {
+        slope!(agent, *MA_MSC_CMD_SLOPE_SLOPE_INTP, *SLOPE_STATUS_TOP, 2);
+        macros::QUAKE(agent, *CAMERA_QUAKE_KIND_S);
+    }
+    frame(agent.lua_state_agent, 21.0);
+    if macros::is_excute(agent) {
+        slope!(agent, *MA_MSC_CMD_SLOPE_SLOPE_INTP, *SLOPE_STATUS_LR, 6);
+    }
+}

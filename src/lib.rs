@@ -95,26 +95,27 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
 	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("dash_speed"), 0, 1.0));
 	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("run_speed_max"), 0, 0.8));
 	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("weight"), 0, 145.0));
-	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("scale"), 0, 1.0));                          // doesnt work
+	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("scale"), 0, 1.0));                          // doesnt work, compensated for it in opff
 	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("shield_radius"), 0, 20.0));
     param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("attack_combo_max"), 0, 1));
     param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("attack100_type"), 0, 1));
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("height"), 0, 24.0));                        // no idea
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("jack_final_target_scale"), 0, 0.8));        // no idea
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("effect_scale"), 0, 2.0));                   // no idea
+    //compensation multiplier added to avoid the side effects that these have on camera_zoom_in
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("camera_range_center_y"), 0, 12.0));         // all of these dont work
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("camera_range_up"), 0, 18.0));               // all of these dont work
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("camera_range_down"), 0, -12.0));            // all of these dont work
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("camera_range_2nd_center_y"), 0, 12.0));     // all of these dont work
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("camera_range_2nd_up"), 0, 16.0));           // all of these dont work
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("camera_range_2nd_down"), 0, -12.0));        // all of these dont work
-    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("size"),0, *FIGHTER_SIZE_LL));               // all of these dont work
+    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("size"),0, *FIGHTER_SIZE_LL));               
     param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("bury_motion_height"),0, *HIT_HEIGHT_HIGH));
     param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("bury_r_motion_height"),0, *HIT_HEIGHT_HIGH));
     
     // fighter_param_motion
-    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("motion_share"),0, *FIGHTER_MOTION_SHARE_TYPE_BIG));
-    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("waist_size"),0, *FIGHTER_WAIST_SIZE_L));
+    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("param_motion"),smash::hash40("motion_share"), *FIGHTER_MOTION_SHARE_TYPE_BIG));
+    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("param_motion"),smash::hash40("waist_size"), *FIGHTER_WAIST_SIZE_L));
 
     // vl.prc
     param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("param_private"),smash::hash40("final_ready_frame"), 1));
@@ -141,7 +142,7 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
     the_csk_collection_api::add_chara_db_entry_info(the_csk_collection_api::CharacterDatabaseEntry {
         ui_chara_id: smash::hash40("ui_chara_potemkin"),
         name_id: the_csk_collection_api::StringType::Overwrite(the_csk_collection_api::CStrCSK::new("potemkin")), 
-        fighter_kind: the_csk_collection_api::Hash40Type::Optional(Some(0x12C30E8564 /* Hash40 of fighter_kind_kamui */)), 
+        fighter_kind: the_csk_collection_api::Hash40Type::Overwrite(0x12C30E8564 /* Hash40 of fighter_kind_kamui */), 
         fighter_kind_corps: the_csk_collection_api::Hash40Type::Optional(Some(0x12C30E8564 /* Hash40 of fighter_kind_kamui */)), 
         ui_series_id: the_csk_collection_api::Hash40Type::Overwrite(0x142be617be), 
         fighter_type: the_csk_collection_api::Hash40Type::Optional(Some(0x1353795179 /* Hash40 of fighter_type_normal */)), 
@@ -174,8 +175,8 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
         color_num: the_csk_collection_api::UnsignedByteType::Overwrite(17), 
         shop_item_tag: the_csk_collection_api::Hash40Type::Optional(Some(0x0)), 
         extra_hash_maps: the_csk_collection_api::Hash40Map::Overwrite(HashMap::from([
-            (0x1337FC912E /* Hash40 of characall_label_c00 */, the_csk_collection_api::Hash40Type::Optional(Some(smash::hash40("vc_narration_characall_potemkin")))), 
-            (0x1340FBA1B8 /* Hash40 of characall_label_c01 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))), 
+            (0x1337FC912E /* Hash40 of characall_label_c00 */, the_csk_collection_api::Hash40Type::Overwrite(smash::hash40("vc_narration_characall_potemkin"))), 
+            (0x1340FBA1B8 /* Hash40 of characall_label_c01 */, the_csk_collection_api::Hash40Type::Overwrite(0x0)), 
             (0x13D9F2F002 /* Hash40 of characall_label_c02 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))), 
             (0x13AEF5C094 /* Hash40 of characall_label_c03 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))), 
             (0x1330915537 /* Hash40 of characall_label_c04 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))), 
@@ -190,7 +191,7 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
             (0x1BFB79118F /* Hash40 of characall_label_article_c05 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))), 
             (0x1B62704035 /* Hash40 of characall_label_article_c06 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))), 
             (0x1B157770A3 /* Hash40 of characall_label_article_c07 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))), 
-            (0x160ab9eb98, the_csk_collection_api::Hash40Type::Optional(Some(0xE4DDD21E6 /* Hash40 of ui_chara_kamui */))),
+            (0x160ab9eb98, the_csk_collection_api::Hash40Type::Overwrite(0xE4DDD21E6 /* Hash40 of ui_chara_kamui */)),
         ])), 
         extra_index_maps: the_csk_collection_api::UnsignedByteMap::Overwrite(HashMap::from([
             (0x915C075DE /* Hash40 of c00_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
@@ -217,7 +218,7 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
             (0x9AA4B79BD /* Hash40 of c05_group */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
             (0x99BA36320 /* Hash40 of c06_group */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
             (0x93DD46894 /* Hash40 of c07_group */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
-            (0x11895f00fc, the_csk_collection_api::UnsignedByteType::Optional(Some(lowest_color as _))),
+            (0x11895f00fc, the_csk_collection_api::UnsignedByteType::Overwrite(lowest_color as _)),
         ])), 
         ..Default::default()
     });

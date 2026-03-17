@@ -1,55 +1,5 @@
 #[derive(Default, Copy, Clone)]
 #[repr(C)]
-pub struct LimitMeter {
-    pub value: f32,
-    pub glow_frame: f32,
-    pub is_available: bool
-}
-
-impl LimitMeter {
-    pub fn new() -> Self {
-        Self {
-            value: 0.0,
-            glow_frame: 0.0,
-            is_available: false
-        }
-    }
-
-    pub fn reset(&mut self) {
-        self.value = 0.0;
-        self.glow_frame = 0.0;
-        self.is_available = false;
-    }
-
-    pub fn add_meter(&mut self, amount: f32) {
-        if self.value + amount > 100.0 {
-            self.value = 100.0;
-            self.is_available = true;
-        }
-        else {
-            self.value += amount;
-        }
-    }
-
-    pub fn is_available(&mut self) -> bool {
-        return self.is_available;
-    }
-
-    pub fn get_glow_frame(&mut self) -> f32 {
-        if self.glow_frame > 90.0 {
-            self.glow_frame = 0.0;
-        }
-        self.glow_frame += 0.5;
-        return self.glow_frame;
-    }
-
-    pub fn get_meter_frame(&mut self) -> f32 {
-        return self.value;
-    }
-}
-
-#[derive(Default, Copy, Clone)]
-#[repr(C)]
 pub struct TensionMeter {
     pub value: f32,
     pub penalty_factor: f32,

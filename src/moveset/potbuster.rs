@@ -240,7 +240,7 @@ pub unsafe extern "C" fn expression_potbuster(agent: &mut L2CAgentBase) {
                 agent,
                 /*frames to zoom in totally*/5.0,
                 /*according to calude the object id?*/0.0,
-                /*the amt of zoom needed, higher the number lower the zoom*/1.1*scale,
+                /*the amt of zoom needed, higher the number lower the zoom*/1.1*scale*1.3,
                 /*y_rot*/0.0, // up and down
                 /*x_rot*/0.0, //left and right
                 true

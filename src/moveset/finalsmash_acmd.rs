@@ -140,7 +140,7 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
                     common,
                     /*frames to zoom in totally*/12.0,
                     /*according to calude the object id?*/0.0,
-                    /*the amt of zoom needed, higher the number lower the zoom*/1.3*scale,
+                    /*the amt of zoom needed, higher the number lower the zoom*/1.3*scale*1.3,
                     /*y_rot*/0.0, // up and down
                     /*x_rot*/0.0, //left and right
                     true
@@ -209,8 +209,11 @@ pub unsafe extern "C" fn effect_finalend(agent: &mut L2CAgentBase) {
         let vec1 = smash_rs::cpp::simd::Vector2{vec: [radius /* radius x */, radius /* radius y */]}; 
         let vec2 = smash_rs::cpp::simd::Vector3{vec: [0.0 /* y offset */, 0.0 /* x offset */, 0.0 /* z offset */]}; 
 
-        EffectModule::request_post_effect_line_circle(agent.module_accessor,Hash40::new("dead_camera_hit"),Hash40::new("hip"),vec1,vec2,true,44.0/sv_information::slow_rate() /*duration*/,0.0 /* fade */);
-        WorkModule::on_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SET_ADJUST_POST_CIRCLE);
+        if !WorkModule::is_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DEATH_IMMINENT){
+            EffectModule::request_post_effect_line_circle(agent.module_accessor,Hash40::new("dead_camera_hit"),Hash40::new("hip"),vec1,vec2,true,44.0/sv_information::slow_rate() /*duration*/,0.0 /* fade */);
+            WorkModule::on_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SET_ADJUST_POST_CIRCLE);
+
+        }
         macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_buster_fire"), Hash40::new("haver"), 0, -1, 3.5, 0.0, 0.0, 0.0, 1.7, true);
         macros::LAST_EFFECT_SET_RATE(agent, 0.5);
         macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_buster_fire"), Hash40::new("havel"), -0, -1, 3.5, 0.0, 0.0, 0.0, 1.7, true);
@@ -275,7 +278,7 @@ pub unsafe extern "C" fn game_heavenlystart(agent: &mut L2CAgentBase) {
             agent,
             /*frames to zoom in totally*/5.0,
             /*according to calude the object id?*/0.0,
-            /*the amt of zoom needed, higher the number lower the zoom*/1.4,
+            /*the amt of zoom needed, higher the number lower the zoom*/1.4*1.3,
             /*y_rot*/0.35,
             /*x_rot*/-0.35*lr,
         );
@@ -459,13 +462,14 @@ pub unsafe extern "C" fn game_fakefinalvisualscene01(agent: &mut L2CAgentBase) {
     }
     frame(agent.lua_state_agent, 265.0);
     if macros::is_excute(agent) {
-        let lr = PostureModule::lr(agent.module_accessor);
-        let vec1 = smash_rs::cpp::simd::Vector2{vec: [0.0, 0.0]}; //
-        let vec2 = smash_rs::cpp::simd::Vector2{vec: [lr*0.5, 0.5]}; //both of these seem to be angle related but i cant put my finger on how exactly
-        let vec3 = smash_rs::cpp::simd::Vector2{vec: [0.5 , 1.5]}; // unsure
-        let vec4 = smash_rs::cpp::simd::Vector2{vec: [0.5 , 1.5]}; // unsure
-        let speedlines = EffectModule::request_post_effect_line_parallel_2d(agent.module_accessor,Hash40::new("dead_area_out"),vec1,vec2,vec3,vec4,true,-1.0 /*duration*/,0.0 /*fade out*/);
-
+        if !WorkModule::is_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DEATH_IMMINENT){
+            let lr = PostureModule::lr(agent.module_accessor);
+            let vec1 = smash_rs::cpp::simd::Vector2{vec: [0.0, 0.0]}; //
+            let vec2 = smash_rs::cpp::simd::Vector2{vec: [lr*0.5, 0.5]}; //both of these seem to be angle related but i cant put my finger on how exactly
+            let vec3 = smash_rs::cpp::simd::Vector2{vec: [0.5 , 1.5]}; // unsure
+            let vec4 = smash_rs::cpp::simd::Vector2{vec: [0.5 , 1.5]}; // unsure
+            let speedlines = EffectModule::request_post_effect_line_parallel_2d(agent.module_accessor,Hash40::new("dead_area_out"),vec1,vec2,vec3,vec4,true,-1.0 /*duration*/,0.0 /*fade out*/);
+        }
     }
 
 }
@@ -509,11 +513,13 @@ pub unsafe extern "C" fn game_finalvisualscene02(agent: &mut L2CAgentBase) {
     }
     frame(agent.lua_state_agent, 71.0);
     if macros::is_excute(agent) {
-        let vec1 = smash_rs::cpp::simd::Vector2{vec: [0.0, 0.0]}; //
-        let vec2 = smash_rs::cpp::simd::Vector2{vec: [0.0, 1.0]}; //both of these seem to be angle related but i cant put my finger on how exactly
-        let vec3 = smash_rs::cpp::simd::Vector2{vec: [0.5 , 1.5]}; // effect width related
-        let vec4 = smash_rs::cpp::simd::Vector2{vec: [0.5 , 1.5]}; // effect width related
-        let speedlines = EffectModule::request_post_effect_line_parallel_2d(agent.module_accessor,Hash40::new("dead_area_out"),vec1,vec2,vec3,vec4,true,-1.0 /*duration*/,0.0 /*fade out*/);
+        if !WorkModule::is_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DEATH_IMMINENT){
+            let vec1 = smash_rs::cpp::simd::Vector2{vec: [0.0, 0.0]}; //
+            let vec2 = smash_rs::cpp::simd::Vector2{vec: [0.0, 1.0]}; //both of these seem to be angle related but i cant put my finger on how exactly
+            let vec3 = smash_rs::cpp::simd::Vector2{vec: [0.5 , 1.5]}; // effect width related
+            let vec4 = smash_rs::cpp::simd::Vector2{vec: [0.5 , 1.5]}; // effect width related
+            let speedlines = EffectModule::request_post_effect_line_parallel_2d(agent.module_accessor,Hash40::new("dead_area_out"),vec1,vec2,vec3,vec4,true,-1.0 /*duration*/,0.0 /*fade out*/);
+        }
     }
 }
 

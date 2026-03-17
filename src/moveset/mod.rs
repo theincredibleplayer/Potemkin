@@ -85,6 +85,9 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_FINAL_CANCELLED_INTO : i32 = 0x
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RC_INITIAL_SLOW : i32 = 0x20000113;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RC_END_SLOW : i32 = 0x20000114;
 
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DEATH_IMMINENT : i32 = 0x20000115;
+
+
 
 // for weapon
 pub const WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_ATTACK : i32 = 0x20000007;
@@ -563,7 +566,7 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
         let prev_status_kind = StatusModule::prev_status_kind(module_accessor,0);
         let mut can_rc = true;
 
-
+        //hurtboxes
         if status_kind == *FIGHTER_STATUS_KIND_ENTRY || !smash::app::sv_information::is_ready_go() {
             let custom_hurtboxes = [
                 //["bone", x1, y1, z1, x2, y2, z2, scale, collision_part, hit height]
@@ -588,9 +591,15 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
             }
         }
 
+        // set_scale
+        if is_potemkin(module_accessor) {
+            ModelModule::set_scale(module_accessor, 1.0);
+            AttackModule::set_attack_scale(module_accessor, 1.0, true);
+            GrabModule::set_size_mul(module_accessor, 1.0);
+        }
 
 
-
+        // roman cancel penalty
         if WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_PENALTY_TIMER) == 0{
             UiManager::set_penalty(get_ui_index_from_entry_id(entry_id), 0.0);
             WorkModule::dec_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_PENALTY_TIMER);
@@ -598,6 +607,8 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
             UiManager::set_penalty(get_ui_index_from_entry_id(entry_id), 0.9);
             WorkModule::dec_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_PENALTY_TIMER);
         }
+
+        //roman cancels
         if !(
         [*FIGHTER_STATUS_KIND_APPEAL
         ,*FIGHTER_STATUS_KIND_ATTACK
@@ -1157,7 +1168,13 @@ pub fn install() {
 
 
     //normals
-    .sound_acmd         ("sound_wait2",             sound_wait2,                            Priority::Low)
+    .sound_acmd         ("sound_wait2",             sound_wait2,                                    Priority::Low)
+
+    .sound_acmd         ("sound_landingheavy",      sound_landingheavy,                             Priority::Low)
+    .expression_acmd    ("expression_landingheavy", expression_landingheavy,                        Priority::Low)
+
+    .sound_acmd         ("sound_landinglight",      sound_landinglight,                             Priority::Low)
+    .expression_acmd    ("expression_landinglight", expression_landinglight,                        Priority::Low)
 
 
     .sound_acmd         ("sound_walkslow",             sound_walkslow,                            Priority::Low)
@@ -1376,6 +1393,7 @@ pub fn install() {
     .status(Main , *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK,           finalsceneattack_main)
 
     .status(Main , *FIGHTER_KAMUI_STATUS_KIND_FINAL_END,                    finalsceneexit_main)
+    .status(End , *FIGHTER_KAMUI_STATUS_KIND_FINAL_END,                    finalsceneexit_end)
 
 
     .status(Main , *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK,           finalvisscene2_main)
@@ -1630,6 +1648,6 @@ pub fn install() {
     }
 
     //skyline::patching::Patch::in_text(0x3414534).nop(); // nops the waterball effect
-    skyline::patching::Patch::in_text(0xb616d0).nop(); // nops the set pos at the end of final smash
+    //skyline::patching::Patch::in_text(0xb616d0).nop(); // nops the set pos at the end of final smash
     //skyline::patching::Patch::in_text(0xb5ccc0).nop().expect("Failed to patch 0xb5ccc0"); // nops the sword effect
 }

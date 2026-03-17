@@ -21,6 +21,11 @@ pub unsafe extern "C" fn potemkin_mirror_handler(module_accessor: *mut BattleObj
                 let article_boma2 = *(article2 as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
                 ModelModule::set_joint_scale(article_boma2, Hash40::new("trans") , &Vector3f{x:-1.0,y:1.0,z:1.0});
             }
+            if ArticleModule::is_exist(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_SPEARHAND){
+                let article3 = ArticleModule::get_article(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_SPEARHAND);
+                let article_boma3 = *(article3 as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
+                ModelModule::set_joint_scale(article_boma3, Hash40::new("trans") , &Vector3f{x:-1.0,y:1.0,z:1.0});
+            }
     } else { 
         // reverses the -ve scale (i am not sure if its actually needed but we ball ig)
         ModelModule::set_joint_scale(module_accessor, Hash40::new("top") , &Vector3f{x:scale,y:scale,z:scale});
@@ -33,6 +38,11 @@ pub unsafe extern "C" fn potemkin_mirror_handler(module_accessor: *mut BattleObj
             let article2 = ArticleModule::get_article(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON);
             let article_boma2 = *(article2 as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
             ModelModule::set_joint_scale(article_boma2, Hash40::new("trans") , &Vector3f{x:1.0,y:1.0,z:1.0});
+        }
+        if ArticleModule::is_exist(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_SPEARHAND){
+            let article3 = ArticleModule::get_article(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_SPEARHAND);
+            let article_boma3 = *(article3 as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
+            ModelModule::set_joint_scale(article_boma3, Hash40::new("trans") , &Vector3f{x:1.0,y:1.0,z:1.0});
         }
     }
 }
@@ -536,8 +546,8 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
             //hash40("swallowed"),
             //hash40("camera_hit"),
             //hash40("pass"),
-            //hash40("ottotto"),
-            //hash40("ottotto_wait"),
+            hash40("ottotto"),
+            hash40("ottotto_wait"),
             hash40("wall_damage"),
             //hash40("stop_wall"),
             //hash40("ceil_damage"),

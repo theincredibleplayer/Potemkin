@@ -326,13 +326,15 @@ pub unsafe extern "C" fn Final_exit(fighter: &mut L2CFighterCommon) -> L2CValue 
 
 pub unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
+    ArticleModule::remove_exist(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_SPEARHAND, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
     fighter.set_situation(SITUATION_KIND_GROUND.into());
     GroundModule::correct(module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND_CLIFF_STOP));
     grabbed_anim_selector(fighter,"catched_pot_final_scene_03", 1.0);
-    WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
+    WorkModule::on_flag(module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
     //CAM_ZOOM_OUT_FINAL(fighter);
     let capture_id = LinkModule::get_node_object_id(fighter.module_accessor, *LINK_NO_CAPTURE);
     let enemy = sv_battle_object::module_accessor(capture_id as u32);
+    WorkModule::off_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
 
 
 
@@ -346,6 +348,9 @@ pub unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> 
     sv_kinetic_energy::set_accel(fighter.lua_state_agent);
     WorkModule::set_float(module_accessor, 3.0, *FIGHTER_INSTANCE_WORK_ID_FLOAT_CHECK_DEAD_OFFSET_Y);
     let check_distance:f32 = 500.0;
+    WorkModule::set_float(module_accessor, check_distance, 0x1000008);
+    WorkModule::set_float(module_accessor, 0.0, 0x1000007);
+
     PostureModule::set_pos(module_accessor,&Vector3f{x: 0.0 , y: check_distance, z: 0.0});
 
     let pos2f = Vector2f{x: PostureModule::pos_x(fighter.module_accessor), y: PostureModule::pos_y(fighter.module_accessor)};
@@ -360,6 +365,7 @@ pub unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> 
         PostureModule::set_pos(module_accessor,&Vector3f{x: 0.0 , y: new_pos_y, z: 0.0});
     }else{
         PostureModule::set_pos(module_accessor,&Vector3f{x: 0.0 , y: 40.0, z: 0.0});
+        WorkModule::on_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DEATH_IMMINENT);
     }
     let pos = Vector3f{x: PostureModule::pos_x(fighter.module_accessor), y: PostureModule::pos_y(fighter.module_accessor), z: PostureModule::pos_z(fighter.module_accessor)};
     //let checkbool = GroundModule::ray_check_hit_pos(fighter.module_accessor,&pos2f,&check_pos,&mut hit_pos,true);
@@ -369,12 +375,35 @@ pub unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> 
 
     return smashline::original_status(Main, fighter, *FIGHTER_KAMUI_STATUS_KIND_FINAL_END)(fighter);
 }
+
+pub unsafe extern "C" fn finalsceneexit_end(fighter: &mut L2CFighterCommon) -> L2CValue {
+    let module_accessor = fighter.module_accessor;
+    WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DEATH_IMMINENT);
+    return smashline::original_status(End, fighter, *FIGHTER_KAMUI_STATUS_KIND_FINAL_END)(fighter);
+}
+
+
 pub unsafe extern "C" fn finalsceneenter_main(fighter: &mut L2CFighterCommon) -> L2CValue {
+    let check_distance:f32 = 500.0;
+    WorkModule::set_float(fighter.module_accessor, check_distance, 0x1000008);
+    WorkModule::set_float(fighter.module_accessor, 0.0, 0x1000007);
+    FighterManager::exit_finalbg(singletons::FighterManager());
+    ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_SPEARHAND, false, -1);
+    potemkin_mirror_handler(fighter.module_accessor);
+    ArticleModule::set_visibility_whole(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_SPEARHAND, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+    ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_SPEARHAND, Hash40::new("final_visual_scene_01"), false, -1.0);
+    let article = ArticleModule::get_article(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_SPEARHAND);
+    let article_boma = *(article as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
+    LinkModule::remove_model_constraint(article_boma,true);
+    LinkModule::set_model_constraint_pos_ort(article_boma,*WEAPON_LINK_NO_CONSTRAINT,Hash40::new("top"),Hash40::new("top"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_OFFSET_TRANSLATE as u32 | *CONSTRAINT_FLAG_OFFSET_ROT as u32,true);
+    ModelModule::set_scale_z(article_boma,1.0);
+
     return smashline::original_status(Main, fighter, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ENTRY)(fighter);
 }
 pub unsafe extern "C" fn finalsceneattack_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
-    WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
+    WorkModule::on_flag(module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
+    
     return smashline::original_status(Main, fighter, *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK)(fighter);
 }
 
