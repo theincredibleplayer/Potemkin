@@ -50,7 +50,15 @@ pub unsafe extern "C" fn special_lw(agent: &mut L2CAgentBase) {
     }
 }
 
-pub unsafe extern "C" fn effect_special_lw(agent: &mut L2CAgentBase) {}
+pub unsafe extern "C" fn effect_special_lw(agent: &mut L2CAgentBase) {
+    frame(agent.lua_state_agent, 28.0);
+    if macros::is_excute(agent) {
+        if StatusModule::situation_kind(agent.module_accessor) != *SITUATION_KIND_AIR{
+            macros::FOOT_EFFECT(agent, Hash40::new("sys_h_smoke_b"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 0.8, 0, 0, 0, 0, 0, 0, false);    
+        }
+    }
+
+}
 
 pub unsafe extern "C" fn sound_special_lw(agent: &mut L2CAgentBase) {
     sv_animcmd::wait(agent.lua_state_agent, 5.0);

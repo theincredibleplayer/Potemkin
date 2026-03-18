@@ -30,7 +30,9 @@ pub unsafe extern "C" fn game_attackhi3(agent: &mut L2CAgentBase) {
     }
 }
 
-pub unsafe extern "C" fn effect_attackhi3(_agent: &mut L2CAgentBase) {}
+pub unsafe extern "C" fn effect_attackhi3(agent: &mut L2CAgentBase) {
+    macros::FOOT_EFFECT(agent, Hash40::new("sys_run_smoke"), Hash40::new("top"), 5, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, false);
+}
 
 pub unsafe extern "C" fn sound_attackhi3(agent: &mut L2CAgentBase) {
     sv_animcmd::frame(agent.lua_state_agent, 8.0);
@@ -63,7 +65,13 @@ pub unsafe extern "C" fn game_attacklw3(agent: &mut L2CAgentBase) {
     }
 }
 
-pub unsafe extern "C" fn effect_attacklw3(_agent: &mut L2CAgentBase) {}
+pub unsafe extern "C" fn effect_attacklw3(agent: &mut L2CAgentBase) {
+    sv_animcmd::frame(agent.lua_state_agent, 9.0);
+    if macros::is_excute(agent) {
+        macros::FOOT_EFFECT(agent, Hash40::new("sys_run_smoke"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, false);
+    }
+
+}
 
 pub unsafe extern "C" fn sound_attacklw3(agent: &mut L2CAgentBase) {
     sv_animcmd::frame(agent.lua_state_agent, 6.0);
@@ -88,6 +96,7 @@ pub unsafe extern "C" fn game_attacks3(agent: &mut L2CAgentBase) {
 
 pub unsafe extern "C" fn effect_attacks3(agent: &mut L2CAgentBase) {
     macros::EFFECT_FOLLOW(agent, Hash40::new("sys_togezoshell_speedline"), Hash40::new("top"), 0, 15, 8, -90, 0, 0, 1.8, true);
+    macros::FOOT_EFFECT(agent, Hash40::new("sys_run_smoke"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, false);
 }
 
 pub unsafe extern "C" fn sound_attacks3(agent: &mut L2CAgentBase) {

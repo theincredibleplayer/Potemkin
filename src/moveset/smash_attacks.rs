@@ -42,17 +42,29 @@ pub unsafe extern "C" fn expression_attackhi4(agent: &mut L2CAgentBase) {
     }
 }
 
-pub unsafe extern "C" fn effect_attackhi4(_agent: &mut L2CAgentBase) {}
+pub unsafe extern "C" fn effect_attackhi4(agent: &mut L2CAgentBase) {
+    frame(agent.lua_state_agent, 4.0);
+    if macros::is_excute(agent) {
+        macros::EFFECT_FLIP(agent, Hash40::new("sys_smash_flash"), Hash40::new("sys_smash_flash"), Hash40::new("top"),
+            -4,   // in and out
+            10,    // up and down
+            10,   // left and right
+            0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true, *EF_FLIP_YZ);
+    }
+    frame(agent.lua_state_agent, 13.0);
+    if macros::is_excute(agent) {
+        macros::FOOT_EFFECT(agent, Hash40::new("sys_h_smoke_b"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 0.8, 0, 0, 0, 0, 0, 0, false);    
+    }
+}
 
 pub unsafe extern "C" fn effect_attackhi4charge(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 5.0);
-    if macros::is_excute(agent) {
-        macros::FOOT_EFFECT(agent, Hash40::new("sys_run_smoke"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 12, 0, 4, 0, 0, 0, false);
-    }
     loop{
+        if macros::is_excute(agent) {
+            macros::FOOT_EFFECT(agent, Hash40::new("sys_run_smoke"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 12, 0, 4, 0, 0, 0, false);
+        }
         wait(agent.lua_state_agent, 5.0);
-        macros::EFFECT(agent, Hash40::new("sys_smash_flash_s"), Hash40::new("handl"), 0, 2, 0, 0, 0, 0, 1, 4, 4, 4, 0, 0, 0, true);
-        macros::EFFECT(agent, Hash40::new("sys_smash_flash_s"), Hash40::new("handr"), 0, 2, 0, 0, 0, 0, 1, 4, 4, 4, 0, 0, 0, true);
+        macros::EFFECT(agent, Hash40::new("sys_smash_flash_s"), Hash40::new("handl"), 4, 0, 0, 0, 0, 0, 1, 4, 4, 4, 0, 0, 0, true);
     }
 }
 
@@ -100,7 +112,25 @@ pub unsafe extern "C" fn game_attacks4(agent: &mut L2CAgentBase) {
     }
 }
 
-pub unsafe extern "C" fn effect_attacks4(_agent: &mut L2CAgentBase) {}
+pub unsafe extern "C" fn effect_attacks4(agent: &mut L2CAgentBase) {
+    frame(agent.lua_state_agent, 8.0);
+    if macros::is_excute(agent) {
+        macros::EFFECT_FLIP(agent, Hash40::new("sys_smash_flash"), Hash40::new("sys_smash_flash"), Hash40::new("top"),
+            -14,   // in and out
+            10,    // up and down
+            -8,   // left and right
+            0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true, *EF_FLIP_YZ);
+        macros::EFFECT_FLIP(agent, Hash40::new("sys_smash_flash"), Hash40::new("sys_smash_flash"), Hash40::new("top"),
+            -1,   // in and out
+            15,    // up and down
+            7,   // left and right
+            0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true, *EF_FLIP_YZ);     
+    }
+    frame(agent.lua_state_agent, 23.0);
+    if macros::is_excute(agent) {
+        macros::FOOT_EFFECT(agent, Hash40::new("sys_h_smoke_b"), Hash40::new("top"), -10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
+    }
+}
 
 pub unsafe extern "C" fn sound_attacks4(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 10.0);
@@ -125,14 +155,14 @@ pub unsafe extern "C" fn game_attacks4charge(agent: &mut L2CAgentBase) {
 
 pub unsafe extern "C" fn effect_attacks4charge(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 5.0);
-    if macros::is_excute(agent) {
-        macros::FOOT_EFFECT(agent, Hash40::new("sys_run_smoke"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 15, 0, 4, 0, 0, 0, false);
-    }
     loop{
+        if macros::is_excute(agent) {
+            macros::FOOT_EFFECT(agent, Hash40::new("sys_run_smoke"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 15, 0, 4, 0, 0, 0, false);
+        }
         wait(agent.lua_state_agent, 5.0);
         if macros::is_excute(agent) {
-            macros::EFFECT(agent, Hash40::new("sys_smash_flash_s"), Hash40::new("havel"), 5, 0, 0, 0, 0, 0, 1, 4, 4, 4, 0, 0, 0, true);
-            macros::EFFECT(agent, Hash40::new("sys_smash_flash_s"), Hash40::new("haver"), 5, 0, 0, 0, 0, 0, 1, 4, 4, 4, 0, 0, 0, true);
+            macros::EFFECT(agent, Hash40::new("sys_smash_flash_s"), Hash40::new("havel"), 0, 0, 4, 0, 0, 0, 1, 4, 4, 4, 0, 0, 0, true);
+            macros::EFFECT(agent, Hash40::new("sys_smash_flash_s"), Hash40::new("haver"), 0, 0, 4, 0, 0, 0, 1, 4, 4, 4, 0, 0, 0, true);
         }
     }
 }
@@ -161,7 +191,7 @@ pub unsafe extern "C" fn expression_attacks4charge(agent: &mut L2CAgentBase) {
 pub unsafe extern "C" fn spear_attacks4(agent: &mut L2CAgentBase) {}
 
 
-pub unsafe extern "C" fn effect_attacks4_charge_spear(_agent: &mut L2CAgentBase) {}
+pub unsafe extern "C" fn effect_attacks4_charge_spear(agent: &mut L2CAgentBase) {}
 
 
 
@@ -179,7 +209,7 @@ pub unsafe extern "C" fn game_attacklw4(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         macros::ATTACK(agent, 0, 0, Hash40::new("top"), 20.0, 35, 65, 0, 50, 8.0, 0.0, 0.0, -12.0, Some(0.0), Some(0.0), Some(20.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_NONE);
         macros::ATTACK(agent, 1, 0, Hash40::new("top"), 20.0, 35, 65, 0, 50, 14.0, 0.0, 14.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_NONE);
-        macros::ATTACK(agent, 2, 0, Hash40::new("top"), 1.0, 0, 10, 0, 10, 80.0, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 2.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 1.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
+        macros::ATTACK(agent, 2, 0, Hash40::new("top"), 1.0, 0, 10, 0, 10, 80.0, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 2.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 1.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
         macros::QUAKE(agent, *CAMERA_QUAKE_KIND_M);
         macros::FT_MOTION_RATE(agent, 1.25);
     }
@@ -192,6 +222,18 @@ pub unsafe extern "C" fn game_attacklw4(agent: &mut L2CAgentBase) {
 }
 
 pub unsafe extern "C" fn effect_attacklw4(agent: &mut L2CAgentBase) {
+    frame(agent.lua_state_agent, 4.0);
+    if macros::is_excute(agent) {
+        macros::EFFECT_FLIP(agent, Hash40::new("sys_smash_flash"), Hash40::new("sys_smash_flash"), Hash40::new("top"),
+            10,   // in and out
+            25,    // up and down
+            -3,   // left and right
+            0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true, *EF_FLIP_YZ);
+    }
+    frame(agent.lua_state_agent, 25.0);
+    if macros::is_excute(agent) {
+        macros::FOOT_EFFECT(agent, Hash40::new("sys_h_smoke_b"), Hash40::new("top"), -10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);    
+    }
     frame(agent.lua_state_agent, 29.0);
     if macros::is_excute(agent) {
         macros::EFFECT(agent, Hash40::new("kamui_floor_crack_slide_head"), Hash40::new("top"), 0, 0, 9, 0, 0, 0, 6.0, 0, 0, 0, 0, 0, 0, true);
@@ -217,12 +259,12 @@ pub unsafe extern "C" fn sound_attacklw4(agent: &mut L2CAgentBase) {
 
 pub unsafe extern "C" fn effect_attacklw4charge(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 5.0);
-    if macros::is_excute(agent) {
-        macros::FOOT_EFFECT(agent, Hash40::new("sys_run_smoke"), Hash40::new("top"), 1, 0, 0, 0, 0, 0, 1, 15, 0, 4, 0, 0, 0, false);
-    }
     loop{
+        if macros::is_excute(agent) {
+            macros::FOOT_EFFECT(agent, Hash40::new("sys_run_smoke"), Hash40::new("top"), 1, 0, 0, 0, 0, 0, 1, 15, 0, 4, 0, 0, 0, false);
+        }
         wait(agent.lua_state_agent, 5.0);
-        macros::EFFECT(agent, Hash40::new("sys_smash_flash_s"), Hash40::new("bust"), 0, 6, 0, 0, 0, 0, 2, 4, 4, 4, 0, 0, 0, false);
+        macros::EFFECT(agent, Hash40::new("sys_smash_flash_s"), Hash40::new("top"), -10, 25, -3, 0, 0, 0, 1.5, 4, 4, 4, 0, 0, 0, false);
     }
 }
 

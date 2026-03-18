@@ -30,7 +30,12 @@ pub unsafe extern "C" fn special_dragon_hi(agent: &mut L2CAgentBase) {
     }
 }
 
-pub unsafe extern "C" fn effect_special_hi(agent: &mut L2CAgentBase) {}
+pub unsafe extern "C" fn effect_special_hi(agent: &mut L2CAgentBase) {
+    frame(agent.lua_state_agent, 10.0);
+    if macros::is_excute(agent) {
+        macros::FOOT_EFFECT(agent, Hash40::new("sys_run_smoke"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, false);
+    }
+}
 
 pub unsafe extern "C" fn sound_special_hi(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 10.0);

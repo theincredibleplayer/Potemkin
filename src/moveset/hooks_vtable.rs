@@ -488,7 +488,7 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
             hash40("win_2_wait"),
             hash40("win_3"),
             hash40("win_3_wait"),
-            //hash40("lose"),
+            hash40("lose"),
             hash40("damage_hi_1"),
             hash40("damage_hi_2"),
             hash40("damage_hi_3"),

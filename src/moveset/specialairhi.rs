@@ -145,6 +145,9 @@ unsafe fn special_air_hi_hold_main_loop(fighter: &mut L2CFighterCommon) -> L2CVa
     }
 
     if MotionModule::is_end(fighter.module_accessor) {
+        if StatusModule::situation_kind(fighter.module_accessor) != *SITUATION_KIND_AIR{
+            macros::FOOT_EFFECT(fighter, Hash40::new("sys_h_smoke_b"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 0.8, 0, 0, 0, 0, 0, 0, false);    
+        }
         fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE.into(),false.into());
     }
     return L2CValue::I32(0)
