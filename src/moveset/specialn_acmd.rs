@@ -186,21 +186,15 @@ pub unsafe extern "C" fn game_specialnfire(agent: &mut L2CAgentBase) {
 }
 
 pub unsafe extern "C" fn effect_specialnfire(agent: &mut L2CAgentBase) {
-    frame(agent.lua_state_agent, 4.0);
+    frame(agent.lua_state_agent, 11.0);
     if macros::is_excute(agent) {
+        if macros::is_excute(agent) {
+            if StatusModule::situation_kind(agent.module_accessor) != *SITUATION_KIND_AIR{
+                macros::FOOT_EFFECT(agent, Hash40::new("sys_run_smoke"), Hash40::new("top"), -6, 0, -10, 0, 0, 0, 1.2, 0, 0, 0, 0, 0, 0, false);    
+            }
+        }
     }
-    frame(agent.lua_state_agent, 16.0);
-    if macros::is_excute(agent) {
-    }
-    wait(agent.lua_state_agent, 2.0);
-    if macros::is_excute(agent) {
-    }
-    wait(agent.lua_state_agent, 2.0);
-    if macros::is_excute(agent) {
-    }
-    wait(agent.lua_state_agent, 2.0);
 }
-
 pub unsafe extern "C" fn sound_specialnfire(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 10.0);
     if macros::is_excute(agent) {

@@ -88,6 +88,13 @@ pub unsafe extern "C" fn caught_final_main(fighter: &mut L2CFighterCommon) -> L2
         x_offset = -2.0;
         z_offset = -2.5;
     }
+    if is_potemkin(fighter.module_accessor) {
+        y_offset = 2.5;
+        z_offset = 0.0;
+        x_offset = 0.5;
+    }
+
+
     WorkModule::on_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
     fighter.status_Thrown();
     let constraint_flags = LinkModule::get_model_constraint_flag(fighter.module_accessor);
@@ -217,6 +224,11 @@ pub unsafe extern "C" fn caught_buster_main(fighter: &mut L2CFighterCommon) -> L
         *FIGHTER_KIND_MIIENEMYS].contains(&fighter_kind) {
         x_offset = -2.0;
         z_offset = -2.5;
+    }
+    if is_potemkin(fighter.module_accessor) {
+        y_offset = 2.5;
+        z_offset = 0.0;
+        x_offset = 0.5;
     }
     let constraint_flags = LinkModule::get_model_constraint_flag(fighter.module_accessor);
     LinkModule::set_model_constraint_flag(fighter.module_accessor,(*CONSTRAINT_FLAG_DISABLE_RESTRICT_Z | *CONSTRAINT_FLAG_POSITION | *CONSTRAINT_FLAG_ORIENTATION | *CONSTRAINT_FLAG_OFFSET_TRANSLATE) as u32);

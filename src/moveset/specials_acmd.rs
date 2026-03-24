@@ -3,6 +3,7 @@ use crate::moveset::*;
 pub unsafe extern "C" fn sound_specialsstart(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         macros::FT_MOTION_RATE(agent, 0.5);
+        macros::FOOT_EFFECT(agent, Hash40::new("sys_h_smoke_b"), Hash40::new("top"), 0, 0, -10, 0, 0, 0, 0.6, 0, 0, 0, 0, 0, 0, false);    
     }
     sv_animcmd::frame(agent.lua_state_agent, 2.0);
     if macros::is_excute(agent) {

@@ -68,7 +68,7 @@ pub unsafe extern "C" fn game_attacklw3(agent: &mut L2CAgentBase) {
 pub unsafe extern "C" fn effect_attacklw3(agent: &mut L2CAgentBase) {
     sv_animcmd::frame(agent.lua_state_agent, 9.0);
     if macros::is_excute(agent) {
-        macros::FOOT_EFFECT(agent, Hash40::new("sys_run_smoke"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, false);
+        macros::FOOT_EFFECT(agent, Hash40::new("sys_run_smoke"), Hash40::new("top"), 0, 0, -10, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, false);
     }
 
 }

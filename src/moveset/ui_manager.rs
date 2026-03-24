@@ -272,6 +272,7 @@ unsafe fn handle_layout_potemkin(layout: *mut Layout) -> *mut Layout {
     let root_pane = &mut *(*layout).root_pane;
     if layout_name == "info_melee" {
         if let Some(child) = root_pane.find_pane_by_name_recursive("pot") {
+            (*child).alpha = 255;
             let anim_list = &mut (*child.as_parts().layout).anim_trans_list;
             let mut curr = anim_list as *mut AnimTransformNode;
             while !curr.is_null() {
@@ -327,6 +328,7 @@ unsafe fn handle_layout_potemkin(layout: *mut Layout) -> *mut Layout {
                 if idx < 8
                 && UiManager::is_enabled(idx) {
                     if let Some(child) = parent.find_pane_by_name_recursive("tension") {
+                        (*child).alpha = 255;
                         let anim_list = &mut (*child.as_parts().layout).anim_trans_list;
                         let mut curr = anim_list as *mut AnimTransformNode;
                         while !curr.is_null() {
@@ -339,7 +341,7 @@ unsafe fn handle_layout_potemkin(layout: *mut Layout) -> *mut Layout {
                                     let anim_cont_offset = *anim_cont_offsets;
                                     let res_animation_cont = (res_animation_block_data_start + anim_cont_offset as u64) as *const ResAnimationContent;
                                     let name = skyline::try_from_c_str((*res_animation_cont).name.as_ptr()).unwrap_or_else(|_| "UNKNOWN".to_string());
-                                    let name_list = ["gear1","gear2","fire1","fire2","tension_meter"];
+                                    let name_list = ["fire1","fire2","gear1","gear2","tension_meter"];
                                     for _name in name_list {
                                         if name == _name {
                                             (*anim_transform).enabled = true;
@@ -354,7 +356,7 @@ unsafe fn handle_layout_potemkin(layout: *mut Layout) -> *mut Layout {
                                 break;
                             }
                         }
-                        let border_list = ["gear1","gear2","fire1","fire2"];
+                        let border_list = ["fire1","fire2","gear1","gear2"];
                         for pane in border_list {
                             if let Some(border) = child.find_pane_by_name_recursive(pane) {
                                 border.set_visible(UiManager::get_border_availability_from_name(idx,pane));

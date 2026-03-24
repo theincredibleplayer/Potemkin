@@ -529,7 +529,7 @@ pub unsafe extern "C" fn cancels(fighter: &mut L2CFighterCommon) {
             return;
         }
         if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_N) != 0  {
-            if (status == *FIGHTER_STATUS_KIND_ATTACK_100) && AttackModule::is_infliction_status(module_accessor,*COLLISION_KIND_MASK_SHIELD){ // disable jab from cancelling into itself when colliding with a shield
+            if AttackModule::is_infliction_status(module_accessor,*COLLISION_KIND_MASK_SHIELD){ // disable jab from cancelling into itself when colliding with a shield
                 return;
             }
             StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_ATTACK, false);
@@ -565,7 +565,11 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
         let status_kind = StatusModule::status_kind(module_accessor);
         let prev_status_kind = StatusModule::prev_status_kind(module_accessor,0);
         let mut can_rc = true;
-
+        if ControlModule::check_button_on(module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_R)
+        && ControlModule::check_button_on(module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L)
+        && [*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN,*FIGHTER_STATUS_KIND_WAIT].contains(&status_kind){
+            fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN.into(), true.into());
+        }
         //hurtboxes
         if status_kind == *FIGHTER_STATUS_KIND_ENTRY || !smash::app::sv_information::is_ready_go() {
             let custom_hurtboxes = [
@@ -856,11 +860,11 @@ pub unsafe extern "C" fn pot_check_special_command(fighter: &mut L2CFighterCommo
         WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_ATTACK_START);
         WorkModule::on_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_JUMP_START);
         WorkModule::on_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_FINAL_CANCELLED_INTO);
+        fighter.change_status(FIGHTER_STATUS_KIND_FINAL.into(), true.into());
         fighter.clear_lua_stack();
         fighter.push_lua_stack(&mut L2CValue::new_int(0x201bc9217c));
         sv_battle_object::notify_event_msc_cmd(fighter.lua_state_agent);
         fighter.pop_lua_stack(1);
-        fighter.change_status(FIGHTER_STATUS_KIND_FINAL.into(), true.into());
         return true.into();
     }
 
@@ -872,8 +876,7 @@ pub unsafe extern "C" fn pot_check_special_command(fighter: &mut L2CFighterCommo
     //}
     // heat knuckle input
     if cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_HI_COMMAND  != 0
-    && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_HI_COMMAND)
-    && fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND {
+    && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_HI_COMMAND){
         fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_HOLD.into(), true.into());
         return true.into();
     }
@@ -982,6 +985,23 @@ pub fn install() {
     .status(Pre       ,  *FIGHTER_STATUS_KIND_WAIT, wait_pre)
 
     .status(Main      , *FIGHTER_STATUS_KIND_WALK, walk_main)
+
+    .status(Main, *FIGHTER_STATUS_KIND_PASS, pass_main)
+    .status(Exec, *FIGHTER_STATUS_KIND_PASS, pass_exec)
+    .status(End, *FIGHTER_STATUS_KIND_PASS, pass_end)
+
+
+    .status(Init, *FIGHTER_STATUS_KIND_LANDING, landing_init)
+    .status(Init, *FIGHTER_STATUS_KIND_LANDING_LIGHT, landing_init)
+    .status(Init, *FIGHTER_STATUS_KIND_LANDING_FALL_SPECIAL, landing_init)
+
+    .status(Init, *FIGHTER_STATUS_KIND_FALL, fall_init)
+    .status(Init, *FIGHTER_STATUS_KIND_FALL_AERIAL, fall_init)
+    .status(Init, *FIGHTER_STATUS_KIND_FALL_SPECIAL, fall_init)
+
+
+    .status(Pre, *FIGHTER_STATUS_KIND_TURN, turn_pre)
+
 
     //.status(Main      , *FIGHTER_STATUS_KIND_FALL, fall_main)
 

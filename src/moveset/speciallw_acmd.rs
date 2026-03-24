@@ -54,7 +54,7 @@ pub unsafe extern "C" fn effect_special_lw(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 28.0);
     if macros::is_excute(agent) {
         if StatusModule::situation_kind(agent.module_accessor) != *SITUATION_KIND_AIR{
-            macros::FOOT_EFFECT(agent, Hash40::new("sys_h_smoke_b"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 0.8, 0, 0, 0, 0, 0, 0, false);    
+            macros::FOOT_EFFECT(agent, Hash40::new("sys_h_smoke_b"), Hash40::new("top"), 0, 0, -10, 0, 0, 0, 0.8, 0, 0, 0, 0, 0, 0, false);    
         }
     }
 

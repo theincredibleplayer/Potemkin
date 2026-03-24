@@ -233,12 +233,7 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
             }
         }
 
-        //forbids turning when in 1on1
-        if lr_1on1 != 0.0 {
-            WorkModule::enable_transition_term_forbid(module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_TURN);
-        }else{
-            WorkModule::unable_transition_term_forbid(module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_TURN);
-        }
+
     }
 }
 
@@ -545,7 +540,7 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
             //hash40("fura_sleep_end"),
             //hash40("swallowed"),
             //hash40("camera_hit"),
-            //hash40("pass"),
+            hash40("pass"),
             hash40("ottotto"),
             hash40("ottotto_wait"),
             hash40("wall_damage"),

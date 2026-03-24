@@ -23,9 +23,6 @@ pub static mut MARKED_COLORS: [bool; 256] = [false; 256];
 
 
 
-
-
-
 pub fn check_deps() -> bool {
     let mut passed = true;
 
@@ -123,7 +120,6 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("param_special_n"),smash::hash40("shoot_offset_y"), 17.0));        // all of these dont work
 
 
-
     // Preform csk collection calls here (allow online, narration characall entry, add chara db, add layout db, w/e)
     the_csk_collection_api::add_series_db_entry_info(the_csk_collection_api::SeriesDatabaseEntry { 
         ui_series_id: smash::hash40("ui_series_guiltygear"), 
@@ -172,7 +168,7 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
         result_pf0: the_csk_collection_api::BoolType::Optional(Some(true)), 
         result_pf1: the_csk_collection_api::BoolType::Optional(Some(true)), 
         result_pf2: the_csk_collection_api::BoolType::Optional(Some(true)), 
-        color_num: the_csk_collection_api::UnsignedByteType::Overwrite(17), 
+        color_num: the_csk_collection_api::UnsignedByteType::Overwrite(color_num as _), 
         shop_item_tag: the_csk_collection_api::Hash40Type::Optional(Some(0x0)), 
         extra_hash_maps: the_csk_collection_api::Hash40Map::Overwrite(HashMap::from([
             (0x1337FC912E /* Hash40 of characall_label_c00 */, the_csk_collection_api::Hash40Type::Overwrite(smash::hash40("vc_narration_characall_potemkin"))), 
@@ -194,8 +190,8 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
             (0x160ab9eb98, the_csk_collection_api::Hash40Type::Overwrite(0xE4DDD21E6 /* Hash40 of ui_chara_kamui */)),
         ])), 
         extra_index_maps: the_csk_collection_api::UnsignedByteMap::Overwrite(HashMap::from([
-            (0x915C075DE /* Hash40 of c00_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
-            (0x9B3B77E6A /* Hash40 of c01_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
+            (0x915C075DE /* Hash40 of c00_index */, the_csk_collection_api::UnsignedByteType::Overwrite(0)), 
+            (0x9B3B77E6A /* Hash40 of c01_index */, the_csk_collection_api::UnsignedByteType::Overwrite(0)), 
             (0x9825F64F7 /* Hash40 of c02_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
             (0x924286F43 /* Hash40 of c03_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
             (0x9E18F51CD /* Hash40 of c04_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
@@ -238,10 +234,10 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
         eye_0_flash4_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
         eye_0_flash4_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
         eye_1_flash_count: the_csk_collection_api::UnsignedByteType::Optional(Some(2)), 
-        eye_1_flash0_pos_x: the_csk_collection_api::FloatType::Overwrite(-52.0), 
-        eye_1_flash0_pos_y: the_csk_collection_api::FloatType::Overwrite(218.0), 
-        eye_1_flash1_pos_x: the_csk_collection_api::FloatType::Overwrite(78.0), 
-        eye_1_flash1_pos_y: the_csk_collection_api::FloatType::Overwrite(210.0), 
+        eye_1_flash0_pos_x: the_csk_collection_api::FloatType::Overwrite(0.0), 
+        eye_1_flash0_pos_y: the_csk_collection_api::FloatType::Overwrite(197.0), 
+        eye_1_flash1_pos_x: the_csk_collection_api::FloatType::Overwrite(75.0), 
+        eye_1_flash1_pos_y: the_csk_collection_api::FloatType::Overwrite(198.0), 
         eye_1_flash2_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
         eye_1_flash2_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
         eye_1_flash3_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
@@ -283,7 +279,7 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
         chara_3_0_offset_x: the_csk_collection_api::FloatType::Optional(Some(-499.0)), 
         chara_3_0_offset_y: the_csk_collection_api::FloatType::Optional(Some(-153.0)), 
         chara_3_0_scale: the_csk_collection_api::FloatType::Optional(Some(1.0)), 
-        chara_3_1_offset_x: the_csk_collection_api::FloatType::Optional(Some(-439.0)), 
+        chara_3_1_offset_x: the_csk_collection_api::FloatType::Optional(Some(-450.0)), 
         chara_3_1_offset_y: the_csk_collection_api::FloatType::Optional(Some(-133.0)), 
         chara_3_1_scale: the_csk_collection_api::FloatType::Optional(Some(0.9)), 
         chara_3_2_offset_x: the_csk_collection_api::FloatType::Optional(Some(-260.0)), 
@@ -321,17 +317,75 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
         chara_0_scale: the_csk_collection_api::FloatType::Optional(Some(1.0)), 
         ..Default::default()
     });
-    //the_csk_collection_api::add_narration_characall_entry("vc_narration_characall_potemkin");
+    the_csk_collection_api::add_narration_characall_entry("vc_narration_characall_potemkin");
+    the_csk_collection_api::add_bgm_db_entry_info(&the_csk_collection_api::BgmDatabaseRootEntry {
+        ui_bgm_id: smash::hash40("ui_bgm_z17_f_potemkin"),
+        clone_from_ui_bgm_id: Some(smash::hash40("ui_bgm_z85_f_cloud")),
+        stream_set_id: the_csk_collection_api::Hash40Type::Overwrite(smash::hash40("set_z17_f_potemkin")),
+        ..Default::default()
+    });
+
+    the_csk_collection_api::add_stream_set_entry_info(&the_csk_collection_api::StreamSetEntry { 
+        stream_set_id: smash::hash40("set_z17_f_potemkin"),
+        info0: the_csk_collection_api::Hash40Type::Overwrite(smash::hash40("info_z17_f_potemkin")),
+        ..Default::default()
+    });
+
+    the_csk_collection_api::add_assigned_info_entry_info(&the_csk_collection_api::AssignedInfoEntry { 
+        info_id: smash::hash40("info_z17_f_potemkin"),
+        stream_id: the_csk_collection_api::Hash40Type::Overwrite(smash::hash40("stream_z17_f_potemkin")),
+        condition: the_csk_collection_api::Hash40Type::Overwrite(smash::hash40("sound_condition_none")),
+        condition_process: the_csk_collection_api::Hash40Type::Overwrite(smash::hash40("sound_condition_process_add")),
+        change_fadeout_frame: the_csk_collection_api::IntType::Overwrite(60),
+        menu_change_fadeout_frame: the_csk_collection_api::IntType::Overwrite(60),
+        ..Default::default()
+    });
+
+    the_csk_collection_api::add_stream_property_entry_info(&the_csk_collection_api::StreamPropertyEntry {
+        stream_id: smash::hash40("stream_z17_f_potemkin"),
+        data_name0: the_csk_collection_api::StringType::Overwrite(the_csk_collection_api::CStrCSK::new("z17_f_potemkin")),
+        ..Default::default()
+    });
+    the_csk_collection_api::add_new_bgm_property_entry(&smash_bgm_property::BgmPropertyEntry {
+        stream_name: hash40::Hash40::new("z17_f_potemkin"),
+        loop_start_ms: 3878,
+        loop_start_sample: 171020,
+        loop_end_ms: 191726,
+        loop_end_sample: 8455205,
+        duration_ms: 197056,
+        duration_sample: 8697160 
+    });
+
+    the_csk_collection_api::set_fighter_jingle(smash::hash40("ui_chara_potemkin"), "z17_f_potemkin");  
 
     moveset::install();
 
-    const MAX_FILE_SIZE: usize = 0x10000;
+    const MAX_FILE_SIZE: usize = 0xe000;
+    let mut fighter_slots: [Vec<i32>; 96] = std::array::from_fn(|_| Vec::new());    
+
     pub const fighters: [&str; 96] = ["bayonetta", "brave", "buddy", "captain", "chrom", "cloud", "daisy", "dedede", "demon", "diddy", "dolly", "donkey", "duckhunt", "edge", "eflame", "element", "elight", "falco", "fox", "gamewatch", "ganon", "gaogaen", "gekkouga", "ike", "inkling", "jack", "kamui", "ken"/*, "kirby"*/, "koopa", "koopag", "koopajr", "krool", "link", "littlemac", "lucario", "lucas", "lucina", "luigi", "mario", "mariod", "marth", "master", "metaknight", "mewtwo", "miienemyf", "miienemyg", "miienemys", "miifighter", "miigunner", "miiswordsman", "murabito", "nana", "ness", "packun", "pacman", "palutena", "peach", "pfushigisou", "pichu", "pickel", "pikachu", "pikmin", "pit", "pitb", "plizardon", "popo", "ptrainer", "ptrainer_low", "purin", "pzenigame", "reflet", "richter", "ridley", "robot", "rockman", "rosetta", "roy", "ryu", "samus", "samusd", "sheik", "shizue", "shulk", "simon", "snake", "sonic", "szerosuit", "tantan", "toonlink", "trail", "wario", "wiifit", "wolf", "yoshi", "younglink", "zelda"];
-    for fighter in fighters.iter() {
+    for (index, &fighter) in fighters.iter().enumerate() {
         for color in 0..8 {
             unsafe{
-                if !(*fighter == "kamui" && MARKED_COLORS[color as usize]){
+                if !(fighter == "kamui" && MARKED_COLORS[color as usize]){
                     my_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE);
+                }
+            }
+        }
+        for slot in 8..256 {
+            let path = format!("mods:/fighter/{}/model/body/c{:02}/", fighters[index], slot);
+
+            if let Ok(meta) = std::fs::metadata(&path) {
+                if meta.is_dir() {
+                    fighter_slots[index].push(slot);
+                }
+            }
+        }
+        for color in &fighter_slots[index] {
+            unsafe{
+                if !(fighters[index] == "kamui" && MARKED_COLORS[*color as usize]){
+                    //println!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighters[index], *color);
+                    my_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, *color)), MAX_FILE_SIZE);
                 }
             }
         }

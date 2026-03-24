@@ -3,9 +3,9 @@ use crate::moveset::*;
 
 pub unsafe extern "C" fn grabbed_anim_selector(fighter: &mut L2CFighterCommon,anim_name: &str, mot_rate: f32) {
     let capture_id = LinkModule::get_node_object_id(fighter.module_accessor, *LINK_NO_CAPTURE);
-    let capture_boma = sv_battle_object::module_accessor(capture_id as u32);
 
     if capture_id != 0x50000000 {
+        let capture_boma = sv_battle_object::module_accessor(capture_id as u32);
         //println!("playing anim");
         //MotionModule::change_motion(captured_boma,Hash40::new("capture_wait_hi"),0.0,1.0,false,0.0,false,false);
 
@@ -123,6 +123,7 @@ pub unsafe extern "C" fn special_hi_start_main(fighter: &mut L2CFighterCommon) -
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
     let scale = PostureModule::scale(fighter.module_accessor);
     let lr = PostureModule::lr(fighter.module_accessor);
+    JostleModule::set_status(fighter.module_accessor, false);
     if camera_checks(fighter){
         CameraModule::reset_all(fighter.module_accessor);            
         macros::CAM_ZOOM_IN_arg6(
@@ -196,6 +197,7 @@ pub unsafe extern "C" fn special_hi_loop_main(fighter: &mut L2CFighterCommon) ->
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
     let scale = PostureModule::scale(fighter.module_accessor);
+    JostleModule::set_status(fighter.module_accessor, false);
     if camera_checks(fighter){
         macros::CAM_ZOOM_OUT(fighter);
         let lr = PostureModule::lr(fighter.module_accessor);
@@ -310,7 +312,7 @@ pub unsafe extern "C" fn special_hi_release_main(fighter: &mut L2CFighterCommon)
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
     let lr = PostureModule::lr(fighter.module_accessor);
-
+    JostleModule::set_status(fighter.module_accessor, false);
     fighter.clear_lua_stack();
     lua_args!(fighter,
     *MA_MSC_CMD_CAMERA_CAM_OFFSET,
@@ -405,6 +407,7 @@ pub unsafe extern "C" fn special_hi_release_exec(fighter: &mut L2CFighterCommon)
         if WorkModule::is_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_HI_FLAG_CAPTURE) {
             let capture_id = LinkModule::get_node_object_id(fighter.module_accessor, *LINK_NO_CAPTURE);
             if capture_id != 0x50000000 {
+                JostleModule::set_status(fighter.module_accessor, true);
                 let capture_boma = sv_battle_object::module_accessor(capture_id as u32);
                 AttackModule::hit_absolute_joint(fighter.module_accessor, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW,capture_id as u32,Hash40::new("throw"), 0, 0);
             }
