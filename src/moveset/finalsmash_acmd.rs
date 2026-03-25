@@ -64,6 +64,8 @@ pub unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
         let lr = LinkModule::get_parent_lr(enemy,*LINK_NO_CAPTURE);
         PostureModule::set_lr(enemy, lr);
         PostureModule::update_rot_y_lr(enemy);
+        macros::SLOW_OPPONENT(agent, 400.0, 128.0);
+
     }
 
 

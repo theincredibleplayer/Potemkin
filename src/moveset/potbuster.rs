@@ -139,6 +139,8 @@ pub unsafe extern "C" fn potbuster(agent: &mut L2CAgentBase) {
     }
     frame(agent.lua_state_agent, 128.0);
     if macros::is_excute(agent) {
+        macros::CAM_ZOOM_OUT(agent);
+        CameraModule::reset_all(agent.module_accessor);
         macros::QUAKE(agent, *CAMERA_QUAKE_KIND_XL);
         macros::ATTACK(agent, 0, 0, Hash40::new("top"), 30.0, 80, 80, 0, 50,20.0, 0.0, 20.0, 0.0, None, None, None, 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL,false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_PUNCH);
         AttackModule::set_catch_only_all(agent.module_accessor, true, false);
@@ -151,9 +153,7 @@ pub unsafe extern "C" fn potbuster(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 158.0);
     if macros::is_excute(agent){
         WorkModule::off_flag(agent.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
-        macros::CAM_ZOOM_OUT(agent);
-        CameraModule::reset_all(agent.module_accessor);
-        macros::CHECK_FINISH_CAMERA(agent, -10, 0);
+        macros::CHECK_FINISH_CAMERA(agent, 0, 0);
         lua_bind::FighterCutInManager::set_throw_finish_zoom_rate(singletons::FighterCutInManager(), 1.5);
         lua_bind::FighterCutInManager::set_throw_finish_offset(singletons::FighterCutInManager(), Vector3f{x: 0.0, y: 0.0, z: 0.0});
     }

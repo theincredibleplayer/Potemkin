@@ -360,10 +360,10 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
 
     moveset::install();
 
-    const MAX_FILE_SIZE: usize = 0xe000;
-    let mut fighter_slots: [Vec<i32>; 96] = std::array::from_fn(|_| Vec::new());    
+    const MAX_FILE_SIZE: usize = 0x20000;
+    let mut fighter_slots: [Vec<i32>; 97] = std::array::from_fn(|_| Vec::new());    
 
-    pub const fighters: [&str; 96] = ["bayonetta", "brave", "buddy", "captain", "chrom", "cloud", "daisy", "dedede", "demon", "diddy", "dolly", "donkey", "duckhunt", "edge", "eflame", "element", "elight", "falco", "fox", "gamewatch", "ganon", "gaogaen", "gekkouga", "ike", "inkling", "jack", "kamui", "ken"/*, "kirby"*/, "koopa", "koopag", "koopajr", "krool", "link", "littlemac", "lucario", "lucas", "lucina", "luigi", "mario", "mariod", "marth", "master", "metaknight", "mewtwo", "miienemyf", "miienemyg", "miienemys", "miifighter", "miigunner", "miiswordsman", "murabito", "nana", "ness", "packun", "pacman", "palutena", "peach", "pfushigisou", "pichu", "pickel", "pikachu", "pikmin", "pit", "pitb", "plizardon", "popo", "ptrainer", "ptrainer_low", "purin", "pzenigame", "reflet", "richter", "ridley", "robot", "rockman", "rosetta", "roy", "ryu", "samus", "samusd", "sheik", "shizue", "shulk", "simon", "snake", "sonic", "szerosuit", "tantan", "toonlink", "trail", "wario", "wiifit", "wolf", "yoshi", "younglink", "zelda"];
+    pub const fighters: [&str; 97] = ["bayonetta", "brave", "buddy", "captain", "chrom", "cloud", "daisy", "dedede", "demon", "diddy", "dolly", "donkey", "duckhunt", "edge", "eflame", "element", "elight", "falco", "fox", "gamewatch", "ganon", "gaogaen", "gekkouga", "ike", "inkling", "jack", "kamui", "ken", "kirby", "koopa", "koopag", "koopajr", "krool", "link", "littlemac", "lucario", "lucas", "lucina", "luigi", "mario", "mariod", "marth", "master", "metaknight", "mewtwo", "miienemyf", "miienemyg", "miienemys", "miifighter", "miigunner", "miiswordsman", "murabito", "nana", "ness", "packun", "pacman", "palutena", "peach", "pfushigisou", "pichu", "pickel", "pikachu", "pikmin", "pit", "pitb", "plizardon", "popo", "ptrainer", "ptrainer_low", "purin", "pzenigame", "reflet", "richter", "ridley", "robot", "rockman", "rosetta", "roy", "ryu", "samus", "samusd", "sheik", "shizue", "shulk", "simon", "snake", "sonic", "szerosuit", "tantan", "toonlink", "trail", "wario", "wiifit", "wolf", "yoshi", "younglink", "zelda"];
     for (index, &fighter) in fighters.iter().enumerate() {
         for color in 0..8 {
             unsafe{
