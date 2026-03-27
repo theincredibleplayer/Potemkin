@@ -357,17 +357,28 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
     });
 
     the_csk_collection_api::set_fighter_jingle(smash::hash40("ui_chara_potemkin"), "z17_f_potemkin");  
-
+    the_csk_collection_api::allow_ui_chara_hash_online(smash::hash40("ui_chara_potemkin"));
     moveset::install();
+    install_motion_patch();
+}
 
-    const MAX_FILE_SIZE: usize = 0x20000;
+
+extern "C" fn install_motion_patch(){
+    const MAX_FILE_SIZE: usize = 0xe000;
+    const MAX_FILE_SIZE_KIRBY: usize = 0x20000;
+    const MAX_FILE_SIZE_TANTAN: usize = 0x10000;
+
     let mut fighter_slots: [Vec<i32>; 97] = std::array::from_fn(|_| Vec::new());    
 
     pub const fighters: [&str; 97] = ["bayonetta", "brave", "buddy", "captain", "chrom", "cloud", "daisy", "dedede", "demon", "diddy", "dolly", "donkey", "duckhunt", "edge", "eflame", "element", "elight", "falco", "fox", "gamewatch", "ganon", "gaogaen", "gekkouga", "ike", "inkling", "jack", "kamui", "ken", "kirby", "koopa", "koopag", "koopajr", "krool", "link", "littlemac", "lucario", "lucas", "lucina", "luigi", "mario", "mariod", "marth", "master", "metaknight", "mewtwo", "miienemyf", "miienemyg", "miienemys", "miifighter", "miigunner", "miiswordsman", "murabito", "nana", "ness", "packun", "pacman", "palutena", "peach", "pfushigisou", "pichu", "pickel", "pikachu", "pikmin", "pit", "pitb", "plizardon", "popo", "ptrainer", "ptrainer_low", "purin", "pzenigame", "reflet", "richter", "ridley", "robot", "rockman", "rosetta", "roy", "ryu", "samus", "samusd", "sheik", "shizue", "shulk", "simon", "snake", "sonic", "szerosuit", "tantan", "toonlink", "trail", "wario", "wiifit", "wolf", "yoshi", "younglink", "zelda"];
     for (index, &fighter) in fighters.iter().enumerate() {
         for color in 0..8 {
             unsafe{
-                if !(fighter == "kamui" && MARKED_COLORS[color as usize]){
+                if fighter == "kirby"{
+                    my_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE_KIRBY);
+                }else if fighter == "tantan"{
+                    my_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE_TANTAN);
+                }else if !(fighter == "kamui" && MARKED_COLORS[color as usize]){
                     my_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE);
                 }
             }
@@ -383,14 +394,16 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
         }
         for color in &fighter_slots[index] {
             unsafe{
-                if !(fighters[index] == "kamui" && MARKED_COLORS[*color as usize]){
-                    //println!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighters[index], *color);
-                    my_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, *color)), MAX_FILE_SIZE);
+                if fighters[index] == "kirby"{
+                    my_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE_KIRBY);
+                }else if fighters[index] == "tantan"{
+                    my_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE_TANTAN);
+                }else if !(fighters[index] == "kamui" && MARKED_COLORS[*color as usize]){
+                    my_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE);
                 }
             }
         }
     }
-
 }
 
 // patches every motion list in the game to add the thrown motion_list entries, earth's arcroplois is quite advanced
@@ -454,8 +467,6 @@ fn my_callback(hash: u64, data: &mut [u8]) -> Option<usize> {
             let vec_res = writer.into_inner();
             let slice = vec_res.as_slice();
             data[..slice.len()].copy_from_slice(slice);
-            std::fs::write("sd:/tmp.bin", &slice).unwrap(); 
-            std::fs::write("sd:/tmp2.bin", &data).unwrap();
             Some(data.len())
         }
         Err(_) => {
@@ -465,104 +476,8 @@ fn my_callback(hash: u64, data: &mut [u8]) -> Option<usize> {
     }
 }
 
-#[skyline::hook(offset = 0x39a4b14, inline)]
-unsafe extern "C" fn motlist_patch(ctx: &mut skyline::hooks::InlineCtx) {
-    if *(ctx.registers[1].x() as *const u32) == 0xE8A1FEF5
-    {
-        println!("this shit is a motion list get his ass");
-        let ptr = ctx.registers[1].x() as *mut u8;
-        let size = ctx.registers[2].x() as usize;    
-        let data = unsafe {
-            std::slice::from_raw_parts_mut(ptr, 0x10000)
-        };
-        let mut reader = std::io::Cursor::new(&mut *data);
-
-        match motion_lib::read_stream(&mut reader) {
-            Ok(mut motion_list) => {
-                let motions_to_add = [
-                    "catched_pot_special_hi","catched_pot_special_hi_girl","catched_pot_special_hi_big","catched_pot_special_hi_dx",
-                    "catched_potemkin_buster","catched_potemkin_buster_girl","catched_potemkin_buster_big","catched_potemkin_buster_dx",
-                    "catched_pot_final_scene_01","catched_pot_final_scene_01_girl","catched_pot_final_scene_01_big","catched_pot_final_scene_01_dx",
-                    "catched_pot_final_scene_02","catched_pot_final_scene_02_girl","catched_pot_final_scene_02_big","catched_pot_final_scene_02_dx",
-                    "catched_pot_final_scene_03","catched_pot_final_scene_03_girl","catched_pot_final_scene_03_big","catched_pot_final_scene_03_dx"
-                ];
-                for entry in motions_to_add{
-                    let new_entry_name = motion_lib::hash40::hash40(entry);
-                    /*let anim = motion_lib::mlist::Animation{
-                        name: motion_lib::hash40::hash40("a00wait2.nuanmb"),
-                        unk: 0
-                    };*/
-                    let extras = std::option::Option::Some(motion_lib::mlist::Extra{
-                        xlu_start:0,
-                        xlu_end:0,
-                        cancel_frame:0,
-                        no_stop_intp:false,
-                    });
-                    let script_name = entry.replace("_girl", "").replace("_big", "").replace("_dx", "").replace("_", "");
-                    let new_motion = motion_lib::mlist::Motion {
-                        game_script: motion_lib::hash40::hash40(["game_",script_name.as_str()].join("").as_str()),
-                        flags: Flags{
-                            turn: false,
-                            r#loop: false,
-                            r#move: false,
-                            fix_trans: true,
-                            fix_rot: false,
-                            fix_scale: true,
-                            unk_40: false,
-                            unk_80: true,
-                            unk_100: false,
-                            unk_200: false,
-                            unk_400: false,
-                            unk_800: false,
-                            unk_1000: false,
-                            unk_2000: false
-                        },
-                        blend_frames: 0,
-                        animations: vec![],
-                        scripts: vec![
-                            motion_lib::hash40::hash40(["expression_",script_name.as_str()].join("").as_str()),
-                            motion_lib::hash40::hash40(["effect_",script_name.as_str()].join("").as_str()),
-                            motion_lib::hash40::hash40(["sound_",script_name.as_str()].join("").as_str())
-                        ],
-                        extra: extras,
-                    };
-                    motion_list.list.insert(new_entry_name, new_motion);
-                }
-                let mut writer = std::io::Cursor::new(Vec::<u8>::new());
-                motion_lib::write_stream(&mut writer, &motion_list).unwrap();
-                let vec_res = writer.into_inner();
-                let slice = vec_res.as_slice();
-                data[..slice.len()].copy_from_slice(slice);
-                println!("patch successful");
-                //std::fs::write("sd:/tmp.bin", &slice).unwrap(); 
-                //std::fs::write("sd:/tmp2.bin", &data).unwrap();
-            }
-            Err(_) => {
-                println!("Failed to patch ");
-            },
-        }
-    }
-}
-
-#[skyline::hook(offset = 0x39bfb30)]
-unsafe extern "C" fn mempy_hook_kill_me(dest:u64,src:u64,n:u64) {
-    println!("derefrenced once: {:x}",*(src as *const  u32));
-    println!("derefrenced twice: {:x}",**(src as *const *const u32));
-    if **(src as *const *const u32) == 0xE8A1FEF5
-    {
-        println!("this shit is a motion list get his ass");
-    }
-    call_original!(dest, src, n)
-}
 
 
-
-#[arc_callback]
-fn debug_callback(hash: u64, data: &mut [u8]) -> Option<usize> {
-    println!("Buffer Ptr: {:p}", data);
-    std::thread::sleep(std::time::Duration::from_secs(20));
-    return None;
-}
 
 #[skyline::main(name = "hotpot")]
 pub fn main() {
@@ -578,7 +493,5 @@ pub fn main() {
         }
         arcrop_register_event_callback(arcropolis_api::Event::ModFilesystemMounted, mods_mounted);
     }
-    skyline::install_hooks!(
-        //mempy_hook_kill_me,
-    );
+
 }

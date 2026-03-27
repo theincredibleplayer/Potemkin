@@ -421,7 +421,7 @@ pub unsafe extern "C" fn cancels(fighter: &mut L2CFighterCommon) {
     ,*FIGHTER_STATUS_KIND_ATTACK_AIR
     ].contains(&status){
         if (cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SUPER_SPECIAL2_COMMAND) != 0
-        && smash::app::lua_bind::FighterManager::is_final(singletons::FighterManager()){
+        && WorkModule::is_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_FINAL_AVAILABLE){
             WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_START);
             WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_START);
             WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_ATTACK_START);
@@ -853,7 +853,7 @@ pub unsafe extern "C" fn pot_check_special_command(fighter: &mut L2CFighterCommo
         return true.into();
     }
     if cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SUPER_SPECIAL2_COMMAND != 0
-    && smash::app::lua_bind::FighterManager::is_final(singletons::FighterManager())
+    && (WorkModule::is_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_FINAL_AVAILABLE))
     && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_N_COMMAND){
         WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_START);
         WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_START);
@@ -865,6 +865,7 @@ pub unsafe extern "C" fn pot_check_special_command(fighter: &mut L2CFighterCommo
         fighter.push_lua_stack(&mut L2CValue::new_int(0x201bc9217c));
         sv_battle_object::notify_event_msc_cmd(fighter.lua_state_agent);
         fighter.pop_lua_stack(1);
+        fighter.is_final_status_or_stage_transition();
         return true.into();
     }
 
