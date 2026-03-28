@@ -912,9 +912,9 @@ pub fn install() {
     
   
 
-    let agent= &mut Agent::new("kamui_dragonhand");
-    let agent = agent.set_costume(costume.to_vec());
-    dragonhand::install(agent);
+    let agent_dragonhand= &mut Agent::new("kamui_dragonhand");
+    let agent_dragonhand = agent_dragonhand.set_costume(costume.to_vec());
+    dragonhand::install(agent_dragonhand);
 
 
     let agent_ryusensya = &mut Agent::new("kamui_ryusensya");
@@ -926,9 +926,9 @@ pub fn install() {
     for k in 8..256{
         all.push(k);
     }
-    let agent_global = &mut Agent::new("fighter");
-    let agent_global = agent_global.set_costume(all.to_vec());
-    global::install(agent_global);
+    let agent_global_all = &mut Agent::new("fighter");
+    let agent_global_all = agent_global_all.set_costume(all.to_vec());
+    global::install(agent_global_all);
 
     let agent_global = &mut Agent::new("fighter");
     global::install(agent_global);
