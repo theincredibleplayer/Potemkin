@@ -872,25 +872,28 @@ pub fn install() {
     agent_kamui.on_start(agent_init);
     agent_kamui.on_start(on_start);
     kamui::install(agent_kamui);
-
+    agent_kamui.install();
 
 
     let agent_waterdragon = &mut Agent::new("kamui_waterdragon");
     let agent_waterdragon = agent_waterdragon.set_costume(costume.to_vec());
 
     articles::waterdragon::install(agent_waterdragon);
+    agent_waterdragon.install();
     
   
 
     let agent_dragonhand= &mut Agent::new("kamui_dragonhand");
     let agent_dragonhand = agent_dragonhand.set_costume(costume.to_vec());
     articles::dragonhand::install(agent_dragonhand);
+    agent_dragonhand.install();
 
 
 
     let agent_ryusensya = &mut Agent::new("kamui_ryusensya");
     let agent_ryusensya = agent_ryusensya.set_costume(costume.to_vec());
     articles::ryusensya::install(agent_ryusensya);
+    agent_ryusensya.install();
 
 
 
@@ -901,12 +904,13 @@ pub fn install() {
     let agent_global_all = &mut Agent::new("fighter");
     let agent_global_all = agent_global_all.set_costume(all.to_vec());
     global::install(agent_global_all);
+    agent_global_all.install();
 
 
 
     let agent_global = &mut Agent::new("fighter");
     global::install(agent_global);
-
+    agent_global.install();
 
 
     ui::install();
