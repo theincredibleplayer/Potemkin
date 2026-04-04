@@ -4,7 +4,7 @@ use super::*;
 
 
 
-pub unsafe extern "C" fn pass_exec(fighter: &mut L2CFighterCommon) -> L2CValue {
+unsafe extern "C" fn pass_exec(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
     println!("pass exec");
     fighter.sub_uniq_process_Pass_exec_status();
@@ -28,7 +28,7 @@ pub unsafe extern "C" fn pass_exec(fighter: &mut L2CFighterCommon) -> L2CValue {
 }
 
 
-pub unsafe extern "C" fn pass_end(fighter: &mut L2CFighterCommon) -> L2CValue {
+unsafe extern "C" fn pass_end(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
     GroundModule::set_offset_y(module_accessor, 0.0);
     if WorkModule::is_flag(module_accessor, *FIGHTER_SPECIAL_COMMAND_USER_STATUS_WORK_ID_PASS_FLAG_COMMAND_EXTEND){
@@ -45,14 +45,14 @@ pub unsafe extern "C" fn pass_end(fighter: &mut L2CFighterCommon) -> L2CValue {
 }
 
 
-pub unsafe extern "C" fn pass_main(fighter: &mut L2CFighterCommon) -> L2CValue {
+unsafe extern "C" fn pass_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
     fighter.status_Pass_common();
     fighter.sub_shift_status_main(L2CValue::Ptr(pass_main_loop as *const () as _))
 }
 
 
-pub unsafe extern "C" fn pass_function_thingy(fighter: &mut L2CFighterCommon) -> L2CValue {
+unsafe extern "C" fn pass_function_thingy(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
     if fighter.sub_transition_group_check_special_command().get_bool(){
         WorkModule::off_flag(module_accessor, *FIGHTER_SPECIAL_COMMAND_USER_STATUS_WORK_ID_PASS_FLAG_COMMAND_EXTEND);
@@ -80,7 +80,7 @@ pub unsafe extern "C" fn pass_function_thingy(fighter: &mut L2CFighterCommon) ->
 }
 
 
-pub unsafe extern "C" fn pass_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
+unsafe extern "C" fn pass_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     fighter.status_Pass_Main_sub(L2CValue::Ptr(pass_function_thingy as *const () as _));
     return L2CValue::I32(0)
 }

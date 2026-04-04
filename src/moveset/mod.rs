@@ -25,16 +25,8 @@ use {
 };
 use skyline::libc::c_void;
 use crate::moveset::ui::ui_manager::UiManager;
-use crate::moveset::misc::misc::*;
-use crate::moveset::misc::extra_functions::*;
-use crate::moveset::hooks::hooks_vtable::*;
-use crate::moveset::misc::event_structs::*;
-use crate::moveset::misc::command_input::*;
-use crate::moveset::misc::lowercase_letters::LOWERCASE_FIGHTER_NAMES;
+use crate::moveset::misc::*;
 
-use crate::FIGHTER_CUTIN_MANAGER_ADDR;
-use crate::FIGHTER_MANAGER;
-use crate::ITEM_MANAGER;
 
 pub static mut IDX: usize = 0;
 
@@ -226,10 +218,7 @@ mod global;
 mod kamui;
 mod misc;
 mod hooks;
-mod spearhand;
-mod dragonhand;
-mod ryusensya;
-mod waterdragon;
+mod articles;
 mod ui;
 
 
@@ -340,7 +329,7 @@ pub unsafe extern "C" fn cancels(fighter: &mut L2CFighterCommon) {
 
     if CancelModule::is_enable_cancel(module_accessor) 
     || fighter.global_table[IS_STOP].get_bool() // cant cancel during hitstop
-    || !AttackModule::is_infliction_status(module_accessor, *COLLISION_KIND_MASK_HIT | *COLLISION_KIND_MASK_SHIELD){ // cancels only if hit or collided with a shield
+    || !AttackModule::is_infliction_status(module_accessor, *COLLISION_KIND_MASK_HIT){ // cancels only if hit
         return;
     }
 
@@ -371,12 +360,12 @@ pub unsafe extern "C" fn cancels(fighter: &mut L2CFighterCommon) {
             StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_FINAL, false);
             return;
         }
-        if (cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SUPER_SPECIAL_COMMAND) != 0{
+        if (cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SUPER_SPECIAL_COMMAND) != 0
+        && fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND {
             StatusModule::change_status_request_from_script(fighter.module_accessor, FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF, false);
             return;
         }
-        if (cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_HI_COMMAND) != 0
-        && fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND {
+        if (cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_HI_COMMAND) != 0{
             StatusModule::change_status_request_from_script(fighter.module_accessor, FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_HOLD, false);
             return;
         }
@@ -465,9 +454,6 @@ pub unsafe extern "C" fn cancels(fighter: &mut L2CFighterCommon) {
             return;
         }
         if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_N) != 0  {
-            if AttackModule::is_infliction_status(module_accessor,*COLLISION_KIND_MASK_SHIELD){ // disable jab from cancelling into itself when colliding with a shield
-                return;
-            }
             StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_ATTACK, false);
             return;
         }
@@ -867,28 +853,10 @@ pub unsafe extern "C" fn is_potemkin(module_accessor: *mut BattleObjectModuleAcc
 
 
 pub fn install() {
-    unsafe {
-        LookupSymbol(
-            &mut FIGHTER_MANAGER,
-            "_ZN3lib9SingletonIN3app14FighterManagerEE9instance_E\u{0}"
-            .as_bytes()
-            .as_ptr(),
-        );
-        LookupSymbol(
-            &mut FIGHTER_CUTIN_MANAGER_ADDR,
-            "_ZN3lib9SingletonIN3app19FighterCutInManagerEE9instance_E\u{0}"
-                .as_bytes()
-                .as_ptr(),
-        );
-        LookupSymbol(
-            &mut ITEM_MANAGER,
-            "_ZN3lib9SingletonIN3app11ItemManagerEE9instance_E\u{0}"
-            .as_bytes()
-            .as_ptr(),
-        );
-    }
-    let mut costume = &mut Vec::new();
 
+
+
+    let mut costume = &mut Vec::new();
     unsafe {
         for i in 0..crate::MARKED_COLORS.len() {
             if crate::MARKED_COLORS[i] {
@@ -896,30 +864,34 @@ pub fn install() {
             }
         }
     }
+    
     let agent_kamui = &mut Agent::new("kamui");
     let agent_kamui = agent_kamui.set_costume(costume.to_vec());
 
-    //agent frame/opff
     agent_kamui.on_line(Main, kamui);
     agent_kamui.on_start(agent_init);
     agent_kamui.on_start(on_start);
     kamui::install(agent_kamui);
 
+
+
     let agent_waterdragon = &mut Agent::new("kamui_waterdragon");
     let agent_waterdragon = agent_waterdragon.set_costume(costume.to_vec());
 
-    waterdragon::install(agent_waterdragon);
+    articles::waterdragon::install(agent_waterdragon);
     
   
 
     let agent_dragonhand= &mut Agent::new("kamui_dragonhand");
     let agent_dragonhand = agent_dragonhand.set_costume(costume.to_vec());
-    dragonhand::install(agent_dragonhand);
+    articles::dragonhand::install(agent_dragonhand);
+
 
 
     let agent_ryusensya = &mut Agent::new("kamui_ryusensya");
     let agent_ryusensya = agent_ryusensya.set_costume(costume.to_vec());
-    ryusensya::install(agent_ryusensya);
+    articles::ryusensya::install(agent_ryusensya);
+
 
 
     let mut all = &mut Vec::new();
@@ -930,14 +902,13 @@ pub fn install() {
     let agent_global_all = agent_global_all.set_costume(all.to_vec());
     global::install(agent_global_all);
 
+
+
     let agent_global = &mut Agent::new("fighter");
     global::install(agent_global);
 
 
 
-
-    
     ui::install();
     hooks::install();
-
 }

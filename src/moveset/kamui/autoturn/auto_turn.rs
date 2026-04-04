@@ -2,12 +2,12 @@ use super::*;
 
 
 
-pub unsafe extern "C" fn autoturn_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
+unsafe extern "C" fn autoturn_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
     fighter.status_pre_Wait();
     return 0.into();
 }
 
-pub unsafe extern "C" fn autoturn_main(fighter: &mut L2CFighterCommon) -> L2CValue {
+unsafe extern "C" fn autoturn_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     fighter.sub_wait_common();
     PostureModule::reverse_lr(fighter.module_accessor);
     if ControlModule::is_remake_command(fighter.module_accessor) {
@@ -17,7 +17,7 @@ pub unsafe extern "C" fn autoturn_main(fighter: &mut L2CFighterCommon) -> L2CVal
     fighter.sub_shift_status_main(L2CValue::Ptr(autoturn_main_loop as *const () as _))
 }
 
-pub unsafe extern "C" fn autoturn_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
+unsafe extern "C" fn autoturn_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     if !fighter.sub_wait_common_Main().get_bool() {
         if MotionModule::is_end(fighter.module_accessor) {
             fighter.change_status(FIGHTER_STATUS_KIND_WAIT.into(),false.into());
@@ -26,7 +26,7 @@ pub unsafe extern "C" fn autoturn_main_loop(fighter: &mut L2CFighterCommon) -> L
     return 0.into();
 }
 
-pub unsafe extern "C" fn autoturn_end(fighter: &mut L2CFighterCommon) -> L2CValue {
+unsafe extern "C" fn autoturn_end(fighter: &mut L2CFighterCommon) -> L2CValue {
     fighter.status_end_Wait();
     return 0.into();
 }

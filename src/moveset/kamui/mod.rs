@@ -1,16 +1,14 @@
 use super::*;
 
-mod finalsmash;
-mod specials;
-mod normals;
+mod status;
+mod acmd;
 mod autoturn;
 
 
 
 
 pub fn install(agent: &mut Agent) {
-    specials::install(agent);
-    normals::install(agent);
+    acmd::install(agent);
+    status::install(agent);
     autoturn::install(agent);
-    finalsmash::install(agent);
 }

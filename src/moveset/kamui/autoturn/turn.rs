@@ -4,7 +4,7 @@ use super::*;
 
 
 
-pub unsafe extern "C" fn turn_pre(fighter: &mut L2CFighterCommon) -> L2CValue{
+unsafe extern "C" fn turn_pre(fighter: &mut L2CFighterCommon) -> L2CValue{
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
 

@@ -3,7 +3,7 @@ use super::*;
 
 
 
-pub unsafe extern "C" fn wait_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
+unsafe extern "C" fn wait_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
     if fighter.status_pre_Wait_check_interrupt().get_bool() {
@@ -42,7 +42,7 @@ pub unsafe extern "C" fn wait_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
 }
 
 
-pub unsafe extern "C" fn wait_main(fighter: &mut L2CFighterCommon) -> L2CValue {
+unsafe extern "C" fn wait_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
     fighter.sub_wait_common();
@@ -55,7 +55,7 @@ pub unsafe extern "C" fn wait_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     fighter.sub_shift_status_main(L2CValue::Ptr(wait_main_loop as *const () as _))
 }
 
-pub unsafe extern "C" fn wait_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
+unsafe extern "C" fn wait_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
     if fighter.status_Wait_Main().get_bool() {

@@ -9,10 +9,6 @@ use arcropolis_api::arc_callback;
 use motion_lib::{hash40, mlist::Flags};
 use arcropolis_api::hash40;
 
-pub static mut FIGHTER_MANAGER: usize = 0;
-pub static mut FIGHTER_CUTIN_MANAGER_ADDR: usize = 0;
-pub static mut ITEM_MANAGER : usize = 0;
-
 
 mod moveset;
 
