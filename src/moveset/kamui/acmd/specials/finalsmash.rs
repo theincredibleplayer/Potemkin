@@ -1,4 +1,5 @@
-use crate::moveset::*;
+use super::*;
+
 
 unsafe extern "C" fn game_finaldash(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
@@ -222,7 +223,13 @@ unsafe extern "C" fn effect_finalend(agent: &mut L2CAgentBase) {
         macros::LAST_EFFECT_SET_RATE(agent, 0.5);
     }
 
-
+    frame(agent.lua_state_agent, 49.0);
+    if macros::is_excute(agent) {
+        EffectModule::kill_kind(agent.module_accessor, Hash40::new("sys_bg_lightning"), false, true);
+        EffectModule::kill_kind(agent.module_accessor, Hash40::new("sys_bg_vortex"), false, true);
+        EffectModule::kill_kind(agent.module_accessor, Hash40::new("sys_bg_black"), false, true);
+        macros::CANCEL_FILL_SCREEN(agent, 0, 30);
+    }
     frame(agent.lua_state_agent, 53.0);
     if macros::is_excute(agent) {
         UiManager::set_explosion_1_on();
@@ -424,6 +431,7 @@ unsafe extern "C" fn sound_finalvisualscene01(agent: &mut L2CAgentBase) {
 
 unsafe extern "C" fn game_fakefinalvisualscene01(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
+        macros::FILL_SCREEN_MODEL_COLOR(agent, 0, 10, 0.3, 0.3, 0.3, 0, 0, 0, 1, 1, *smash::lib::lua_const::EffectScreenLayer::GROUND, *EFFECT_SCREEN_PRIO_FINAL);
         set_vis_hud(false);
         UiManager::set_bar_on();
         ArticleModule::generate_article(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, false, -1);
@@ -446,9 +454,19 @@ unsafe extern "C" fn game_fakefinalvisualscene01(agent: &mut L2CAgentBase) {
         macros::LAST_EFFECT_SET_RATE(agent, 0.2);
         EffectModule::set_alpha_last(agent.module_accessor, 0.35);
     }
+
+    frame(agent.lua_state_agent, 40.0);
+    if macros::is_excute(agent) {
+        macros::EFFECT(agent, Hash40::new("sys_bg_black"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
+        let eff = EffectModule::req(agent.module_accessor, Hash40::new("sys_bg_vortex"),  &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, 1.0, 0, 0, false,0);
+        EffectModule::set_rgb(agent.module_accessor, eff as u32, 0.0,0.0,0.3);
+    }
+
+
     frame(agent.lua_state_agent, 145.0);
     if macros::is_excute(agent) {
         UiManager::set_jetpack_on();
+        macros::EFFECT(agent, Hash40::new("sys_bg_lightning"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
     }
     frame(agent.lua_state_agent, 229.0);
     if macros::is_excute(agent) {

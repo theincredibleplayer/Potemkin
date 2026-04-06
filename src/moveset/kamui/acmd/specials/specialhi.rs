@@ -1,4 +1,4 @@
-use crate::moveset::*;
+use super::*;
 
 
 unsafe extern "C" fn special_hi(agent: &mut L2CAgentBase) {
@@ -15,7 +15,7 @@ unsafe extern "C" fn special_hi(agent: &mut L2CAgentBase) {
     sv_animcmd::wait(agent.lua_state_agent, 6.0);
     if macros::is_excute(agent) {
         grab!(agent, *MA_MSC_CMD_GRAB_CLEAR_ALL);
-        macros::FT_MOTION_RATE(agent, 0.5);
+        macros::FT_MOTION_RATE(agent, 1.5);
 
     }
 }
@@ -156,8 +156,15 @@ unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         AttackModule::clear_all(agent.module_accessor);
     }
-    
     sv_animcmd::frame(agent.lua_state_agent, 45.0);
+    if macros::is_excute(agent) {
+        macros::ATTACK_IGNORE_THROW(agent, 0, 0, Hash40::new("top"), 10.0, 361, 100, 0, 60, 9.0, 0.0, 28.0, 12.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+    }
+    sv_animcmd::frame(agent.lua_state_agent, 46.0);
+    if macros::is_excute(agent) {
+        AttackModule::clear_all(agent.module_accessor);
+    }
+    sv_animcmd::frame(agent.lua_state_agent, 47.0);
     if macros::is_excute(agent) {
         let entry_id = WorkModule::get_int(agent.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         UiManager::add_tension(get_ui_index_from_entry_id(entry_id),18.0);

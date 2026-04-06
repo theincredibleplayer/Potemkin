@@ -310,7 +310,7 @@ unsafe extern "C" fn final_exit(fighter: &mut L2CFighterCommon) -> L2CValue {
         WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_ATTACK_START);
         WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_JUMP_START);
         WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_FINAL_CANCELLED_INTO);
-
+        macros::CANCEL_FILL_SCREEN(fighter, 0, 0);
         return smashline::original_status(Exit, fighter, *FIGHTER_STATUS_KIND_FINAL)(fighter);
     }
     return L2CValue::I32(0)
@@ -331,11 +331,13 @@ unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> L2CV
     GroundModule::correct(module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND_CLIFF_STOP));
     grabbed_anim_selector(fighter,"catched_pot_final_scene_03", 1.0);
     WorkModule::on_flag(module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
-    //CAM_ZOOM_OUT_FINAL(fighter);
+    CAM_ZOOM_OUT_FINAL(fighter);
     let capture_id = LinkModule::get_node_object_id(fighter.module_accessor, *LINK_NO_CAPTURE);
     let enemy = sv_battle_object::module_accessor(capture_id as u32);
     WorkModule::off_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
 
+    ModelModule::set_scale_z(fighter.module_accessor,1.0);
+    ModelModule::set_scale_z(enemy,1.0);
 
 
 
@@ -360,6 +362,7 @@ unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> L2CV
     let cliff_pos = GroundModule::hang_cliff_pos_3f(fighter.module_accessor);
     
     if distance_to_ground != -1.0 {
+        CameraModule::reset_all(fighter.module_accessor);            
         macros::REQ_FINAL_START_CAMERA_arg3(fighter,Hash40::new("d04finalvisualscene03.nuanmb"), false, false);
         let new_pos_y = check_distance - distance_to_ground;
         PostureModule::set_pos(module_accessor,&Vector3f{x: 0.0 , y: new_pos_y, z: 0.0});

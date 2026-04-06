@@ -1,4 +1,4 @@
-use crate::moveset::*;
+use super::*;
 
 
 unsafe extern "C" fn game_romancancel(agent: &mut L2CAgentBase) {

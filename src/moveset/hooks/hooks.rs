@@ -37,7 +37,7 @@ unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, event:
                 //final smash's link module
                 if StatusModule::status_kind(module_accessor) == FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP
                 || StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_FINAL {
-                    PostureModule::set_pos(module_accessor,&Vector3f{x: 0.0 , y: 0.0, z: 50.0});
+                    PostureModule::set_pos(module_accessor,&Vector3f{x: 0.0 , y: 0.0, z: 100.0});
                     WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_JUMP);
 
                     WorkModule::off_flag(module_accessor ,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_START);
@@ -128,7 +128,6 @@ pub fn install() {
         waterball_on_hit,
         noping_the_waterball_eff,
         noping_the_sword_eff,
-        //get_param_float_hook,
         autoturn_situation_check_hook,
     );
 }

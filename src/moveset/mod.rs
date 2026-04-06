@@ -190,6 +190,7 @@ pub const FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT: i32 = 0x555;
 pub const FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT: i32 = 0x556;
 pub const FIGHTER_STATUS_KIND_POT_BUSTER_CAUGHT: i32 = 0x557;
 pub const FIGHTER_STATUS_KIND_POT_AIR_THROW_CAUGHT: i32 = 0x558;
+pub const FIGHTER_STATUS_KIND_POT_REBOUND_JUMP: i32 = 0x559;
 
 
 // global table consts
@@ -487,11 +488,11 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
         let status_kind = StatusModule::status_kind(module_accessor);
         let prev_status_kind = StatusModule::prev_status_kind(module_accessor,0);
         let mut can_rc = true;
-        if ControlModule::check_button_on(module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_R)
-        && ControlModule::check_button_on(module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L)
-        && [*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN,*FIGHTER_STATUS_KIND_WAIT].contains(&status_kind){
-            fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN.into(), true.into());
-        }
+        //if ControlModule::check_button_on(module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_R)
+        //&& ControlModule::check_button_on(module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L)
+        //&& [*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN,*FIGHTER_STATUS_KIND_WAIT].contains(&status_kind){
+        //    fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN.into(), true.into());
+        //}
         //hurtboxes
         if status_kind == *FIGHTER_STATUS_KIND_ENTRY || !smash::app::sv_information::is_ready_go() {
             let custom_hurtboxes = [

@@ -1,4 +1,4 @@
-use crate::moveset::*;
+use super::*;
 
 
 unsafe extern "C" fn potbusterwhiff(agent: &mut L2CAgentBase) {

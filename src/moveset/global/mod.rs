@@ -4,6 +4,8 @@ use super::*;
 
 
 mod caught;
+mod rebound;
+
 
 unsafe extern "C" fn opff_global(fighter: &mut L2CFighterCommon) {
     let fighter_kind = fighter.global_table[KIND].get_i32();
@@ -27,5 +29,5 @@ pub fn install(agent: &mut Agent) {
     agent.on_line(Main, opff_global);
     agent.on_start(agent_init_global);
     caught::install(agent);
-
+    rebound::install(agent);
 }

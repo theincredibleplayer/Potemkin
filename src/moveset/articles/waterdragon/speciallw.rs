@@ -3,9 +3,12 @@ use super::*;
 
 
 pub unsafe extern "C" fn special_lw_hit(agent: &mut L2CAgentBase) {
-    sv_animcmd::frame(agent.lua_state_agent, 37.0);
     if macros::is_excute(agent) {
         macros::FT_MOTION_RATE(agent, 0.7);
+    }
+    sv_animcmd::frame(agent.lua_state_agent, 37.0);
+    if macros::is_excute(agent) {
+        macros::FT_MOTION_RATE(agent, 1.0);
     }
 }
 

@@ -852,13 +852,15 @@ pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,coll
         if category == *BATTLE_OBJECT_CATEGORY_FIGHTER
         && collision_log.collision_kind == *COLLISION_KIND_HIT as u8 {
             let opp_boma = sv_battle_object::module_accessor(collision_log.opponent_object_id as u32);
-            if StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_SPECIAL_LW {
+            let opp_status = StatusModule::status_kind(opp_boma);
+            if (StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_SPECIAL_LW)
+            && ![FIGHTER_STATUS_KIND_POT_REBOUND_JUMP,*FIGHTER_STATUS_KIND_REBOUND].contains(&opp_status) {
                 if HitModule::get_status(opp_boma, collision_log.receiver_id as i32, 0) == 0 {
                     AttackModule::set_no_uniq_effect_all(module_accessor, true, false);
                     EffectModule::req_common(opp_boma,Hash40::new("fire_hit_l_l"),0.0);
                     WorkModule::set_float(opp_boma, 0.6, *FIGHTER_STATUS_WORK_ID_FLOAT_REBOUND_MOTION_RATE);
                     if StatusModule::situation_kind(opp_boma) != *SITUATION_KIND_GROUND {
-                        StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND_JUMP, false);
+                        StatusModule::change_status_request_from_script(opp_boma, FIGHTER_STATUS_KIND_POT_REBOUND_JUMP, false);
                     }else{
                         StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND, false);
                     }

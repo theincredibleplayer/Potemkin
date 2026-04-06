@@ -409,12 +409,12 @@ unsafe fn megafist_f_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
 
 unsafe extern "C" fn megafist_f_land_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     KineticModule::clear_speed_all(fighter.module_accessor);
-    //MotionModule::change_motion_inherit_frame(fighter.module_accessor,Hash40::new("special_s_mf_f_land"),-1.0,1.0,0.0,false,false);
-    if fighter.global_table[PREV_STATUS_KIND].get_i32() == *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F{
-        MotionModule::change_motion(fighter.module_accessor,Hash40::new("special_s_mf_f_land"),0.0,1.0,false,0.0,false,false);
-    } else {
-        MotionModule::change_motion(fighter.module_accessor,Hash40::new("special_s_mf_f_land"),0.0,1.0,false,0.0,false,false);
-    }
+    MotionModule::change_motion_inherit_frame(fighter.module_accessor,Hash40::new("special_s_mf_f_land"),-1.0,1.0,0.0,false,false);
+    //if fighter.global_table[PREV_STATUS_KIND].get_i32() == *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F{
+    //    MotionModule::change_motion(fighter.module_accessor,Hash40::new("special_s_mf_f_land"),0.0,1.0,false,0.0,false,false);
+    //} else {
+    //    MotionModule::change_motion(fighter.module_accessor,Hash40::new("special_s_mf_f_land"),0.0,1.0,false,0.0,false,false);
+    //}
     fighter.sub_shift_status_main(L2CValue::Ptr(megafist_f_land_main_loop as *const () as _))
 }
 
@@ -483,7 +483,7 @@ pub fn install(agent: &mut Agent) {
 
     //.status(Pre, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_B, megafist_f_pre)
     agent.status(Main,  *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_B,         megafist_f_main);
-    agent.status(Main,  *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_B_LANDING, megafist_f_land_main);
+    agent.status(Main,  *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F_LANDING, megafist_f_land_main);
     //.status(Pre, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F, megafist_f_pre)
     agent.status(Main,  *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F,         megafist_f_main);
 
