@@ -2,15 +2,6 @@ use super::*;
 
 
 
-
-
-
-
-
-
-
-
-
 unsafe extern "C" fn effect_specialnstart(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
     }
@@ -95,6 +86,8 @@ unsafe extern "C" fn game_specialnfire(agent: &mut L2CAgentBase) {
     sv_animcmd::wait(agent.lua_state_agent, 7.0);
     if macros::is_excute(agent) {
         AttackModule::clear_all(agent.module_accessor);
+        macros::FT_MOTION_RATE(agent, 4.0);
+
     }
 }
 

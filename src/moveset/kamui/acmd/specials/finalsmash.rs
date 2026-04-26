@@ -209,8 +209,8 @@ unsafe extern "C" fn effect_finalend(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         EffectModule::remove_post_effect_line(agent.module_accessor, 6, true);
         let radius = 20.0;
-        let vec1 = smash_rs::cpp::simd::Vector2{vec: [radius /* radius x */, radius /* radius y */]}; 
-        let vec2 = smash_rs::cpp::simd::Vector3{vec: [0.0 /* y offset */, 0.0 /* x offset */, 0.0 /* z offset */]}; 
+        let vec1 = simd::Vector2f{vec: [radius /* radius x */, radius /* radius y */]}; 
+        let vec2 = simd::Vector3f{vec: [0.0 /* y offset */, 0.0 /* x offset */, 0.0 /* z offset */]}; 
 
         if !WorkModule::is_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DEATH_IMMINENT){
             EffectModule::request_post_effect_line_circle(agent.module_accessor,Hash40::new("dead_camera_hit"),Hash40::new("hip"),vec1,vec2,true,44.0/sv_information::slow_rate() /*duration*/,0.0 /* fade */);
@@ -484,10 +484,10 @@ unsafe extern "C" fn game_fakefinalvisualscene01(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         if !WorkModule::is_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DEATH_IMMINENT){
             let lr = PostureModule::lr(agent.module_accessor);
-            let vec1 = smash_rs::cpp::simd::Vector2{vec: [0.0, 0.0]}; //
-            let vec2 = smash_rs::cpp::simd::Vector2{vec: [lr*0.5, 0.5]}; //both of these seem to be angle related but i cant put my finger on how exactly
-            let vec3 = smash_rs::cpp::simd::Vector2{vec: [0.5 , 1.5]}; // unsure
-            let vec4 = smash_rs::cpp::simd::Vector2{vec: [0.5 , 1.5]}; // unsure
+            let vec1 = simd::Vector2f{vec: [0.0, 0.0]}; //
+            let vec2 = simd::Vector2f{vec: [lr*0.5, 0.5]}; //both of these seem to be angle related but i cant put my finger on how exactly
+            let vec3 = simd::Vector2f{vec: [0.5 , 1.5]}; // unsure
+            let vec4 = simd::Vector2f{vec: [0.5 , 1.5]}; // unsure
             let speedlines = EffectModule::request_post_effect_line_parallel_2d(agent.module_accessor,Hash40::new("dead_area_out"),vec1,vec2,vec3,vec4,true,-1.0 /*duration*/,0.0 /*fade out*/);
         }
     }
@@ -534,10 +534,10 @@ unsafe extern "C" fn game_finalvisualscene02(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 71.0);
     if macros::is_excute(agent) {
         if !WorkModule::is_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DEATH_IMMINENT){
-            let vec1 = smash_rs::cpp::simd::Vector2{vec: [0.0, 0.0]}; //
-            let vec2 = smash_rs::cpp::simd::Vector2{vec: [0.0, 1.0]}; //both of these seem to be angle related but i cant put my finger on how exactly
-            let vec3 = smash_rs::cpp::simd::Vector2{vec: [0.5 , 1.5]}; // effect width related
-            let vec4 = smash_rs::cpp::simd::Vector2{vec: [0.5 , 1.5]}; // effect width related
+            let vec1 = simd::Vector2f{vec: [0.0, 0.0]}; //
+            let vec2 = simd::Vector2f{vec: [0.0, 1.0]}; //both of these seem to be angle related but i cant put my finger on how exactly
+            let vec3 = simd::Vector2f{vec: [0.5 , 1.5]}; // effect width related
+            let vec4 = simd::Vector2f{vec: [0.5 , 1.5]}; // effect width related
             let speedlines = EffectModule::request_post_effect_line_parallel_2d(agent.module_accessor,Hash40::new("dead_area_out"),vec1,vec2,vec3,vec4,true,-1.0 /*duration*/,0.0 /*fade out*/);
         }
     }

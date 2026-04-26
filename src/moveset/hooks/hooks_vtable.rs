@@ -30,7 +30,7 @@ pub unsafe extern "C" fn kamui_on_search(_vtable: u64, fighter: &mut Fighter, lo
                 EffectModule::set_rate_last(opp_boma, ( ( 60.0 )/( clear_time as f32 ) ) );
 
                 if WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_YELLOW_RC){
-                    WorkModule::set_float(opp_boma, 0.7, *FIGHTER_STATUS_WORK_ID_FLOAT_REBOUND_MOTION_RATE);
+                    WorkModule::set_float(opp_boma, 0.6, *FIGHTER_STATUS_WORK_ID_FLOAT_REBOUND_MOTION_RATE);
                     if StatusModule::situation_kind(opp_boma) != *SITUATION_KIND_GROUND {
                         StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND_JUMP, false);
                     }else{
@@ -112,8 +112,8 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
         if WorkModule::is_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SET_ADJUST_POST_CIRCLE){
             let agent = get_fighter_common_from_accessor((&mut*module_accessor));
             let radius = 20.0;
-            let vec1 = smash_rs::cpp::simd::Vector2{vec: [radius /* radius x */, radius /* radius y */]}; 
-            let vec2 = smash_rs::cpp::simd::Vector3{vec: [0.0 /* y offset */, 0.0 /* x offset */, 0.0 /* z offset */]}; 
+            let vec1 = simd::Vector2f{vec: [radius /* radius x */, radius /* radius y */]}; 
+            let vec2 = simd::Vector3f{vec: [0.0 /* y offset */, 0.0 /* x offset */, 0.0 /* z offset */]}; 
             EffectModule::set_post_effect_line_circle_target(module_accessor,Hash40::new("hip"),vec1,vec2,true);
         }
 
@@ -879,7 +879,7 @@ pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,coll
             *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK_WAIT,
             *FIGHTER_STATUS_KIND_FINAL].contains(&status){
                 if HitModule::get_status(opp_boma, collision_log.receiver_id as i32, 0) == 0 {
-                    UiManager::add_tension(get_ui_index_from_entry_id(entry_id), damage*0.75);
+                    UiManager::add_tension(get_ui_index_from_entry_id(entry_id), damage*0.6);
                 }
             }
         }

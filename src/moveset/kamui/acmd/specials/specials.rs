@@ -17,7 +17,7 @@ unsafe extern "C" fn sound_specialsstart(agent: &mut L2CAgentBase) {
 unsafe extern "C" fn game_specialsloop(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         WorkModule::on_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
-        damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_DAMAGE_POWER, 17.0);
+        damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_DAMAGE_POWER, 10.0);
         macros::SEARCH(agent, 0, 0, Hash40::new("top"), 10.0, 0.0, 5.0, -5.0, Some(0.0), Some(19.0), Some(0.0), *COLLISION_KIND_MASK_HIT, *HIT_STATUS_MASK_NORMAL, 1, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIEB, *COLLISION_PART_MASK_ALL, false);
     }
 }
@@ -41,7 +41,7 @@ unsafe extern "C" fn effect_specials(agent: &mut L2CAgentBase) {
 unsafe extern "C" fn game_specialsattack(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         WorkModule::on_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
-        damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_DAMAGE_POWER, 17.0);
+        damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_DAMAGE_POWER, 10.0);
         macros::FT_MOTION_RATE(agent, 0.6);
     }
     frame(agent.lua_state_agent, 9.0);
@@ -77,7 +77,7 @@ unsafe extern "C" fn sound_specialsattack(agent: &mut L2CAgentBase) {
 
 unsafe extern "C" fn sound_specialsend(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        macros::FT_MOTION_RATE(agent, 0.75);
+        //macros::FT_MOTION_RATE(agent, 0.75);
         damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0.0);
     }
     sv_animcmd::frame(agent.lua_state_agent, 2.0);
@@ -89,7 +89,7 @@ unsafe extern "C" fn sound_specialsend(agent: &mut L2CAgentBase) {
         macros::STOP_SE(agent, Hash40::new("vc_pot_hammerfall_b"));
         macros::STOP_SE(agent, Hash40::new("vc_pot_hammerfall_c"));
     }
-    sv_animcmd::frame(agent.lua_state_agent, 9.0);
+    sv_animcmd::frame(agent.lua_state_agent, 7.0);
     if macros::is_excute(agent) {
         WorkModule::off_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
         damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_NORMAL, 0);
@@ -116,6 +116,7 @@ unsafe extern "C" fn game_specialsmff(agent: &mut L2CAgentBase) {
     sv_animcmd::frame(agent.lua_state_agent, 31.0);
     if macros::is_excute(agent) {
         HitModule::set_status_all(agent.module_accessor, HitStatus(*HIT_STATUS_NORMAL), 0);
+        macros::FT_MOTION_RATE(agent, 1.6);
     }
 }
 

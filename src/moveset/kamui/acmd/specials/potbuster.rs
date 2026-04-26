@@ -43,7 +43,7 @@ unsafe extern "C" fn game_potbuster(agent: &mut L2CAgentBase) {
         macros::CAM_ZOOM_OUT(agent);
         CameraModule::reset_all(agent.module_accessor);
         macros::QUAKE(agent, *CAMERA_QUAKE_KIND_XL);
-        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 30.0, 80, 80, 0, 50,20.0, 0.0, 20.0, 0.0, None, None, None, 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL,false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 23.0, 80, 90, 0, 50,20.0, 0.0, 20.0, 0.0, None, None, None, 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL,false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_PUNCH);
         AttackModule::set_catch_only_all(agent.module_accessor, true, false);
         AttackModule::set_no_dead_all(agent.module_accessor, true, false);
     }
@@ -87,10 +87,10 @@ unsafe extern "C" fn effect_potbuster(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 74.0);
     if macros::is_excute(agent) {
         if camera_checks(agent){
-            let vec1 = smash_rs::cpp::simd::Vector2{vec: [0.0, 0.0]}; //
-            let vec2 = smash_rs::cpp::simd::Vector2{vec: [0.0, 1.0]}; //both of these seem to be angle related but i cant put my finger on how exactly
-            let vec3 = smash_rs::cpp::simd::Vector2{vec: [1.0 , 1.0]}; // effect width related
-            let vec4 = smash_rs::cpp::simd::Vector2{vec: [1.0 , 1.0]}; // effect width related
+            let vec1 = simd::Vector2f{vec: [0.0, 0.0]}; //
+            let vec2 = simd::Vector2f{vec: [0.0, 1.0]}; //both of these seem to be angle related but i cant put my finger on how exactly
+            let vec3 = simd::Vector2f{vec: [1.0 , 1.0]}; // effect width related
+            let vec4 = simd::Vector2f{vec: [1.0 , 1.0]}; // effect width related
             let speedlines = EffectModule::request_post_effect_line_parallel_2d(agent.module_accessor,Hash40::new("dead_area_out"),vec1,vec2,vec3,vec4,true,3.0/sv_information::slow_rate() /*duration*/,15.0/sv_information::slow_rate() /*fade out*/);
         }
     }

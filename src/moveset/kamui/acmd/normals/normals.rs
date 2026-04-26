@@ -7,6 +7,13 @@ unsafe extern "C" fn game_turn(agent: &mut L2CAgentBase) {
     }
 }
 
+unsafe extern "C" fn game_squat(agent: &mut L2CAgentBase) {
+    frame(agent.lua_state_agent, 7.0);
+    if macros::is_excute(agent) {
+        macros::FT_MOTION_RATE(agent, 0.4);
+        WorkModule::on_flag(agent.module_accessor, *FIGHTER_STATUS_WORK_ID_FLAG_RESERVE_CHANGE_STATUS_DLAY_MOTION);
+    }
+}
 
 unsafe extern "C" fn catch(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
@@ -427,6 +434,9 @@ pub fn install(agent: &mut Agent) {
     agent.sound_acmd        ("sound_entryr",                    sound_entryl,                   Priority::Low);
 
     agent.sound_acmd         ("sound_wait2",                    sound_wait2,                    Priority::Low);
+
+    agent.game_acmd         ("game_squat",                      game_squat,                     Priority::Low);
+
 
     agent.sound_acmd         ("sound_landingheavy",             sound_landingheavy,             Priority::Low);
     agent.expression_acmd    ("expression_landingheavy",        expression_landingheavy,        Priority::Low);

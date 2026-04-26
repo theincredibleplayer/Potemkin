@@ -5,7 +5,7 @@ unsafe fn special_air_hi_velocity_and_motion_handler(fighter: &mut L2CFighterCom
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
     let stick_x = WorkModule::get_float(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_HEAT_TACKLE_STICK_X).abs();
     let stick_y = WorkModule::get_float(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_HEAT_TACKLE_STICK_Y);
-    let degree_range = 30.0;
+    let degree_range = 15.0;
     let mut speed_scale= 0.0;
     if !fighter.global_table[IS_STOP].get_bool() {
         speed_scale = WorkModule::get_float(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_HEAT_TACKLE_SPEED) * speed_mul;
@@ -41,7 +41,7 @@ unsafe fn special_air_hi_velocity_and_motion_handler(fighter: &mut L2CFighterCom
     lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,speed_scale);
     sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
     sv_kinetic_energy::set_limit_speed(fighter.lua_state_agent);
-
+    fighter.clear_lua_stack();
     lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,speed_scale);
     sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
     sv_kinetic_energy::set_limit_speed(fighter.lua_state_agent);

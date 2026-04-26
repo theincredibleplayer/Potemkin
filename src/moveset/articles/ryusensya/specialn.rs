@@ -7,8 +7,8 @@ pub unsafe extern "C" fn game_regular(agent: &mut L2CAgentBase) {
         let owner_id = WorkModule::get_int(agent.module_accessor,*WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER);
         let owner_accessor = sv_battle_object::module_accessor(owner_id as u32);
         let mut damage = WorkModule::get_float(owner_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_REAL_POWER_REFLECT);
-        if damage < 10.0{
-            damage = 10.0/1.4;
+        if damage < 7.0{
+            damage = 7.0/1.4;
         }
         macros::ATTACK(agent, 0, 0, Hash40::new("top"),  damage * 1.4 ,
          55, 90, 0, 70, 25.0, 0.0, 0.0, 0.0, None, None, None,

@@ -1,16 +1,6 @@
-use smash::lib::{L2CValue,lua_const::*};
-use smash::lua2cpp::{L2CAgentBase,L2CFighterCommon};
 use smash::hash40;
-use smash::app::lua_bind::*;
-use smashline::*;
-use smash::app::*;
 use smash_script::macros::*;
-use smash::app::sv_animcmd::*;
-use smash::phx::Hash40;
-use smash::phx::{Vector2f,Vector3f};
 use skyline::nn::ro::LookupSymbol;
-use smash_script::lua_args;
-use smash_script::macros;
 use std::arch::asm;
 use skyline::hooks::{Region,getRegionAddress};
 use {
@@ -424,9 +414,12 @@ pub unsafe extern "C" fn cancels(fighter: &mut L2CFighterCommon) {
                 if control == attack_air{
                     if !(motion_kind == hash40("attack_air_lw")
                     && control == *FIGHTER_COMMAND_ATTACK_AIR_KIND_LW){
-                        ControlModule::set_attack_air_kind(module_accessor,attack_air);
-                        StatusModule::change_status_force(fighter.module_accessor, *FIGHTER_STATUS_KIND_ATTACK_AIR, false);
-                        return;
+                        if !(motion_kind == hash40("attack_air_f")
+                        && control == *FIGHTER_COMMAND_ATTACK_AIR_KIND_F){
+                            ControlModule::set_attack_air_kind(module_accessor,attack_air);
+                            StatusModule::change_status_force(fighter.module_accessor, *FIGHTER_STATUS_KIND_ATTACK_AIR, false);
+                            return;
+                        }
                     }
                 }
             }
@@ -493,6 +486,7 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
         //&& [*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN,*FIGHTER_STATUS_KIND_WAIT].contains(&status_kind){
         //    fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN.into(), true.into());
         //}
+
         //hurtboxes
         if status_kind == *FIGHTER_STATUS_KIND_ENTRY || !smash::app::sv_information::is_ready_go() {
             let custom_hurtboxes = [
@@ -706,7 +700,10 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
             ,*FIGHTER_STATUS_KIND_SQUAT_B
             ,*FIGHTER_STATUS_KIND_SQUAT_F
             ,*FIGHTER_STATUS_KIND_SQUAT_RV
-            ,*FIGHTER_STATUS_KIND_SQUAT_WAIT];
+            ,*FIGHTER_STATUS_KIND_SQUAT_WAIT
+            ,*FIGHTER_STATUS_KIND_MISS_FOOT
+            ,*FIGHTER_STATUS_KIND_OTTOTTO
+            ,*FIGHTER_STATUS_KIND_OTTOTTO_WAIT];
 
 
             if fighter.global_table[IS_STOP].get_bool()

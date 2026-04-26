@@ -21,7 +21,7 @@ unsafe extern "C" fn special_lw(agent: &mut L2CAgentBase) {
         LinkModule::set_model_constraint_pos_ort(plane_boma,*WEAPON_LINK_NO_CONSTRAINT,Hash40::new("attach"),Hash40::new("top"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_OFFSET_TRANSLATE as u32 | *CONSTRAINT_FLAG_OFFSET_ROT as u32,true);
         ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, Hash40::new("special_n_end_max"), false, -1.0);
         
-        macros::ATTACK(agent,0,0,Hash40::new("top"),10.0,60,100,0,0,8.0, 0.0, 10.0, 20.0, Some(0.0), Some(10.0), Some(25.0),3.0,1.0,*ATTACK_SETOFF_KIND_THRU,*ATTACK_LR_CHECK_F,false,f32::NAN,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_FIRE,*ATTACK_REGION_NONE);
+        macros::ATTACK(agent,0,0,Hash40::new("top"),10.0,60,100,0,0,8.0, 0.0, 10.0, 20.0, Some(0.0), Some(10.0), Some(25.0),3.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,f32::NAN,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_FIRE,*ATTACK_REGION_NONE);
 
     }
     sv_animcmd::wait(agent.lua_state_agent, 9.0);

@@ -22,7 +22,7 @@ unsafe extern "C" fn effect_special_air_hi(agent: &mut L2CAgentBase) {
         damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0); 
 
         for n in 0..5 {
-            if n == 3{
+            if n == 2{
                 if macros::is_excute(agent) {
                     damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_NORMAL, 0);
                     WorkModule::off_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
