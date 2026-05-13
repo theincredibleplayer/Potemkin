@@ -79,6 +79,15 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
 
 
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("param_private"), 0x19996b81b6, 1200.0));
+    //aerials
+    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("landing_attack_air_frame_n"),0, 6));               
+    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("landing_attack_air_frame_f"),0, 10));
+    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("landing_attack_air_frame_b"),0, 12));
+    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("landing_attack_air_frame_lw"),0, 20));
+    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("landing_attack_air_frame_hi"),0, 12));
+
+
+
 
 
     // fighter_param

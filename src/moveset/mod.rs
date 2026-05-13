@@ -77,6 +77,7 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RC_END_SLOW : i32 = 0x20000114;
 
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DEATH_IMMINENT : i32 = 0x20000115;
 
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ATTACK_CANCELLED_INTO : i32 = 0x20000115;
 
 
 // for weapon
@@ -213,7 +214,6 @@ mod articles;
 mod ui;
 
 
-//this does... something......... probably
 extern "C" {
     #[link_name = "\u{1}_ZN3app19FighterCutInManager13is_one_on_oneEv"]
     pub fn FighterCutInManager__is_one_on_one() -> bool;
@@ -221,7 +221,11 @@ extern "C" {
 
 
 pub unsafe extern "C" fn camera_checks(fighter: &mut L2CAgentBase) -> bool {
-    let ret = !is_flat_stage() && FighterCutInManager__is_one_on_one();
+    let ret = 
+    !is_flat_stage() 
+    && FighterCutInManager__is_one_on_one() 
+    && !WorkModule::is_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_DISABLE_FINAL_START_CAMERA);
+
     return ret;
 }
 
@@ -325,6 +329,28 @@ pub unsafe extern "C" fn cancels(fighter: &mut L2CFighterCommon) {
     }
 
 
+    if  [*FIGHTER_STATUS_KIND_ATTACK_HI3
+        ,*FIGHTER_STATUS_KIND_ATTACK_AIR
+        ,*FIGHTER_STATUS_KIND_ATTACK_LW3
+        ].contains(&status){
+            let jump_count = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_JUMP_COUNT);
+            let max_jump_count = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_JUMP_COUNT_MAX);
+            let remaining_jumps= max_jump_count - jump_count;
+            if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_JUMP_BUTTON) != 0 {
+                if remaining_jumps > 0{
+                    if fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND{
+                        StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_JUMP_SQUAT, false);
+                        ControlModule::clear_command_one(fighter.module_accessor, *FIGHTER_PAD_COMMAND_CATEGORY1, *FIGHTER_PAD_CMD_CAT1_JUMP);
+                        ControlModule::clear_command_one(fighter.module_accessor, *FIGHTER_PAD_COMMAND_CATEGORY1, *FIGHTER_PAD_CMD_CAT1_JUMP_BUTTON);    
+                    }else{
+                        StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_JUMP, false);
+                    }
+                    return;
+                }
+            }
+        }
+
+
 
     if [
     *FIGHTER_STATUS_KIND_ATTACK
@@ -384,26 +410,6 @@ pub unsafe extern "C" fn cancels(fighter: &mut L2CFighterCommon) {
             StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_SPECIAL_LW, false);
             return;
         }
-        if![
-        *FIGHTER_STATUS_KIND_ATTACK_HI4
-        ,*FIGHTER_STATUS_KIND_ATTACK_S4
-        ].contains(&status){
-            let jump_count = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_JUMP_COUNT);
-            let max_jump_count = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_JUMP_COUNT_MAX);
-            let remaining_jumps= max_jump_count - jump_count;
-            if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_JUMP_BUTTON) != 0 {
-                if remaining_jumps > 0{
-                    if fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND{
-                        StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_JUMP_SQUAT, false);
-                        ControlModule::clear_command_one(fighter.module_accessor, *FIGHTER_PAD_COMMAND_CATEGORY1, *FIGHTER_PAD_CMD_CAT1_JUMP);
-                        ControlModule::clear_command_one(fighter.module_accessor, *FIGHTER_PAD_COMMAND_CATEGORY1, *FIGHTER_PAD_CMD_CAT1_JUMP_BUTTON);    
-                    }else{
-                        StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_JUMP, false);
-                    }
-                    return;
-                }
-            }
-        }
     }
     if [*FIGHTER_STATUS_KIND_ATTACK_AIR
     ].contains(&status){
@@ -441,6 +447,10 @@ pub unsafe extern "C" fn cancels(fighter: &mut L2CFighterCommon) {
         }
         if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_S3 ) != 0 {
             StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_ATTACK_S3, false);
+            return;
+        }
+        if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_S4 ) != 0 {
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_ATTACK_S4, false);
             return;
         }
         if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_LW3) != 0  {
@@ -737,7 +747,7 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
                 WorkModule::set_int(module_accessor, 20, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_FREEZE_DURATION);
                 WorkModule::set_int(module_accessor, 19, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_SLOW_CLEAR_TIME);
                 WorkModule::set_int(module_accessor, 9,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_FAST_RC_TIME);
-                WorkModule::set_float(module_accessor,4.0, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_SLOW_MUL);
+                WorkModule::set_float(module_accessor,2.0, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_SLOW_MUL);
                 WorkModule::set_int(module_accessor, 6,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_SLOW_START_TIME);
                 StatusModule::change_status_request_from_script(module_accessor, FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL, true);
                 return;
@@ -765,6 +775,15 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
 // command input shit
 pub unsafe extern "C" fn pot_check_special_command(fighter: &mut L2CFighterCommon) -> L2CValue {
     let cat4 = fighter.global_table[CMD_CAT4].get_i32();
+    // kara cancel
+    let status_kind = StatusModule::status_kind(fighter.module_accessor);
+
+    if cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SUPER_SPECIAL_COMMAND != 0
+    && ((status_kind == FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_HOLD) || (status_kind == FIGHTER_STATUS_KIND_SPECIAL_S))
+    && fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND{
+        fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF.into(), true.into());
+        return true.into();
+    }
     // potemkin buster input
     if cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SUPER_SPECIAL_COMMAND != 0
     && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_N_COMMAND)

@@ -20,7 +20,10 @@ pub unsafe extern "C" fn kamui_on_search(_vtable: u64, fighter: &mut Fighter, lo
             let stop_time = WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_FREEZE_DURATION);
 
 
-
+            let is_opponent_clock = WorkModule::is_flag(opp_boma, *FIGHTER_INSTANCE_WORK_ID_FLAG_SLOW_CAUSE_TIMER);
+            let is_opponent_clock_whole = WorkModule::is_flag(opp_boma, *FIGHTER_INSTANCE_WORK_ID_FLAG_WHOLE_SLOW_CAUSE_TIMER);
+            let do_slow = !(is_opponent_clock || is_opponent_clock_whole);
+    
             if WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RC_END_SLOW){
                 // the 0x800000 seems to make the effect immune to the user being slowed
                 // also apparently the order of spawning the effects matter in the draw order?
@@ -30,39 +33,45 @@ pub unsafe extern "C" fn kamui_on_search(_vtable: u64, fighter: &mut Fighter, lo
                 EffectModule::set_rate_last(opp_boma, ( ( 60.0 )/( clear_time as f32 ) ) );
 
                 if WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_YELLOW_RC){
-                    WorkModule::set_float(opp_boma, 0.6, *FIGHTER_STATUS_WORK_ID_FLOAT_REBOUND_MOTION_RATE);
+                    WorkModule::set_float(opp_boma, 0.5, *FIGHTER_STATUS_WORK_ID_FLOAT_REBOUND_MOTION_RATE);
                     if StatusModule::situation_kind(opp_boma) != *SITUATION_KIND_GROUND {
                         StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND_JUMP, false);
                     }else{
                         StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND, false);
                     }
-                    SlowModule::set(
-                        opp_boma,
-                        0,
-                        slow_mul,
-                        clear_time,
-                        false,
-                        *BATTLE_OBJECT_ID_INVALID as u32
-                    );
+                    if do_slow{
+                        SlowModule::set(
+                            opp_boma,
+                            0,
+                            slow_mul,
+                            clear_time,
+                            false,
+                            *BATTLE_OBJECT_ID_INVALID as u32
+                        );
+                    }
                 }else{
+                    if do_slow{
+                        SlowModule::set(
+                            opp_boma,
+                            0,
+                            slow_mul,
+                            clear_time,
+                            false,
+                            *BATTLE_OBJECT_ID_INVALID as u32
+                        );
+                    }
+                }
+            }else if WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RC_INITIAL_SLOW){
+                if do_slow{
                     SlowModule::set(
                         opp_boma,
                         0,
-                        slow_mul,
-                        clear_time,
+                        255,
+                        stop_time,
                         false,
                         *BATTLE_OBJECT_ID_INVALID as u32
                     );
                 }
-            }else if WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RC_INITIAL_SLOW){
-                SlowModule::set(
-                    opp_boma,
-                    0,
-                    255,
-                    stop_time,
-                    false,
-                    *BATTLE_OBJECT_ID_INVALID as u32
-                );
             }
         }
         if StatusModule::status_kind(module_accessor) == FIGHTER_STATUS_KIND_FINAL {
@@ -287,10 +296,10 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
             hash40("attack_air_b"),
             hash40("attack_air_hi"),
             hash40("attack_air_lw"),
-            //hash40("landing_air_n"),
-            //hash40("landing_air_f"),
-            //hash40("landing_air_b"),
-            //hash40("landing_air_hi"),
+            hash40("landing_air_n"),
+            hash40("landing_air_f"),
+            hash40("landing_air_b"),
+            hash40("landing_air_hi"),
             hash40("landing_air_lw"),
             hash40("special_n_start"),
             hash40("special_n_hold"),

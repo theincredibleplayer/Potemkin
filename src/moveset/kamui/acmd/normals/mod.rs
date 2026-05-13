@@ -1,6 +1,6 @@
 use super::*;
 
-
+mod landing;
 mod aerials;
 mod air_throw;
 mod normals;
@@ -19,5 +19,5 @@ pub fn install(agent: &mut Agent) {
     taunt::install(agent);
     throw::install(agent);
     tilts::install(agent);
-
+    landing::install(agent);
 }

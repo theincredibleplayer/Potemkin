@@ -164,7 +164,7 @@ unsafe extern "C" fn effect_cliffattack(agent: &mut L2CAgentBase) {
 unsafe extern "C" fn game_attack11(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 5.0);
     if macros::is_excute(agent) {
-        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 2.5, 60, 190, 0, 30, 7.0, 0.0, 9.0, 15.0, Some(0.0), Some(20.0), Some(15.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 2.5, 60, 150, 0, 30, 7.0, 0.0, 9.0, 15.0, Some(0.0), Some(20.0), Some(15.0), 1.5, 1.5, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
         AttackModule::set_add_reaction_frame(agent.module_accessor, 0, 2.0, false);
     }
     wait(agent.lua_state_agent, 4.0);
@@ -356,42 +356,7 @@ unsafe extern "C" fn sound_wait2(agent: &mut L2CAgentBase) {
 }
 
 
-unsafe extern "C" fn sound_landinglight(agent: &mut L2CAgentBase) {
-    frame(agent.lua_state_agent, 2.0);
-    if macros::is_excute(agent) {
-        macros::PLAY_LANDING_SE(agent, Hash40::new("se_btl_pot_09"));
-    }
-}
 
-unsafe extern "C" fn expression_landinglight(agent: &mut L2CAgentBase) {
-    let expression_common : &mut smash::lua2cpp::L2CFighterAnimcmdExpressionCommon = std::mem::transmute(&mut *agent);
-    expression_common.expression_LandingLightRumble();
-    if macros::is_excute(agent) {
-        slope!(agent, *MA_MSC_CMD_SLOPE_SLOPE, *SLOPE_STATUS_LR);
-        macros::QUAKE(agent, *CAMERA_QUAKE_KIND_S);
-    }
-}
-
-
-unsafe extern "C" fn sound_landingheavy(agent: &mut L2CAgentBase) {
-    frame(agent.lua_state_agent, 1.0);
-    if macros::is_excute(agent) {
-        macros::PLAY_LANDING_SE(agent, Hash40::new("se_btl_pot_09"));
-    }
-}
-
-unsafe extern "C" fn expression_landingheavy(agent: &mut L2CAgentBase) {
-    let expression_common : &mut smash::lua2cpp::L2CFighterAnimcmdExpressionCommon = std::mem::transmute(&mut *agent);
-    expression_common.expression_LandingHeavyRumble();
-    if macros::is_excute(agent) {
-        slope!(agent, *MA_MSC_CMD_SLOPE_SLOPE_INTP, *SLOPE_STATUS_TOP, 2);
-        macros::QUAKE(agent, *CAMERA_QUAKE_KIND_S);
-    }
-    frame(agent.lua_state_agent, 21.0);
-    if macros::is_excute(agent) {
-        slope!(agent, *MA_MSC_CMD_SLOPE_SLOPE_INTP, *SLOPE_STATUS_LR, 6);
-    }
-}
 
 
 pub unsafe extern "C" fn game_win1a(agent: &mut L2CAgentBase) {
@@ -438,11 +403,6 @@ pub fn install(agent: &mut Agent) {
     agent.game_acmd         ("game_squat",                      game_squat,                     Priority::Low);
 
 
-    agent.sound_acmd         ("sound_landingheavy",             sound_landingheavy,             Priority::Low);
-    agent.expression_acmd    ("expression_landingheavy",        expression_landingheavy,        Priority::Low);
-
-    agent.sound_acmd         ("sound_landinglight",             sound_landinglight,             Priority::Low);
-    agent.expression_acmd    ("expression_landinglight",        expression_landinglight,        Priority::Low);
 
     agent.sound_acmd         ("sound_walkslow",                 sound_walkslow,                 Priority::Low);
     agent.effect_acmd        ("effect_walkslow",                effect_walkslow,                Priority::Low);
