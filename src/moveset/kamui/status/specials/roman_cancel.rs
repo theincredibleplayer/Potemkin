@@ -4,7 +4,7 @@ unsafe extern "C" fn roman_cancel_pre(fighter: &mut L2CFighterCommon) -> L2CValu
     StatusModule::init_settings
         (fighter.module_accessor,
         SituationKind(*SITUATION_KIND_NONE),
-        *FIGHTER_KINETIC_TYPE_GROUND_STOP,
+        *FIGHTER_KINETIC_TYPE_UNIQ,
         *GROUND_CORRECT_KIND_GROUND_CLIFF_STOP as u32,
         GroundCliffCheckKind(*GROUND_CLIFF_CHECK_KIND_NONE),
         true,
@@ -145,6 +145,10 @@ unsafe fn roman_cancel_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
         WorkModule::enable_transition_term_group(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_GROUP_CHK_AIR_TREAD_JUMP);
         WorkModule::enable_transition_term_group(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_GROUP_CHK_GROUND_ITEM);
         WorkModule::enable_transition_term_group(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_GROUP_CHK_GROUND_JUMP);
+        WorkModule::enable_transition_term(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_APPEAL_LW);
+        WorkModule::enable_transition_term(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_APPEAL_S);
+        WorkModule::enable_transition_term(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_APPEAL_U);
+
         WorkModule::unable_transition_term_group(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_GROUP_CHK_GROUND);
         WorkModule::unable_transition_term_group(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_GROUP_CHK_AIR_ESCAPE);
         WorkModule::unable_transition_term_group(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_GROUP_CHK_GROUND_GUARD);

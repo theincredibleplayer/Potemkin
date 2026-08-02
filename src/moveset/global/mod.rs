@@ -13,21 +13,15 @@ unsafe extern "C" fn opff_global(fighter: &mut L2CFighterCommon) {
     if !is_potemkin(fighter.module_accessor) {
         UiManager::disable_ui(get_ui_index_from_entry_id(entry_id));
     }
-}
-
-unsafe extern "C" fn agent_init_global(fighter: &mut L2CFighterCommon) {
-    if smash::app::lua_bind::FighterManager::entry_count(singletons::FighterManager() as _) > 4 {
-        UiManager::player_count_over_4(true);
-    }else{
-        UiManager::player_count_over_4(false);
-    }
+    //if WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_GARUDA_COOLDOWN) > 0{
+    //    WorkModule::dec_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_GARUDA_COOLDOWN);
+    //}
 }
 
 
 
 pub fn install(agent: &mut Agent) {
     agent.on_line(Main, opff_global);
-    agent.on_start(agent_init_global);
     caught::install(agent);
     rebound::install(agent);
 }

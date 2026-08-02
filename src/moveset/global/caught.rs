@@ -24,6 +24,8 @@ pub unsafe extern "C" fn caught_final_main(fighter: &mut L2CFighterCommon) -> L2
     let mut z_offset = -(7.2 - egg_size)/2.0; // this is for in and out
     let mut y_offset = -(7.2 - egg_size)/3.0 + 0.25; // this is for up and down
 
+    physics!(fighter,*MA_MSC_CMD_PHYSICS_PH_SWING_STOP, true);
+
     MotionModule::change_motion(fighter.module_accessor, Hash40::new_raw(motion), 0.0, 1.0, false, 0.0, false, false);
 
     let head_pos = &mut Vector3f{ x: 0.0, y: 0.0, z: 0.0 };
@@ -113,6 +115,7 @@ pub unsafe extern "C" fn caught_final_main(fighter: &mut L2CFighterCommon) -> L2
 pub unsafe extern "C" fn caught_final_end(fighter: &mut L2CFighterCommon) -> L2CValue {
     let z_scale = WorkModule::get_float(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_OPPONENT_Z_SCALE);
     ModelModule::set_scale_z(fighter.module_accessor,z_scale);
+    physics!(fighter,*MA_MSC_CMD_PHYSICS_PH_SWING_STOP, false);
     return smashline::original_status(End, fighter, *FIGHTER_STATUS_KIND_THROWN)(fighter)
 }
 
@@ -121,6 +124,12 @@ pub unsafe extern "C" fn caught_specialhi_main(fighter: &mut L2CFighterCommon) -
     let motion_share = WorkModule::get_param_int(fighter.module_accessor,0xcad2ee25e,0xc07d88ea0);
     let mut motion = hash40("catched_pot_special_hi");
     let mut share_type = 0;
+    let parent_id = LinkModule::get_parent_id(fighter.module_accessor,*LINK_NO_CAPTURE,true);
+    let parent_boma = sv_battle_object::module_accessor(parent_id as u32);
+    let parent_lr = PostureModule::lr(parent_boma);
+    PostureModule::set_lr(fighter.module_accessor, -parent_lr);
+    PostureModule::update_rot_y_lr(fighter.module_accessor);
+
     if motion_share == *FIGHTER_MOTION_SHARE_TYPE_TARO {
         motion = FighterMotionModuleImpl::add_body_type_hash(
             fighter.module_accessor,
@@ -164,6 +173,8 @@ pub unsafe extern "C" fn caught_buster_main(fighter: &mut L2CFighterCommon) -> L
     let mut z_offset = (7.2 -egg_size)/4.0;
     let mut y_offset = 0.0;
 
+    PostureModule::set_lr(fighter.module_accessor, -parent_lr);
+    PostureModule::update_rot_y_lr(fighter.module_accessor);
     MotionModule::change_motion(fighter.module_accessor, Hash40::new_raw(motion), 0.0, 1.0, false, 0.0, false, false);
 
     let head_pos = &mut Vector3f{ x: 0.0, y: 0.0, z: 0.0 };

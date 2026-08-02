@@ -6,10 +6,22 @@ pub unsafe extern "C" fn special_lw_hit(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         macros::FT_MOTION_RATE(agent, 0.7);
     }
-    sv_animcmd::frame(agent.lua_state_agent, 37.0);
+    sv_animcmd::frame(agent.lua_state_agent, 27.0);
     if macros::is_excute(agent) {
         macros::FT_MOTION_RATE(agent, 1.0);
     }
+    sv_animcmd::frame(agent.lua_state_agent, 28.0);
+    if macros::is_excute(agent) {
+    }
+    sv_animcmd::wait(agent.lua_state_agent, 1.0);
+    if macros::is_excute(agent) {
+        macros::FT_MOTION_RATE(agent, 0.7);
+    }
+    sv_animcmd::wait(agent.lua_state_agent, 8.0);
+    if macros::is_excute(agent) {
+        macros::FT_MOTION_RATE(agent, 1.0);
+    }
+
 }
 
 pub unsafe extern "C" fn effect_special_lw_hit(agent: &mut L2CAgentBase) {}

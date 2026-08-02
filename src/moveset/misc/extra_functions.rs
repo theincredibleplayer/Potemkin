@@ -22,6 +22,8 @@ pub unsafe extern "C" fn set_lr_float(lr_float: f32, module_accessor: *mut smash
 #[skyline::from_offset(0x6955b0)]
 pub unsafe extern "C" fn internal_final_cam(module: CameraModule, status_kind: Hash40, param3: i32) -> f32;
 */
+#[skyline::from_offset(0x62a540)]
+pub unsafe extern "C" fn kill_maybe(fighter: &mut Fighter, param_2: i32);
 
 
 
@@ -52,158 +54,40 @@ extern "C" {
     pub fn get_warp_pos();
 }
 //sv_information
-extern "C" {
-    #[link_name = "\u{1}_ZN3app14sv_information13is_flat_stageEv"]
-    pub fn is_flat_stage() -> bool;
-}
 
 
-pub unsafe extern "C" fn grabbed_anim_selector(fighter: &mut L2CFighterCommon,anim_name: &str, mot_rate: f32) {
-    let capture_id = LinkModule::get_node_object_id(fighter.module_accessor, *LINK_NO_CAPTURE);
-
-    if capture_id != 0x50000000 {
-        let capture_boma = sv_battle_object::module_accessor(capture_id as u32);
-        //println!("playing anim");
-        //MotionModule::change_motion(captured_boma,Hash40::new("capture_wait_hi"),0.0,1.0,false,0.0,false,false);
-
-        // finds out the body type of the opponent and changes the motion variable to that
-        let motion_share = WorkModule::get_param_int(capture_boma,0xcad2ee25e,0xc07d88ea0); //grabs the body type param
-        let mut motion = hash40(anim_name);
-        let mut share_type = 0;
-        
-        if motion_share == *FIGHTER_MOTION_SHARE_TYPE_TARO {
-            motion = FighterMotionModuleImpl::add_body_type_hash(
-                capture_boma,
-                Hash40::new_raw(motion),
-                *BODY_TYPE_MOTION_DX
-            );
-        }
-
-        else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_GIRL {
-            motion = FighterMotionModuleImpl::add_body_type_hash(
-                capture_boma,
-                Hash40::new_raw(motion),
-                *BODY_TYPE_MOTION_GIRL
-            );
-        }
-
-        else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_BIG {
-            motion = FighterMotionModuleImpl::add_body_type_hash(
-                capture_boma,
-                Hash40::new_raw(motion),
-                *BODY_TYPE_MOTION_BIG
-            );
-        }
 
 
-        //plays the anim
-        MotionModule::change_motion(capture_boma, Hash40::new_raw(motion), 0.0, mot_rate, false, 0.0, false, false);
-        //println!("flipped state: {}", boi);
 
-
-        
-        //let pre_flip_state = MotionModule::is_flip(capture_boma);
-        //WorkModule::set_flag(capture_boma,boi,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_FLIP);
-        // this should flip the opponent if im facing left but it doesnt work for some reason??
-        //if PostureModule::lr(fighter.module_accessor) < 0.0 {
-        //    //println!("flipped allegedly from elsewhere");
-        //    PostureModule::set_lr(capture_boma, 1.0);
-        //    PostureModule::update_rot_y_lr(capture_boma);
-        //    //MotionModule::set_flip(capture_boma,true,true,false);
-        //} else {
-        //    PostureModule::set_lr(capture_boma, -1.0);
-        //    PostureModule::update_rot_y_lr(capture_boma);
-        //    //MotionModule::set_flip(capture_boma,false,true,false);
-        //}
-
-    }
-}
-
-
-pub unsafe extern "C" fn some_function(mut param_1:&bool, status_kind: i32) {
-    if ![
-    *FIGHTER_STATUS_KIND_DASH,
-    *FIGHTER_RYU_STATUS_KIND_DASH_BACK,
-    *FIGHTER_STATUS_KIND_RUN_BRAKE,
-    *FIGHTER_STATUS_KIND_LANDING_FALL_SPECIAL,
-    *FIGHTER_STATUS_KIND_SQUAT_RV,
-    *FIGHTER_STATUS_KIND_TREAD_DAMAGE_RV,
-    *FIGHTER_STATUS_KIND_GUARD_OFF,
-    *FIGHTER_STATUS_KIND_GUARD_DAMAGE,
-    *FIGHTER_STATUS_KIND_ESCAPE,
-    *FIGHTER_STATUS_KIND_ESCAPE_F,
-    *FIGHTER_STATUS_KIND_ESCAPE_B,
-    *FIGHTER_STATUS_KIND_ATTACK_DASH,
-    *FIGHTER_STATUS_KIND_ATTACK,
-    *FIGHTER_STATUS_KIND_ATTACK_S3,
-    *FIGHTER_STATUS_KIND_ATTACK_HI3,
-    *FIGHTER_STATUS_KIND_ATTACK_S4,
-    *FIGHTER_STATUS_KIND_ATTACK_HI4,
-    *FIGHTER_STATUS_KIND_ATTACK_LW4,
-    *FIGHTER_STATUS_KIND_LANDING_ATTACK_AIR,
-    *FIGHTER_STATUS_KIND_CATCH,
-    *FIGHTER_STATUS_KIND_CATCH_DASH,
-    *FIGHTER_STATUS_KIND_CATCH_TURN,
-    *FIGHTER_STATUS_KIND_CATCH_CUT,
-    *FIGHTER_STATUS_KIND_THROW,
-    *FIGHTER_STATUS_KIND_CAPTURE_CUT,
-    *FIGHTER_STATUS_KIND_DAMAGE,
-    *FIGHTER_STATUS_KIND_DOWN_STAND,
-    *FIGHTER_STATUS_KIND_DOWN_STAND_ATTACK,
-    *FIGHTER_STATUS_KIND_DOWN_STAND_FB,
-    *FIGHTER_STATUS_KIND_PASSIVE,
-    *FIGHTER_STATUS_KIND_PASSIVE_FB,
-    *FIGHTER_STATUS_KIND_FURAFURA_END,
-    *FIGHTER_STATUS_KIND_DAMAGE_SONG_END,
-    *FIGHTER_STATUS_KIND_CLIFF_CLIMB,
-    *FIGHTER_STATUS_KIND_CLIFF_ATTACK,
-    *FIGHTER_STATUS_KIND_CLIFF_ESCAPE,
-    *FIGHTER_STATUS_KIND_SLIP_STAND,
-    *FIGHTER_STATUS_KIND_SLIP_STAND_ATTACK,
-    *FIGHTER_STATUS_KIND_SLIP_STAND_F,
-    *FIGHTER_STATUS_KIND_SLIP_STAND_B,
-    *FIGHTER_STATUS_KIND_ITEM_LIGHT_PICKUP,
-    *FIGHTER_STATUS_KIND_ITEM_THROW,
-    *FIGHTER_STATUS_KIND_ITEM_THROW_DASH,
-    *FIGHTER_STATUS_KIND_ITEM_THROW_HEAVY,
-    *FIGHTER_STATUS_KIND_ITEM_SWING,
-    *FIGHTER_STATUS_KIND_ITEM_SWING_S3,
-    *FIGHTER_STATUS_KIND_ITEM_SWING_S4,
-    *FIGHTER_STATUS_KIND_ITEM_SWING_DASH,
-    *FIGHTER_STATUS_KIND_APPEAL,
-    *FIGHTER_RYU_STATUS_KIND_ATTACK_COMMAND1
+pub unsafe extern "C" fn some_function(status_kind: i32) -> bool {
+    if  [
+    *FIGHTER_STATUS_KIND_FINAL
+    ,*FIGHTER_STATUS_KIND_SPECIAL_N
+    ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_BITE
+    ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_HOLD
+    ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_ATTACK
+    ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_ATTACK_END
+    ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_JUMP_END
+    ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_B
+    ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL
+    ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_B_LANDING
+    ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F
+    ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F_LANDING
+    ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_END
+    ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_JUMP
+    ,FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START
+    ,FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_LOOP
+    ,FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE
+    ,FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE
+    ,FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_HOLD
+    ,FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_END
+    ,FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER
+    ,FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF
+    ,FIGHTER_KAMUI_STATUS_KIND_AIR_THROW
     ].contains(&status_kind){
-        if  [
-        *FIGHTER_STATUS_KIND_FINAL
-        ,*FIGHTER_STATUS_KIND_SPECIAL_N
-        ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_BITE
-        ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_HOLD
-        ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_ATTACK
-        ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_ATTACK_END
-        ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_JUMP_END
-        ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_B
-        ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL
-        ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_B_LANDING
-        ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F
-        ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F_LANDING
-        ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_END
-        ,*FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_JUMP
-        ,FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START
-        ,FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_LOOP
-        ,FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE
-        ,FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE
-        ,FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_HOLD
-        ,FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_END
-        ,FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER
-        ,FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF
-        ,FIGHTER_KAMUI_STATUS_KIND_AIR_THROW
-        ].contains(&status_kind){
-            param_1 = &true;
-            return ;
-        } else {
-            param_1 = &false;
-            return ;
-        }
+        return true;
+    } else {
+        return false;
     }
 }
     
@@ -212,8 +96,8 @@ unsafe extern "C" fn update_lr(fighter: &mut L2CFighterCommon) {
     let lr_1on1 = WorkModule::get_float(fighter.module_accessor, *FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1);
     //PostureModule::set_lr(fighter.module_accessor, lr_1on1);
     //PostureModule::update_rot_y_lr(fighter.module_accessor);
-    fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN.into(),false.into());
     //WorkModule::on_flag(fighter.module_accessor, *FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLAG_AUTO_TURN_END_STATUS);
+    fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN.into(),false.into());
 }
 
 
@@ -232,8 +116,6 @@ pub unsafe extern "C" fn auto_turn(fighter: &mut L2CFighterCommon) -> L2CValue {
     if !(lr_1on1 == 0.0) {
         if !(lr_1on1 == PostureModule::lr(fighter.module_accessor)) {
             if StatusModule::situation_kind(fighter.module_accessor) == *SITUATION_KIND_GROUND {
-                var90 = false;
-                varc0 = false;
                 if !(status_kind == FIGHTER_STATUS_KIND_WALK) {
                     if  [
                         *FIGHTER_STATUS_KIND_SQUAT,
@@ -248,25 +130,22 @@ pub unsafe extern "C" fn auto_turn(fighter: &mut L2CFighterCommon) -> L2CValue {
                         *FIGHTER_STATUS_KIND_ATTACK_LW4_START,
                         *FIGHTER_STATUS_KIND_CATCH,
                         *FIGHTER_STATUS_KIND_ITEM_SWING,
-                        *FIGHTER_RYU_STATUS_KIND_WALK_BACK,
+                        FIGHTER_KAMUI_STATUS_KIND_WALK_BACK,
                         *FIGHTER_STATUS_KIND_ATTACK,
                     ].contains(&status_kind){
                         update_lr(fighter);
                         return 0.into();
                     }
                     if status_kind == *FIGHTER_STATUS_KIND_WAIT {
-                        some_function(&varc0,status_kind_interrupt);
-                        if varc0 {
-                            return 0.into();
+                        if !some_function(status_kind_interrupt) {
+                            update_lr(fighter);
                         }
-                        update_lr(fighter);
                         return 0.into();
                     }
                     if status_kind == *FIGHTER_STATUS_KIND_JUMP_SQUAT {
-                        if status_kind_interrupt == *FIGHTER_STATUS_KIND_TURN_RUN {
-                            return 0.into();
+                        if status_kind_interrupt != *FIGHTER_STATUS_KIND_TURN_RUN {
+                            update_lr(fighter);
                         }
-                        update_lr(fighter);
                         return 0.into();
                     }
                     if status_kind == *FIGHTER_STATUS_KIND_ATTACK {
@@ -279,28 +158,20 @@ pub unsafe extern "C" fn auto_turn(fighter: &mut L2CFighterCommon) -> L2CValue {
                         return 0.into();
                     }
                     if status_kind == *FIGHTER_STATUS_KIND_ITEM_THROW {
-                        if situation_kind == *SITUATION_KIND_GROUND
-                        || situation_kind == *SITUATION_KIND_AIR {
-                            if cat_3 == *FIGHTER_PAD_CMD_CAT3_FLAG_ITEM_LIGHT_THROW_4 {
-                                if cat_3 == *FIGHTER_PAD_CMD_CAT3_FLAG_ITEM_LIGHT_THROW_FB4{
-                                    return 0.into();
-                                }
-                            } else {
-                                if cat_3 == *FIGHTER_PAD_CMD_CAT3_FLAG_ITEM_LIGHT_THROW_HI {
-                                } else {
-                                    if cat_3 !=*FIGHTER_PAD_CMD_CAT3_FLAG_ITEM_LIGHT_THROW_LW {
-                                        return 0.into();
-                                    }
-                                }
+                        if situation_kind == *SITUATION_KIND_GROUND {
+                            if (cat_3 & *FIGHTER_PAD_CMD_CAT3_FLAG_ITEM_LIGHT_THROW_4 != 0) 
+                            && (cat_3 & *FIGHTER_PAD_CMD_CAT3_FLAG_ITEM_LIGHT_THROW_FB4 != 0) {
+                                return 0.into();
+                            } else if cat_3 & *FIGHTER_PAD_CMD_CAT3_FLAG_ITEM_LIGHT_THROW_HI != 0 {
+                                
+                            } else if cat_3 & *FIGHTER_PAD_CMD_CAT3_FLAG_ITEM_LIGHT_THROW_LW != 0{
+                                return 0.into();
                             }
                             update_lr(fighter);
                             return 0.into();
                         }
                     }
                 } else {
-                    var90 = true;
-                }
-                if var90 {
                     update_lr(fighter);
                 }
             }

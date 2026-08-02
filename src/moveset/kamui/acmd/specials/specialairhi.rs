@@ -1,6 +1,10 @@
 use super::*;
 
-
+unsafe extern "C" fn expression_specialairhihold(agent: &mut L2CAgentBase) {
+    if macros::is_excute(agent) {
+        slope!(agent, *MA_MSC_CMD_SLOPE_SLOPE, *SLOPE_STATUS_LR);
+    }
+}
 
 unsafe extern "C" fn special_air_hi(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
@@ -42,6 +46,7 @@ unsafe extern "C" fn effect_special_air_hi(agent: &mut L2CAgentBase) {
 }
 unsafe extern "C" fn expression_special_air_hi(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
+
         macros::QUAKE(agent, *CAMERA_QUAKE_KIND_L);
     }
 }
@@ -49,6 +54,17 @@ unsafe extern "C" fn expression_special_air_hi(agent: &mut L2CAgentBase) {
 
 
 pub fn install(agent: &mut Agent) {
+    //agent.game_acmd          ("game_specialairhi",          special_air_hi,                 Priority::Low);
+    //agent.sound_acmd         ("sound_specialairhi",         sound_special_air_hi,           Priority::Low);
+    //agent.effect_acmd        ("effect_specialairhi",        effect_special_air_hi,          Priority::Low);
+    agent.expression_acmd    ("expression_specialairhihold",    expression_specialairhihold,      Priority::Low);
+    //agent.game_acmd          ("game_specialairhi",          special_air_hi,                 Priority::Low);
+    //agent.sound_acmd         ("sound_specialairhi",         sound_special_air_hi,           Priority::Low);
+    //agent.effect_acmd        ("effect_specialairhi",        effect_special_air_hi,          Priority::Low);
+    agent.expression_acmd    ("expression_specialairhiholdground",    expression_specialairhihold,      Priority::Low);
+
+
+
     agent.game_acmd          ("game_specialairhi",          special_air_hi,                 Priority::Low);
     agent.sound_acmd         ("sound_specialairhi",         sound_special_air_hi,           Priority::Low);
     agent.effect_acmd        ("effect_specialairhi",        effect_special_air_hi,          Priority::Low);

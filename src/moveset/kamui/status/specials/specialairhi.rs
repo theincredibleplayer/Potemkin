@@ -17,6 +17,7 @@ unsafe fn special_air_hi_velocity_and_motion_handler(fighter: &mut L2CFighterCom
     let mut angle = stick_y.atan2(stick_x).to_degrees();
     let lr = PostureModule::lr(module_accessor);
     WorkModule::set_float(module_accessor,speed_scale, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_HEAT_TACKLE_SPEED);
+    println!("speed_Scale = {}",speed_scale);
     if angle > degree_range {
         speed_x = speed_scale * angle.to_radians().cos();
         speed_y = speed_scale * angle.to_radians().sin();
@@ -37,21 +38,34 @@ unsafe fn special_air_hi_velocity_and_motion_handler(fighter: &mut L2CFighterCom
     KineticModule::enable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_MOTION);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
+
     fighter.clear_lua_stack();
-    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,speed_scale);
+    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,speed_scale,0.0);
     sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
-    sv_kinetic_energy::set_limit_speed(fighter.lua_state_agent);
     fighter.clear_lua_stack();
-    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,speed_scale);
-    sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
+    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,speed_scale,0.0);
     sv_kinetic_energy::set_limit_speed(fighter.lua_state_agent);
 
     fighter.clear_lua_stack();
-    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,*ENERGY_STOP_RESET_TYPE_AIR, 0.0,speed_y,0.0,0.0,0.0);
-    sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
+    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,speed_scale,0.0);
+    sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
     fighter.clear_lua_stack();
-    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_AIR, speed_x * PostureModule::lr(module_accessor),0.0,0.0,0.0,0.0);
-    sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
+    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,speed_scale,0.0);
+    sv_kinetic_energy::set_limit_speed(fighter.lua_state_agent);
+
+    fighter.clear_lua_stack();
+    lua_args!(fighter, *FIGHTER_KINETIC_ENERGY_ID_GRAVITY, speed_y, 0.0);
+    sv_kinetic_energy::set_speed(fighter.lua_state_agent);
+    fighter.clear_lua_stack();
+    lua_args!(fighter, *FIGHTER_KINETIC_ENERGY_ID_STOP, speed_x * PostureModule::lr(module_accessor), 0.0);
+    sv_kinetic_energy::set_speed(fighter.lua_state_agent);
+
+    //fighter.clear_lua_stack();
+    //lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,*ENERGY_STOP_RESET_TYPE_AIR, 0.0,speed_y,0.0,0.0,0.0);
+    //sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
+    //fighter.clear_lua_stack();
+    //lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_AIR, speed_x * PostureModule::lr(module_accessor),0.0,0.0,0.0,0.0);
+    //sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
 }
 
 
@@ -158,13 +172,13 @@ unsafe extern "C" fn special_air_hi_pre(fighter: &mut L2CFighterCommon) -> L2CVa
     StatusModule::init_settings
         (fighter.module_accessor,
         SituationKind(*SITUATION_KIND_AIR),
-        *FIGHTER_KINETIC_TYPE_FALL,
+        *FIGHTER_KINETIC_TYPE_AIR_STOP,
         *GROUND_CORRECT_KIND_AIR as u32,
         GroundCliffCheckKind(*GROUND_CLIFF_CHECK_KIND_ALWAYS),
         true,
-        *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_FLAG,
-        *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_INT,
-        *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_FLOAT,
+        *FIGHTER_STATUS_WORK_KEEP_FLAG_ALL_FLAG,
+        *FIGHTER_STATUS_WORK_KEEP_FLAG_ALL_INT,
+        *FIGHTER_STATUS_WORK_KEEP_FLAG_ALL_FLOAT,
         0);
     FighterStatusModuleImpl::set_fighter_status_data
         (fighter.module_accessor,
@@ -248,13 +262,13 @@ unsafe extern "C" fn special_air_hi_end_pre(fighter: &mut L2CFighterCommon) -> L
     StatusModule::init_settings
         (fighter.module_accessor,
         SituationKind(*SITUATION_KIND_AIR),
-        *FIGHTER_KINETIC_TYPE_FALL,
+        *FIGHTER_KINETIC_TYPE_AIR_STOP,
         *GROUND_CORRECT_KIND_AIR as u32,
         GroundCliffCheckKind(*GROUND_CLIFF_CHECK_KIND_ALWAYS),
         true,
-        *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_FLAG,
-        *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_INT,
-        *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_FLOAT,
+        *FIGHTER_STATUS_WORK_KEEP_FLAG_ALL_FLAG,
+        *FIGHTER_STATUS_WORK_KEEP_FLAG_ALL_INT,
+        *FIGHTER_STATUS_WORK_KEEP_FLAG_ALL_FLOAT,
         0);
     FighterStatusModuleImpl::set_fighter_status_data
         (fighter.module_accessor,
@@ -286,12 +300,7 @@ unsafe fn special_air_hi_end_main_loop(fighter: &mut L2CFighterCommon) -> L2CVal
     if fighter.sub_transition_group_check_air_cliff().get_bool() {
         return 1.into()
     }
-    if CancelModule::is_enable_cancel(fighter.module_accessor) {
-        if fighter.sub_wait_ground_check_common(false.into()).get_bool()
-        || fighter.sub_air_check_fall_common().get_bool() {
-            return 0.into();
-        }
-    }
+
     if fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND
     && fighter.global_table[PREV_SITUATION_KIND].get_i32() == *SITUATION_KIND_AIR {
         fighter.change_status(FIGHTER_STATUS_KIND_LANDING_FALL_SPECIAL.into(),false.into());

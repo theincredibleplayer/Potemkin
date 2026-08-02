@@ -34,7 +34,10 @@ pub unsafe extern "C" fn special_dragon_hi_release(agent: &mut L2CAgentBase) {
             macros::FT_MOTION_RATE(agent, 0.5);
         }
     }
-    sv_animcmd::frame(agent.lua_state_agent, 46.0);
+    sv_animcmd::frame(agent.lua_state_agent, 47.0);
+    if macros::is_excute(agent) {
+    }
+    sv_animcmd::wait(agent.lua_state_agent, 1.0);
     if macros::is_excute(agent) {
         macros::FT_MOTION_RATE(agent, 2.0);
     }

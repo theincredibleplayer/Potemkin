@@ -5,6 +5,7 @@ unsafe extern "C" fn potbusterwhiff_main(fighter: &mut L2CFighterCommon) -> L2CV
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
     //GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
+    fighter.sub_set_special_start_common_kinetic_setting(hash40("param_special_lw").into());
     MotionModule::change_motion(module_accessor,Hash40::new("potemkin_buster_whiff"),0.0,1.0,false,0.0,false,false);
     
     fighter.clear_lua_stack();

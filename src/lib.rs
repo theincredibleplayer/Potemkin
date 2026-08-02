@@ -3,7 +3,7 @@
 #![allow(warnings)]
 #![feature(simd_ffi)]
 use std::collections::HashMap;
-use smash::lib::lua_const::{FIGHTER_KIND_KAMUI, FIGHTER_SIZE_LL, FIGHTER_MOTION_SHARE_TYPE_BIG, FIGHTER_WAIST_SIZE_L, HIT_HEIGHT_HIGH};
+use smash::lib::lua_const::{FIGHTER_KIND_KAMUI, FIGHTER_SIZE_LL, FIGHTER_MOTION_SHARE_TYPE_BIG, FIGHTER_WAIST_SIZE_L, HIT_HEIGHT_HIGH, FIGHTER_COMBO_TYPE_NONE};
 use motion_lib::{self, mlist::{Animation, Extra}, hash40::WriteHash40};
 use arcropolis_api::arc_callback;
 use motion_lib::{hash40, mlist::Flags};
@@ -104,6 +104,31 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("height"), 0, 24.0));                        // no idea
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("jack_final_target_scale"), 0, 0.8));        // no idea
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("effect_scale"), 0, 2.0));                   // no idea
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("jostle_weight"), 0, 12.0));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("jostle_front"), 0, 4.2));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("jostle_back"), 0, 2.0));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("entry_stand_scale"), 0, 2.0));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("slope_top_angle_max"), 0, 60.0));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("egg_scale"), 0, 3.0));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("egg_collision_offset_1_y"), 0, 10.0));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("egg_collision_offset_2_y"), 0, 13.0));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("egg_collision_size"), 0, 15.0));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("zelda_triforce_offset_y"), 0, 0.0));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("edge_flare_offset_x"), 0, 4.0));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("edge_flare_offset_y"), 0, 3.0));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("edge_flare_radius"), 0, 17.5));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_range_front"), 0, 19.0));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_range_front_max"), 0, 27.0));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_range_back"), 0, 10.0));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_range_h"), 0, 14.0));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_range_air_front"), 0, 14.25));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_range_air_back"), 0, 10.0));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_range_air_h"), 0, 21.0));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("ice_offset_y"), 0, 4.5));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("ice_offset_z"), 0, -3.0));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("ice_radius"), 0, 16.0));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("dead_up_camera_hit_distance"), 0, 27.5));                   
+
     //compensation multiplier added to avoid the side effects that these have on camera_zoom_in
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("camera_range_center_y"), 0, 12.0));         // all of these dont work
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("camera_range_up"), 0, 18.0));               // all of these dont work
@@ -114,21 +139,22 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
     param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("size"),0, *FIGHTER_SIZE_LL));               
     param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("bury_motion_height"),0, *HIT_HEIGHT_HIGH));
     param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("bury_r_motion_height"),0, *HIT_HEIGHT_HIGH));
-    
+    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("attack_combo_type"),0, *FIGHTER_COMBO_TYPE_NONE));
+
     // fighter_param_motion
     param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("param_motion"),smash::hash40("motion_share"), *FIGHTER_MOTION_SHARE_TYPE_BIG));
     param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("param_motion"),smash::hash40("waist_size"), *FIGHTER_WAIST_SIZE_L));
 
     // vl.prc
     param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("param_private"),smash::hash40("final_ready_frame"), 1));
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("param_special_n"),smash::hash40("shoot_offset_x"), 20.0));           // all of these dont work
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("param_special_n"),smash::hash40("shoot_offset_y"), 17.0));        // all of these dont work
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("param_special_n"),smash::hash40("shoot_offset_x"), 20.0));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("param_special_n"),smash::hash40("shoot_offset_y"), 17.0));
 
 
     // Preform csk collection calls here (allow online, narration characall entry, add chara db, add layout db, w/e)
     the_csk_collection_api::add_series_db_entry_info(the_csk_collection_api::SeriesDatabaseEntry { 
         ui_series_id: smash::hash40("ui_series_guiltygear"), 
-        name_id: the_csk_collection_api::StringType::Optional(Some(the_csk_collection_api::CStrCSK::new("guiltygear"))), 
+        name_id: the_csk_collection_api::StringType::Overwrite(the_csk_collection_api::CStrCSK::new("guiltygear")), 
         disp_order: the_csk_collection_api::SignedByteType::Overwrite(40), 
         disp_order_sound: the_csk_collection_api::SignedByteType::Overwrite(40), 
         save_no: the_csk_collection_api::SignedByteType::Optional(Some(55)), 
@@ -380,11 +406,11 @@ extern "C" fn install_motion_patch(){
         for color in 0..8 {
             unsafe{
                 if fighter == "kirby"{
-                    my_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE_KIRBY);
+                    potemkin_motion_patch_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE_KIRBY);
                 }else if fighter == "tantan"{
-                    my_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE_TANTAN);
+                    potemkin_motion_patch_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE_TANTAN);
                 }else if !(fighter == "kamui" && MARKED_COLORS[color as usize]){
-                    my_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE);
+                    potemkin_motion_patch_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE);
                 }
             }
         }
@@ -400,11 +426,11 @@ extern "C" fn install_motion_patch(){
         for color in &fighter_slots[index] {
             unsafe{
                 if fighters[index] == "kirby"{
-                    my_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE_KIRBY);
+                    potemkin_motion_patch_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE_KIRBY);
                 }else if fighters[index] == "tantan"{
-                    my_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE_TANTAN);
+                    potemkin_motion_patch_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE_TANTAN);
                 }else if !(fighters[index] == "kamui" && MARKED_COLORS[*color as usize]){
-                    my_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE);
+                    potemkin_motion_patch_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE);
                 }
             }
         }
@@ -413,7 +439,7 @@ extern "C" fn install_motion_patch(){
 
 // patches every motion list in the game to add the thrown motion_list entries, earth's arcroplois is quite advanced
 #[arc_callback]
-fn my_callback(hash: u64, data: &mut [u8]) -> Option<usize> {
+fn potemkin_motion_patch_callback(hash: u64, data: &mut [u8]) -> Option<usize> {
     arcropolis_api::load_original_file(hash, &mut *data);
     let mut reader = std::io::Cursor::new(&mut *data);
     match motion_lib::read_stream(&mut reader) {
@@ -426,46 +452,49 @@ fn my_callback(hash: u64, data: &mut [u8]) -> Option<usize> {
                 "catched_pot_final_scene_03","catched_pot_final_scene_03_girl","catched_pot_final_scene_03_big","catched_pot_final_scene_03_dx"
             ];
             for entry in motions_to_add{
-                let new_entry_name = motion_lib::hash40::hash40(entry);
-                /*let anim = motion_lib::mlist::Animation{
-                    name: motion_lib::hash40::hash40("a00wait2.nuanmb"),
-                    unk: 0
-                };*/
-                let extras = std::option::Option::Some(motion_lib::mlist::Extra{
-                    xlu_start:0,
-                    xlu_end:0,
-                    cancel_frame:0,
-                    no_stop_intp:false,
-                });
-                let script_name = entry.replace("_girl", "").replace("_big", "").replace("_dx", "").replace("_", "");
-                let new_motion = motion_lib::mlist::Motion {
-                    game_script: motion_lib::hash40::hash40(["game_",script_name.as_str()].join("").as_str()),
-                    flags: Flags{
-                        turn: false,
-                        r#loop: false,
-                        r#move: false,
-                        fix_trans: true,
-                        fix_rot: false,
-                        fix_scale: true,
-                        unk_40: false,
-                        unk_80: true,
-                        unk_100: false,
-                        unk_200: false,
-                        unk_400: false,
-                        unk_800: false,
-                        unk_1000: false,
-                        unk_2000: false
-                    },
-                    blend_frames: 0,
-                    animations: vec![],
-                    scripts: vec![
-                        motion_lib::hash40::hash40(["expression_",script_name.as_str()].join("").as_str()),
-                        motion_lib::hash40::hash40(["effect_",script_name.as_str()].join("").as_str()),
-                        motion_lib::hash40::hash40(["sound_",script_name.as_str()].join("").as_str())
-                    ],
-                    extra: extras,
-                };
-                motion_list.list.insert(new_entry_name, new_motion);
+                if !motion_list.list.contains_key(&motion_lib::hash40::hash40(entry)){
+                    let new_entry_name = motion_lib::hash40::hash40(entry);
+                    /*let anim = motion_lib::mlist::Animation{
+                        name: motion_lib::hash40::hash40("a00wait2.nuanmb"),
+                        unk: 0
+                    };*/
+                    // if animation is to be used add it here, if its a thrown anim leave this empty (as it is now) because the game will take it from the attacker's folder
+                    let extras = std::option::Option::Some(motion_lib::mlist::Extra{
+                        xlu_start:0,
+                        xlu_end:0,
+                        cancel_frame:0,
+                        no_stop_intp:false,
+                    });
+                    let script_name = entry.replace("_girl", "").replace("_big", "").replace("_dx", "").replace("_", "");
+                    let new_motion = motion_lib::mlist::Motion {
+                        game_script: motion_lib::hash40::hash40(["game_",script_name.as_str()].join("").as_str()),
+                        flags: Flags{
+                            turn: false,
+                            r#loop: false,
+                            r#move: false,
+                            fix_trans: true,
+                            fix_rot: false,
+                            fix_scale: true,
+                            unk_40: false,
+                            unk_80: true,
+                            unk_100: false,
+                            unk_200: false,
+                            unk_400: false,
+                            unk_800: false,
+                            unk_1000: false,
+                            unk_2000: false
+                        },
+                        blend_frames: 0,
+                        animations: vec![/* add anim from above here */],
+                        scripts: vec![
+                            motion_lib::hash40::hash40(["expression_",script_name.as_str()].join("").as_str()),
+                            motion_lib::hash40::hash40(["effect_",script_name.as_str()].join("").as_str()),
+                            motion_lib::hash40::hash40(["sound_",script_name.as_str()].join("").as_str())
+                        ],
+                        extra: extras,
+                    };
+                    motion_list.list.insert(new_entry_name, new_motion);
+                }
             }
             let mut writer = std::io::Cursor::new(Vec::<u8>::new());
             motion_lib::write_stream(&mut writer, &motion_list).unwrap();

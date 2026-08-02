@@ -9,7 +9,30 @@ unsafe extern "C" fn special_hi_pre(fighter: &mut L2CFighterCommon) -> L2CValue 
         StatusModule::set_status_kind_interrupt(fighter.module_accessor, FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE_HOLD);
         return 1.into()
     }
-    return smashline::original_status(Pre, fighter, *FIGHTER_STATUS_KIND_SPECIAL_HI)(fighter);
+    StatusModule::init_settings
+    (fighter.module_accessor,
+    SituationKind(*SITUATION_KIND_NONE),
+    *FIGHTER_KINETIC_TYPE_NONE,
+    *GROUND_CORRECT_KIND_GROUND_CLIFF_STOP as u32,
+    GroundCliffCheckKind(*GROUND_CLIFF_CHECK_KIND_NONE),
+    true,
+    *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_FLAG,
+    *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_INT,
+    *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_FLOAT,
+    0);
+FighterStatusModuleImpl::set_fighter_status_data
+    (fighter.module_accessor,
+    false,
+    *FIGHTER_TREADED_KIND_NO_REAC,
+    false,
+    false,
+    false,
+    (*FIGHTER_LOG_MASK_FLAG_ATTACK_KIND_SPECIAL_HI) as u64,
+    (*FIGHTER_STATUS_ATTR_START_TURN) as u32,
+    (*FIGHTER_POWER_UP_ATTACK_BIT_SPECIAL_HI) as u32,
+    0);
+return L2CValue::I32(0)
+    //return smashline::original_status(Pre, fighter, *FIGHTER_STATUS_KIND_SPECIAL_HI)(fighter);
 }
 
 unsafe extern "C" fn special_hi_main(fighter: &mut L2CFighterCommon) -> L2CValue {
@@ -57,6 +80,32 @@ unsafe fn special_hi_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
 }
 
 
+
+unsafe extern "C" fn special_hi_start_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
+    StatusModule::init_settings
+        (fighter.module_accessor,
+        SituationKind(*SITUATION_KIND_NONE),
+        *FIGHTER_KINETIC_TYPE_NONE,
+        *GROUND_CORRECT_KIND_GROUND_CLIFF_STOP as u32,
+        GroundCliffCheckKind(*GROUND_CLIFF_CHECK_KIND_NONE),
+        true,
+        *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_FLAG,
+        *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_INT,
+        *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_FLOAT,
+        0);
+    FighterStatusModuleImpl::set_fighter_status_data
+        (fighter.module_accessor,
+        false,
+        *FIGHTER_TREADED_KIND_NO_REAC,
+        false,
+        false,
+        false,
+        (*FIGHTER_LOG_MASK_FLAG_ATTACK_KIND_SPECIAL_HI) as u64,
+        (0) as u32,
+        (*FIGHTER_POWER_UP_ATTACK_BIT_SPECIAL_HI) as u32,
+        0);
+    return L2CValue::I32(0)
+}
 
 unsafe extern "C" fn special_hi_start_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
@@ -132,6 +181,33 @@ unsafe fn special_hi_start_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue
     return L2CValue::I32(0)
 }
 
+
+
+unsafe extern "C" fn special_hi_loop_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
+    StatusModule::init_settings
+        (fighter.module_accessor,
+        SituationKind(*SITUATION_KIND_NONE),
+        *FIGHTER_KINETIC_TYPE_NONE,
+        *GROUND_CORRECT_KIND_GROUND_CLIFF_STOP as u32,
+        GroundCliffCheckKind(*GROUND_CLIFF_CHECK_KIND_NONE),
+        true,
+        *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_FLAG,
+        *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_INT,
+        *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_FLOAT,
+        0);
+    FighterStatusModuleImpl::set_fighter_status_data
+        (fighter.module_accessor,
+        false,
+        *FIGHTER_TREADED_KIND_NO_REAC,
+        false,
+        false,
+        false,
+        (*FIGHTER_LOG_MASK_FLAG_ATTACK_KIND_SPECIAL_HI) as u64,
+        (0) as u32,
+        (*FIGHTER_POWER_UP_ATTACK_BIT_SPECIAL_HI) as u32,
+        0);
+    return L2CValue::I32(0)
+}
 
 unsafe extern "C" fn special_hi_loop_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
@@ -246,7 +322,31 @@ unsafe fn special_hi_loop_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue 
     return L2CValue::I32(0)
 }
 
-
+unsafe extern "C" fn special_hi_release_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
+    StatusModule::init_settings
+    (fighter.module_accessor,
+    SituationKind(*SITUATION_KIND_NONE),
+    *FIGHTER_KINETIC_TYPE_NONE,
+    *GROUND_CORRECT_KIND_GROUND_CLIFF_STOP as u32,
+    GroundCliffCheckKind(*GROUND_CLIFF_CHECK_KIND_NONE),
+    true,
+    *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_FLAG,
+    *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_INT,
+    *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_FLOAT,
+    0);
+    FighterStatusModuleImpl::set_fighter_status_data
+    (fighter.module_accessor,
+    false,
+    *FIGHTER_TREADED_KIND_NO_REAC,
+    false,
+    false,
+    false,
+    (*FIGHTER_LOG_MASK_FLAG_ATTACK_KIND_SPECIAL_HI) as u64,
+    (0) as u32,
+    (*FIGHTER_POWER_UP_ATTACK_BIT_SPECIAL_HI) as u32,
+    0);
+    return L2CValue::I32(0)
+}
 
 unsafe extern "C" fn special_hi_release_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
@@ -281,6 +381,10 @@ unsafe extern "C" fn special_hi_release_main(fighter: &mut L2CFighterCommon) -> 
 unsafe fn special_hi_release_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
+    let frame = MotionModule::frame(module_accessor);
+
+
+    ArticleModule::set_frame(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, frame);
 
 
     if WorkModule::is_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_HI_FLAG_FINAL_JAB_HIT_MOTION_PLAY){
@@ -339,8 +443,6 @@ unsafe fn special_hi_release_main_loop(fighter: &mut L2CFighterCommon) -> L2CVal
     return L2CValue::I32(0)
 }
 
-
-
 unsafe extern "C" fn special_hi_release_exec(fighter: &mut L2CFighterCommon) -> L2CValue {
     //handles releasing since the normal acmd ints arent set properly (i should probably research that later)
     if WorkModule::is_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_HI_FLAG_HIT) {
@@ -366,6 +468,7 @@ unsafe extern "C" fn special_hi_end(fighter: &mut L2CFighterCommon) -> L2CValue 
     && StatusModule::status_kind_next(module_accessor) != FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START
     && StatusModule::status_kind_next(module_accessor) != FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE{
         ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
+        CameraModule::reset_main_camera_fov(module_accessor);
         CameraModule::zoom_out(module_accessor, 0);
         if CatchModule::is_catch(module_accessor) {
             CatchModule::set_send_cut_event(module_accessor, true);
@@ -383,12 +486,15 @@ pub fn install(agent: &mut Agent) {
     agent.status(Main,  *FIGHTER_STATUS_KIND_SPECIAL_HI,                special_hi_main);
     agent.status(End,   *FIGHTER_STATUS_KIND_SPECIAL_HI,                special_hi_end);
 
+    agent.status(Pre,   FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START,     special_hi_start_pre);
     agent.status(Main,  FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START,     special_hi_start_main);
     agent.status(End,   FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START,     special_hi_end);
 
+    agent.status(Pre,   FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_LOOP,      special_hi_loop_pre);
     agent.status(Main,  FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_LOOP,      special_hi_loop_main);
     agent.status(End,   FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_LOOP,      special_hi_end);
 
+    agent.status(Pre,   FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE,   special_hi_release_pre);
     agent.status(Main,  FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE,   special_hi_release_main);
     agent.status(End,   FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE,   special_hi_end);
     agent.status(Exec,  FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE,   special_hi_release_exec);

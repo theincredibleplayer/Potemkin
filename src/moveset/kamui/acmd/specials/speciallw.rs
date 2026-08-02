@@ -5,7 +5,12 @@ unsafe extern "C" fn special_lw(agent: &mut L2CAgentBase) {
         macros::FT_MOTION_RATE(agent, 0.7);
         macros::HIT_NODE(agent, Hash40::new("arml"), *HIT_STATUS_XLU);
     }
-    sv_animcmd::frame(agent.lua_state_agent, 28.0);
+    sv_animcmd::frame(agent.lua_state_agent, 27.0);
+    if macros::is_excute(agent) {
+        macros::FT_MOTION_RATE(agent, 1.0);
+    }
+    //sv_animcmd::frame(agent.lua_state_agent, 28.0);
+    execute(agent.lua_state_agent, 28.0);
     if macros::is_excute(agent) {
         if StatusModule::situation_kind(agent.module_accessor) != *SITUATION_KIND_GROUND{
             macros::SET_SPEED_EX(agent, -0.6, 0.25, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
@@ -21,10 +26,15 @@ unsafe extern "C" fn special_lw(agent: &mut L2CAgentBase) {
         LinkModule::set_model_constraint_pos_ort(plane_boma,*WEAPON_LINK_NO_CONSTRAINT,Hash40::new("attach"),Hash40::new("top"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_OFFSET_TRANSLATE as u32 | *CONSTRAINT_FLAG_OFFSET_ROT as u32,true);
         ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, Hash40::new("special_n_end_max"), false, -1.0);
         
-        macros::ATTACK(agent,0,0,Hash40::new("top"),10.0,60,100,0,0,8.0, 0.0, 10.0, 20.0, Some(0.0), Some(10.0), Some(25.0),3.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,f32::NAN,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_FIRE,*ATTACK_REGION_NONE);
+        macros::ATTACK(agent,0,0,Hash40::new("top"),10.0,60,100,0,0,8.0, 0.0, 10.0, 20.0, Some(0.0), Some(10.0), Some(25.0),3.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,f32::NAN,0.0,0.0,false,false,false,false,true,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_FIRE,*ATTACK_REGION_NONE);
+        AttackModule::set_no_uniq_effect_all(agent.module_accessor, true, false);
 
     }
-    sv_animcmd::wait(agent.lua_state_agent, 9.0);
+    sv_animcmd::wait(agent.lua_state_agent, 1.0);
+    if macros::is_excute(agent) {
+        macros::FT_MOTION_RATE(agent, 0.7);
+    }
+    sv_animcmd::wait(agent.lua_state_agent, 8.0);
     if macros::is_excute(agent) {
         AttackModule::clear_all(agent.module_accessor);
         ArticleModule::remove_exist(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));

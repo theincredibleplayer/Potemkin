@@ -14,6 +14,28 @@ pub unsafe extern "C" fn appeal_end(fighter: &mut L2CFighterCommon) -> L2CValue 
 
 pub unsafe extern "C" fn appeal_s(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
+        /*
+        let entry_id = WorkModule::get_int(agent.module_accessor,*FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID);
+        let fighter_info = lua_bind::FighterManager::get_fighter_information(singletons::FighterManager(), FighterEntryID(entry_id));
+        let dead_count = FighterInformation::dead_count(fighter_info,-2); // self explanitory, includes suicides too
+        let suicide_count = FighterInformation::suicide_count(fighter_info,-2); // self explanitory
+        let total_beat_count = FighterInformation::total_beat_count(fighter_info,-2); // stocks you have taken
+        let stock_ref = ((*((fighter_info as u64 + 8) as *const u64) + 0xd8) as *mut u32);
+        let ptr = *((fighter_info as u64 + 8) as *const u64);
+        let number1 = *((ptr + 0xd4)as *const u64);
+        let number2 = *((ptr + 0xd0)as *const u64);
+        let number3 = *((ptr + 0xcc)as *const u64); // suicide count
+        let number3_ref = ((ptr + 0xcc)as *mut u32); // suicide count
+
+        println!("\ndead_Count = {}
+        suicide_count = {}
+        total_beat_count = {}
+        number1 = {}
+        number2 = {}
+        number3 = {}",dead_count,suicide_count,total_beat_count,number1,number2,number3);
+        *stock_ref = *stock_ref - 1;
+        *number3_ref = *number3_ref - 1;
+        */
         ArticleModule::generate_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
         potemkin_mirror_handler(agent.module_accessor);
         ArticleModule::change_motion(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("appeal_s"),false,-1.0);
@@ -26,6 +48,7 @@ pub unsafe extern "C" fn appeal_s(agent: &mut L2CAgentBase) {
             smash::app::FighterAvailableFinal { _address: *(smash::lib::lua_const::FighterAvailableFinal::DEFAULT) as u8 },
             0
         );*/
+        //reset: *(float *)(*DAT_71052b7f00 + 0xdac) = ((*(float *)(*DAT_71052b7f00 + 0xa94) * 180.0) / 3.1415927) * 0.017453292;
     }
     frame(agent.lua_state_agent, 46.0);
     if macros::is_excute(agent) {
@@ -39,7 +62,6 @@ pub unsafe extern "C" fn appeal_s(agent: &mut L2CAgentBase) {
         LinkModule::remove_model_constraint(plane_boma,true);
         LinkModule::set_model_constraint_pos_ort(plane_boma,*WEAPON_LINK_NO_CONSTRAINT,Hash40::new("attach"),Hash40::new("top"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_OFFSET_TRANSLATE as u32 | *CONSTRAINT_FLAG_OFFSET_ROT as u32,true);
         ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, Hash40::new("special_air_n_hold"), false, -1.0);
-
     }
     frame(agent.lua_state_agent, 101.0);
     if macros::is_excute(agent) {
@@ -74,7 +96,6 @@ pub unsafe extern "C" fn sound_appeal_s(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         let sound = sound_selector(agent,"vc_pot_taunt_hi_X".to_string(),3,false,false,0);
         macros::PLAY_SE(agent, Hash40::new_raw(sound));
-
     }
 } 
 

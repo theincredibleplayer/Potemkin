@@ -51,6 +51,8 @@ unsafe extern "C" fn special_lw_main(fighter: &mut L2CFighterCommon) -> L2CValue
         fighter.clear_lua_stack();
         lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,0.8);
         sv_kinetic_energy::set_limit_speed(fighter.lua_state_agent);
+        fighter.clear_lua_stack();
+        lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,0.8);
         sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
         //fighter.clear_lua_stack();
         //lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_GROUND,0.0,0.0,0.0,0.0,0.0);
@@ -66,6 +68,13 @@ unsafe extern "C" fn special_lw_main(fighter: &mut L2CFighterCommon) -> L2CValue
 unsafe fn special_lw_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
+    let frame = MotionModule::frame(module_accessor);
+
+    
+    ArticleModule::set_frame(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, frame);
+
+
+
     if CancelModule::is_enable_cancel(fighter.module_accessor) {
         if fighter.sub_wait_ground_check_common(false.into()).get_bool()
         || fighter.sub_air_check_fall_common().get_bool() {

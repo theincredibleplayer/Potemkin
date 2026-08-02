@@ -2,6 +2,8 @@
 use nnsdk::ui2d::*;
 use smash::ui2d::SmashPane;
 use parking_lot::RwLock;
+use smash::app::lua_bind::*;
+
 use crate::moveset::ui::dual_meter::TensionMeter;
 use crate::moveset::ui::dual_meter::CutInUI;
 
@@ -88,18 +90,6 @@ impl UiManager {
         let mut manager = UI_MANAGER.write();
         unsafe {
             manager.tension_meter[ui_id].consume_tension();
-        }
-    }
-    pub fn is_player_count_over_4() -> bool{
-        let mut manager = UI_MANAGER.write();
-        unsafe {
-            manager.tension_meter[0].is_player_count_over_4()
-        }
-    }
-    pub fn player_count_over_4(is_it: bool) {
-        let mut manager = UI_MANAGER.write();
-        unsafe {
-            manager.tension_meter[0].player_count_over_4(is_it);
         }
     }
     pub fn get_frame_from_name(ui_id: usize, name: &str) -> f32 {
@@ -315,7 +305,7 @@ unsafe fn handle_layout_potemkin(layout: *mut Layout) -> *mut Layout {
                 }
             }
         }
-        let player_smash_8 = UiManager::is_player_count_over_4();
+        let player_smash_8 = FighterManager::entry_count(singletons::FighterManager()) > 4;
         let mut pane_list;
         if !player_smash_8{
             pane_list = ["p1","p2","p3","p4","p5","p6","p7","p8"];

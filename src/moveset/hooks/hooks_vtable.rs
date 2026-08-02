@@ -121,8 +121,8 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
         if WorkModule::is_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SET_ADJUST_POST_CIRCLE){
             let agent = get_fighter_common_from_accessor((&mut*module_accessor));
             let radius = 20.0;
-            let vec1 = simd::Vector2f{vec: [radius /* radius x */, radius /* radius y */]}; 
-            let vec2 = simd::Vector3f{vec: [0.0 /* y offset */, 0.0 /* x offset */, 0.0 /* z offset */]}; 
+            let vec1 = simd::Vector2{vec: [radius /* radius x */, radius /* radius y */]}; 
+            let vec2 = simd::Vector3{vec: [0.0 /* y offset */, 0.0 /* x offset */, 0.0 /* z offset */]}; 
             EffectModule::set_post_effect_line_circle_target(module_accessor,Hash40::new("hip"),vec1,vec2,true);
         }
 
@@ -247,8 +247,8 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
             hash40("fall_special_b"),
             hash40("landing_fall_special"),
             hash40("fall_damage"),
-            //hash40("walk_fall_r"),
-            //hash40("walk_fall_l"),
+            hash40("walk_fall_r"),
+            hash40("walk_fall_l"),
             //hash40("run_fall_r"),
             //hash40("run_fall_l"),
             hash40("squat"),
@@ -257,10 +257,10 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
             hash40("squat_rv"),
             hash40("landing_light"),
             hash40("landing_heavy"),
-            //hash40("step_jump"),
-            //hash40("step_pose"),
-            //hash40("step_pose_back"),
-            //hash40("step_pose_air"),
+            hash40("step_jump"),
+            hash40("step_pose"),
+            hash40("step_pose_back"),
+            hash40("step_pose_air"),
             hash40("step_fall"),
             hash40("guard_on"),
             hash40("guard"),
@@ -390,13 +390,14 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
             //hash40("thrown_b_girl"),
             //hash40("thrown_hi_girl"),
             //hash40("thrown_lw_girl"),
-            //hash40("capture_pulled_hi"),
-            //hash40("capture_wait_hi"),
-            //hash40("capture_damage_hi"),
-            //hash40("capture_pulled_lw"),
-            //hash40("capture_wait_lw"),
-            //hash40("capture_damage_lw"),
+            hash40("capture_pulled_hi"),
+            hash40("capture_wait_hi"),
+            hash40("capture_damage_hi"),
+            hash40("capture_pulled_lw"),
+            hash40("capture_wait_lw"),
+            hash40("capture_damage_lw"),
             hash40("capture_cut"),
+            hash40("capture_jump"),
             hash40("entry_r"),
             hash40("entry_l"),
             hash40("appeal_hi_r"),
@@ -436,7 +437,7 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
             hash40("down_wait_u"),
             hash40("down_damage_u"),
             hash40("down_damage_u3"),
-            hash40("down_eat_u"),
+            //hash40("down_eat_u"),
             hash40("down_stand_u"),
             hash40("down_attack_u"),
             hash40("down_forward_u"),
@@ -445,7 +446,7 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
             hash40("down_wait_d"),
             hash40("down_damage_d"),
             hash40("down_damage_d3"),
-            hash40("down_eat_d"),
+            //hash40("down_eat_d"),
             hash40("down_stand_d"),
             hash40("down_attack_d"),
             hash40("down_forward_d"),
@@ -454,28 +455,28 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
             hash40("passive"),
             hash40("passive_stand_f"),
             hash40("passive_stand_b"),
-            //hash40("passive_wall"),
-            //hash40("passive_wall_jump"),
-            //hash40("passive_ceil"),
+            hash40("passive_wall"),
+            hash40("passive_wall_jump"),
+            hash40("passive_ceil"),
             hash40("shield_break_fly"),
             hash40("furafura"),
-            //hash40("bind"),
-            //hash40("furafura_start_u"),
-            //hash40("furafura_start_d"),
-            //hash40("furafura_end"),
-            //hash40("fura_sleep_start"),
-            //hash40("fura_sleep_loop"),
-            //hash40("fura_sleep_end"),
+            hash40("bind"),
+            hash40("furafura_start_u"),
+            hash40("furafura_start_d"),
+            hash40("furafura_end"),
+            hash40("fura_sleep_start"),
+            hash40("fura_sleep_loop"),
+            hash40("fura_sleep_end"),
             //hash40("swallowed"),
-            //hash40("camera_hit"),
+            hash40("camera_hit"),
             hash40("pass"),
             hash40("ottotto"),
             hash40("ottotto_wait"),
             hash40("wall_damage"),
-            //hash40("stop_wall"),
-            //hash40("ceil_damage"),
-            //hash40("stop_ceil"),
-            //hash40("miss_foot"),
+            hash40("stop_wall"),
+            hash40("ceil_damage"),
+            hash40("stop_ceil"),
+            hash40("miss_foot"),
             hash40("cliff_catch"),
             hash40("cliff_wait"),
             hash40("cliff_climb_quick"),
@@ -490,38 +491,39 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
             hash40("slip_attack"),
             hash40("slip_escape_f"),
             hash40("slip_escape_b"),
-            //hash40("item_light_get"),
-            //hash40("item_light_walk_get"),
-            //hash40("item_light_eat"),
-            //hash40("item_light_walk_eat"),
-            //hash40("item_light_throw_f"),
-            //hash40("item_light_throw_b"),
-            //hash40("item_light_throw_hi"),
-            //hash40("item_light_throw_lw"),
-            //hash40("item_light_throw_f4"),
-            //hash40("item_light_throw_b4"),
-            //hash40("item_light_throw_hi4"),
-            //hash40("item_light_throw_lw4"),
+            hash40("item_light_get"),
+            hash40("item_light_walk_get"),
+            hash40("item_light_eat"),
+            hash40("item_light_walk_eat"),
+            hash40("item_light_throw_f"),
+            hash40("item_light_throw_b"),
+            hash40("item_light_throw_hi"),
+            hash40("item_light_throw_lw"),
+            hash40("item_light_throw_f4"),
+            hash40("item_light_throw_b4"),
+            hash40("item_light_throw_hi4"),
+            hash40("item_light_throw_lw4"),
             //hash40("item_light_throw_dash"),
-            //hash40("item_light_throw_drop"),
-            //hash40("item_light_throw_air_f"),
-            //hash40("item_light_throw_air_b"),
-            //hash40("item_light_throw_air_hi"),
-            //hash40("item_light_throw_air_lw"),
-            //hash40("item_light_throw_air_f4"),
-            //hash40("item_light_throw_air_b4"),
-            //hash40("item_light_throw_air_hi4"),
-            //hash40("item_light_throw_air_lw4"),
-            //hash40("item_heavy_get"),
-            //hash40("item_heavy_walk"),
-            //hash40("item_heavy_throw_f"),
-            //hash40("item_heavy_throw_b"),
-            //hash40("item_heavy_throw_hi"),
-            //hash40("item_heavy_throw_lw"),
-            //hash40("item_heavy_throw_f4"),
-            //hash40("item_heavy_throw_b4"),
-            //hash40("item_heavy_throw_hi4"),
-            //hash40("item_heavy_throw_lw4"),
+            hash40("item_light_throw_drop"),
+            hash40("item_light_throw_air_f"),
+            hash40("item_light_throw_air_b"),
+            hash40("item_light_throw_air_hi"),
+            hash40("item_light_throw_air_lw"),
+            hash40("item_light_throw_air_f4"),
+            hash40("item_light_throw_air_b4"),
+            hash40("item_light_throw_air_hi4"),
+            hash40("item_light_throw_air_lw4"),
+            hash40("item_heavy_wait"),
+            hash40("item_heavy_get"),
+            hash40("item_heavy_walk"),
+            hash40("item_heavy_throw_f"),
+            hash40("item_heavy_throw_b"),
+            hash40("item_heavy_throw_hi"),
+            hash40("item_heavy_throw_lw"),
+            hash40("item_heavy_throw_f4"),
+            hash40("item_heavy_throw_b4"),
+            hash40("item_heavy_throw_hi4"),
+            hash40("item_heavy_throw_lw4"),
             //hash40("item_sword_swing_1"),
             //hash40("item_sword_swing_3"),
             //hash40("item_sword_swing_4"),
@@ -649,9 +651,9 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
             //hash40("item_revengeshooter_shoot_upper"),
             //hash40("item_revengeshooter_shoot_air"),
             //hash40("item_genesis_get"),
-            //hash40("item_rocketbelt"),
+            hash40("item_rocketbelt"),
             //hash40("item_specialflag_hoist"),
-            //hash40("item_assist_item"),
+            hash40("item_assist_item"),
             //hash40("item_gekikara_wait"),
             //hash40("item_gekikara_wait_face"),
             //hash40("item_grass_pull"),
@@ -684,7 +686,7 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
             //hash40("ladder_catch_air_l"),
             //hash40("ladder_catch_end_r"),
             //hash40("ladder_catch_end_l"),
-            //hash40("jump_board_jump"),
+            hash40("jump_board_jump"),
         ].contains(&motion){
             ModelModule::set_mesh_visibility(module_accessor, Hash40::new("low_bodybase"),    false);
             ModelModule::set_mesh_visibility(module_accessor, Hash40::new("low_bodyemi"),     false);
@@ -792,8 +794,13 @@ pub unsafe extern "C" fn kamui_on_shield(vtable: u64, fighter: &mut Fighter, col
                     let item_manager = singletons::ItemManager();
                     smash::app::lua_bind::ItemManager::remove_item_from_id(item_manager,opponent_id);
                 }
+                let opponent_kind =utility::get_kind( &mut *opponent_accessor);
                 WorkModule::on_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_N_HAS_REFLECTED);
-                notify_event_msc_cmd!(opponent_common, Hash40::new_raw(0x199c462b5d));
+                if opponent_kind != *WEAPON_KIND_ROSETTA_TICO{
+                    notify_event_msc_cmd!(opponent_common, Hash40::new_raw(0x199c462b5d));
+                }else{
+                    StatusModule::change_status_request(opponent_accessor, *WEAPON_ROSETTA_TICO_STATUS_KIND_DEAD ,false);
+                }
                 ShieldModule::clear_all(module_accessor);
                 WorkModule::set_float(module_accessor, opponent_real_power, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_REAL_POWER_REFLECT);
                 ArticleModule::generate_article(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_RYUSENSYA, false, -1);
@@ -862,16 +869,35 @@ pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,coll
         && collision_log.collision_kind == *COLLISION_KIND_HIT as u8 {
             let opp_boma = sv_battle_object::module_accessor(collision_log.opponent_object_id as u32);
             let opp_status = StatusModule::status_kind(opp_boma);
-            if (StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_SPECIAL_LW)
-            && ![FIGHTER_STATUS_KIND_POT_REBOUND_JUMP,*FIGHTER_STATUS_KIND_REBOUND].contains(&opp_status) {
+            let pot_lr = PostureModule::lr(module_accessor);
+            let opp_lr = PostureModule::lr(opp_boma);
+    
+            if (StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_SPECIAL_LW){
                 if HitModule::get_status(opp_boma, collision_log.receiver_id as i32, 0) == 0 {
-                    AttackModule::set_no_uniq_effect_all(module_accessor, true, false);
+                    //AttackModule::set_no_uniq_effect_all(module_accessor, true, false);
+                    EffectModule::reset_common(opp_boma);
                     EffectModule::req_common(opp_boma,Hash40::new("fire_hit_l_l"),0.0);
-                    WorkModule::set_float(opp_boma, 0.6, *FIGHTER_STATUS_WORK_ID_FLOAT_REBOUND_MOTION_RATE);
-                    if StatusModule::situation_kind(opp_boma) != *SITUATION_KIND_GROUND {
-                        StatusModule::change_status_request_from_script(opp_boma, FIGHTER_STATUS_KIND_POT_REBOUND_JUMP, false);
-                    }else{
-                        StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND, false);
+                }
+            }
+    
+            if (StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_SPECIAL_LW)
+            && ![FIGHTER_STATUS_KIND_POT_REBOUND_JUMP,*FIGHTER_STATUS_KIND_REBOUND,*FIGHTER_STATUS_KIND_CAPTURE_CUT].contains(&opp_status) {
+                if HitModule::get_status(opp_boma, collision_log.receiver_id as i32, 0) == 0 {
+                    if pot_lr != -opp_lr{
+                        PostureModule::set_lr(opp_boma,-pot_lr);
+                        PostureModule::update_rot_y_lr(opp_boma);
+                        //let lr = PostureModule::lr(enemy);
+                        //TurnModule::set_turn(enemy, Hash40::new("back_damage"), -lr, false, false, true);
+                    }
+
+
+                    WorkModule::set_float(opp_boma, 0.5, *FIGHTER_STATUS_WORK_ID_FLOAT_REBOUND_MOTION_RATE);
+                    if WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_GARUDA_COOLDOWN) <= 0{
+                        if StatusModule::situation_kind(opp_boma) != *SITUATION_KIND_GROUND {
+                            StatusModule::change_status_request_from_script(opp_boma, FIGHTER_STATUS_KIND_POT_REBOUND_JUMP, false);
+                        }else{
+                            StatusModule::change_status_request_from_script(opp_boma, *FIGHTER_STATUS_KIND_REBOUND, false);
+                        }
                     }
                 }
             }
@@ -903,7 +929,6 @@ pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,coll
 
 //vtable patching stuff
 pub static mut KAMUI_VTABLE_ENTRIES: [usize; 146] = [0; 146];
-pub static mut KAMUI_WEAPON_VTABLE_ENTRIES: [usize; 102] = [0; 102];
 
 
 fn patch_vtable_function(offset: usize, function: u64) {
@@ -924,11 +949,6 @@ pub fn install() {
         KAMUI_VTABLE_ENTRIES[0] = 0x4FC8B50;
         for i in 1..146 {
             KAMUI_VTABLE_ENTRIES[i] = KAMUI_VTABLE_ENTRIES[0] + (0x8 * (i as usize));
-        }
-
-        KAMUI_WEAPON_VTABLE_ENTRIES[0] = 0x4fc9b50; //INSERT WEAPON VTABLE START OFFSET
-        for i in 1..102 {
-            KAMUI_WEAPON_VTABLE_ENTRIES[i] = KAMUI_WEAPON_VTABLE_ENTRIES[0] + (0x8 * (i as usize));
         }
         patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_FRAME_3],kamui_on_frame as u64);
         patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_SEARCH],kamui_on_search as u64);

@@ -7,11 +7,29 @@ pub unsafe extern "C" fn potemkin_mirror_handler(module_accessor: *mut BattleObj
     let situation_kind = StatusModule::situation_kind(module_accessor);
     let motion_kind =MotionModule::motion_kind(module_accessor);
     let lr = PostureModule::lr(module_accessor);
+    let mut can_mirror = true;
+    if [
+        hash40("ladder_wait"),
+        hash40("ladder_up"),
+        hash40("ladder_down"),
+        hash40("ladder_catch_r"),
+        hash40("ladder_catch_l"),
+        hash40("ladder_catch_air_r"),
+        hash40("ladder_catch_air_l"),
+        hash40("ladder_catch_end_r"),
+        hash40("ladder_catch_end_l"),
+    ].contains(&motion_kind){
+        can_mirror = false;
+    }
     // scales the models of both pot and his articles by -1 on the x axis to mirror (accurate to strive)
-    if ((lr < 0.0) && (![*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN].contains(&status_kind) && !((motion_kind == hash40("air_turn")) || (motion_kind == hash40("turn"))) ) )
+    if (((lr < 0.0) && (![*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN].contains(&status_kind) && !((motion_kind == hash40("air_turn")) || (motion_kind == hash40("turn"))) ) )
     || (((lr > 0.0) && ( [*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN].contains(&status_kind) || ((motion_kind == hash40("air_turn")) || (motion_kind == hash40("turn"))) ) ) )
+    && can_mirror)
     {
-            ModelModule::set_joint_scale(module_accessor, Hash40::new("top") , &Vector3f{x:-scale,y:scale,z:scale});
+            ModelModule::set_joint_scale(module_accessor, Hash40::new("top")   , &Vector3f{x:-scale,y:scale,z:scale});
+            ModelModule::set_joint_scale(module_accessor, Hash40::new("handr") , &Vector3f{x:scale,y:-scale,z:-scale});
+            ModelModule::set_joint_scale(module_accessor, Hash40::new("handl") , &Vector3f{x:scale,y:-scale,z:-scale});
+            //ModelModule::set_joint_scale(module_accessor, Hash40::new("throw") , &Vector3f{x:-scale,y:-scale,z:scale});
             if ArticleModule::is_exist(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND){
                 let article = ArticleModule::get_article(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND);
                 let article_boma = *(article as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
@@ -29,7 +47,11 @@ pub unsafe extern "C" fn potemkin_mirror_handler(module_accessor: *mut BattleObj
             }
     } else { 
         // reverses the -ve scale (i am not sure if its actually needed but we ball ig)
-        ModelModule::set_joint_scale(module_accessor, Hash40::new("top") , &Vector3f{x:scale,y:scale,z:scale});
+        ModelModule::set_joint_scale(module_accessor, Hash40::new("top")   , &Vector3f{x:scale,y:scale,z:scale});
+        ModelModule::set_joint_scale(module_accessor, Hash40::new("handr") , &Vector3f{x:scale,y:scale,z:scale});
+        ModelModule::set_joint_scale(module_accessor, Hash40::new("handl") , &Vector3f{x:scale,y:scale,z:scale});
+        //ModelModule::set_joint_scale(module_accessor, Hash40::new("throw") , &Vector3f{x:scale,y:scale,z:scale});
+
         if ArticleModule::is_exist(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND){
             let article = ArticleModule::get_article(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND);
             let article_boma = *(article as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
@@ -83,5 +105,65 @@ pub unsafe extern "C" fn potemkin_weapon_attach_handler(module_accessor: *mut Ba
     }
 }
 
+pub unsafe extern "C" fn grabbed_anim_selector(fighter: &mut L2CFighterCommon,anim_name: &str, mot_rate: f32) {
+    let capture_id = LinkModule::get_node_object_id(fighter.module_accessor, *LINK_NO_CAPTURE);
+
+    if capture_id != 0x50000000 {
+        let capture_boma = sv_battle_object::module_accessor(capture_id as u32);
+        //println!("playing anim");
+        //MotionModule::change_motion(captured_boma,Hash40::new("capture_wait_hi"),0.0,1.0,false,0.0,false,false);
+        let capture_category = sv_battle_object::category((*capture_boma).battle_object_id);
+        // finds out the body type of the opponent and changes the motion variable to that
+        if capture_category == *BATTLE_OBJECT_CATEGORY_FIGHTER{
+            let motion_share = WorkModule::get_param_int(capture_boma,0xcad2ee25e,0xc07d88ea0); //grabs the body type param
+            let mut motion = hash40(anim_name);
+            let mut share_type = 0;
+            
+            if motion_share == *FIGHTER_MOTION_SHARE_TYPE_TARO {
+                motion = FighterMotionModuleImpl::add_body_type_hash(
+                    capture_boma,
+                    Hash40::new_raw(motion),
+                    *BODY_TYPE_MOTION_DX
+                );
+            }
+
+            else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_GIRL {
+                motion = FighterMotionModuleImpl::add_body_type_hash(
+                    capture_boma,
+                    Hash40::new_raw(motion),
+                    *BODY_TYPE_MOTION_GIRL
+                );
+            }
+
+            else if motion_share == *FIGHTER_MOTION_SHARE_TYPE_BIG {
+                motion = FighterMotionModuleImpl::add_body_type_hash(
+                    capture_boma,
+                    Hash40::new_raw(motion),
+                    *BODY_TYPE_MOTION_BIG
+                );
+            }
+
+
+            //plays the anim
+            MotionModule::change_motion(capture_boma, Hash40::new_raw(motion), 0.0, mot_rate, false, 0.0, false, false);
+            //println!("flipped state: {}", boi);
+
+
+            
+            //let pre_flip_state = MotionModule::is_flip(capture_boma);
+            ////WorkModule::set_flag(capture_boma,boi,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_FLIP);
+            //// this should flip the opponent if im facing left but it doesnt work for some reason??
+            //let parent_lr = PostureModule::lr(fighter.module_accessor);
+            //PostureModule::set_lr(capture_boma, -parent_lr);
+            //PostureModule::update_rot_y_lr(capture_boma);
+            //if parent_lr < 0.0 {
+            //    println!("flipped allegedly from elsewhere");
+            //    MotionModule::set_flip(capture_boma,true,true,false);
+            //} else {
+            //    MotionModule::set_flip(capture_boma,false,true,false);
+            //}
+        }
+    }
+}
 
 

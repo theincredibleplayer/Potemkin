@@ -7,11 +7,16 @@ unsafe extern "C" fn game_attackairhi(agent: &mut L2CAgentBase) {
     }
     frame(agent.lua_state_agent, 14.0);
     if macros::is_excute(agent) {
-        macros::CATCH(agent, 0, Hash40::new("top"), 10.0, 0.0, 18.0, 8.0, None, None, None, FIGHTER_STATUS_KIND_POT_AIR_THROW_CAUGHT, *COLLISION_SITUATION_MASK_A);
+        macros::CATCH(agent, 0, Hash40::new("top"), 8.0, 0.0, 18.0, 8.0, None, None, None, FIGHTER_STATUS_KIND_POT_AIR_THROW_CAUGHT, *COLLISION_SITUATION_MASK_G);
+        macros::CATCH(agent, 1, Hash40::new("top"), 12.0, 0.0, 18.0, 8.0, None, None, None, FIGHTER_STATUS_KIND_POT_AIR_THROW_CAUGHT, *COLLISION_SITUATION_MASK_A);
     }
     wait(agent.lua_state_agent, 4.0);
     if macros::is_excute(agent) {
         grab!(agent, *MA_MSC_CMD_GRAB_CLEAR_ALL);
+    }
+    frame(agent.lua_state_agent, 30.0);
+    if macros::is_excute(agent) {
+        macros::FT_MOTION_RATE(agent, 0.75);
     }
     frame(agent.lua_state_agent, 44.0);
     if macros::is_excute(agent) {
@@ -57,7 +62,7 @@ unsafe extern "C" fn game_attackairlw(agent: &mut L2CAgentBase) {
         macros::ATTACK(agent, 0, 0, Hash40::new("hip"), 13.0, 80, 80, 0, 50, 8.0, 0.0, 0.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_OBJECT);
         macros::ATTACK(agent, 1, 0, Hash40::new("hip"), 8.0, 280, 80, 0, 50, 5.0, 0.0,-8.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_OBJECT);
     }
-    wait(agent.lua_state_agent, 5.0);
+    wait(agent.lua_state_agent, 8.0);
     if macros::is_excute(agent) {
         macros::ATTACK(agent, 1, 0, Hash40::new("hip"), 8.0, 60, 70, 0, 60, 5.0, 0.0,-8.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_OBJECT);
     }

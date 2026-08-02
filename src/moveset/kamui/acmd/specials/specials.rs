@@ -1,16 +1,36 @@
 use super::*;
 
 
-unsafe extern "C" fn sound_specialsstart(agent: &mut L2CAgentBase) {
+
+unsafe extern "C" fn game_specialsstart(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         macros::FT_MOTION_RATE(agent, 0.5);
+    }
+}
+
+unsafe extern "C" fn effect_specialsstart(agent: &mut L2CAgentBase) {
+    if macros::is_excute(agent) {
         macros::FOOT_EFFECT(agent, Hash40::new("sys_h_smoke_b"), Hash40::new("top"), 0, 0, -5, 0, 0, 0, 0.6, 0, 0, 0, 0, 0, 0, false);    
     }
+    frame(agent.lua_state_agent, 5.0);
+    if macros::is_excute(agent) {
+        macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_hammerfall_dash"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1.5, true);
+        EffectModule::set_rate_last(agent.module_accessor, 0.5);
+    }
+}
+
+unsafe extern "C" fn sound_specialsstart(agent: &mut L2CAgentBase) {
     sv_animcmd::frame(agent.lua_state_agent, 2.0);
     if macros::is_excute(agent) {
         let sound = sound_selector(agent,"vc_pot_hammerfall_X".to_string(),2,false,false,0);
         macros::PLAY_SE(agent, Hash40::new_raw(sound));
         macros::PLAY_SE(agent, Hash40::new("se_btl_pot_00"));
+    }
+}
+
+unsafe extern "C" fn expression_specialsstart(agent: &mut L2CAgentBase) {
+    if macros::is_excute(agent) {
+        slope!(agent, *MA_MSC_CMD_SLOPE_SLOPE_INTP, *SLOPE_STATUS_TOP, 5, true);
     }
 }
 
@@ -31,13 +51,13 @@ unsafe extern "C" fn effect_specialsloop(agent: &mut L2CAgentBase) {
         wait(agent.lua_state_agent, 30.0);
     }
 }
-unsafe extern "C" fn effect_specials(agent: &mut L2CAgentBase) {
-    frame(agent.lua_state_agent, 5.0);
+
+unsafe extern "C" fn expression_specialsloop(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_hammerfall_dash"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1.5, true);
-        EffectModule::set_rate_last(agent.module_accessor, 0.5);
+        slope!(agent, *MA_MSC_CMD_SLOPE_SLOPE_INTP, *SLOPE_STATUS_TOP, 0, true);
     }
 }
+
 unsafe extern "C" fn game_specialsattack(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         WorkModule::on_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
@@ -75,8 +95,19 @@ unsafe extern "C" fn sound_specialsattack(agent: &mut L2CAgentBase) {
     }
 }
 
+unsafe extern "C" fn expression_specialsattack(agent: &mut L2CAgentBase) {
+    if macros::is_excute(agent) {
+        slope!(agent, *MA_MSC_CMD_SLOPE_SLOPE_INTP, *SLOPE_STATUS_TOP, 0, true);
+    }
+    frame(agent.lua_state_agent, 41.0);
+    if macros::is_excute(agent) {
+        slope!(agent, *MA_MSC_CMD_SLOPE_SLOPE_INTP, *SLOPE_STATUS_LR, 7);
+    }
+}
+
 unsafe extern "C" fn sound_specialsend(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
+        slope!(agent, *MA_MSC_CMD_SLOPE_SLOPE_INTP, *SLOPE_STATUS_TOP, 0, true);
         macros::FT_MOTION_RATE(agent, 0.8);
         damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0.0);
     }
@@ -93,6 +124,10 @@ unsafe extern "C" fn sound_specialsend(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         WorkModule::off_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
         damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_NORMAL, 0);
+    }
+    sv_animcmd::frame(agent.lua_state_agent, 21.0);
+    if macros::is_excute(agent) {
+        slope!(agent, *MA_MSC_CMD_SLOPE_SLOPE_INTP, *SLOPE_STATUS_LR, 5);
     }
 }
 
@@ -132,13 +167,19 @@ unsafe extern "C" fn sound_specialsmff(agent: &mut L2CAgentBase) {
 
 
 pub fn install(agent: &mut Agent) {
+    agent.game_acmd     ("game_specials",           game_specialsstart,     Priority::Low);
     agent.sound_acmd    ("sound_specials",          sound_specialsstart,    Priority::Low);
+    agent.effect_acmd   ("effect_specials",         effect_specialsstart,   Priority::Low);
+    agent.expression_acmd("expression_specials",    expression_specialsstart,Priority::Low);
+
     agent.game_acmd     ("game_specialsslide",      game_specialsloop,      Priority::Low);
     agent.effect_acmd   ("effect_specialsslide",    effect_specialsloop,    Priority::Low);
-    agent.effect_acmd   ("effect_specials",         effect_specials,        Priority::Low);
+    agent.expression_acmd("expression_specialsslide",expression_specialsloop,Priority::Low);
+
     agent.game_acmd     ("game_specialsattack",     game_specialsattack,    Priority::Low);
     agent.sound_acmd    ("sound_specialsattack",    sound_specialsattack,   Priority::Low);
     agent.effect_acmd   ("effect_specialsattack",   effect_specialsattack,  Priority::Low);
+    agent.expression_acmd("expression_specialsattack",expression_specialsattack,Priority::Low);
 
     agent.sound_acmd    ("sound_specialsend",       sound_specialsend,      Priority::Low);
 

@@ -47,6 +47,7 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FAST_RC_ENABLE : i32 = 0x200000fe;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FAST_RC_DETECTED : i32 = 0x200000ff;
 
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_N_HAS_REFLECTED : i32 = 0x20000100;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_N_HAS_REFLECTED_2 : i32 = 0x20000101;
 
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_SOUND_ID_KILL : i32 = 0x20000104;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_WIN_FRAME : i32 = 0x20000105;
@@ -77,8 +78,9 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RC_END_SLOW : i32 = 0x20000114;
 
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DEATH_IMMINENT : i32 = 0x20000115;
 
-pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ATTACK_CANCELLED_INTO : i32 = 0x20000115;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ATTACK_CANCELLED_INTO : i32 = 0x20000116;
 
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ENABLE_FOV_CHANGE : i32 = 0x20000117;
 
 // for weapon
 pub const WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_ATTACK : i32 = 0x20000007;
@@ -119,6 +121,11 @@ pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_POTEMKIN_Z_SCALE: i32 = 0x71;
 
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FINAL_X_JUMP_SPEED: i32 = 0x72;
 
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_LOSE_POS_X: i32 = 0x73;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_LOSE_POS_Y: i32 = 0x74;
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_LOSE_POS_Z: i32 = 0x75;
+
+
 // for weapon
 pub const WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLOAT_BOOM_POWER: i32 = 0x4;
 
@@ -153,6 +160,10 @@ pub const FIGHTER_KAMUI_STATUS_KIND_FINAL_FAKE_VISSCENE: i32 = 0x1fb;
 pub const FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL: i32 = 0x1fc;
 pub const FIGHTER_KAMUI_STATUS_KIND_WIN: i32 = 0x1fd;
 pub const FIGHTER_KAMUI_STATUS_KIND_AIR_THROW: i32 = 0x1fe;
+pub const FIGHTER_KAMUI_STATUS_KIND_ITEM_HEAVY_WAIT: i32 = 0x1ff;
+pub const FIGHTER_KAMUI_STATUS_KIND_ITEM_HEAVY_JUMP: i32 = 0x200;
+pub const FIGHTER_KAMUI_STATUS_KIND_ITEM_HEAVY_FALL: i32 = 0x201;
+pub const FIGHTER_KAMUI_STATUS_KIND_ITEM_HEAVY_TURN: i32 = 0x201;
 
 
 
@@ -182,6 +193,10 @@ pub const FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT: i32 = 0x556;
 pub const FIGHTER_STATUS_KIND_POT_BUSTER_CAUGHT: i32 = 0x557;
 pub const FIGHTER_STATUS_KIND_POT_AIR_THROW_CAUGHT: i32 = 0x558;
 pub const FIGHTER_STATUS_KIND_POT_REBOUND_JUMP: i32 = 0x559;
+
+
+// new common ints
+pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_GARUDA_COOLDOWN: i32 = 0x100001ce;
 
 
 // global table consts
@@ -222,7 +237,7 @@ extern "C" {
 
 pub unsafe extern "C" fn camera_checks(fighter: &mut L2CAgentBase) -> bool {
     let ret = 
-    !is_flat_stage() 
+    !sv_information::is_flat_stage() 
     && FighterCutInManager__is_one_on_one() 
     && !WorkModule::is_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_DISABLE_FINAL_START_CAMERA);
 
@@ -491,12 +506,21 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
         let status_kind = StatusModule::status_kind(module_accessor);
         let prev_status_kind = StatusModule::prev_status_kind(module_accessor,0);
         let mut can_rc = true;
-        //if ControlModule::check_button_on(module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_R)
-        //&& ControlModule::check_button_on(module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L)
-        //&& [*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN,*FIGHTER_STATUS_KIND_WAIT].contains(&status_kind){
-        //    fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN.into(), true.into());
+        //if ItemModule::is_have_item(fighter.module_accessor, 0) {
+        //    if ItemModule::get_have_item_size(fighter.module_accessor, 0) as i32 == *ITEM_SIZE_LIGHT{
+        //        ItemModule::set_have_item_constraint_joint(
+        //            fighter.module_accessor,
+        //            Hash40::new("haver"),
+        //            0
+        //        );
+        //    }else{
+        //        ItemModule::set_have_item_constraint_joint(
+        //            fighter.module_accessor,
+        //            Hash40::new("throw"),
+        //            0
+        //        );
+        //    }
         //}
-
         //hurtboxes
         if status_kind == *FIGHTER_STATUS_KIND_ENTRY || !smash::app::sv_information::is_ready_go() {
             let custom_hurtboxes = [

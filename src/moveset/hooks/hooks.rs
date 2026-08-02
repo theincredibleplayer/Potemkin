@@ -9,8 +9,8 @@ unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, event:
             let module_accessor = fighter.battle_object.module_accessor;
             //upair linkmodule
             let opponent_category = sv_battle_object::category(capture_event.sender_id);
+            let opponent_boma = sv_battle_object::module_accessor(capture_event.sender_id as u32);
             // println!("what's up");
-            if opponent_category == *BATTLE_OBJECT_CATEGORY_FIGHTER {
                 if StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_ATTACK_AIR {
                     StatusModule::change_status_request(module_accessor, FIGHTER_KAMUI_STATUS_KIND_AIR_THROW, false);
                     capture_event.result = true;
@@ -35,6 +35,7 @@ unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, event:
                     return 0;
                 }
                 //final smash's link module
+            if opponent_category == *BATTLE_OBJECT_CATEGORY_FIGHTER {
                 if StatusModule::status_kind(module_accessor) == FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP
                 || StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_FINAL {
                     PostureModule::set_pos(module_accessor,&Vector3f{x: 0.0 , y: 0.0, z: 100.0});
@@ -49,9 +50,6 @@ unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, event:
 
                     capture_event.result = true;
                     capture_event.node = smash_rs::phx::Hash40::new("throw");
-                    
-
-
                     return 0;
                 }
             }
@@ -74,6 +72,43 @@ unsafe extern "C" fn autoturn_situation_check_hook(ctx: &mut skyline::hooks::Inl
     }
 }
 
+#[skyline::hook(offset = 0x3ede68, inline)]
+unsafe extern "C" fn potemkin_item_grab_hook(ctx: &mut skyline::hooks::InlineCtx) {
+    let grabber_battle_object = ctx.registers[0].x() as *mut BattleObject;
+    let grabber_module_accessor = (*grabber_battle_object).module_accessor;
+    let captured_original_status = ctx.registers[22].w() as i32;
+    let status_kind = StatusModule::status_kind(grabber_module_accessor);
+    println!("original status = {:x}",captured_original_status);
+    if is_potemkin(grabber_module_accessor){
+        if [*FIGHTER_STATUS_KIND_ATTACK_AIR
+        ,FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF
+        ,*FIGHTER_STATUS_KIND_SPECIAL_HI
+        ,FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP
+        ,*FIGHTER_STATUS_KIND_FINAL
+        ].contains(&status_kind){
+            if [0x9].contains(&captured_original_status) { // this check is basically to check if this is an item or not
+                ctx.registers[22].set_w(*ITEM_STATUS_KIND_CAPTURE_DEMON_DIVED as u32);
+            } 
+            if [0x2].contains(&captured_original_status) { // this check is to check if enemy or not
+                ctx.registers[22].set_w(0x22);
+            }
+        }
+    }
+}
+
+// consider moving this to like init or something
+#[skyline::hook(offset = 0x470b90, inline)]
+unsafe extern "C" fn change_item_hold_hand_hook(ctx: &mut skyline::hooks::InlineCtx) {
+    let item_module = ctx.registers[24].x() as *const u64;
+    let mut item_hash_ptr = (item_module as u64 + 0x20) as *mut *mut u64 ;
+    let module_accessor = (item_module as u64 + 0x8) as *mut *mut BattleObjectModuleAccessor;
+
+    if is_potemkin(*module_accessor){
+        **item_hash_ptr = 0x051a07c0e7;
+    }else{
+        **item_hash_ptr = 0x05e008fd84;
+    }
+}
 
 #[skyline::hook(offset = 0x3414310)]
 unsafe extern "C" fn noping_the_waterball_eff(unk0:u64, weapon: *mut smash::app::Weapon, unk2: u64) -> u64 {
@@ -129,5 +164,7 @@ pub fn install() {
         noping_the_waterball_eff,
         noping_the_sword_eff,
         autoturn_situation_check_hook,
+        potemkin_item_grab_hook,
+        change_item_hold_hand_hook
     );
 }

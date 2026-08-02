@@ -1,6 +1,60 @@
 use super::*;
 
 
+unsafe extern "C" fn fake_kill_screen(agent: &mut L2CAgentBase,enemy: *mut BattleObjectModuleAccessor) {
+    if macros::is_excute(agent) {
+        let common = get_fighter_common_from_accessor(&mut* enemy);
+        set_stage_visibility(agent.module_accessor, false);
+        macros::QUAKE(common, *CAMERA_QUAKE_KIND_XL);
+        SlowModule::clear_whole(agent.module_accessor);
+        let vector = simd::Vector2{vec: [1.0, 1.0]};
+        StopModule::set_hit_stop_frame(enemy, 20, true);
+        ShakeModule::req_time_scale(enemy, Hash40::new("damage_ground_finish"), 60, false, vector, 1.0, 0.0, false, false,-1,1.0);
+        ShakeModule::set_ignore_slow(enemy, true);
+
+        let handle = EffectModule::req_screen(enemy, Hash40::new("bg_finishhit"), false, true, true);
+        EffectModule::set_billboard(enemy, handle as u32, true);
+        EffectModule::set_disable_render_offset_last(enemy);
+        SoundModule::play_se(enemy, Hash40::new("se_common_finishhit"), false, false, false, false, enSEType(0));
+        let scale = PostureModule::scale(enemy);
+        CameraModule::reset_all(enemy);            
+        macros::CAM_ZOOM_IN_arg6(
+            common,
+            /*frames to zoom in totally*/12.0,
+            /*according to calude the object id?*/0.0,
+            /*the amt of zoom needed, higher the number lower the zoom*/1.3*scale*1.1,
+            /*y_rot*/0.0, // up and down
+            /*x_rot*/0.0, //left and right
+            true
+        );
+        
+        SlowModule::set_whole(enemy, 9, 40);
+        EFFECT_GLOBAL_BACK_GROUND(common.lua_state_agent);
+    }
+    wait(agent.lua_state_agent, 1.0);
+    if macros::is_excute(agent) {
+        agent.clear_lua_stack();
+        lua_args!(agent, Hash40::new("sys_bg_finishhit"), false, false);
+        smash::app::sv_animcmd::EFFECT_OFF_KIND(agent.lua_state_agent);
+        agent.pop_lua_stack(1);
+        agent.clear_lua_stack();
+        lua_args!(agent, Hash40::new("sys_bg_black"), false, false);
+        smash::app::sv_animcmd::EFFECT_OFF_KIND(agent.lua_state_agent);
+        agent.pop_lua_stack(1);
+    }
+    wait(agent.lua_state_agent, 4.0);
+    //frame(agent.lua_state_agent, 152.0);
+    if macros::is_excute(agent) {
+        let common = get_fighter_common_from_accessor(&mut* enemy);
+        set_stage_visibility(agent.module_accessor, true);
+        macros::FT_MOTION_RATE(agent, 1.0);
+        macros::CAM_ZOOM_OUT(common);
+    }
+}
+
+
+
+
 unsafe extern "C" fn game_finaldash(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         //macros::EFFECT(agent, Hash40::new("sys_genesis_bg"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
@@ -74,6 +128,7 @@ unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 20.0, 60, 0, 170, 100, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 20.0, 60, 0, 170, 100, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        AttackModule::set_no_dead_all(agent.module_accessor, true, true);
         //HitModule::set_whole(module_accessor, smash::app::HitStatus(*HIT_STATUS_NORMAL), 0);
     }
 
@@ -81,9 +136,9 @@ unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 53.0);
     if macros::is_excute(agent) {
         KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY);
-        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 50.0, 35, 50, 0, 50, 25, 0.0, 10.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 5.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_NONE);
+        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 50.0, 35, 50, 0, 50, 25, 0.0, 10.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 5.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_NONE);
+        AttackModule::set_no_dead_all(agent.module_accessor, true, false);
         AttackModule::set_catch_only_all(agent.module_accessor, true, false);
-        AttackModule::set_no_dead_all(agent.module_accessor, true, true);
         WorkModule::off_flag(agent.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
         //SlowModule::set_whole(enemy, 4, 30);
         //MotionModule::change_motion(enemy,Hash40::new("down_wait_d"),0.0,1.0,false,0.0,false,false);
@@ -96,101 +151,86 @@ unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 128.0);
     if macros::is_excute(agent) {
         let capture_id = LinkModule::get_node_object_id(agent.module_accessor, *LINK_NO_CAPTURE);
-        let enemy = sv_battle_object::module_accessor(capture_id as u32);
-        let z_scale = WorkModule::get_float(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_POTEMKIN_Z_SCALE);
-        ModelModule::set_scale_z(agent.module_accessor,z_scale);
+        if capture_id != 0x50000000 {
+            let pot_lr = PostureModule::lr(agent.module_accessor);
+            let enemy = sv_battle_object::module_accessor(capture_id as u32);
+            let z_scale = WorkModule::get_float(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_POTEMKIN_Z_SCALE);
 
-        if DamageModule::damage(enemy, 0) > 100.0 {
-            macros::FT_MOTION_RATE(agent, 2.0);
-            EffectModule::req_follow(enemy, Hash40::new("sys_explosion_sign"), Hash40::new("hip"), &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, 1.0, false, 0, 0, 0, 0, 0, false, false);
-            if capture_id != 0x50000000 {
-                AttackModule::hit_absolute_joint(agent.module_accessor, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW,capture_id as u32,Hash40::new("throw"), 0, 0);
-                CameraModule::reset_all(agent.module_accessor); 
-                macros::CAM_ZOOM_OUT_FINAL(agent);
-                WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_END_EXIT);
+            let opp_entry_id = WorkModule::get_int(enemy,*FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID);
+            let fighter_info = lua_bind::FighterManager::get_fighter_information(singletons::FighterManager(), FighterEntryID(opp_entry_id));
+            let stock_ref = ((*((fighter_info as u64 + 8) as *const u64) + 0xd8) as *mut u32);
+            let stocks = *stock_ref;
+            let time = sv_information::get_remaining_time_as_frame();
+            let melee_rule_type = sv_global_parameter::melee_rule_type();
+            let is_stock= melee_rule_type == hash40("meleeruletype_s8::stock");
+            let is_hp   = melee_rule_type == hash40("meleeruletype_s8::hp");
+            let is_time = melee_rule_type == hash40("meleeruletype_s8::time");
+            let is_training= smashball::is_training_mode();
+            let mut is_dead = false;
+            let mut is_kill_screen = false;
+
+            if is_training{
+                is_kill_screen = true;
+                is_dead = DamageModule::damage(enemy, 0) >= 100.0;
+            }else if is_hp{
+                let entry_id = WorkModule::get_int(enemy, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+                let fighter_info = FighterManager::get_fighter_information(singletons::FighterManager(), FighterEntryID(entry_id as i32));
+                let hit_point = FighterInformation::hit_point(fighter_info);
+                is_dead = hit_point <= 10.0;
+                is_kill_screen = stocks == 1;
+            }else if is_stock{
+                is_kill_screen = stocks == 1;
+                is_dead = DamageModule::damage(enemy, 0) >= 100.0;
+            }else if is_time{
+                is_kill_screen = false;
+                is_dead = DamageModule::damage(enemy, 0) >= 100.0;
+            }
+            println!("is_hp {}\nis_stock {}\nis_training {}\nis_time {}\nis_dead {}\nis_kill_screen {}",is_hp,is_stock,is_training,is_time,is_dead,is_kill_screen);
+            ModelModule::set_scale_z(agent.module_accessor,z_scale);
+            CameraModule::reset_all(agent.module_accessor); 
+            macros::CAM_ZOOM_OUT_FINAL(agent);
+            AttackModule::hit_absolute_joint(agent.module_accessor, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW,capture_id as u32,Hash40::new("throw"), 0, 0);
+            WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_END_EXIT);
+
+            if is_dead
+            {
+                macros::FT_MOTION_RATE(agent, 2.0);
+                EffectModule::req_follow(enemy, Hash40::new("sys_explosion_sign"), Hash40::new("hip"), &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, 1.0, false, 0, 0, 0, 0, 0, false, false);
+                wait(agent.lua_state_agent, 1.0);
+                if macros::is_excute(agent) {
+                    PostureModule::set_lr(enemy,-pot_lr);
+                    PostureModule::update_rot_y_lr(enemy);
+                    let lr = PostureModule::lr(enemy);
+                    TurnModule::set_turn(enemy, Hash40::new("back_damage"), -lr, false, false, true);
+                }
+                for n in 1..21{
+                    wait(agent.lua_state_agent, 1.0);
+                    if n<=3{
+                        EffectModule::req_follow(enemy, Hash40::new("sys_explosion_sign"), Hash40::new("hip"), &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, 1.0, false, 0, 0, 0, 0, 0, false, false);
+                        macros::LAST_EFFECT_SET_RATE(agent, 3.0);
+                    }
+                    SlowModule::set_whole(agent.module_accessor, 3, 100);
+                }
+                wait(agent.lua_state_agent, 1.0);
+                if macros::is_excute(agent) {
+                    if is_kill_screen {
+                        fake_kill_screen(agent,enemy);
+                    }
+                    StatusModule::change_status_force(enemy, *FIGHTER_STATUS_KIND_DEAD, false);
+                }
+            }else{
                 wait(agent.lua_state_agent, 1.0);
                 if macros::is_excute(agent) {
                     let lr = PostureModule::lr(enemy);
-                    TurnModule::set_turn(enemy, Hash40::new("back_damage"), lr, false, false, true);
-                    PostureModule::reverse_lr(enemy);
+                    PostureModule::set_lr(enemy,-pot_lr);
                     PostureModule::update_rot_y_lr(enemy);
-
-                }
-            }
-            for n in 1..21{
-                wait(agent.lua_state_agent, 1.0);
-                if n<=3{
-                    EffectModule::req_follow(enemy, Hash40::new("sys_explosion_sign"), Hash40::new("hip"), &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, &Vector3f{x: 0.0, y: 0.0, z: 0.0} as *const Vector3f, 1.0, false, 0, 0, 0, 0, 0, false, false);
-                    macros::LAST_EFFECT_SET_RATE(agent, 3.0);
-                }
-                SlowModule::set_whole(agent.module_accessor, 3, 100);
-            }
-            wait(agent.lua_state_agent, 1.0);
-            if macros::is_excute(agent) {
-                let common = get_fighter_common_from_accessor(&mut* enemy);
-                set_stage_visibility(agent.module_accessor, false);               ////////////////////////////////problem here
-                macros::QUAKE(common, *CAMERA_QUAKE_KIND_XL);
-                SlowModule::clear_whole(agent.module_accessor);
-                
-                StopModule::set_hit_stop_frame(enemy, 20, true);
-                let handle = EffectModule::req_screen(enemy, Hash40::new("bg_finishhit"), false, true, true);
-                EffectModule::set_billboard(enemy, handle as u32, true);
-                EffectModule::set_disable_render_offset_last(enemy);
-                SoundModule::play_se(enemy, Hash40::new("se_common_finishhit"), false, false, false, false, enSEType(0));
-                let scale = PostureModule::scale(enemy);
-                CameraModule::reset_all(enemy);            
-                macros::CAM_ZOOM_IN_arg6(
-                    common,
-                    /*frames to zoom in totally*/12.0,
-                    /*according to calude the object id?*/0.0,
-                    /*the amt of zoom needed, higher the number lower the zoom*/1.3*scale*1.3,
-                    /*y_rot*/0.0, // up and down
-                    /*x_rot*/0.0, //left and right
-                    true
-                );
-                
-                SlowModule::set_whole(enemy, 9, 40);
-                EFFECT_GLOBAL_BACK_GROUND(common.lua_state_agent);
-            }
-            wait(agent.lua_state_agent, 1.0);
-            if macros::is_excute(agent) {
-                agent.clear_lua_stack();
-                lua_args!(agent, Hash40::new("sys_bg_finishhit"), false, false);
-                smash::app::sv_animcmd::EFFECT_OFF_KIND(agent.lua_state_agent);
-                agent.pop_lua_stack(1);
-                agent.clear_lua_stack();
-                lua_args!(agent, Hash40::new("sys_bg_black"), false, false);
-                smash::app::sv_animcmd::EFFECT_OFF_KIND(agent.lua_state_agent);
-                agent.pop_lua_stack(1);
-            }
-            wait(agent.lua_state_agent, 4.0);
-            //frame(agent.lua_state_agent, 152.0);
-            if macros::is_excute(agent) {
-                let common = get_fighter_common_from_accessor(&mut* enemy);
-                set_stage_visibility(agent.module_accessor, true);
-                macros::FT_MOTION_RATE(agent, 1.0);
-                macros::CAM_ZOOM_OUT(common);
-                StatusModule::change_status_request_from_script(enemy, FIGHTER_STATUS_KIND_DEAD.into(), false.into());
-            }
-            
-        }else{
-            if capture_id != 0x50000000 {
-                AttackModule::hit_absolute_joint(agent.module_accessor, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW,capture_id as u32,Hash40::new("throw"), 0, 0);
-                CameraModule::reset_all(agent.module_accessor); 
-                macros::CAM_ZOOM_OUT_FINAL(agent);
-                WorkModule::on_flag(agent.module_accessor, *FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_END_EXIT);
-                wait(agent.lua_state_agent, 1.0);
-                if macros::is_excute(agent) {
                     let lr = PostureModule::lr(enemy);
-                    TurnModule::set_turn(enemy, Hash40::new("back_damage"), lr, false, false, true);
-                    PostureModule::reverse_lr(enemy);
-                    PostureModule::update_rot_y_lr(enemy);
-                }    
+                    TurnModule::set_turn(enemy, Hash40::new("back_damage"), -lr, false, false, true);
+                }                
             }
-            
         }
     }
-  }
+}
   
 unsafe extern "C" fn sound_finalend(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 5.0);
@@ -209,13 +249,23 @@ unsafe extern "C" fn effect_finalend(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         EffectModule::remove_post_effect_line(agent.module_accessor, 6, true);
         let radius = 20.0;
-        let vec1 = simd::Vector2f{vec: [radius /* radius x */, radius /* radius y */]}; 
-        let vec2 = simd::Vector3f{vec: [0.0 /* y offset */, 0.0 /* x offset */, 0.0 /* z offset */]}; 
+        let vec1 = simd::Vector2{vec: [radius /* radius x */, radius /* radius y */]}; 
+        let vec2 = simd::Vector3{vec: [0.0 /* y offset */, 0.0 /* x offset */, 0.0 /* z offset */]}; 
 
         if !WorkModule::is_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DEATH_IMMINENT){
             EffectModule::request_post_effect_line_circle(agent.module_accessor,Hash40::new("dead_camera_hit"),Hash40::new("hip"),vec1,vec2,true,44.0/sv_information::slow_rate() /*duration*/,0.0 /* fade */);
             WorkModule::on_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SET_ADJUST_POST_CIRCLE);
-
+        }else{
+            EffectModule::kill_kind(agent.module_accessor, Hash40::new("sys_bg_lightning"), false, true);
+            EffectModule::kill_kind(agent.module_accessor, Hash40::new("sys_bg_vortex"), false, true);
+            EffectModule::kill_kind(agent.module_accessor, Hash40::new("sys_bg_black"), false, true);
+            macros::CANCEL_FILL_SCREEN(agent, 0, 20);
+            let vec1 = simd::Vector2{vec: [0.0, 0.0]};
+            let vec2 = simd::Vector2{vec: [0.0, 1.0]}; //both of these seem to be angle related but i cant put my finger on how exactly
+            let vec3 = simd::Vector2{vec: [0.5 , 1.5]}; // effect width related
+            let vec4 = simd::Vector2{vec: [0.5 , 1.5]}; // effect width related
+            let speedlines = EffectModule::request_post_effect_line_parallel_2d(agent.module_accessor,Hash40::new("dead_area_out"),vec1,vec2,vec3,vec4,true,-1.0 /*duration*/,0.0 /*fade out*/);
+        
         }
         macros::EFFECT_FOLLOW(agent, Hash40::new("kamui_buster_fire"), Hash40::new("haver"), 0, -1, 3.5, 0.0, 0.0, 0.0, 1.7, true);
         macros::LAST_EFFECT_SET_RATE(agent, 0.5);
@@ -313,7 +363,8 @@ unsafe extern "C" fn game_heavenlystart(agent: &mut L2CAgentBase) {
             WorkModule::set_float(agent.module_accessor, 0.0, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FINAL_X_JUMP_SPEED);
         }
         WorkModule::on_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_JUMP);
-        macros::CATCH(agent, 0, Hash40::new("hip"), 20.0,0.0,0.0,0.0, None, None, None, FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, *COLLISION_SITUATION_MASK_A);
+        macros::CATCH(agent, 0, Hash40::new("hip"), 15.0,0.0,0.0,0.0, None, None, None, FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, *COLLISION_SITUATION_MASK_G);
+        macros::CATCH(agent, 1, Hash40::new("hip"), 20.0,0.0,0.0,0.0, None, None, None, FIGHTER_STATUS_KIND_POT_FINAL_CAUGHT, *COLLISION_SITUATION_MASK_A);
         macros::CAM_ZOOM_OUT(agent);
     }
 }
@@ -441,7 +492,7 @@ unsafe extern "C" fn game_fakefinalvisualscene01(agent: &mut L2CAgentBase) {
         
         let enemy_id = LinkModule::get_node_object_id(agent.module_accessor, *LINK_NO_CAPTURE);
         let enemy = sv_battle_object::module_accessor(enemy_id as u32);
-        macros::SLOW_OPPONENT(agent, 400.0, 400.0);
+        macros::SLOW_OPPONENT(agent, 400.0, 900.0);
         SlowModule::clear(enemy);
     }
     frame(agent.lua_state_agent, 18.0);
@@ -482,16 +533,13 @@ unsafe extern "C" fn game_fakefinalvisualscene01(agent: &mut L2CAgentBase) {
     }
     frame(agent.lua_state_agent, 265.0);
     if macros::is_excute(agent) {
-        if !WorkModule::is_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DEATH_IMMINENT){
-            let lr = PostureModule::lr(agent.module_accessor);
-            let vec1 = simd::Vector2f{vec: [0.0, 0.0]}; //
-            let vec2 = simd::Vector2f{vec: [lr*0.5, 0.5]}; //both of these seem to be angle related but i cant put my finger on how exactly
-            let vec3 = simd::Vector2f{vec: [0.5 , 1.5]}; // unsure
-            let vec4 = simd::Vector2f{vec: [0.5 , 1.5]}; // unsure
-            let speedlines = EffectModule::request_post_effect_line_parallel_2d(agent.module_accessor,Hash40::new("dead_area_out"),vec1,vec2,vec3,vec4,true,-1.0 /*duration*/,0.0 /*fade out*/);
-        }
+        let lr = PostureModule::lr(agent.module_accessor);
+        let vec1 = simd::Vector2{vec: [0.0, 0.0]}; //
+        let vec2 = simd::Vector2{vec: [lr*0.5, 0.5]}; //both of these seem to be angle related but i cant put my finger on how exactly
+        let vec3 = simd::Vector2{vec: [0.5 , 1.5]}; // unsure
+        let vec4 = simd::Vector2{vec: [0.5 , 1.5]}; // unsure
+        let speedlines = EffectModule::request_post_effect_line_parallel_2d(agent.module_accessor,Hash40::new("dead_area_out"),vec1,vec2,vec3,vec4,true,-1.0 /*duration*/,0.0 /*fade out*/);
     }
-
 }
 
 unsafe extern "C" fn sound_fakefinalvisualscene01(agent: &mut L2CAgentBase) {
@@ -533,13 +581,11 @@ unsafe extern "C" fn game_finalvisualscene02(agent: &mut L2CAgentBase) {
     }
     frame(agent.lua_state_agent, 71.0);
     if macros::is_excute(agent) {
-        if !WorkModule::is_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DEATH_IMMINENT){
-            let vec1 = simd::Vector2f{vec: [0.0, 0.0]}; //
-            let vec2 = simd::Vector2f{vec: [0.0, 1.0]}; //both of these seem to be angle related but i cant put my finger on how exactly
-            let vec3 = simd::Vector2f{vec: [0.5 , 1.5]}; // effect width related
-            let vec4 = simd::Vector2f{vec: [0.5 , 1.5]}; // effect width related
-            let speedlines = EffectModule::request_post_effect_line_parallel_2d(agent.module_accessor,Hash40::new("dead_area_out"),vec1,vec2,vec3,vec4,true,-1.0 /*duration*/,0.0 /*fade out*/);
-        }
+        let vec1 = simd::Vector2{vec: [0.0, 0.0]}; //
+        let vec2 = simd::Vector2{vec: [0.0, 1.0]}; //both of these seem to be angle related but i cant put my finger on how exactly
+        let vec3 = simd::Vector2{vec: [0.5 , 1.5]}; // effect width related
+        let vec4 = simd::Vector2{vec: [0.5 , 1.5]}; // effect width related
+        let speedlines = EffectModule::request_post_effect_line_parallel_2d(agent.module_accessor,Hash40::new("dead_area_out"),vec1,vec2,vec3,vec4,true,-1.0 /*duration*/,0.0 /*fade out*/);
     }
 }
 
@@ -550,9 +596,10 @@ unsafe extern "C" fn sound_finalvisualscene02(agent: &mut L2CAgentBase) {
     let enemy_id = LinkModule::get_node_object_id(agent.module_accessor, *LINK_NO_CAPTURE);
     let enemy = sv_battle_object::module_accessor(enemy_id as u32);
     let enemy_kind = sv_battle_object::kind(enemy_id as u32);
-    let name = LOWERCASE_FIGHTER_NAMES.get(enemy_kind as usize).unwrap();
-    let result = ["vc_",name,"_damage_twinkle"].join("");
-    let scream_handle = SoundModule::play_se(enemy, Hash40::new(result.as_str()), true, false, false, false, enSEType(0));
+    //let name = LOWERCASE_FIGHTER_NAMES.get(enemy_kind as usize).unwrap();
+    //let result = ["vc_",name,"_damage_twinkle"].join("");
+    let result = SoundModule::get_common_sound_label(enemy,*FIGHTER_COMMONSND_HOSHIKIE as u32);
+    let scream_handle = SoundModule::play_se(enemy, Hash40::new_raw(result), true, false, false, false, enSEType(0));
     SoundModule::set_se_vol(enemy, scream_handle as i32, 2.0, 0);
     //for zarek's pacman mod
     let name = LOWERCASE_FIGHTER_NAMES.get(enemy_kind as usize).unwrap();

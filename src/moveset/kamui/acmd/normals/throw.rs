@@ -1,6 +1,6 @@
 use super::*;
 
-unsafe extern "C" fn throw_lw(agent: &mut L2CAgentBase) {
+unsafe extern "C" fn game_throwlw(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.0, 70, 120, 0, 80, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 5.0, 361, 100, 0, 100, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -8,7 +8,6 @@ unsafe extern "C" fn throw_lw(agent: &mut L2CAgentBase) {
 
     frame(agent.lua_state_agent,15.0);
     if macros::is_excute(agent) {
-        //macros::QUAKE(agent, *CAMERA_QUAKE_KIND_XL);
         macros::ATTACK(agent, 0, 0, Hash40::new("throw"), 10.0, 80, 80, 0, 50,10.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL,false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
         AttackModule::set_catch_only_all(agent.module_accessor, true, false);
         AttackModule::set_no_dead_all(agent.module_accessor, true, false);
@@ -23,16 +22,28 @@ unsafe extern "C" fn throw_lw(agent: &mut L2CAgentBase) {
         let target_no = WorkModule::get_int64(agent.module_accessor, *FIGHTER_STATUS_THROW_WORK_INT_TARGET_HIT_NO);
         macros::ATK_HIT_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, Hash40::new("throw"), target, target_group, target_no);
     }
+    wait(agent.lua_state_agent, 2.0);
+    if macros::is_excute(agent) {
+        AttackModule::clear_all(agent.module_accessor);
+    }
+
 
 }
 
-unsafe extern "C" fn effect_throw_lw(agent: &mut L2CAgentBase) {
+unsafe extern "C" fn effect_throwlw(agent: &mut L2CAgentBase) {
 }
 
-unsafe extern "C" fn sound_throw_lw(agent: &mut L2CAgentBase) {
+unsafe extern "C" fn sound_throwlw(agent: &mut L2CAgentBase) {
+
 }
 
 unsafe extern "C" fn expression_throwlw(agent: &mut L2CAgentBase) {
+    if macros::is_excute(agent) {
+        agent.clear_lua_stack();
+        lua_args!(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, *CAMERA_QUAKE_KIND_M);
+        FT_ATTACK_ABS_CAMERA_QUAKE(agent.lua_state_agent);
+        slope!(agent, *MA_MSC_CMD_SLOPE_SLOPE, *SLOPE_STATUS_LR);
+    }
 }
 
 
@@ -42,7 +53,7 @@ unsafe extern "C" fn game_throwf(agent: &mut L2CAgentBase) {
         let lr = PostureModule::lr(agent.module_accessor);
         let is_ground = GroundModule::ray_check(
             agent.module_accessor, 
-            &Vector2f{ x: PostureModule::pos_x(agent.module_accessor)+15.0*lr, y: PostureModule::pos_y(agent.module_accessor)+22.0}, 
+            &Vector2f{ x: PostureModule::pos_x(agent.module_accessor)+16.5*lr, y: PostureModule::pos_y(agent.module_accessor)+22.0}, 
             &Vector2f{ x: 14.0*lr, y: -66.0},
             true
         ) == 1;
@@ -82,9 +93,9 @@ unsafe extern "C" fn sound_throwf(agent: &mut L2CAgentBase) {
 
 unsafe extern "C" fn expression_throwf(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        // check what this does
-        //AttackModule::set_attack_reference_joint_id(agent.module_accessor, Hash40::new("arml"), AttackDirectionAxis(*ATTACK_DIRECTION_X), AttackDirectionAxis(*ATTACK_DIRECTION_Z), AttackDirectionAxis(*ATTACK_DIRECTION_Y));
-        //macros::FT_ATTACK_ABS_CAMERA_QUAKE(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, *CAMERA_QUAKE_KIND_NONE);
+        agent.clear_lua_stack();
+        lua_args!(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, *CAMERA_QUAKE_KIND_M);
+        FT_ATTACK_ABS_CAMERA_QUAKE(agent.lua_state_agent);
         slope!(agent, *MA_MSC_CMD_SLOPE_SLOPE, *SLOPE_STATUS_LR);
     }
     frame(agent.lua_state_agent, 33.0);
@@ -101,7 +112,7 @@ unsafe extern "C" fn game_throwb(agent: &mut L2CAgentBase) {
         let lr = PostureModule::lr(agent.module_accessor);
         let is_ground = GroundModule::ray_check(
             agent.module_accessor, 
-            &Vector2f{ x: PostureModule::pos_x(agent.module_accessor)+15.0*lr, y: PostureModule::pos_y(agent.module_accessor)+22.0}, 
+            &Vector2f{ x: PostureModule::pos_x(agent.module_accessor)+16.5*lr, y: PostureModule::pos_y(agent.module_accessor)+22.0}, 
             &Vector2f{ x: 14.0*lr, y: -66.0},
             true
         ) == 1;
@@ -202,9 +213,9 @@ unsafe extern "C" fn sound_throwhi(agent: &mut L2CAgentBase) {
 
 
 pub fn install(agent: &mut Agent) {
-    agent.game_acmd         ("game_throwlw",        throw_lw,           Priority::Low);
-    agent.effect_acmd       ("effect_throwlw",      effect_throw_lw,    Priority::Low);
-    agent.sound_acmd        ("sound_throwlw",       sound_throw_lw,     Priority::Low);
+    agent.game_acmd         ("game_throwlw",        game_throwlw,           Priority::Low);
+    agent.effect_acmd       ("effect_throwlw",      effect_throwlw,    Priority::Low);
+    agent.sound_acmd        ("sound_throwlw",       sound_throwlw,     Priority::Low);
     agent.expression_acmd   ("expression_throwlw",  expression_throwlw, Priority::Low);
 
     agent.game_acmd         ("game_throwf",         game_throwf,        Priority::Low);
