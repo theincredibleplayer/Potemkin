@@ -11,7 +11,6 @@ unsafe extern "C" fn rebound_jump_main(fighter: &mut L2CFighterCommon) -> L2CVal
     MotionModule::change_motion(module_accessor, Hash40::new("capture_jump"), 0.0, rate, false, 0.0, false, false);
     WorkModule::enable_transition_term(module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_FALL);
     WorkModule::enable_transition_term(module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_WAIT);
-    WorkModule::set_int(module_accessor, 400, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_GARUDA_COOLDOWN);
     fighter.clear_lua_stack();
     lua_args!(fighter,*MA_MSC_CMD_PHYSICS_SET_SWING_INTP,false);
     sv_module_access::physics(fighter.lua_state_agent);

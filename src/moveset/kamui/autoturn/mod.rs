@@ -1,6 +1,6 @@
 use super::*;
 
-
+mod auto_turn_squat;
 mod auto_turn_air;
 mod auto_turn;
 mod fall;
@@ -10,7 +10,10 @@ mod turn;
 mod wait;
 mod walk_back;
 mod walk;
+mod squat;
+pub mod status_end;
 
+use auto_turn_squat::*;
 use auto_turn_air::*;
 use auto_turn::*;
 use fall::*;
@@ -20,9 +23,12 @@ use turn::*;
 use wait::*;
 use walk_back::*;
 use walk::*;
+use squat::*;
+pub use status_end::*;
 
 
 pub fn install(agent: &mut Agent) {
+    auto_turn_squat::install(agent);
     auto_turn_air::install(agent);
     auto_turn::install(agent);
     fall::install(agent);
@@ -32,4 +38,5 @@ pub fn install(agent: &mut Agent) {
     wait::install(agent);
     walk_back::install(agent);
     walk::install(agent);
+    squat::install(agent);
 }

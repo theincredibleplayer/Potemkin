@@ -2,14 +2,10 @@ use super::*;
 
 unsafe extern "C" fn special_lw(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        macros::FT_MOTION_RATE(agent, 0.7);
+        macros::FT_MOTION_RATE(agent, 1.05);
         macros::HIT_NODE(agent, Hash40::new("arml"), *HIT_STATUS_XLU);
     }
-    sv_animcmd::frame(agent.lua_state_agent, 27.0);
-    if macros::is_excute(agent) {
-        macros::FT_MOTION_RATE(agent, 1.0);
-    }
-    //sv_animcmd::frame(agent.lua_state_agent, 28.0);
+    sv_animcmd::frame(agent.lua_state_agent, 28.0);
     execute(agent.lua_state_agent, 28.0);
     if macros::is_excute(agent) {
         if StatusModule::situation_kind(agent.module_accessor) != *SITUATION_KIND_GROUND{
@@ -32,7 +28,7 @@ unsafe extern "C" fn special_lw(agent: &mut L2CAgentBase) {
     }
     sv_animcmd::wait(agent.lua_state_agent, 1.0);
     if macros::is_excute(agent) {
-        macros::FT_MOTION_RATE(agent, 0.7);
+        macros::FT_MOTION_RATE(agent, 1.0);
     }
     sv_animcmd::wait(agent.lua_state_agent, 8.0);
     if macros::is_excute(agent) {

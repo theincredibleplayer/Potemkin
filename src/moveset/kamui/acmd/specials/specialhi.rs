@@ -10,15 +10,17 @@ unsafe extern "C" fn special_hi(agent: &mut L2CAgentBase) {
     sv_animcmd::frame(agent.lua_state_agent, 12.0);
     if macros::is_excute(agent) {
         macros::HIT_NODE(agent, Hash40::new("armr"), *HIT_STATUS_XLU);
-        macros::CATCH(agent, 0, Hash40::new("top"), 8.0,0.0,34.5,20.5, None, None, None, FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, *COLLISION_SITUATION_MASK_G);
-        macros::CATCH(agent, 1, Hash40::new("top"), 12.0,0.0,34.5,20.5, None, None, None, FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, *COLLISION_SITUATION_MASK_A);
+        macros::HIT_NODE(agent, Hash40::new("shoulderr"), *HIT_STATUS_XLU);
+
+        macros::CATCH(agent, 0, Hash40::new("top"), 8.0 ,0.0,36.0,23.0, None, None, None, FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, *COLLISION_SITUATION_MASK_G);
+        macros::CATCH(agent, 1, Hash40::new("top"), 12.0,0.0,36.0,23.0, None, None, None, FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, *COLLISION_SITUATION_MASK_A);
     }
     sv_animcmd::wait(agent.lua_state_agent, 6.0);
     if macros::is_excute(agent) {
         macros::HIT_NODE(agent, Hash40::new("armr"), *HIT_STATUS_NORMAL);
+        macros::HIT_NODE(agent, Hash40::new("shoulderr"), *HIT_STATUS_NORMAL);
         grab!(agent, *MA_MSC_CMD_GRAB_CLEAR_ALL);
         macros::FT_MOTION_RATE(agent, 1.6);
-
     }
 }
 
@@ -171,7 +173,11 @@ unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
     sv_animcmd::wait(agent.lua_state_agent, 1.0);
     if macros::is_excute(agent) {
         AttackModule::clear_all(agent.module_accessor);
-        macros::FT_MOTION_RATE(agent, 2.0);
+        if camera_checks(agent){
+            macros::FT_MOTION_RATE(agent, 2.0);
+        }else{
+            macros::FT_MOTION_RATE(agent, 1.0);
+        }
     }
 
 }
@@ -292,12 +298,12 @@ unsafe extern "C" fn expression_special_hi_release(agent: &mut L2CAgentBase) {
             CameraModule::reset_all(agent.module_accessor);            
             macros::CAM_ZOOM_IN_arg6(
                 agent,
-                /*frames to zoom in totally*/5.0,
+                /*frames to zoom in totally*/3.0,
                 /*according to calude the object id?*/0.0,
-                /*the amt of zoom needed, higher the number lower the zoom*/3.0*scale*1.3,
+                /*the amt of zoom needed, higher the number lower the zoom*/3.5*scale*1.3,
                 /*y_rot*/0.0, // up and down
                 /*x_rot*/0.0, //left and right
-                true
+                /*this seems to be a quake multiplier*/ true,
             );
             agent.clear_lua_stack();
             lua_args!(agent,
@@ -307,7 +313,7 @@ unsafe extern "C" fn expression_special_hi_release(agent: &mut L2CAgentBase) {
             /*z*/0);
             smash::app::sv_module_access::camera(agent.lua_state_agent);
         }
-        sv_animcmd::wait(agent.lua_state_agent, 2.0);
+        sv_animcmd::wait(agent.lua_state_agent, 1.0);
         if macros::is_excute(agent) {
             macros::CAM_ZOOM_OUT(agent);
         }

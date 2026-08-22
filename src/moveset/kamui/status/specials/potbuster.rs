@@ -1,6 +1,32 @@
 use super::*;
 
 
+unsafe extern "C" fn potbusterwhiff_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
+    StatusModule::init_settings
+        (fighter.module_accessor,
+        SituationKind(*SITUATION_KIND_GROUND),
+        *FIGHTER_KINETIC_TYPE_GROUND_STOP,
+        *GROUND_CORRECT_KIND_GROUND_CLIFF_STOP as u32,
+        GroundCliffCheckKind(*GROUND_CLIFF_CHECK_KIND_ALWAYS),
+        false,
+        *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_FLAG,
+        *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_INT,
+        *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_FLOAT,
+        0);
+    FighterStatusModuleImpl::set_fighter_status_data
+        (fighter.module_accessor,
+        false,
+        *FIGHTER_TREADED_KIND_NO_REAC,
+        false,
+        false,
+        false,
+        (*FIGHTER_LOG_MASK_FLAG_ATTACK_KIND_SPECIAL_N) as u64,
+        (0) as u32,
+        (*FIGHTER_POWER_UP_ATTACK_BIT_SPECIAL_N) as u32,
+        0);
+    return L2CValue::I32(0)
+}
+
 unsafe extern "C" fn potbusterwhiff_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
@@ -96,8 +122,10 @@ unsafe extern "C" fn potbuster_end(fighter: &mut L2CFighterCommon) -> L2CValue {
 
 
 pub fn install(agent: &mut Agent) {
+    agent.status(Pre, FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF, potbusterwhiff_pre);
     agent.status(Main, FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF, potbusterwhiff_main);
 
+    agent.status(Pre, FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER, potbusterwhiff_pre);
     agent.status(Main, FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER, potbuster_main);
     agent.status(End, FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER, potbuster_end);
 }

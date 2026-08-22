@@ -224,12 +224,12 @@ unsafe extern "C" fn expression_walkslow(agent: &mut L2CAgentBase) {
         if macros::is_excute(agent) {
             slope!(agent, *MA_MSC_CMD_SLOPE_SLOPE, *SLOPE_STATUS_LR);
         }
-        frame(agent.lua_state_agent, 18.0);
+        frame(agent.lua_state_agent, 17.0);
         if macros::is_excute(agent) {
             ControlModule::set_rumble(agent.module_accessor, Hash40::new("rbkind_walk_hv"), 0, false, *BATTLE_OBJECT_ID_INVALID as u32);
             macros::QUAKE(agent, *CAMERA_QUAKE_KIND_S_HALF);
         }
-        frame(agent.lua_state_agent, 58.0);
+        frame(agent.lua_state_agent, 57.0);
         ControlModule::set_rumble(agent.module_accessor, Hash40::new("rbkind_walk_hv"), 0, false, *BATTLE_OBJECT_ID_INVALID as u32);
         macros::QUAKE(agent, *CAMERA_QUAKE_KIND_S_HALF);
         agent.clear_lua_stack();
@@ -272,12 +272,12 @@ unsafe extern "C" fn expression_walkslowb(agent: &mut L2CAgentBase) {
         if macros::is_excute(agent) {
             slope!(agent, *MA_MSC_CMD_SLOPE_SLOPE, *SLOPE_STATUS_LR);
         }
-        frame(agent.lua_state_agent, 18.0);
+        frame(agent.lua_state_agent, 17.0);
         if macros::is_excute(agent) {
             ControlModule::set_rumble(agent.module_accessor, Hash40::new("rbkind_walk_hv"), 0, false, *BATTLE_OBJECT_ID_INVALID as u32);
             macros::QUAKE(agent, *CAMERA_QUAKE_KIND_S_HALF);
         }
-        frame(agent.lua_state_agent, 66.0);
+        frame(agent.lua_state_agent, 65.0);
         ControlModule::set_rumble(agent.module_accessor, Hash40::new("rbkind_walk_hv"), 0, false, *BATTLE_OBJECT_ID_INVALID as u32);
         macros::QUAKE(agent, *CAMERA_QUAKE_KIND_S_HALF);
         agent.clear_lua_stack();

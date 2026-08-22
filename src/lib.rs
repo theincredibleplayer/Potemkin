@@ -91,9 +91,11 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
 
 
     // fighter_param
-	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("walk_speed_max"), 0, 0.7));
-	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("walk_slow_speed_mul"), 0, 0.25));
-	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("walk_fast_ratio"), 0, 0.9));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("walk_accel_mul"), 0, 1.0));
+	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("walk_accel_add"), 0, 1.0));
+	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("walk_speed_max"), 0, 0.73));
+	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("walk_slow_speed_mul"), 0, 0.18));
+	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("walk_fast_ratio"), 0, 0.7));
 	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("dash_speed"), 0, 1.0));
 	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("run_speed_max"), 0, 0.8));
 	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("weight"), 0, 145.0));

@@ -95,7 +95,9 @@ unsafe fn special_s_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
     let lr = PostureModule::lr(fighter.module_accessor);
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
-
+    if fighter.sub_transition_group_check_special_command().get_bool(){
+        return 1.into();
+    }
     if CancelModule::is_enable_cancel(fighter.module_accessor) {
         if fighter.sub_wait_ground_check_common(false.into()).get_bool()
         || fighter.sub_air_check_fall_common().get_bool() {
@@ -207,7 +209,6 @@ unsafe fn side_b_slide_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     }
     if speed_x.abs() < 1.0 {
         fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_ATTACK.into(),false.into());
-
     }
     /*if AttackModule::is_infliction(fighter.module_accessor,*COLLISION_KIND_MASK_HIT)
     || AttackModule::is_infliction(fighter.module_accessor,*COLLISION_KIND_MASK_SHIELD) {

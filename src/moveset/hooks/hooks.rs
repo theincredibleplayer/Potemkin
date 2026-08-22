@@ -78,7 +78,7 @@ unsafe extern "C" fn potemkin_item_grab_hook(ctx: &mut skyline::hooks::InlineCtx
     let grabber_module_accessor = (*grabber_battle_object).module_accessor;
     let captured_original_status = ctx.registers[22].w() as i32;
     let status_kind = StatusModule::status_kind(grabber_module_accessor);
-    println!("original status = {:x}",captured_original_status);
+    //println!("original status = {:x}",captured_original_status);
     if is_potemkin(grabber_module_accessor){
         if [*FIGHTER_STATUS_KIND_ATTACK_AIR
         ,FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF
@@ -96,17 +96,25 @@ unsafe extern "C" fn potemkin_item_grab_hook(ctx: &mut skyline::hooks::InlineCtx
     }
 }
 
-// consider moving this to like init or something
+
 #[skyline::hook(offset = 0x470b90, inline)]
-unsafe extern "C" fn change_item_hold_hand_hook(ctx: &mut skyline::hooks::InlineCtx) {
+unsafe extern "C" fn potemkin_change_item_hold_hand_hook(ctx: &mut skyline::hooks::InlineCtx) {
     let item_module = ctx.registers[24].x() as *const u64;
     let mut item_hash_ptr = (item_module as u64 + 0x20) as *mut *mut u64 ;
+    let mut item_hash_ptr_2 = (*item_hash_ptr as u64 + 0x8) as *mut u64;
+    let mut item_hash_ptr_3 = (*item_hash_ptr as u64 + 0x18) as *mut u64;
+    //println!("ptr1 {:x}\nptr2 {:x}\nptr3 {:x}",**item_hash_ptr,*item_hash_ptr_2,*item_hash_ptr_3);
     let module_accessor = (item_module as u64 + 0x8) as *mut *mut BattleObjectModuleAccessor;
-
-    if is_potemkin(*module_accessor){
-        **item_hash_ptr = 0x051a07c0e7;
-    }else{
-        **item_hash_ptr = 0x05e008fd84;
+    if utility::get_kind(&mut **module_accessor) == *FIGHTER_KIND_KAMUI{
+        if is_potemkin(*module_accessor){
+            **item_hash_ptr = 0x051a07c0e7;
+            *(item_hash_ptr_2) = 0x051a07c0e7;
+            *(item_hash_ptr_3) = 0x051a07c0e7;
+        }else{
+            **item_hash_ptr = 0x05e008fd84;
+            *(item_hash_ptr_2) = 0x05e008fd84;
+            *(item_hash_ptr_3) = 0x05e008fd84;
+        }
     }
 }
 
@@ -127,7 +135,7 @@ unsafe extern "C" fn noping_the_waterball_eff(unk0:u64, weapon: *mut smash::app:
 }
 
 #[skyline::hook(offset = 0xb5cbf0)]
-unsafe extern "C" fn noping_the_sword_eff(fighter: &mut Fighter) -> u64 {
+unsafe extern "C" fn potemkin_noping_the_sword_eff(fighter: &mut Fighter) -> u64 {
     if is_potemkin(fighter.battle_object.module_accessor){
         return 0;
     }else{
@@ -162,9 +170,9 @@ pub fn install() {
         kamui_link_event,
         waterball_on_hit,
         noping_the_waterball_eff,
-        noping_the_sword_eff,
+        potemkin_noping_the_sword_eff,
         autoturn_situation_check_hook,
         potemkin_item_grab_hook,
-        change_item_hold_hand_hook
+        potemkin_change_item_hold_hand_hook
     );
 }

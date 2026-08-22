@@ -416,20 +416,6 @@ unsafe fn special_hi_release_main_loop(fighter: &mut L2CFighterCommon) -> L2CVal
     }
 
 
-    // also depricated code from the faked grab
-    /*if WorkModule::is_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RELEASE_ENEMY) {
-        let enemy_id = WorkModule::get_int(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_GRABBED_ENEMY_ID) as u32;
-        let enemy = sv_battle_object::module_accessor(enemy_id);
-        LinkModule::remove_model_constraint(enemy,true);
-        if LinkModule::is_link(enemy,*LINK_NO_CAPTURE) {
-            LinkModule::unlink(enemy,*LINK_NO_CAPTURE);
-        }
-        let pos = Vector2f{x: PostureModule::pos_x(module_accessor) + (20.0 * PostureModule::lr(module_accessor)), y: PostureModule::pos_y(module_accessor) + 30.0};
-        PostureModule::set_pos_2d(enemy,&pos);
-        WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RELEASE_ENEMY);
-    }*/
-
-
     if MotionModule::is_end(fighter.module_accessor) {
         if fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND {
             fighter.change_status(FIGHTER_STATUS_KIND_WAIT.into(),false.into());

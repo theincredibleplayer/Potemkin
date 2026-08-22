@@ -1,3 +1,5 @@
+use std::ops::Rem;
+
 use super::*;
 
 
@@ -19,6 +21,7 @@ pub unsafe extern "C" fn caught_final_main(fighter: &mut L2CFighterCommon) -> L2
     let height = WorkModule::get_param_float(fighter.module_accessor, hash40("height"), 0);
     let egg_size = WorkModule::get_param_float(fighter.module_accessor, hash40("egg_collision_size"), 0);
     let fighter_kind = utility::get_kind(&mut (*fighter.module_accessor));
+    let parent_lr = PostureModule::lr(parent_boma);
 
     let mut x_offset = 22.0 - height; // this is for left and right
     let mut z_offset = -(7.2 - egg_size)/2.0; // this is for in and out
@@ -108,6 +111,10 @@ pub unsafe extern "C" fn caught_final_main(fighter: &mut L2CFighterCommon) -> L2
     ModelModule::set_scale_z(fighter.module_accessor,1.0);
     
     MotionModule::change_motion(fighter.module_accessor, Hash40::new_raw(motion), 0.0, 1.0, false, 0.0, false, false);
+    if parent_lr < 0.0{
+        notify_event_msc_cmd!(fighter, Hash40::new_raw(0x23c33f3bdc));
+    }
+    
     fighter.sub_shift_status_main(L2CValue::Ptr(caught_main_loop as *const () as _))
 }
 
@@ -151,9 +158,12 @@ pub unsafe extern "C" fn caught_specialhi_main(fighter: &mut L2CFighterCommon) -
             *BODY_TYPE_MOTION_BIG
         );
     }
-    let constraint_flags = LinkModule::get_model_constraint_flag(fighter.module_accessor);
-    LinkModule::set_model_constraint_flag(fighter.module_accessor,(*CONSTRAINT_FLAG_DISABLE_RESTRICT_Z | *CONSTRAINT_FLAG_POSITION | *CONSTRAINT_FLAG_FLIP_ROT_Y | *CONSTRAINT_FLAG_OFFSET_TRANSLATE) as u32);
+    //let constraint_flags = LinkModule::get_model_constraint_flag(fighter.module_accessor);
+    //LinkModule::set_model_constraint_flag(fighter.module_accessor,(*CONSTRAINT_FLAG_DISABLE_RESTRICT_Z | *CONSTRAINT_FLAG_POSITION | *CONSTRAINT_FLAG_ORIENTATION | *CONSTRAINT_FLAG_OFFSET_TRANSLATE) as u32);
     MotionModule::change_motion(fighter.module_accessor, Hash40::new_raw(motion), 0.0, 1.0, false, 0.0, false, false);
+    LinkModule::set_model_constraint_pos_ort(fighter.module_accessor, *LINK_NO_CAPTURE, Hash40::new("rot"), Hash40::new("throw"), (*CONSTRAINT_FLAG_POSITION | *CONSTRAINT_FLAG_ORIENTATION) as u32, true);
+        notify_event_msc_cmd!(fighter, Hash40::new_raw(0x23c33f3bdc));
+    //MotionModule::set_link_flip_target_joint(fighter.module_accessor,true);
 
     fighter.sub_shift_status_main(L2CValue::Ptr(caught_main_loop as *const () as _))
 }
@@ -245,6 +255,20 @@ pub unsafe extern "C" fn caught_buster_main(fighter: &mut L2CFighterCommon) -> L
     LinkModule::set_model_constraint_flag(fighter.module_accessor,(*CONSTRAINT_FLAG_DISABLE_RESTRICT_Z | *CONSTRAINT_FLAG_POSITION | *CONSTRAINT_FLAG_ORIENTATION | *CONSTRAINT_FLAG_OFFSET_TRANSLATE) as u32);
     MotionModule::change_motion(fighter.module_accessor, Hash40::new_raw(motion), 0.0, 1.0, false, 0.0, false, false);
     LinkModule::set_constraint_translate_offset(fighter.module_accessor, &Vector3f{ x: x_offset, y: y_offset, z: z_offset });
+    //fighter.flip_have_item_capture();
+    if parent_lr < 0.0{
+        notify_event_msc_cmd!(fighter, Hash40::new_raw(0x23c33f3bdc));
+    }
+    //fighter.clear_lua_stack();
+    //lua_args!(fighter, Hash40::new_raw(0x23c33f3bdc));
+    //sv_battle_object::notify_event_msc_cmd(fighter.lua_state_agent);
+    //fighter.pop_lua_stack(1);
+    //fighter.clear_lua_stack();
+    //fighter.push_lua_stack(agent);
+    //fighter.push_lua_stack(&mut L2CValue::new_int(0x23c33f3bdc));
+    //sv_battle_object::notify_event_msc_cmd(fighter.lua_state_agent);
+    //fighter.pop_lua_stack(1);     
+
     fighter.sub_shift_status_main(L2CValue::Ptr(caught_main_loop as *const () as _))
 }
 
@@ -284,10 +308,42 @@ pub unsafe extern "C" fn caught_airthrow_main(fighter: &mut L2CFighterCommon) ->
 
 
 pub unsafe extern "C" fn caught_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
-    return smashline::original_status(Pre, fighter, *FIGHTER_STATUS_KIND_THROWN)(fighter)
+    StatusModule::init_settings
+    (fighter.module_accessor,
+    SituationKind(*SITUATION_KIND_NONE),
+    *FIGHTER_KINETIC_TYPE_UNIQ,
+    *GROUND_CORRECT_KIND_NONE as u32,
+    GroundCliffCheckKind(*GROUND_CLIFF_CHECK_KIND_NONE),
+    false,
+    *FIGHTER_STATUS_WORK_KEEP_FLAG_ALL_FLAG,
+    *FIGHTER_STATUS_WORK_KEEP_FLAG_ALL_INT,
+    *FIGHTER_STATUS_WORK_KEEP_FLAG_ALL_FLOAT,
+    0);
+    FighterStatusModuleImpl::set_fighter_status_data
+    (fighter.module_accessor,
+    false,
+    *FIGHTER_TREADED_KIND_NO_REAC,
+    false,
+    true,
+    false,
+    (0) as u64,
+    (*FIGHTER_STATUS_ATTR_NO_DROP_ITEM | *FIGHTER_STATUS_ATTR_DISABLE_TURN_DAMAGE) as u32,
+    (0) as u32,
+    0);
+    return L2CValue::I32(0)
+    //return smashline::original_status(Pre, fighter, *FIGHTER_STATUS_KIND_THROWN)(fighter)
 }
 
 pub unsafe extern "C" fn caught_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
+    println!("frame/4 = {}",MotionModule::frame(fighter.module_accessor).rem(4.0) as i32);
+    if MotionModule::frame(fighter.module_accessor).rem(4.0) == 0.0{
+        //physics!(fighter,*MA_MSC_CMD_PHYSICS_PH_SWING_STOP, false);
+        PhysicsModule::set_swing_rate(fighter.module_accessor, 1.0);
+        //physics!(fighter,*MA_MSC_CMD_PHYSICS_PH_SWING_STOP, true);
+    }else{
+        //physics!(fighter,*MA_MSC_CMD_PHYSICS_PH_SWING_STOP, true);
+        PhysicsModule::set_swing_rate(fighter.module_accessor, 0.0);
+    }
     return 0.into();
 }
 
