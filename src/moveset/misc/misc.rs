@@ -1,7 +1,57 @@
 use super::*;
 
 
+pub trait BomaExt {
+    unsafe fn set_front_cliff_hangdata(&mut self, x: f32, y: f32);
+    unsafe fn set_back_cliff_hangdata(&mut self, x: f32, y: f32);
+    unsafe fn set_center_cliff_hangdata(&mut self, x: f32, y: f32);
+}
 
+impl BomaExt for BattleObjectModuleAccessor {
+    unsafe fn set_front_cliff_hangdata(&mut self, x: f32, y: f32) {
+        let ground_module = *(self as *mut BattleObjectModuleAccessor as *const u64).add(0x58 / 8);
+        let ground_data = *((ground_module + 0x28) as *mut *mut f32);
+        *ground_data.add(0x530 / 4) = x;
+        *ground_data.add(0x534 / 4) = y;
+    }
+
+    /// Sets the position of the back/blue ledge-grab box (see [`set_center_cliff_hangdata`](BomaExt::set_center_cliff_hangdata) for more information)
+    /// 
+    /// # Arguments
+    /// * `x` - The x coordinate, relative to the [position](smash::app::lua_bind::PostureModule::pos) of the fighter
+    /// * `y` - The y coordinate, relative to the [position](smash::app::lua_bind::PostureModule::pos) of the fighter
+    unsafe fn set_back_cliff_hangdata(&mut self, x: f32, y: f32) {
+        let ground_module = *(self as *mut BattleObjectModuleAccessor as *const u64).add(0x58 / 8);
+        let ground_data = *((ground_module + 0x28) as *mut *mut f32);
+        *ground_data.add(0x540 / 4) = x;
+        *ground_data.add(0x544 / 4) = y;
+    }
+
+    /// Sets the center position of the two ledge-grab boxes
+    /// 
+    /// # Information about hang data
+    /// There are two rectangles which represent the ledge-grab data for a fighter. One of them is usually
+    /// placed behind the fighter and the other in front. For the purposes of explanation, I will refer to
+    /// the one in front as "red" and the one in the back as "blue", as those are the colors chosen
+    /// for the visualizer. 
+    /// 
+    /// The center position for ledge-grab boxes is a point which both the red and blue boxes have as a corner.
+    /// Both boxes meet at this location. This is usually located near the center of the fighter on the x-axis. The
+    /// location on the y-axis of the fighter depends on the fighter.
+    /// 
+    /// The front and back positions (set by [`BomaExt::set_front_cliff_hangdata`] and [`BomaExt::set_back_cliff_hangdata`] respectively)
+    /// are the corners that oppose this center.
+    /// 
+    /// # Arguments
+    /// * `x` - The x coordinate, relative to the [position](smash::app::lua_bind::PostureModule::pos) of the fighter
+    /// * `y` - The y coordinate, relative to the [position](smash::app::lua_bind::PostureModule::pos) of the fighter
+    unsafe fn set_center_cliff_hangdata(&mut self, x: f32, y: f32) {
+        let ground_module = *(self as *mut BattleObjectModuleAccessor as *const u64).add(0x58 / 8);
+        let ground_data = *((ground_module + 0x28) as *mut *mut f32);
+        *ground_data.add(0x520 / 4) = x;
+        *ground_data.add(0x524 / 4) = y;
+    }
+}
 
 #[allow(non_snake_case)]
 pub mod MiscModule {
@@ -31,7 +81,7 @@ pub mod MiscModule {
     }
 
 
-    #[skyline::from_offset(0x3ac540)]
+    #[skyline::from_offset(GET_BATTLE_OBJECT_FROM_ID_OFFSET)]
     pub fn get_battle_object_from_id(id: u32) -> *mut BattleObject;
 }
 
@@ -71,3 +121,37 @@ pub fn get_ui_index_from_entry_id(entry_id: usize) -> usize {
     }
     return index;
 }
+
+#[skyline::from_offset(GET_FIGHTER_VTABLE_OFFSET)]
+fn get_fighter_vtable(id: u32) -> *const usize;
+
+#[skyline::from_offset(GET_WEAPON_VTABLE_OFFSET)]
+fn get_weapon_vtable(id: u32) -> *const usize;
+
+pub fn get_vtable_function_offset(kind: i32, entry: usize, is_weapon: bool, get_ptr: bool) -> usize {
+    if (kind < 0) {std::process::abort()};
+    unsafe{
+        if is_weapon{
+            if (kind > 0x267) || (entry > 104){
+                std::process::abort();
+            }
+        }else{
+            if (kind > 0x5E) || (entry > 146){
+                std::process::abort();
+            }
+        }
+        let vtable = if is_weapon {
+            get_weapon_vtable(kind as u32)
+        } else { 
+            get_fighter_vtable(kind as u32)
+        };
+        let first_entry_ptr = *(vtable as *const u64) as *const usize;
+        let main = skyline::hooks::getRegionAddress(skyline::hooks::Region::Text);
+        if get_ptr {
+            return first_entry_ptr.add(entry as usize) as usize - main as usize;
+        } else {
+            return *first_entry_ptr.add(entry as usize) - main as usize;
+        }
+    }
+}
+

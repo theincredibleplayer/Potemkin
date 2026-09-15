@@ -209,16 +209,20 @@ unsafe extern "C" fn roman_cancel_end(fighter: &mut L2CFighterCommon) -> L2CValu
     HitModule::set_status_all(fighter.module_accessor, HitStatus(*HIT_STATUS_NORMAL), 0);
 
     if WorkModule::is_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RED_RC){
-        EffectModule::detach_kind(module_accessor, Hash40::new("kamui_red_rc_blast"), -1);
+        EffectModule::detach_kind(module_accessor, Hash40::new("kamui_red_rc"), 0);
+        EffectModule::detach_kind(module_accessor, Hash40::new("kamui_red_rc_blast"), 0);
         WorkModule::set_int(module_accessor,240 , FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_PENALTY_TIMER);
     }else if WorkModule::is_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_PURPLE_RC){
-        EffectModule::detach_kind(module_accessor, Hash40::new("kamui_purple_rc_blast"), -1);
+        EffectModule::detach_kind(module_accessor, Hash40::new("kamui_purple_rc"), 0);
+        EffectModule::detach_kind(module_accessor, Hash40::new("kamui_purple_rc_blast"), 0);
         WorkModule::set_int(module_accessor,240 , FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_PENALTY_TIMER);
     }else if WorkModule::is_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_YELLOW_RC){
-        EffectModule::detach_kind(module_accessor, Hash40::new("kamui_yellow_rc_blast"), -1);
+        EffectModule::detach_kind(module_accessor, Hash40::new("kamui_yellow_rc"), 0);
+        EffectModule::detach_kind(module_accessor, Hash40::new("kamui_yellow_rc_blast"), 0);
         WorkModule::set_int(module_accessor,480 , FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_PENALTY_TIMER);
     }else if WorkModule::is_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_BLUE_RC){
-        EffectModule::detach_kind(module_accessor, Hash40::new("kamui_blue_rc_blast"), -1);
+        EffectModule::detach_kind(module_accessor, Hash40::new("kamui_blue_rc"), 0);
+        EffectModule::detach_kind(module_accessor, Hash40::new("kamui_blue_rc_blast"), 0);
         WorkModule::set_int(module_accessor,120 , FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_PENALTY_TIMER);
     }
     
@@ -246,14 +250,14 @@ unsafe extern "C" fn roman_cancel_end(fighter: &mut L2CFighterCommon) -> L2CValu
 
 
         fighter.clear_lua_stack();
-        lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_AIR, 4.0 * speed_mul * moving_x /*PostureModule::lr(module_accessor)*/,0.0,0.0,0.0,0.0);
+        lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_GROUND, 4.0 * speed_mul * moving_x /*PostureModule::lr(module_accessor)*/,0.0,0.0,0.0,0.0);
         sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
 
         fighter.clear_lua_stack();
         lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,limiting_speed,0.0);
         sv_kinetic_energy::set_limit_speed(fighter.lua_state_agent);
 
-        lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,*ENERGY_STOP_RESET_TYPE_AIR, 0.0, 4.0 * speed_mul * moving_y,0.0,0.0,0.0);
+        lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,*ENERGY_STOP_RESET_TYPE_GROUND, 0.0, 4.0 * speed_mul * moving_y,0.0,0.0,0.0);
         sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
         fighter.clear_lua_stack();
 

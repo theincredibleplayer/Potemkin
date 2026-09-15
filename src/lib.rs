@@ -88,7 +88,13 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
 
 
 
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_lift_accel_mul"), 0, 1.0));
+	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_lift_accel_add"), 0, 1.0));
+	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_lift_speed_max"), 0, 0.73));
 
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("shoot_walk_accel_mul"), 0, 1.0));
+	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("shoot_walk_accel_add"), 0, 1.0));
+	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("shoot_walk_speed_max"), 0, 0.73));
 
     // fighter_param
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("walk_accel_mul"), 0, 1.0));
@@ -174,7 +180,7 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
         fighter_kind: the_csk_collection_api::Hash40Type::Overwrite(0x12C30E8564 /* Hash40 of fighter_kind_kamui */), 
         fighter_kind_corps: the_csk_collection_api::Hash40Type::Overwrite(0x12C30E8564 /* Hash40 of fighter_kind_kamui */), 
         ui_series_id: the_csk_collection_api::Hash40Type::Overwrite(0x142be617be), 
-        fighter_type: the_csk_collection_api::Hash40Type::Overwrite(0x1353795179 /* Hash40 of fighter_type_normal */), 
+        fighter_type: the_csk_collection_api::Hash40Type::Overwrite(0x10e2915152 /* Hash40 of fighter_type_big */), 
         alt_chara_id: the_csk_collection_api::Hash40Type::Overwrite(0x0), 
         exhibit_year: the_csk_collection_api::ShortType::Overwrite(2015), 
         exhibit_day_order: the_csk_collection_api::IntType::Overwrite(62501), 
@@ -266,7 +272,7 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
         eye_0_flash3_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
         eye_0_flash4_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
         eye_0_flash4_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        eye_1_flash_count: the_csk_collection_api::UnsignedByteType::Optional(Some(2)), 
+        eye_1_flash_count: the_csk_collection_api::UnsignedByteType::Overwrite(2),
         eye_1_flash0_pos_x: the_csk_collection_api::FloatType::Overwrite(0.0), 
         eye_1_flash0_pos_y: the_csk_collection_api::FloatType::Overwrite(197.0), 
         eye_1_flash1_pos_x: the_csk_collection_api::FloatType::Overwrite(75.0), 
@@ -277,7 +283,7 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
         eye_1_flash3_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
         eye_1_flash4_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
         eye_1_flash4_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        eye_2_flash_count: the_csk_collection_api::UnsignedByteType::Optional(Some(2)), 
+        eye_2_flash_count: the_csk_collection_api::UnsignedByteType::Overwrite(2), 
         eye_2_flash0_pos_x: the_csk_collection_api::FloatType::Overwrite(-27.0), 
         eye_2_flash0_pos_y: the_csk_collection_api::FloatType::Overwrite(93.0), 
         eye_2_flash1_pos_x: the_csk_collection_api::FloatType::Overwrite(69.0), 

@@ -21,7 +21,7 @@ unsafe extern "C" fn fake_kill_screen(agent: &mut L2CAgentBase,enemy: *mut Battl
         macros::CAM_ZOOM_IN_arg6(
             common,
             /*frames to zoom in totally*/12.0,
-            /*according to calude the object id?*/0.0,
+            /*according to claude1308 the object id?*/0.0,
             /*the amt of zoom needed, higher the number lower the zoom*/1.3*scale*1.1,
             /*y_rot*/0.0, // up and down
             /*x_rot*/0.0, //left and right
@@ -62,7 +62,7 @@ unsafe extern "C" fn game_finaldash(agent: &mut L2CAgentBase) {
         JostleModule::set_status(agent.module_accessor, false);
         HitModule::set_whole(agent.module_accessor, smash::app::HitStatus(*HIT_STATUS_INVINCIBLE), 0);
         ArticleModule::remove_exist(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
-        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 0.0, 0, 0, 0, 0, 17.0, 13.0, 8.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_LL, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
+        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 0.0, 0, 0, 0, 0, 17.0, 13.0, 8.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_LL, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
         AttackModule::set_no_dead_all(agent.module_accessor, true, false);
         AttackModule::set_force_reaction(agent.module_accessor, 0, true, false);
         AttackModule::set_force_reaction(agent.module_accessor, 1, true, false);
@@ -83,7 +83,7 @@ unsafe extern "C" fn game_finaldashattack(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         WorkModule::on_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_HPB_CHECK_ENEMY);
         macros::QUAKE(agent, *CAMERA_QUAKE_KIND_XL);
-        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 7.0, 368, 100, 180, 0, 19.0, 13.0, 8.0, 0.0, None, None, None, 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_NONE);
+        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 7.0, 368, 100, 180, 0, 19.0, 13.0, 8.0, 0.0, None, None, None, 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_NONE);
         AttackModule::set_vec_target_pos(agent.module_accessor, 0, Hash40::new("top"), &Vector2f{x: 30.0, y: 50.0}, 40, false);
         AttackModule::set_no_dead_all(agent.module_accessor, true, false);
         AttackModule::set_force_reaction(agent.module_accessor, 0, true, false);
@@ -336,7 +336,7 @@ unsafe extern "C" fn game_heavenlystart(agent: &mut L2CAgentBase) {
         macros::CAM_ZOOM_IN_arg5(
             agent,
             /*frames to zoom in totally*/5.0,
-            /*according to calude the object id?*/0.0,
+            /*according to claude1308 the object id?*/0.0,
             /*the amt of zoom needed, higher the number lower the zoom*/1.4*1.3,
             /*y_rot*/0.35,
             /*x_rot*/-0.35*lr,

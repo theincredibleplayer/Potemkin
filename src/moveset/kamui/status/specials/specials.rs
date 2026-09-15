@@ -52,15 +52,15 @@ unsafe extern "C" fn special_s_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
 unsafe extern "C" fn special_s_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     motion_setup(fighter,false);
     let module_accessor = fighter.module_accessor;
-    fighter.clear_lua_stack();
-    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_CONTROL,*ENERGY_CONTROLLER_RESET_TYPE_FREE,0.0,0.0,0.0,0.0,0.0);
-    sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
+    //fighter.clear_lua_stack();
+    //lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_CONTROL,*ENERGY_CONTROLLER_RESET_TYPE_FREE,0.0,0.0,0.0,0.0,0.0);
+    //sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
 
 
     let lr = PostureModule::lr(fighter.module_accessor);
 
     fighter.clear_lua_stack();
-    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_GROUND, 0.0 * PostureModule::lr(module_accessor),0.0,0.0,0.0,0.0);
+    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_GROUND, 3.0 * PostureModule::lr(module_accessor),0.0,0.0,0.0,0.0);
     sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
 
     let limiting_speed = 5.0;
@@ -71,7 +71,7 @@ unsafe extern "C" fn special_s_main(fighter: &mut L2CFighterCommon) -> L2CValue 
 
 
     fighter.clear_lua_stack();
-    lua_args!(fighter, FIGHTER_KINETIC_ENERGY_ID_STOP, 0.5*lr, 0.0);
+    lua_args!(fighter, FIGHTER_KINETIC_ENERGY_ID_STOP, 0.0, 0.0);
     sv_kinetic_energy::set_accel(fighter.lua_state_agent);
 
 
@@ -95,8 +95,25 @@ unsafe fn special_s_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
     let lr = PostureModule::lr(fighter.module_accessor);
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
-    if fighter.sub_transition_group_check_special_command().get_bool(){
-        return 1.into();
+    if MotionModule::frame(module_accessor) <= 6.0{
+        WorkModule::enable_transition_term(module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_N_COMMAND);
+        WorkModule::enable_transition_term(module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_N2_COMMAND);
+        if WorkModule::is_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ENABLE_KARA){
+            if ControlModule::check_button_on(module_accessor, *CONTROL_PAD_BUTTON_ATTACK){
+                fighter.clear_lua_stack();
+                lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_GROUND, 1.8 * PostureModule::lr(module_accessor),0.0,0.0,0.0,0.0);
+                sv_kinetic_energy::reset_energy(fighter.lua_state_agent);    
+                fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF.into(), true.into());
+                return 1.into();
+            }
+        }
+
+        if fighter.sub_transition_group_check_special_command().get_bool(){
+            fighter.clear_lua_stack();
+            lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_GROUND, 1.8 * PostureModule::lr(module_accessor),0.0,0.0,0.0,0.0);
+            sv_kinetic_energy::reset_energy(fighter.lua_state_agent);    
+            return 1.into();
+        }
     }
     if CancelModule::is_enable_cancel(fighter.module_accessor) {
         if fighter.sub_wait_ground_check_common(false.into()).get_bool()
@@ -126,7 +143,7 @@ unsafe fn special_s_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
 unsafe extern "C" fn side_b_slide_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
     StatusModule::init_settings
         (fighter.module_accessor,
-        SituationKind(*SITUATION_KIND_NONE),
+        SituationKind(*SITUATION_KIND_GROUND),
         *FIGHTER_KINETIC_TYPE_GROUND_STOP,
         *GROUND_CORRECT_KIND_GROUND_CLIFF_STOP as u32,
         GroundCliffCheckKind(*GROUND_CLIFF_CHECK_KIND_NONE),
@@ -226,7 +243,7 @@ unsafe extern "C" fn side_b_slide_end(fighter: &mut L2CFighterCommon) -> L2CValu
 unsafe extern "C" fn side_b_end_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
     StatusModule::init_settings
         (fighter.module_accessor,
-        SituationKind(*SITUATION_KIND_NONE),
+        SituationKind(*SITUATION_KIND_GROUND),
         *FIGHTER_KINETIC_TYPE_GROUND_STOP,
         *GROUND_CORRECT_KIND_GROUND_CLIFF_STOP as u32,
         GroundCliffCheckKind(*GROUND_CLIFF_CHECK_KIND_NONE),
@@ -251,7 +268,7 @@ unsafe extern "C" fn side_b_end_pre(fighter: &mut L2CFighterCommon) -> L2CValue 
 
 
 
-unsafe extern "C" fn side_b_end(fighter: &mut L2CFighterCommon) -> L2CValue {
+unsafe extern "C" fn side_b_end_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
     KineticModule::enable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_STOP);
     //KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY);
@@ -261,10 +278,10 @@ unsafe extern "C" fn side_b_end(fighter: &mut L2CFighterCommon) -> L2CValue {
     MotionModule::change_motion(fighter.module_accessor,Hash40::new("special_s_end"),0.0,1.0,false,0.0,false,false);
     lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,0.7,0.0);
     sv_kinetic_energy::set_brake(fighter.lua_state_agent);
-    fighter.sub_shift_status_main(L2CValue::Ptr(side_b_end_loop as *const () as _))
+    fighter.sub_shift_status_main(L2CValue::Ptr(side_b_end_main_loop as *const () as _))
 }
 
-unsafe fn side_b_end_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
+unsafe fn side_b_end_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
     //KineticModule::clear_speed_all(fighter.module_accessor);
     if CancelModule::is_enable_cancel(fighter.module_accessor) {
@@ -385,25 +402,30 @@ unsafe extern "C" fn megafist_f_main(fighter: &mut L2CFighterCommon) -> L2CValue
     KineticModule::enable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_STOP);
     KineticModule::enable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_MOTION);
-    KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
+    KineticModule::enable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
 
     if StatusModule::status_kind(module_accessor) == *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F {
         MotionModule::change_motion(fighter.module_accessor,Hash40::new("special_s_mf_f"),0.0,1.0,false,0.0,false,false);
     } else {
         MotionModule::change_motion(fighter.module_accessor,Hash40::new("special_s_mf_f"),0.0,1.0,false,0.0,false,false);
     }
-
+    let mut jump_speed = 3.0;
+    if WorkModule::is_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_INPUT){
+        jump_speed = 3.6;
+    }
     fighter.clear_lua_stack();
-    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,3.0);
+    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,jump_speed);
     sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
+    fighter.clear_lua_stack();
+    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,jump_speed);
     sv_kinetic_energy::set_limit_speed(fighter.lua_state_agent);
 
 
-    
+
 
 
     fighter.clear_lua_stack();
-    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,*ENERGY_STOP_RESET_TYPE_AIR, 0.0,3.0,0.0,0.0,0.0);
+    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,*ENERGY_STOP_RESET_TYPE_AIR, 0.0,jump_speed,0.0,0.0,0.0);
     sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
 
     fighter.clear_lua_stack();
@@ -415,9 +437,37 @@ unsafe extern "C" fn megafist_f_main(fighter: &mut L2CFighterCommon) -> L2CValue
     }
     lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_AIR, speed_const * PostureModule::lr(module_accessor),0.0,0.0,0.0,0.0);
     sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
+
     fighter.clear_lua_stack();
-    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY, -0.2, -0.2);
+    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,1.0);
+    sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
+    fighter.clear_lua_stack();
+    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,1.0);
+    sv_kinetic_energy::set_limit_speed(fighter.lua_state_agent);
+
+    let mut gravity = -0.2;
+    if WorkModule::is_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_INPUT){
+        gravity = -0.24;
+    }
+
+    fighter.clear_lua_stack();
+    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY, gravity, gravity);
     sv_kinetic_energy::set_accel(fighter.lua_state_agent);
+
+    sv_kinetic_energy!(set_accel_x_mul, fighter, FIGHTER_KINETIC_ENERGY_ID_CONTROL, 0.05);
+    let mut control_limit = 0.25;
+    if WorkModule::is_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_INPUT){
+        control_limit = 0.26;
+    }
+
+    fighter.clear_lua_stack();
+    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_CONTROL,control_limit);
+    sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
+
+    fighter.clear_lua_stack();
+    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_CONTROL,control_limit);
+    sv_kinetic_energy::set_limit_speed(fighter.lua_state_agent);
+
     //KineticModule::add_speed(module_accessor, &Vector3f{x:30.0,y:30.0,z:0.0});
     fighter.sub_shift_status_main(L2CValue::Ptr(megafist_f_main_loop as *const () as _))
 }
@@ -427,7 +477,7 @@ unsafe fn megafist_f_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     KineticModule::enable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_STOP);
     KineticModule::enable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_MOTION);
-    KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
+    KineticModule::enable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
     let speed_const;
     if StatusModule::status_kind(module_accessor) == *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F {
         speed_const = 0.8;
@@ -437,6 +487,14 @@ unsafe fn megafist_f_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     fighter.clear_lua_stack();
     lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_AIR, speed_const * PostureModule::lr(module_accessor),0.0,0.0,0.0,0.0);
     sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
+
+    fighter.clear_lua_stack();
+    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,1.0);
+    sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
+    fighter.clear_lua_stack();
+    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,1.0);
+    sv_kinetic_energy::set_limit_speed(fighter.lua_state_agent);
+
 
     if StatusModule::is_situation_changed(fighter.module_accessor) == true  {
         fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F_LANDING.into(),false.into());
@@ -501,18 +559,32 @@ unsafe extern "C" fn megafist_b_land_main(fighter: &mut L2CFighterCommon) -> L2C
     return L2CValue::I32(0)
 }
 
+unsafe extern "C" fn special_s_end(fighter: &mut L2CFighterCommon) -> L2CValue {
+    WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ENABLE_KARA);
+    return L2CValue::I32(0)
+}
 
+unsafe extern "C" fn megafist_f_end(fighter: &mut L2CFighterCommon) -> L2CValue {
+    WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_INPUT);
+    return L2CValue::I32(0)
+}
 
+unsafe extern "C" fn side_b_end_end(fighter: &mut L2CFighterCommon) -> L2CValue {
+    return L2CValue::I32(0)
+}
 
 pub fn install(agent: &mut Agent) {
     agent.status(Pre,   *FIGHTER_STATUS_KIND_SPECIAL_S,                             special_s_pre);
     agent.status(Main,  *FIGHTER_STATUS_KIND_SPECIAL_S,                             special_s_main);
+    agent.status(End,   *FIGHTER_STATUS_KIND_SPECIAL_S,                             special_s_end);
+
             
     agent.status(Pre,   *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL,                  side_b_slide_pre);
     agent.status(Main,  *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL,                  side_b_slide);
             
     agent.status(Pre,   *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_END,              side_b_end_pre);
-    agent.status(Main,  *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_END,              side_b_end);
+    agent.status(Main,  *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_END,              side_b_end_main);
+    agent.status(End ,  *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_END,              side_b_end_end);
             
     agent.status(Pre,   *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_ATTACK,                side_b_attack_pre);
     agent.status(Main,  *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_ATTACK,                side_b_attack);
@@ -524,8 +596,13 @@ pub fn install(agent: &mut Agent) {
 
     //.status(Pre, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_B, megafist_f_pre)
     agent.status(Main,  *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_B,         megafist_f_main);
+    agent.status(End,  *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_B,         megafist_f_end);
+
+    agent.status(Main,  *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F,         megafist_f_main);
+    agent.status(End,  *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F,         megafist_f_end);
+
     agent.status(Main,  *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F_LANDING, megafist_f_land_main);
     //.status(Pre, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F, megafist_f_pre)
-    agent.status(Main,  *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_WALL_ATTACK_F,         megafist_f_main);
+
 
 }

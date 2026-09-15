@@ -371,6 +371,8 @@ pub unsafe extern "C" fn caught_end(fighter: &mut L2CFighterCommon) -> L2CValue 
 
 
 pub fn install(agent: &mut Agent) {
+    agent.game_acmd("game_catchedpotspecialhi", game_catchedpotspecialhi, Priority::Default);
+
     agent.status(Pre,            FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_pre);
     agent.status(Main,           FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_specialhi_main);
     agent.status(Exit,           FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, caught_exit);

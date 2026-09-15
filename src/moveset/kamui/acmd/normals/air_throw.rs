@@ -21,8 +21,8 @@ unsafe extern "C" fn game_throwair(agent: &mut L2CAgentBase) {
     wait(agent.lua_state_agent, 3.0);
     if macros::is_excute(agent) {
         macros::CHECK_FINISH_CAMERA(agent, 10, 10);
-        lua_bind::FighterCutInManager::set_throw_finish_zoom_rate(singletons::FighterCutInManager(), 2.0);
-        lua_bind::FighterCutInManager::set_throw_finish_offset(singletons::FighterCutInManager(), Vector3f{x: 10.0, y: 10.0, z: 0.0});
+        lua_bind::FighterCutInManager::set_throw_finish_zoom_rate(singletons::FighterCutInManager(), 1.8);
+        lua_bind::FighterCutInManager::set_throw_finish_offset(singletons::FighterCutInManager(), Vector3f{x: 10.0, y: 14.0, z: 0.0});
     }
     wait(agent.lua_state_agent, 1.0);
     if macros::is_excute(agent) {

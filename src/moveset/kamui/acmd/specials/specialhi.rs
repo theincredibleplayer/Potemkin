@@ -13,7 +13,9 @@ unsafe extern "C" fn special_hi(agent: &mut L2CAgentBase) {
         macros::HIT_NODE(agent, Hash40::new("shoulderr"), *HIT_STATUS_XLU);
 
         macros::CATCH(agent, 0, Hash40::new("top"), 8.0 ,0.0,36.0,23.0, None, None, None, FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, *COLLISION_SITUATION_MASK_G);
-        macros::CATCH(agent, 1, Hash40::new("top"), 12.0,0.0,36.0,23.0, None, None, None, FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, *COLLISION_SITUATION_MASK_A);
+        macros::CATCH(agent, 1, Hash40::new("top"), 11.0,0.0,36.0,23.0, None, None, None, FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, *COLLISION_SITUATION_MASK_A);
+        macros::CATCH(agent, 2, Hash40::new("top"), 5.0 ,0.0,21.6,8.0, Some(0.0),Some(30.7),Some(17.0), FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, *COLLISION_SITUATION_MASK_A);
+
     }
     sv_animcmd::wait(agent.lua_state_agent, 6.0);
     if macros::is_excute(agent) {
@@ -83,7 +85,7 @@ unsafe extern "C" fn special_hi_loop(agent: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(agent.lua_state_agent, 3.0);
     if macros::is_excute(agent) {
-        macros::ATTACK(agent,0,0,Hash40::new("top"),1.0,361,30,10,12,5.0,0.0,28.0,12.0,None,None,None,1.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_none"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_NONE,*ATTACK_REGION_NONE);
+        macros::ATTACK(agent,0,0,Hash40::new("top"),1.0,361,30,10,12,5.0,0.0,30.0,14.0,None,None,None,1.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_none"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_NONE,*ATTACK_REGION_NONE);
         AttackModule::set_catch_only_all(agent.module_accessor, true, false);
         AttackModule::set_no_dead_all(agent.module_accessor, true, false);
     }
@@ -149,7 +151,7 @@ unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(agent.lua_state_agent, 3.0);
     if macros::is_excute(agent) {
-        macros::ATTACK(agent,0,0,Hash40::new("top"),1.0,361,30,10,12,5.0,0.0,28.0,12.0,None,None,None
+        macros::ATTACK(agent,0,0,Hash40::new("top"),1.0,361,30,10,12,5.0,0.0,30.0,14.0,None,None,None
         ,1.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,false,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_none"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_NONE,*ATTACK_REGION_NONE);
         AttackModule::set_catch_only_all(agent.module_accessor, true, false);
         AttackModule::set_no_dead_all(agent.module_accessor, true, false);
@@ -161,7 +163,7 @@ unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(agent.lua_state_agent, 45.0);
     if macros::is_excute(agent) {
-        macros::ATTACK_IGNORE_THROW(agent, 0, 0, Hash40::new("top"), 10.0, 361, 100, 0, 60, 12.0, 0.0, 28.0, 12.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_IGNORE_THROW(agent, 0, 0, Hash40::new("top"), 10.0, 361, 100, 0, 60, 12.0, 0.0, 28.0, 12.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
     
     sv_animcmd::frame(agent.lua_state_agent, 47.0);
@@ -250,7 +252,7 @@ unsafe extern "C" fn expression_special_hi_release(agent: &mut L2CAgentBase) {
             //macros::CAM_ZOOM_IN_arg6(
             //    agent,
             //    /*frames to zoom in totally*/3.0,
-            //    /*according to calude the object id?*/0.0,
+            //    /*according to claude1308 the object id?*/0.0,
             //    /*the amt of zoom needed, higher the number lower the zoom*/2.5*scale*1.3,
             //    /*y_rot*/0.35, // up and down
             //    /*x_rot*/-0.6 * lr, //left and right
@@ -259,7 +261,7 @@ unsafe extern "C" fn expression_special_hi_release(agent: &mut L2CAgentBase) {
             macros::CAM_ZOOM_IN_arg6(
                 agent,
                 /*frames to zoom in totally*/3.0,
-                /*according to calude the object id?*/0.0,
+                /*according to claude1308 the object id?*/0.0,
                 /*the amt of zoom needed, higher the number lower the zoom*/3.5*scale*1.3,
                 /*y_rot*/0.13, // up and down
                 /*x_rot*/-0.7 * lr, //left and right
@@ -299,7 +301,7 @@ unsafe extern "C" fn expression_special_hi_release(agent: &mut L2CAgentBase) {
             macros::CAM_ZOOM_IN_arg6(
                 agent,
                 /*frames to zoom in totally*/3.0,
-                /*according to calude the object id?*/0.0,
+                /*according to claude1308 the object id?*/0.0,
                 /*the amt of zoom needed, higher the number lower the zoom*/3.5*scale*1.3,
                 /*y_rot*/0.0, // up and down
                 /*x_rot*/0.0, //left and right

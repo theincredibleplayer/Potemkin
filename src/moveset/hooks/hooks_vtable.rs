@@ -1,5 +1,21 @@
 use super::*;
+use std::sync::LazyLock;
 
+static KAMUI_ON_RESET_OFFSET : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::RESET_1,             false, false));
+static KAMUI_INIT_OFFSET     : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::INITIALIZE,          false, false));
+static KAMUI_ON_SHIELD       : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_SHIELD_COLLISION, false, false));
+static KAMUI_ON_DAMAGE       : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_DAMAGE,           false, false));
+static KAMUI_ON_ATTACK       : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_ATTACK,           false, false));
+
+static OFFSET_ON_FRAME_3           : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_FRAME_3,           false, true));
+static OFFSET_ON_SEARCH            : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_SEARCH,            false, true));
+static OFFSET_RESET_1              : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::RESET_1,              false, true));
+static OFFSET_INITIALIZE           : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::INITIALIZE,           false, true));
+static OFFSET_ON_SHIELD_COLLISION  : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_SHIELD_COLLISION,  false, true));
+static OFFSET_ON_DAMAGE            : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_DAMAGE,            false, true));
+static OFFSET_ON_ATTACK            : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_ATTACK,            false, true));
+static OFFSET_ON_CHANGE_MOTION     : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_CHANGE_MOTION,     false, true));
+static OFFSET_ON_STATUS_TRANSITION : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_STATUS_TRANSITION, false, true));
 
 //searchbox implementations
 pub unsafe extern "C" fn kamui_on_search(_vtable: u64, fighter: &mut Fighter, log: u64, _some_float: f32) {
@@ -170,13 +186,15 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
 
 
 // initialization vtable hook (using it as agent init since i cant use workmodule in agent init) (thanks wuboy)
-#[skyline::from_offset(0xb5c360)]
+#[skyline::from_offset(*KAMUI_ON_RESET_OFFSET)]
 pub unsafe extern "C" fn kamui_reset_original(vtable: u64, fighter: &mut Fighter);
 
 pub unsafe extern "C" fn kamui_reset(vtable: u64, fighter: &mut Fighter) {
     let module_accessor = (*fighter).battle_object.module_accessor;
     ShieldModule::set_target_property(fighter.battle_object.module_accessor, *COLLISION_PROPERTY_REFLECT,2);
     let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
+
     UiManager::reset_on_rebirth(get_ui_index_from_entry_id(entry_id));
     UiManager::reset_cutin();
     if smashball::is_training_mode(){
@@ -193,6 +211,28 @@ pub unsafe extern "C" fn kamui_reset(vtable: u64, fighter: &mut Fighter) {
     WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_ATTACK_START);
     WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_JUMP_START);
 
+
+    let item_module = *(module_accessor as *const *const u64).add(0xc8 / 8);
+    let mut item_hash_ptr = (item_module as u64 + 0x20) as *mut *mut u64 ;
+    let mut item_hash_ptr_2 = (*item_hash_ptr as u64 + 0x8) as *mut u64;
+    let mut genesis_bone = (*item_hash_ptr as u64 + 0x18) as *mut u64;
+    let dat = (skyline::hooks::getRegionAddress(skyline::hooks::Region::Text) as u64 + 0x4fc8fe0) as u64;
+    let mut commonhave_hash = (dat + 0x20) as  *mut *mut u64;
+
+    
+    if utility::get_kind(&mut *module_accessor) == *FIGHTER_KIND_KAMUI{
+        if is_potemkin(module_accessor){
+            **commonhave_hash  = hash40("haver");
+            **item_hash_ptr    = hash40("haver");
+            *(item_hash_ptr_2) = hash40("haver");
+            *(genesis_bone)    = hash40("g_grip_r");
+        } else {
+            **commonhave_hash  = hash40("havel");
+            **item_hash_ptr    = hash40("havel");
+            *(item_hash_ptr_2) = hash40("havel");
+            *(genesis_bone)    = hash40("havel");
+        }
+    }
     kamui_reset_original(vtable,fighter);
 }
 
@@ -528,40 +568,40 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
             hash40("item_heavy_throw_b4"),
             hash40("item_heavy_throw_hi4"),
             hash40("item_heavy_throw_lw4"),
-            //hash40("item_sword_swing_1"),
-            //hash40("item_sword_swing_3"),
-            //hash40("item_sword_swing_4"),
-            //hash40("item_sword_swing_4_hold"),
+            hash40("item_sword_swing_1"),
+            hash40("item_sword_swing_3"),
+            hash40("item_sword_swing_4"),
+            hash40("item_sword_swing_4_hold"),
             //hash40("item_sword_swing_dash"),
-            //hash40("item_starrod_swing_1"),
-            //hash40("item_starrod_swing_3"),
-            //hash40("item_starrod_swing_4"),
-            //hash40("item_starrod_swing_4_hold"),
+            hash40("item_starrod_swing_1"),
+            hash40("item_starrod_swing_3"),
+            hash40("item_starrod_swing_4"),
+            hash40("item_starrod_swing_4_hold"),
             //hash40("item_starrod_swing_dash"),
-            //hash40("item_lipstick_swing_1"),
-            //hash40("item_lipstick_swing_3"),
-            //hash40("item_lipstick_swing_4"),
-            //hash40("item_lipstick_swing_4_hold"),
+            hash40("item_lipstick_swing_1"),
+            hash40("item_lipstick_swing_3"),
+            hash40("item_lipstick_swing_4"),
+            hash40("item_lipstick_swing_4_hold"),
             //hash40("item_lipstick_swing_dash"),
-            //hash40("item_firebar_swing_1"),
-            //hash40("item_firebar_swing_3"),
-            //hash40("item_firebar_swing_4"),
-            //hash40("item_firebar_swing_4_hold"),
+            hash40("item_firebar_swing_1"),
+            hash40("item_firebar_swing_3"),
+            hash40("item_firebar_swing_4"),
+            hash40("item_firebar_swing_4_hold"),
             //hash40("item_firebar_swing_dash"),
-            //hash40("item_club_swing_1"),
-            //hash40("item_club_swing_3"),
-            //hash40("item_club_swing_4"),
-            //hash40("item_club_swing_4_hold"),
+            hash40("item_club_swing_1"),
+            hash40("item_club_swing_3"),
+            hash40("item_club_swing_4"),
+            hash40("item_club_swing_4_hold"),
             //hash40("item_club_swing_dash"),
-            //hash40("item_killsword_swing_1"),
-            //hash40("item_killsword_swing_3"),
-            //hash40("item_killsword_swing_4"),
-            //hash40("item_killsword_swing_4_hold"),
+            hash40("item_killsword_swing_1"),
+            hash40("item_killsword_swing_3"),
+            hash40("item_killsword_swing_4"),
+            hash40("item_killsword_swing_4_hold"),
             //hash40("item_killsword_swing_dash"),
-            //hash40("item_deathscythe_swing_1"),
-            //hash40("item_deathscythe_swing_3"),
-            //hash40("item_deathscythe_swing_4"),
-            //hash40("item_deathscythe_swing_4_hold"),
+            hash40("item_deathscythe_swing_1"),
+            hash40("item_deathscythe_swing_3"),
+            hash40("item_deathscythe_swing_4"),
+            hash40("item_deathscythe_swing_4_hold"),
             //hash40("item_deathscythe_swing_dash"),
             //hash40("item_golden_hammer_wait"),
             //hash40("item_golden_hammer_move"),
@@ -569,109 +609,109 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
             //hash40("item_hammer_wait"),
             //hash40("item_hammer_move"),
             //hash40("item_hammer_jump"),
-            //hash40("item_bat_swing_4"),
-            //hash40("item_bat_swing_1"),
-            //hash40("item_bat_swing_3"),
+            hash40("item_bat_swing_4"),
+            hash40("item_bat_swing_1"),
+            hash40("item_bat_swing_3"),
             //hash40("item_bat_swing_dash"),
-            //hash40("item_screw"),
-            //hash40("item_screw_air"),
-            //hash40("item_screw_fall"),
-            //hash40("barrel_screw"),
+            hash40("item_screw"),
+            hash40("item_screw_air"),
+            hash40("item_screw_fall"),
+            hash40("barrel_screw"),
             //hash40("item_dragoon_get"),
             //hash40("item_dragoon_ride"),
             //hash40("item_warpstar"),
-            //hash40("item_shoot_legs_walk_f"),
-            //hash40("item_shoot_legs_walk_b"),
-            //hash40("item_shoot_legs_jump_squat"),
-            //hash40("item_shoot_legs_landing"),
-            //hash40("item_lgun_shoot"),
-            //hash40("item_lgun_shoot_upper"),
-            //hash40("item_lgun_shoot_air"),
-            //hash40("item_lgun_shoot_empty"),
-            //hash40("item_lgun_shoot_upper_empty"),
-            //hash40("item_lgun_shoot_air_empty"),
-            //hash40("item_fflower_shoot"),
-            //hash40("item_fflower_shoot_upper"),
-            //hash40("item_fflower_shoot_air"),
-            //hash40("item_fflower_shoot_aerial"),
-            //hash40("item_fflower_shoot_loop"),
-            //hash40("item_fflower_shoot_loop_upper"),
-            //hash40("item_fflower_shoot_air_loop"),
-            //hash40("item_scope_start"),
-            //hash40("item_scope_start_upper"),
-            //hash40("item_scope_wait"),
-            //hash40("item_scope_wait_upper"),
-            //hash40("item_scope_rapid"),
-            //hash40("item_scope_rapid_upper"),
-            //hash40("item_scope_fire"),
-            //hash40("item_scope_fire_upper"),
-            //hash40("item_scope_end"),
-            //hash40("item_scope_end_upper"),
-            //hash40("item_scope_fall"),
-            //hash40("item_scope_air_start"),
-            //hash40("item_scope_air_rapid"),
-            //hash40("item_scope_air_fire"),
-            //hash40("item_scope_air_end"),
-            //hash40("item_scope_air_start_aerial"),
-            //hash40("item_scope_air_rapid_aerial"),
-            //hash40("item_scope_air_fire_aerial"),
-            //hash40("item_scope_air_end_aerial"),
-            //hash40("item_scope_start_upper_empty"),
-            //hash40("item_scope_rapid_empty"),
-            //hash40("item_scope_rapid_upper_empty"),
-            //hash40("item_scope_fire_empty"),
-            //hash40("item_scope_fire_upper_empty"),
-            //hash40("item_scope_end_empty"),
-            //hash40("item_scope_end_upper_empty"),
-            //hash40("item_scope_air_start_empty"),
-            //hash40("item_scope_air_rapid_empty"),
-            //hash40("item_scope_air_fire_empty"),
-            //hash40("item_scope_air_end_empty"),
-            //hash40("item_scope_air_start_empty_aerial"),
-            //hash40("item_scope_air_rapid_empty_aerial"),
-            //hash40("item_scope_air_fire_empty_aerial"),
-            //hash40("item_scope_air_end_empty_aerial"),
-            //hash40("item_magicpot_start"),
-            //hash40("item_magicpot_start_upper"),
-            //hash40("item_magicpot_wait"),
-            //hash40("item_magicpot_wait_upper"),
-            //hash40("item_magicpot_end"),
-            //hash40("item_magicpot_end_upper"),
-            //hash40("item_magicpot_fall"),
-            //hash40("item_magicpot_air_start"),
-            //hash40("item_magicpot_air_end"),
-            //hash40("item_magicpot_air_start_aerial"),
-            //hash40("item_magicpot_air_end_aerial"),
-            //hash40("item_drill_shoot"),
-            //hash40("item_drill_shoot_upper"),
-            //hash40("item_drill_shoot_air"),
-            //hash40("item_steeldiver_shoot"),
-            //hash40("item_steeldiver_shoot_upper"),
-            //hash40("item_steeldiver_shoot_air"),
-            //hash40("item_staff_shoot"),
-            //hash40("item_staff_shoot_upper"),
-            //hash40("item_staff_shoot_air"),
-            //hash40("item_revengeshooter_shoot"),
-            //hash40("item_revengeshooter_shoot_upper"),
-            //hash40("item_revengeshooter_shoot_air"),
-            //hash40("item_genesis_get"),
+            hash40("item_shoot_legs_walk_f"),
+            hash40("item_shoot_legs_walk_b"),
+            hash40("item_shoot_legs_jump_squat"),
+            hash40("item_shoot_legs_landing"),
+            hash40("item_lgun_shoot"),
+            hash40("item_lgun_shoot_upper"),
+            hash40("item_lgun_shoot_air"),
+            hash40("item_lgun_shoot_empty"),
+            hash40("item_lgun_shoot_upper_empty"),
+            hash40("item_lgun_shoot_air_empty"),
+            hash40("item_fflower_shoot"),
+            hash40("item_fflower_shoot_upper"),
+            hash40("item_fflower_shoot_air"),
+            hash40("item_fflower_shoot_aerial"),
+            hash40("item_fflower_shoot_loop"),
+            hash40("item_fflower_shoot_loop_upper"),
+            hash40("item_fflower_shoot_air_loop"),
+            hash40("item_scope_start"),
+            hash40("item_scope_start_upper"),
+            hash40("item_scope_wait"),
+            hash40("item_scope_wait_upper"),
+            hash40("item_scope_rapid"),
+            hash40("item_scope_rapid_upper"),
+            hash40("item_scope_fire"),
+            hash40("item_scope_fire_upper"),
+            hash40("item_scope_end"),
+            hash40("item_scope_end_upper"),
+            hash40("item_scope_fall"),
+            hash40("item_scope_air_start"),
+            hash40("item_scope_air_rapid"),
+            hash40("item_scope_air_fire"),
+            hash40("item_scope_air_end"),
+            hash40("item_scope_air_start_aerial"),
+            hash40("item_scope_air_rapid_aerial"),
+            hash40("item_scope_air_fire_aerial"),
+            hash40("item_scope_air_end_aerial"),
+            hash40("item_scope_start_upper_empty"),
+            hash40("item_scope_rapid_empty"),
+            hash40("item_scope_rapid_upper_empty"),
+            hash40("item_scope_fire_empty"),
+            hash40("item_scope_fire_upper_empty"),
+            hash40("item_scope_end_empty"),
+            hash40("item_scope_end_upper_empty"),
+            hash40("item_scope_air_start_empty"),
+            hash40("item_scope_air_rapid_empty"),
+            hash40("item_scope_air_fire_empty"),
+            hash40("item_scope_air_end_empty"),
+            hash40("item_scope_air_start_empty_aerial"),
+            hash40("item_scope_air_rapid_empty_aerial"),
+            hash40("item_scope_air_fire_empty_aerial"),
+            hash40("item_scope_air_end_empty_aerial"),
+            hash40("item_magicpot_start"),
+            hash40("item_magicpot_start_upper"),
+            hash40("item_magicpot_wait"),
+            hash40("item_magicpot_wait_upper"),
+            hash40("item_magicpot_end"),
+            hash40("item_magicpot_end_upper"),
+            hash40("item_magicpot_fall"),
+            hash40("item_magicpot_air_start"),
+            hash40("item_magicpot_air_end"),
+            hash40("item_magicpot_air_start_aerial"),
+            hash40("item_magicpot_air_end_aerial"),
+            hash40("item_drill_shoot"),
+            hash40("item_drill_shoot_upper"),
+            hash40("item_drill_shoot_air"),
+            hash40("item_steeldiver_shoot"),
+            hash40("item_steeldiver_shoot_upper"),
+            hash40("item_steeldiver_shoot_air"),
+            hash40("item_staff_shoot"),
+            hash40("item_staff_shoot_upper"),
+            hash40("item_staff_shoot_air"),
+            hash40("item_revengeshooter_shoot"),
+            hash40("item_revengeshooter_shoot_upper"),
+            hash40("item_revengeshooter_shoot_air"),
+            hash40("item_genesis_get"),
             hash40("item_rocketbelt"),
             hash40("item_specialflag_hoist"),
             hash40("item_assist_item"),
             //hash40("item_gekikara_wait"),
             //hash40("item_gekikara_wait_face"),
             //hash40("item_grass_pull"),
-            //hash40("item_genesis_start"),
-            //hash40("item_genesis_start_upper"),
-            //hash40("item_genesis_turn"),
-            //hash40("item_genesis_fire"),
-            //hash40("item_genesis_loop"),
-            //hash40("item_genesis_end"),
-            //hash40("item_genesis_fall"),
-            //hash40("item_genesis_aerial_legs"),
-            //hash40("item_genesis_air_fire"),
-            //hash40("item_genesis_air_loop"),
-            //hash40("item_genesis_air_end"),
+            hash40("item_genesis_start"),
+            hash40("item_genesis_start_upper"),
+            hash40("item_genesis_turn"),
+            hash40("item_genesis_fire"),
+            hash40("item_genesis_loop"),
+            hash40("item_genesis_end"),
+            hash40("item_genesis_fall"),
+            hash40("item_genesis_aerial_legs"),
+            hash40("item_genesis_air_fire"),
+            hash40("item_genesis_air_loop"),
+            hash40("item_genesis_air_end"),
             //hash40("swim_rise"),
             //hash40("swim_up"),
             //hash40("swim_up_damage"),
@@ -736,7 +776,7 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
 }
 
 
-#[skyline::from_offset(0xb5c1a0)]
+#[skyline::from_offset(*KAMUI_INIT_OFFSET)]
 pub unsafe extern "C" fn kamui_init_og(vtable: u64, fighter: &mut Fighter);
 
 pub unsafe extern "C" fn kamui_init(vtable: u64, fighter: &mut Fighter) {
@@ -766,7 +806,6 @@ pub unsafe extern "C" fn kamui_init(vtable: u64, fighter: &mut Fighter) {
         
         MiscModule::add_shield_group(module_accessor, resource, 2);
     }
-
     kamui_init_og(vtable,fighter);
 }
 
@@ -774,7 +813,7 @@ pub unsafe extern "C" fn kamui_init(vtable: u64, fighter: &mut Fighter) {
 
 
 
-#[skyline::from_offset(0xb63960)]
+#[skyline::from_offset(*KAMUI_ON_SHIELD)]
 pub unsafe extern "C" fn kamui_on_shield_original(vtable: u64, fighter: &mut Fighter, collision_event: &mut ShieldAttackCollisionEvent);
 
 pub unsafe extern "C" fn kamui_on_shield(vtable: u64, fighter: &mut Fighter, collision_event: &mut ShieldAttackCollisionEvent ) {
@@ -816,7 +855,7 @@ pub unsafe extern "C" fn kamui_on_shield(vtable: u64, fighter: &mut Fighter, col
 }
 
 
-#[skyline::from_offset(0xb5e710)]
+#[skyline::from_offset(*KAMUI_ON_DAMAGE)]
 pub unsafe extern "C" fn kamui_on_damage_og(vtable: u64, fighter: &mut Fighter,damage_log:u64);
 
 pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,damage_log:u64) {
@@ -842,6 +881,7 @@ pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,dama
                 *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_S_ATTACK,
                 FIGHTER_KAMUI_STATUS_KIND_HEAT_TACKLE,
                 FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF,
+                FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER,
                 ].contains(&status_kind)
             && WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON) {
                 let time_base = 45.0 * (1.0/sv_information::slow_rate());
@@ -863,7 +903,7 @@ pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,dama
     kamui_on_damage_og(vtable,fighter,damage_log);
 }
 
-#[skyline::from_offset(0xb5e240)]
+#[skyline::from_offset(*KAMUI_ON_ATTACK)]
 pub unsafe extern "C" fn kamui_on_attack_og(vtable: u64, fighter: &mut Fighter,collision_log:CollisionLogScuffed, damage: f32);
 
 pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,collision_log:CollisionLogScuffed, damage:f32) {
@@ -922,7 +962,7 @@ pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,coll
             *FIGHTER_STATUS_KIND_FINAL].contains(&status){
                 if HitModule::get_status(opp_boma, collision_log.receiver_id as i32, 0) == 0 {
                     let count = smash::app::lua_bind::FighterManager::entry_count(singletons::FighterManager() as _) as f32;
-                    let mult = 0.64 - 0.02 * count;
+                    let mult = 0.64 - 0.05 * count;
                     UiManager::add_tension(get_ui_index_from_entry_id(entry_id), damage*mult);
                 }
             }
@@ -933,12 +973,12 @@ pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,coll
 }
 
 
+pub unsafe extern "C" fn kamui_on_status_transition(vtable: u64, fighter: &mut Fighter, next_status:i32) {
+    let module_accessor = fighter.battle_object.module_accessor;
+    if is_potemkin(module_accessor){
 
-
-
-//vtable patching stuff
-pub static mut KAMUI_VTABLE_ENTRIES: [usize; 146] = [0; 146];
-
+    }
+}
 
 fn patch_vtable_function(offset: usize, function: u64) {
     // println!("function ptr: {:#x}", function as u64);
@@ -952,20 +992,17 @@ fn patch_vtable_function(offset: usize, function: u64) {
 
 
 
-
 pub fn install() {
     unsafe {
-        KAMUI_VTABLE_ENTRIES[0] = 0x4FC8B50;
-        for i in 1..146 {
-            KAMUI_VTABLE_ENTRIES[i] = KAMUI_VTABLE_ENTRIES[0] + (0x8 * (i as usize));
-        }
-        patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_FRAME_3],kamui_on_frame as u64);
-        patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_SEARCH],kamui_on_search as u64);
-        patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::RESET_1], kamui_reset as u64);
-        patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::INITIALIZE], kamui_init as u64);
-        patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_SHIELD_COLLISION], kamui_on_shield as u64);
-        patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_DAMAGE], kamui_on_damage as u64);
-        patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_ATTACK], kamui_on_attack as u64);
-        patch_vtable_function(KAMUI_VTABLE_ENTRIES[VtableEntry::ON_CHANGE_MOTION], kamui_on_change_motion as u64);
+        patch_vtable_function(*OFFSET_ON_FRAME_3          , kamui_on_frame as u64);
+        patch_vtable_function(*OFFSET_ON_SEARCH           , kamui_on_search as u64);
+        patch_vtable_function(*OFFSET_RESET_1             , kamui_reset as u64);
+        patch_vtable_function(*OFFSET_INITIALIZE          , kamui_init as u64);
+        patch_vtable_function(*OFFSET_ON_SHIELD_COLLISION , kamui_on_shield as u64);
+        patch_vtable_function(*OFFSET_ON_DAMAGE           , kamui_on_damage as u64);
+        patch_vtable_function(*OFFSET_ON_ATTACK           , kamui_on_attack as u64);
+        patch_vtable_function(*OFFSET_ON_CHANGE_MOTION    , kamui_on_change_motion as u64);
+        patch_vtable_function(*OFFSET_ON_STATUS_TRANSITION, kamui_on_status_transition as u64);
+
     }
 }

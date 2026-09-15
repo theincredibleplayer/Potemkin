@@ -2,13 +2,20 @@ use super::*;
 
 
 unsafe extern "C" fn potbusterwhiff(agent: &mut L2CAgentBase) {
-    frame(agent.lua_state_agent, 6.0);
     if macros::is_excute(agent) {
-        macros::FOOT_EFFECT(agent, Hash40::new("sys_run_smoke"), Hash40::new("top"), 0, 0, -5, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, false);
+        macros::FT_MOTION_RATE(agent, 1.6);
+    }
+    frame(agent.lua_state_agent, 3.0);
+    if macros::is_excute(agent) {
         WorkModule::on_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
         damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0); 
-        macros::CATCH(agent, 0, Hash40::new("top"), 6.1, 0.0, 9.0, 7.0, Some(0.0), Some(9.0), Some(12.7), FIGHTER_STATUS_KIND_POT_BUSTER_CAUGHT, *COLLISION_SITUATION_MASK_G);
-        macros::CATCH(agent, 1, Hash40::new("top"), 4.55, 0.0, 9.0, 5.45, Some(0.0), Some(9.0), Some(15.25), FIGHTER_STATUS_KIND_POT_BUSTER_CAUGHT, *COLLISION_SITUATION_MASK_A);
+    }
+    frame(agent.lua_state_agent, 5.0);
+    if macros::is_excute(agent) {
+        macros::FOOT_EFFECT(agent, Hash40::new("sys_run_smoke"), Hash40::new("top"), 0, 0, -5, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, false);
+        macros::CATCH(agent, 0, Hash40::new("top"), 6.1, 0.0, 9.0, 7.0, Some(0.0), Some(9.0), Some(13.0), FIGHTER_STATUS_KIND_POT_BUSTER_CAUGHT, *COLLISION_SITUATION_MASK_GA);
+        macros::FT_MOTION_RATE(agent, 1.0);
+        //macros::CATCH(agent, 1, Hash40::new("top"), 4.55, 0.0, 9.0, 5.45, Some(0.0), Some(9.0), Some(15.25), FIGHTER_STATUS_KIND_POT_BUSTER_CAUGHT, *COLLISION_SITUATION_MASK_A);
     }
     wait(agent.lua_state_agent, 4.0);
     if macros::is_excute(agent) {
@@ -34,12 +41,17 @@ unsafe extern "C" fn game_potbuster(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         JostleModule::set_status(agent.module_accessor, false);
         grab!(agent, *MA_MSC_CMD_GRAB_CLEAR_ALL);
+        WorkModule::on_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
+        damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0); 
+
         macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.0, 80, 140, 0, 80, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 100, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         WorkModule::on_flag(agent.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
     }
     frame(agent.lua_state_agent, 128.0);
     if macros::is_excute(agent) {
+        damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_NORMAL, 0);
+        WorkModule::off_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
         macros::CAM_ZOOM_OUT(agent);
         CameraModule::reset_all(agent.module_accessor);
         macros::QUAKE(agent, *CAMERA_QUAKE_KIND_XL);
@@ -54,9 +66,9 @@ unsafe extern "C" fn game_potbuster(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 158.0);
     if macros::is_excute(agent){
         WorkModule::off_flag(agent.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
-        macros::CHECK_FINISH_CAMERA(agent, 0, 0);
-        lua_bind::FighterCutInManager::set_throw_finish_zoom_rate(singletons::FighterCutInManager(), 1.5);
-        lua_bind::FighterCutInManager::set_throw_finish_offset(singletons::FighterCutInManager(), Vector3f{x: 0.0, y: 0.0, z: 0.0});
+        macros::CHECK_FINISH_CAMERA(agent, 10, 0);
+        lua_bind::FighterCutInManager::set_throw_finish_zoom_rate(singletons::FighterCutInManager(), 1.8);
+        lua_bind::FighterCutInManager::set_throw_finish_offset(singletons::FighterCutInManager(), Vector3f{x: 0.0, y: 10.0, z: 0.0});
     }
     frame(agent.lua_state_agent, 159.0);
     if macros::is_excute(agent) {
@@ -65,6 +77,7 @@ unsafe extern "C" fn game_potbuster(agent: &mut L2CAgentBase) {
             AttackModule::hit_absolute_joint(agent.module_accessor, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW,capture_id as u32,Hash40::new("throw"), 0, 0);
         }
         JostleModule::set_status(agent.module_accessor, true);
+        //HitModule::set_status_all(agent.module_accessor, HitStatus(*HIT_STATUS_NORMAL), 0);
     }
 }
 
@@ -116,6 +129,9 @@ unsafe extern "C" fn sound_potbuster(agent: &mut L2CAgentBase) {
         macros::STOP_SE(agent, Hash40::new("vc_pot_busterwhiff_b"));
         macros::STOP_SE(agent, Hash40::new("vc_pot_busterwhiff_c"));
         macros::PLAY_SE(agent, Hash40::new("se_btl_pot_impact_catch_large"));
+    }
+    frame(agent.lua_state_agent, 2.0);
+    if macros::is_excute(agent) {
         let sound = sound_selector(agent,"vc_pot_potemkin_buster_X_X".to_string(),3,true,false,0);
         //macros::PLAY_SE(agent, Hash40::new_raw(sound));
         SoundModule::play_se(agent.module_accessor, Hash40::new_raw(sound), true, false, false, false, enSEType(0));
@@ -134,6 +150,7 @@ unsafe extern "C" fn sound_potbuster(agent: &mut L2CAgentBase) {
 }
 
 unsafe extern "C" fn expression_potbuster(agent: &mut L2CAgentBase) {
+    frame(agent.lua_state_agent, 2.0);
     if macros::is_excute(agent) {
         if camera_checks(agent){
             macros::CAM_ZOOM_OUT(agent);
@@ -142,8 +159,8 @@ unsafe extern "C" fn expression_potbuster(agent: &mut L2CAgentBase) {
             CameraModule::reset_all(agent.module_accessor);            
             macros::CAM_ZOOM_IN_arg6(
                 agent,
-                /*frames to zoom in totally*/5.0,
-                /*according to calude the object id?*/0.0,
+                /*frames to zoom in totally*/8.0,
+                /*according to claude1308 the object id?*/0.0,
                 /*the amt of zoom needed, higher the number lower the zoom*/1.1*scale*1.3,
                 /*y_rot*/0.0, // up and down
                 /*x_rot*/0.0, //left and right
@@ -158,9 +175,10 @@ unsafe extern "C" fn expression_potbuster(agent: &mut L2CAgentBase) {
             smash::app::sv_module_access::camera(agent.lua_state_agent);
         }
     }
-    frame(agent.lua_state_agent, 5.0);
+    frame(agent.lua_state_agent, 9.0);
     if macros::is_excute(agent) {
         if camera_checks(agent){
+            CameraModule::reset_all(agent.module_accessor);
             macros::CAM_ZOOM_OUT(agent);
             macros::REQ_MOTION_CAMERA(agent, Hash40::new("d04potemkinbuster.nuanmb"), false);
         }

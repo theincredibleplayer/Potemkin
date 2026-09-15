@@ -1,5 +1,10 @@
 //huge thanks to the goat WuBoy for this code
 use super::*;
+
+const BUTTON_A :  u8 = 0x1;
+const BUTTON_B :  u8 = 0x2;
+const BUTTON_AB:  u8 = 0x3;
+
 /// Sets a command input to only use certain buttons.
 pub unsafe fn set_command_input_button(module_accessor: *mut BattleObjectModuleAccessor, command: usize, buttons: u8) {
     let buttons = InputAllow::from_bits(buttons).unwrap();
@@ -219,9 +224,11 @@ unsafe extern "C" fn special_46_input(
 pub unsafe extern "C" fn on_start(fighter: &mut L2CFighterCommon) {
     //set_command_input_function(fighter.module_accessor, 0x7, special_46_input); //hammerfall
     //set_command_input_function(fighter.module_accessor, 0xA, special_360_input); //pot buster
-    set_command_input_button(fighter.module_accessor, 0x3, 0x2);
-    set_command_input_button(fighter.module_accessor, 0x2, 0x2);
-    set_command_input_button(fighter.module_accessor, 0x0, 0x2);
+    set_command_input_button(fighter.module_accessor, *FIGHTER_PAD_CMD_CAT4_SPECIAL_HI_COMMAND as usize, BUTTON_B);
+    set_command_input_button(fighter.module_accessor, *FIGHTER_PAD_CMD_CAT4_SPECIAL_S_COMMAND as usize, BUTTON_B);
+    set_command_input_button(fighter.module_accessor, *FIGHTER_PAD_CMD_CAT4_SPECIAL_N_COMMAND as usize, BUTTON_B);
     //set_command_input_button(fighter.module_accessor, 0x7, 0x3);
-    set_command_input_button(fighter.module_accessor, 0x8, 0x1);
+    //set_command_input_button(fighter.module_accessor, *FIGHTER_PAD_CMD_CAT4_SUPER_SPECIAL_COMMAND as usize, BUTTON_A);
+    //set_command_input_button(fighter.module_accessor, *FIGHTER_PAD_CMD_CAT4_SUPER_SPECIAL_R_COMMAND as usize, BUTTON_A);
+
 }

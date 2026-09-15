@@ -53,8 +53,8 @@ pub unsafe extern "C" fn potemkin_mirror_handler(module_accessor: *mut BattleObj
     } else { 
         // reverses the -ve scale (i am not sure if its actually needed but we ball ig)
         ModelModule::set_joint_scale(module_accessor, Hash40::new("top")   , &Vector3f{x:scale,y:scale,z:scale});
-        ModelModule::set_joint_scale(module_accessor, Hash40::new("havel") , &Vector3f{x:scale,y:scale,z:scale});
-        ModelModule::set_joint_scale(module_accessor, Hash40::new("haver") , &Vector3f{x:scale,y:scale,z:scale});
+        //ModelModule::set_joint_scale(module_accessor, Hash40::new("havel") , &Vector3f{x:scale,y:scale,z:scale});
+        //ModelModule::set_joint_scale(module_accessor, Hash40::new("haver") , &Vector3f{x:scale,y:scale,z:scale});
         //ModelModule::set_joint_scale(module_accessor, Hash40::new("throw") , &Vector3f{x:scale,y:scale,z:scale});
 
         //ModelModule::set_joint_scale(module_accessor, Hash40::new("throw") , &Vector3f{x:scale,y:scale,z:scale});

@@ -166,7 +166,6 @@ unsafe extern "C" fn final_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue
         }
         return L2CValue::I32(0) 
     } else if WorkModule::is_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_START){
-        let mut current_speed = WorkModule::get_float(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_SPECIAL_S_ACCEL);
         let module_accessor = fighter.module_accessor;
         let timer = WorkModule::get_float(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FINAL_TIMER);
         let speed_x = KineticModule::get_sum_speed_x(module_accessor, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_ALL);
@@ -251,20 +250,30 @@ unsafe extern "C" fn final_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue
             fighter.clear_lua_stack();
             lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,10.0);
             sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
+            fighter.clear_lua_stack();
+            lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,10.0);
             sv_kinetic_energy::set_limit_speed(fighter.lua_state_agent);
+
             fighter.clear_lua_stack();
             lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,speed_limit_x);
             sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
+            fighter.clear_lua_stack();
+            lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,speed_limit_x);
             sv_kinetic_energy::set_limit_speed(fighter.lua_state_agent);
+
             fighter.clear_lua_stack();
             lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,*ENERGY_STOP_RESET_TYPE_AIR, 0.0,2.0,0.0,0.0,0.0);
             sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
             fighter.clear_lua_stack();
             lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_AIR, speed_x * PostureModule::lr(module_accessor),0.0,0.0,0.0,0.0);
             sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
+            
             fighter.clear_lua_stack();
             lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY, 0.0, 0.0);
             sv_kinetic_energy::set_accel(fighter.lua_state_agent);
+        }else{
+            //KineticModule::clear_speed_all(fighter.module_accessor);
+            KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY);
         }
         if MotionModule::is_end(module_accessor) {
             WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_START);

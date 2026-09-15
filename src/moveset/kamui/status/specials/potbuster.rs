@@ -7,8 +7,8 @@ unsafe extern "C" fn potbusterwhiff_pre(fighter: &mut L2CFighterCommon) -> L2CVa
         SituationKind(*SITUATION_KIND_GROUND),
         *FIGHTER_KINETIC_TYPE_GROUND_STOP,
         *GROUND_CORRECT_KIND_GROUND_CLIFF_STOP as u32,
-        GroundCliffCheckKind(*GROUND_CLIFF_CHECK_KIND_ALWAYS),
-        false,
+        GroundCliffCheckKind(*GROUND_CLIFF_CHECK_KIND_NONE),
+        true,
         *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_FLAG,
         *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_INT,
         *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_FLOAT,
@@ -33,13 +33,6 @@ unsafe extern "C" fn potbusterwhiff_main(fighter: &mut L2CFighterCommon) -> L2CV
     //GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
     fighter.sub_set_special_start_common_kinetic_setting(hash40("param_special_lw").into());
     MotionModule::change_motion(module_accessor,Hash40::new("potemkin_buster_whiff"),0.0,1.0,false,0.0,false,false);
-    
-    fighter.clear_lua_stack();
-    fighter.push_lua_stack(&mut L2CValue::I32(*FIGHTER_KINETIC_ENERGY_ID_MOTION));
-    let mut lr = PostureModule::lr(fighter.module_accessor);
-    fighter.push_lua_stack(&mut L2CValue::F32(lr));
-    sv_kinetic_energy::set_chara_dir(fighter.lua_state_agent);
-
     fighter.sub_shift_status_main(L2CValue::Ptr(potbusterwhiff_main_loop as *const () as _))
 }
 
@@ -70,6 +63,31 @@ unsafe fn potbusterwhiff_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     return L2CValue::I32(0)
 }
 
+unsafe extern "C" fn potbuster_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
+    StatusModule::init_settings
+        (fighter.module_accessor,
+        SituationKind(*SITUATION_KIND_GROUND),
+        *FIGHTER_KINETIC_TYPE_GROUND_STOP,
+        *GROUND_CORRECT_KIND_GROUND_CLIFF_STOP as u32,
+        GroundCliffCheckKind(*GROUND_CLIFF_CHECK_KIND_NONE),
+        false,
+        *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_FLAG,
+        *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_INT,
+        *FIGHTER_STATUS_WORK_KEEP_FLAG_NONE_FLOAT,
+        0);
+    FighterStatusModuleImpl::set_fighter_status_data
+        (fighter.module_accessor,
+        false,
+        *FIGHTER_TREADED_KIND_NO_REAC,
+        false,
+        false,
+        false,
+        (*FIGHTER_LOG_MASK_FLAG_ATTACK_KIND_SPECIAL_N) as u64,
+        (0) as u32,
+        (*FIGHTER_POWER_UP_ATTACK_BIT_SPECIAL_N) as u32,
+        0);
+    return L2CValue::I32(0)
+}
 
 unsafe extern "C" fn potbuster_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
@@ -78,6 +96,8 @@ unsafe extern "C" fn potbuster_main(fighter: &mut L2CFighterCommon) -> L2CValue 
     MotionModule::change_motion(module_accessor,Hash40::new("potemkin_buster"),0.0,1.0,false,0.0,false,false);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_STOP);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
+    KineticModule::clear_speed_all(module_accessor);
+    WorkModule::on_flag(module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD_UP);
     fighter.sub_shift_status_main(L2CValue::Ptr(potbuster_main_loop as *const () as _))
 }
 
@@ -116,6 +136,8 @@ unsafe extern "C" fn potbuster_end(fighter: &mut L2CFighterCommon) -> L2CValue {
         CatchModule::catch_cut(fighter.module_accessor,false,false);
         println!("catch cut was ran");
     }
+    WorkModule::off_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD_UP);
+    WorkModule::off_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
     return L2CValue::I32(0)
 }
 
@@ -125,7 +147,7 @@ pub fn install(agent: &mut Agent) {
     agent.status(Pre, FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF, potbusterwhiff_pre);
     agent.status(Main, FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER_WHIFF, potbusterwhiff_main);
 
-    agent.status(Pre, FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER, potbusterwhiff_pre);
+    agent.status(Pre, FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER, potbuster_pre);
     agent.status(Main, FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER, potbuster_main);
     agent.status(End, FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER, potbuster_end);
 }

@@ -118,7 +118,7 @@ unsafe extern "C" fn special_hi_start_main(fighter: &mut L2CFighterCommon) -> L2
         macros::CAM_ZOOM_IN_arg6(
             fighter,
             /*frames to zoom in totally*/10.0,
-            /*according to calude the object id?*/0.0,
+            /*according to claude1308 the object id?*/0.0,
             /*the amt of zoom needed, higher the number lower the zoom*/1.1*scale*1.3,
             /*y_rot*/0.1, // up and down
             /*x_rot*/0.2 * lr, //left and right
@@ -221,7 +221,7 @@ unsafe extern "C" fn special_hi_loop_main(fighter: &mut L2CFighterCommon) -> L2C
         macros::CAM_ZOOM_IN_arg6(
             fighter,
             /*frames to zoom in totally*/90.0,
-            /*according to calude the object id?*/0.0,
+            /*according to claude1308 the object id?*/0.0,
             /*the amt of zoom needed, higher the number lower the zoom*/1.1*scale*1.3,
             /*y_rot*/0.1, // up and down
             /*x_rot*/-0.3 * lr, //left and right
@@ -286,7 +286,7 @@ unsafe fn special_hi_loop_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue 
                 macros::CAM_ZOOM_IN_arg6(
                     fighter,
                     /*frames to zoom in totally*/50.0,
-                    /*according to calude the object id?*/0.0,
+                    /*according to claude1308 the object id?*/0.0,
                     /*the amt of zoom needed, higher the number lower the zoom*/2.0*scale*1.3,
                     /*y_rot*/0.13, // up and down
                     /*x_rot*/-0.7 * lr, //left and right

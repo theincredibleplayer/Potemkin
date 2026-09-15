@@ -253,6 +253,7 @@ unsafe fn special_air_hi_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
 
 unsafe extern "C" fn special_air_hi_end(fighter: &mut L2CFighterCommon) -> L2CValue {
     WorkModule::off_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ATTACH_WEAPON);
+    WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_INPUT);
     ArticleModule::remove_exist(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
     JostleModule::set_status(fighter.module_accessor, true);
     return L2CValue::I32(0)
@@ -264,7 +265,7 @@ unsafe extern "C" fn special_air_hi_end_pre(fighter: &mut L2CFighterCommon) -> L
         SituationKind(*SITUATION_KIND_AIR),
         *FIGHTER_KINETIC_TYPE_AIR_STOP,
         *GROUND_CORRECT_KIND_AIR as u32,
-        GroundCliffCheckKind(*GROUND_CLIFF_CHECK_KIND_ALWAYS),
+        GroundCliffCheckKind(*GROUND_CLIFF_CHECK_KIND_ALWAYS_BOTH_SIDES),
         true,
         *FIGHTER_STATUS_WORK_KEEP_FLAG_ALL_FLAG,
         *FIGHTER_STATUS_WORK_KEEP_FLAG_ALL_INT,
