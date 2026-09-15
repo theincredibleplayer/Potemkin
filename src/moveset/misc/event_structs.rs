@@ -502,7 +502,7 @@ impl VtableEntry {
     pub const RETURN_IN_X3: usize = 144;                            // shared across the entire cast except sora and kazuya it seems, returns whatever was in the register in_x3 + 0x58
                                                                     // sora and kazuya have 14 params to the function and i am not reading allat
 
-    pub const RETURNS_ITEM_HAND_GRIP_HEX: usize = 145;              // shared across the entire cast except minmin it seems, this one always returns the hash for item_hand_grip even with minmin
+    pub const RETURNS_ITEM_HAND_GRIP_HASH: usize = 145;             // shared across the entire cast except minmin it seems, this one always returns the hash for item_hand_grip even with minmin
 }
 
 #[repr(C)]

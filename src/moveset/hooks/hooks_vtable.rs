@@ -699,7 +699,7 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
             hash40("item_specialflag_hoist"),
             hash40("item_assist_item"),
             //hash40("item_gekikara_wait"),
-            //hash40("item_gekikara_wait_face"),
+            hash40("item_gekikara_wait_face"),
             //hash40("item_grass_pull"),
             hash40("item_genesis_start"),
             hash40("item_genesis_start_upper"),
@@ -730,7 +730,12 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
             //hash40("ladder_catch_air_l"),
             //hash40("ladder_catch_end_r"),
             //hash40("ladder_catch_end_l"),
-            hash40("jump_board_jump"),
+            //hash40("jump_board_jump"),
+            hash40("fill_blank"),
+            hash40("fill_blank_damage"),
+            hash40("fill_blank_finish"),
+            hash40("fill_blank_cliff"),
+            hash40("fill_blank_sleep"),
         ].contains(&motion){
             ModelModule::set_mesh_visibility(module_accessor, Hash40::new("low_bodybase"),    false);
             ModelModule::set_mesh_visibility(module_accessor, Hash40::new("low_bodyemi"),     false);
@@ -994,6 +999,12 @@ fn patch_vtable_function(offset: usize, function: u64) {
 
 pub fn install() {
     unsafe {
+        LazyLock::force(&KAMUI_ON_RESET_OFFSET);
+        LazyLock::force(&KAMUI_INIT_OFFSET);
+        LazyLock::force(&KAMUI_ON_SHIELD);
+        LazyLock::force(&KAMUI_ON_DAMAGE);
+        LazyLock::force(&KAMUI_ON_ATTACK);
+
         patch_vtable_function(*OFFSET_ON_FRAME_3          , kamui_on_frame as u64);
         patch_vtable_function(*OFFSET_ON_SEARCH           , kamui_on_search as u64);
         patch_vtable_function(*OFFSET_RESET_1             , kamui_reset as u64);
