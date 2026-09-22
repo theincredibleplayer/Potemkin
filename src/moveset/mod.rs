@@ -211,10 +211,10 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
                 [hash40("shoulderr") as f64, 0.3, 0.0, 0.0, 7.75, 0.0, 0.0, 4.0, *COLLISION_PART_BODY as f64,*HIT_HEIGHT_HIGH as f64],
                 [hash40("arml") as f64, 0.0, 0.0, 0.0, 7.75, 0.0, 0.0, 4.0, *COLLISION_PART_BODY as f64,*HIT_HEIGHT_CENTER as f64],
                 [hash40("armr") as f64, 0.0, 0.0, 0.0, 7.75, 0.0, 0.0, 4.0, *COLLISION_PART_BODY as f64,*HIT_HEIGHT_CENTER as f64],
-                [hash40("legl") as f64, 0.2, 0.0, 0.0, 3.8, 0.0, 0.0, 3.4, *COLLISION_PART_BODY as f64,*HIT_HEIGHT_LOW as f64],
-                [hash40("legr") as f64, 0.2, 0.0, 0.0, 3.8, 0.0, 0.0, 3.4, *COLLISION_PART_BODY as f64,*HIT_HEIGHT_LOW as f64],
-                [hash40("kneel") as f64, 0.2, 0.0, 0.0, 4.6, 0.0, 0.0, 2.4, *COLLISION_PART_LEGS as f64,*HIT_HEIGHT_LOW as f64],
-                [hash40("kneer") as f64, 0.2, 0.0, 0.0, 4.6, 0.0, 0.0, 2.4, *COLLISION_PART_LEGS as f64,*HIT_HEIGHT_LOW as f64]
+                [hash40("legl") as f64, 0.2, 0.0, 0.0, 3.8, 0.0, 0.0, 3.4, *COLLISION_PART_BODY_LEGS as f64,*HIT_HEIGHT_LOW as f64],
+                [hash40("legr") as f64, 0.2, 0.0, 0.0, 3.8, 0.0, 0.0, 3.4, *COLLISION_PART_BODY_LEGS as f64,*HIT_HEIGHT_LOW as f64],
+                [hash40("kneel") as f64, 0.2, 0.0, 0.0, 4.6, 0.0, 0.0, 2.4, *COLLISION_PART_BODY_LEGS as f64,*HIT_HEIGHT_LOW as f64],
+                [hash40("kneer") as f64, 0.2, 0.0, 0.0, 4.6, 0.0, 0.0, 2.4, *COLLISION_PART_BODY_LEGS as f64,*HIT_HEIGHT_LOW as f64]
             ];
             let mut f = 0;
             for i in custom_hurtboxes {
@@ -224,7 +224,6 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
                 f += 1;
             }
         }
-
         // set_scale
         ModelModule::set_scale(module_accessor, 1.0);
         AttackModule::set_attack_scale(module_accessor, 1.0, true);
@@ -405,7 +404,8 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
         if !roman_cancellable_status.contains(&status_kind)
         || (prev_status_kind == FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL
             && StatusModule::is_changing(module_accessor)) 
-        || !UiManager::is_tension_available(get_ui_index_from_entry_id(entry_id)){
+        || !UiManager::is_tension_available(get_ui_index_from_entry_id(entry_id))
+        || (CatchModule::is_catch(module_accessor) && !AttackModule::is_hit_abs(module_accessor)){
             can_rc = false;
         }   
 
@@ -436,11 +436,14 @@ pub unsafe extern "C" fn kamui(fighter: &mut L2CFighterCommon) {
                 return;
             } 
 
-            if is_stop
-            && AttackModule::is_infliction_status(module_accessor, *COLLISION_KIND_MASK_HIT | *COLLISION_KIND_MASK_SHIELD)
+            if (is_stop || AttackModule::is_hit_abs(module_accessor))
+            && (AttackModule::is_infliction_status(module_accessor, *COLLISION_KIND_MASK_HIT | *COLLISION_KIND_MASK_SHIELD) || AttackModule::is_hit_abs(module_accessor))
             && is_input_pressed{
                 //red rc 
                 WorkModule::on_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RED_RC);
+                if get_rc_direction(fighter) != 0{
+                    WorkModule::set_int(module_accessor,get_rc_direction(fighter),FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_ROMAN_CANCEL_BUFFER_DIRECTION);
+                }
                 return;
             } else if (blue_rc_status_list.contains(&status_kind) 
             || ((MotionModule::frame(module_accessor) <= 3.0) && blue_rc_status_list.contains(&prev_status_kind) && (status_kind != FIGHTER_STATUS_KIND_FINAL)) )
@@ -575,16 +578,23 @@ unsafe extern "C" fn agent_init(fighter: &mut L2CFighterCommon) {
 
 pub unsafe extern "C" fn is_potemkin(module_accessor: *mut BattleObjectModuleAccessor) -> bool {
     if utility::get_kind(&mut *module_accessor) == *FIGHTER_KIND_KAMUI{
-        let entry_id = sv_battle_object::entry_id((*module_accessor).battle_object_id);
-        let info = smash::cpp::root::app::lua_bind::FighterManager::get_fighter_information(singletons::FighterManager(), smash::app::FighterEntryID(entry_id as i32));
-        let color = smash::app::lua_bind::FighterInformation::fighter_color(info) as i32;    
-        //let color = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_COLOR);
+        let color = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_COLOR);
         crate::MARKED_COLORS[color as usize]    
     }else{
         false
     }
 }
 
+pub unsafe extern "C" fn is_potemkin_svinfo(module_accessor: *mut BattleObjectModuleAccessor) -> bool {
+    if utility::get_kind(&mut *module_accessor) == *FIGHTER_KIND_KAMUI{
+        let entry_id = sv_battle_object::entry_id((*module_accessor).battle_object_id);
+        let info = smash::cpp::root::app::lua_bind::FighterManager::get_fighter_information(singletons::FighterManager(), smash::app::FighterEntryID(entry_id as i32));
+        let color = smash::app::lua_bind::FighterInformation::fighter_color(info) as i32;    
+        crate::MARKED_COLORS[color as usize]
+    }else{
+        false
+    }
+}
 
 pub fn install() {
     let mut costume = &mut Vec::new();

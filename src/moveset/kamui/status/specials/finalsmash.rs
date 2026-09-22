@@ -296,6 +296,7 @@ unsafe extern "C" fn final_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue
         KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY);
         KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_MOTION);
         KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
+        PostureModule::set_pos(module_accessor,&Vector3f{x: 0.0 , y: 0.0, z: 20.0});
 
         if MotionModule::is_end(fighter.module_accessor) {
             WorkModule::on_flag(fighter.module_accessor,*FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_SUCCESS);
@@ -335,6 +336,7 @@ unsafe extern "C" fn final_exit(fighter: &mut L2CFighterCommon) -> L2CValue {
 
 unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
+    ModelModule::set_scale_z(fighter.module_accessor,1.0);
     ArticleModule::remove_exist(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_SPEARHAND, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
     fighter.set_situation(SITUATION_KIND_GROUND.into());
     GroundModule::correct(module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND_CLIFF_STOP));
@@ -344,9 +346,8 @@ unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> L2CV
     let capture_id = LinkModule::get_node_object_id(fighter.module_accessor, *LINK_NO_CAPTURE);
     let enemy = sv_battle_object::module_accessor(capture_id as u32);
     WorkModule::off_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
-
-    ModelModule::set_scale_z(fighter.module_accessor,1.0);
     ModelModule::set_scale_z(enemy,1.0);
+
 
 
 
@@ -362,7 +363,7 @@ unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> L2CV
     WorkModule::set_float(module_accessor, check_distance, 0x1000008);
     WorkModule::set_float(module_accessor, 0.0, 0x1000007);
 
-    PostureModule::set_pos(module_accessor,&Vector3f{x: 0.0 , y: check_distance, z: 0.0});
+    PostureModule::set_pos_2d(module_accessor,&Vector2f{x: 0.0 , y: check_distance});
 
     let pos2f = Vector2f{x: PostureModule::pos_x(fighter.module_accessor), y: PostureModule::pos_y(fighter.module_accessor)};
     let check_pos = Vector2f{x: 0.0, y: check_distance};
@@ -372,11 +373,11 @@ unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> L2CV
     
     if distance_to_ground != -1.0 {
         CameraModule::reset_all(fighter.module_accessor);            
-        macros::REQ_FINAL_START_CAMERA_arg3(fighter,Hash40::new("d04finalvisualscene03.nuanmb"), false, false);
         let new_pos_y = check_distance - distance_to_ground;
-        PostureModule::set_pos(module_accessor,&Vector3f{x: 0.0 , y: new_pos_y, z: 0.0});
+        PostureModule::set_pos_2d(module_accessor,&Vector2f{x: 0.0 , y: new_pos_y});
+        macros::REQ_FINAL_START_CAMERA_arg3(fighter,Hash40::new("d04finalvisualscene03.nuanmb"), false, false);
     }else{
-        PostureModule::set_pos(module_accessor,&Vector3f{x: 0.0 , y: 40.0, z: 0.0});
+        PostureModule::set_pos_2d(module_accessor,&Vector2f{x: 0.0 , y: 40.0});
         WorkModule::on_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DEATH_IMMINENT);
     }
     let pos = Vector3f{x: PostureModule::pos_x(fighter.module_accessor), y: PostureModule::pos_y(fighter.module_accessor), z: PostureModule::pos_z(fighter.module_accessor)};

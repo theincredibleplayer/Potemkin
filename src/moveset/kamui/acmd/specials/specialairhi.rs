@@ -65,7 +65,6 @@ unsafe extern "C" fn effect_special_air_hi(agent: &mut L2CAgentBase) {
 }
 unsafe extern "C" fn expression_special_air_hi(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-
         macros::QUAKE(agent, *CAMERA_QUAKE_KIND_L);
     }
 }

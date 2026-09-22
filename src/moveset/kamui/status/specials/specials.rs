@@ -71,12 +71,12 @@ unsafe extern "C" fn special_s_main(fighter: &mut L2CFighterCommon) -> L2CValue 
 
 
     fighter.clear_lua_stack();
-    lua_args!(fighter, FIGHTER_KINETIC_ENERGY_ID_STOP, 0.0, 0.0);
+    lua_args!(fighter, *FIGHTER_KINETIC_ENERGY_ID_STOP, 0.0, 0.0);
     sv_kinetic_energy::set_accel(fighter.lua_state_agent);
 
 
     fighter.clear_lua_stack();
-    lua_args!(fighter, FIGHTER_KINETIC_ENERGY_ID_STOP, 0.0, 0.0);
+    lua_args!(fighter, *FIGHTER_KINETIC_ENERGY_ID_STOP, 0.0, 0.0);
     sv_kinetic_energy::set_brake(fighter.lua_state_agent);
 
     KineticModule::enable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_STOP);
@@ -186,12 +186,12 @@ unsafe extern "C" fn side_b_slide(fighter: &mut L2CFighterCommon) -> L2CValue {
 
 
     fighter.clear_lua_stack();
-    lua_args!(fighter, FIGHTER_KINETIC_ENERGY_ID_STOP, 0.0, 0.0);
+    lua_args!(fighter, *FIGHTER_KINETIC_ENERGY_ID_STOP, 0.0, 0.0);
     sv_kinetic_energy::set_accel(fighter.lua_state_agent);
 
 
     fighter.clear_lua_stack();
-    lua_args!(fighter, FIGHTER_KINETIC_ENERGY_ID_STOP, 0.06, 0.0);
+    lua_args!(fighter, *FIGHTER_KINETIC_ENERGY_ID_STOP, 0.06, 0.0);
     sv_kinetic_energy::set_brake(fighter.lua_state_agent);
 
 

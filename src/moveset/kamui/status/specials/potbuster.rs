@@ -98,6 +98,9 @@ unsafe extern "C" fn potbuster_main(fighter: &mut L2CFighterCommon) -> L2CValue 
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
     KineticModule::clear_speed_all(module_accessor);
     WorkModule::on_flag(module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD_UP);
+    if camera_checks(fighter){
+        WorkModule::on_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ENABLE_CAMERA);
+    }
     fighter.sub_shift_status_main(L2CValue::Ptr(potbuster_main_loop as *const () as _))
 }
 
@@ -138,6 +141,7 @@ unsafe extern "C" fn potbuster_end(fighter: &mut L2CFighterCommon) -> L2CValue {
     }
     WorkModule::off_flag(fighter.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD_UP);
     WorkModule::off_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
+    WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ENABLE_CAMERA);
     return L2CValue::I32(0)
 }
 

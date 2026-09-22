@@ -5,39 +5,17 @@ pub unsafe extern "C" fn special_dragon_hi(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         VisibilityModule::set_whole(agent.module_accessor, false);
     }
-    sv_animcmd::frame(agent.lua_state_agent, 11.0);
-    if macros::is_excute(agent) {
-    }
-    sv_animcmd::wait(agent.lua_state_agent, 7.0);
-    if macros::is_excute(agent) {
-    }
 }
 
 pub unsafe extern "C" fn special_hi_start_dragon(agent: &mut L2CAgentBase) {
-    if !camera_checks(agent){
-        if macros::is_excute(agent) {
-            macros::FT_MOTION_RATE(agent, 0.5);
-        }
-    }
+
 }
 
 pub unsafe extern "C" fn special_dragon_hi_loop(agent: &mut L2CAgentBase) {
-    if !camera_checks(agent){
-        if macros::is_excute(agent) {
-            macros::FT_MOTION_RATE(agent, 0.5);
-        }
-    }
+
 }
 pub unsafe extern "C" fn special_dragon_hi_release(agent: &mut L2CAgentBase) {
-    if !camera_checks(agent){
-        if macros::is_excute(agent) {
-            macros::FT_MOTION_RATE(agent, 0.5);
-        }
-    }
-    sv_animcmd::frame(agent.lua_state_agent, 47.0);
-    if macros::is_excute(agent) {
-    }
-    sv_animcmd::wait(agent.lua_state_agent, 1.0);
+    sv_animcmd::wait(agent.lua_state_agent, 48.0);
     if macros::is_excute(agent) {
         macros::FT_MOTION_RATE(agent, 2.0);
     }

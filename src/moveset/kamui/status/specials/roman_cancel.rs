@@ -50,41 +50,31 @@ unsafe extern "C" fn roman_cancel_main(fighter: &mut L2CFighterCommon) -> L2CVal
     let mut moving_y : f64 = 0.0;
     let limiting_speed = 5.0;
     let speed_mul = 0.5;
-
+    let mut dir = 0;
+    let buffer_dir = WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_ROMAN_CANCEL_BUFFER_DIRECTION);
     if !WorkModule::is_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_YELLOW_RC){
-        if stick_y.abs() > stick_x.abs(){
-            if stick_y < 0.0 {
-                fighter.set_situation(SITUATION_KIND_AIR.into());
-                StatusModule::set_keep_situation_air(fighter.module_accessor,true);
-                GroundModule::correct(fighter.module_accessor, GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
-                moving_y = -1.0;
-                moving_x = 0.0;
-            }else if stick_y > 0.0{
-                fighter.set_situation(SITUATION_KIND_AIR.into());
-                StatusModule::set_keep_situation_air(fighter.module_accessor,true);
-                GroundModule::correct(fighter.module_accessor, GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
-                moving_y = 1.0;
-                moving_x = 0.0;
-            } else {
-                moving_x = 0.0;
-                moving_y = 0.0;
-            }
-        } else if stick_y.abs() <= stick_x.abs(){
-            if stick_x < 0.0 {
-                moving_x = -1.0;
-                moving_y = 0.0;
-            } else if stick_x > 0.0 {
-                moving_x = 1.0;
-                moving_y = 0.0;
-            } else {
-                moving_x = 0.0;
-                moving_y = 0.0;
-            }
-        }
+        dir = get_rc_direction(fighter);
     }
+    if buffer_dir != 0 {
+        dir = buffer_dir;
+    }
+    if dir == 8 || dir == 2{
+        fighter.set_situation(SITUATION_KIND_AIR.into());
+        StatusModule::set_keep_situation_air(fighter.module_accessor,true);
+        GroundModule::correct(fighter.module_accessor, GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
+    }
+    match dir{
+        2 => {moving_x =  0.0; moving_y = -1.0;}
+        4 => {moving_x = -1.0; moving_y =  0.0;}
+        6 => {moving_x =  1.0; moving_y =  0.0;}
+        8 => {moving_x =  0.0; moving_y =  1.0;}
+        _ => {moving_x =  0.0; moving_y =  0.0;}
+    }
+
     if (moving_x != 0.0) || (moving_y != 0.0){
         WorkModule::on_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_RC_DASH);
     }
+
     WorkModule::set_float(module_accessor, moving_x as f32, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_RC_MOVE_X);
     WorkModule::set_float(module_accessor, moving_y as f32, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_RC_MOVE_Y);
     WorkModule::set_float(module_accessor, limiting_speed as f32, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_RC_LIMITING_SPEED);
@@ -291,7 +281,7 @@ unsafe extern "C" fn roman_cancel_end(fighter: &mut L2CFighterCommon) -> L2CValu
     WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RC_CLOCK_EFFECT);
     WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RC_END_SLOW);
     WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RC_INITIAL_SLOW);
-
+    WorkModule::set_int(module_accessor, 0, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_ROMAN_CANCEL_BUFFER_DIRECTION);
     return L2CValue::I32(0)
 }
 

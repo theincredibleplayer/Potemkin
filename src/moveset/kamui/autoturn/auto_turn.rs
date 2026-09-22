@@ -10,6 +10,7 @@ unsafe extern "C" fn autoturn_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
 unsafe extern "C" fn autoturn_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     fighter.sub_wait_common();
     PostureModule::reverse_lr(fighter.module_accessor);
+
     if ControlModule::is_remake_command(fighter.module_accessor) {
         fighter.sub_fighter_remake_control_command();
     }

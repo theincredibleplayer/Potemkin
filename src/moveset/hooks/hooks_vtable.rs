@@ -1,21 +1,28 @@
 use super::*;
 use std::sync::LazyLock;
 
-static KAMUI_ON_RESET_OFFSET : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::RESET_1,             false, false));
-static KAMUI_INIT_OFFSET     : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::INITIALIZE,          false, false));
-static KAMUI_ON_SHIELD       : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_SHIELD_COLLISION, false, false));
-static KAMUI_ON_DAMAGE       : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_DAMAGE,           false, false));
-static KAMUI_ON_ATTACK       : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_ATTACK,           false, false));
+static KAMUI_ON_RESET_OFFSET            : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::RESET_1                   , false, false));
+static KAMUI_INIT_OFFSET                : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::INITIALIZE                , false, false));
+static KAMUI_ON_SHIELD                  : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_SHIELD_COLLISION       , false, false));
+static KAMUI_ON_DAMAGE                  : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_DAMAGE                 , false, false));
+static KAMUI_ON_ATTACK                  : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_ATTACK                 , false, false));
+static KAMUI_ON_CHANGE_MOTION           : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_CHANGE_MOTION          , false, false));
+static KAMUI_ON_SITUATION_CHANGE_2      : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_SITUATION_CHANGE_2     , false, false));
+static KAMUI_ON_STATUS_CHANGE_2         : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_STATUS_CHANGE_2        , false, false));
+static KAMUI_ON_DEATH                   : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_DEATH                  , false, false));
 
-static OFFSET_ON_FRAME_3           : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_FRAME_3,           false, true));
-static OFFSET_ON_SEARCH            : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_SEARCH,            false, true));
-static OFFSET_RESET_1              : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::RESET_1,              false, true));
-static OFFSET_INITIALIZE           : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::INITIALIZE,           false, true));
-static OFFSET_ON_SHIELD_COLLISION  : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_SHIELD_COLLISION,  false, true));
-static OFFSET_ON_DAMAGE            : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_DAMAGE,            false, true));
-static OFFSET_ON_ATTACK            : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_ATTACK,            false, true));
-static OFFSET_ON_CHANGE_MOTION     : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_CHANGE_MOTION,     false, true));
-static OFFSET_ON_STATUS_TRANSITION : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_STATUS_TRANSITION, false, true));
+static OFFSET_ON_FRAME_4                : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_FRAME_4                , false, true));
+static OFFSET_ON_SEARCH                 : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_SEARCH                 , false, true));
+static OFFSET_RESET_1                   : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::RESET_1                   , false, true));
+static OFFSET_INITIALIZE                : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::INITIALIZE                , false, true));
+static OFFSET_ON_SHIELD_COLLISION       : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_SHIELD_COLLISION       , false, true));
+static OFFSET_ON_DAMAGE                 : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_DAMAGE                 , false, true));
+static OFFSET_ON_ATTACK                 : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_ATTACK                 , false, true));
+static OFFSET_ON_CHANGE_MOTION          : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_CHANGE_MOTION          , false, true));
+static OFFSET_ON_STATUS_CHANGE          : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_STATUS_CHANGE          , false, true));
+static OFFSET_ON_SITUATION_CHANGE_2     : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_SITUATION_CHANGE_2     , false, true));
+static OFFSET_ON_STATUS_CHANGE_2        : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_STATUS_CHANGE_2        , false, true));
+static OFFSET_ON_DEATH                  : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_DEATH                  , false, true));
 
 //searchbox implementations
 pub unsafe extern "C" fn kamui_on_search(_vtable: u64, fighter: &mut Fighter, log: u64, _some_float: f32) {
@@ -100,6 +107,10 @@ pub unsafe extern "C" fn kamui_on_search(_vtable: u64, fighter: &mut Fighter, lo
     }
 }
 
+
+#[skyline::from_offset(0x69ae40)]
+extern "C" fn ryu_ken_autoturn_handler(module_accessor: *mut BattleObjectModuleAccessor, param_1: u32, param_2: u32);
+
 pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
     let scale = PostureModule::scale(fighter.battle_object.module_accessor); //gets the model's scale
     let module_accessor = fighter.battle_object.module_accessor;
@@ -109,6 +120,8 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
 
 
     if is_potemkin(module_accessor){
+        //let prevent_turn = StopModule::is_damage(module_accessor) as u32;
+        //ryu_ken_autoturn_handler(module_accessor,prevent_turn,0);
         potemkin_mirror_handler(module_accessor);
         //weapon attaching code
         potemkin_weapon_attach_handler(module_accessor);
@@ -173,10 +186,7 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
                 *FIGHTER_STATUS_KIND_CLIFF_JUMP2,
                 *FIGHTER_STATUS_KIND_CLIFF_JUMP3,
             ].contains(&status_kind){
-                //PostureModule::reverse_lr(module_accessor);
                 StatusModule::change_status_request(module_accessor, FIGHTER_KAMUI_STATUS_KIND_AIR_AUTO_TURN ,false);
-                //MotionModule::change_motion(module_accessor, Hash40::new("air_turn"), 0.0, 1.0, false, 0.0, false, false);
-                //PostureModule::update_rot_y_lr(agent.module_accessor);
             }
         }
 
@@ -191,27 +201,6 @@ pub unsafe extern "C" fn kamui_reset_original(vtable: u64, fighter: &mut Fighter
 
 pub unsafe extern "C" fn kamui_reset(vtable: u64, fighter: &mut Fighter) {
     let module_accessor = (*fighter).battle_object.module_accessor;
-    ShieldModule::set_target_property(fighter.battle_object.module_accessor, *COLLISION_PROPERTY_REFLECT,2);
-    let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
-
-
-    UiManager::reset_on_rebirth(get_ui_index_from_entry_id(entry_id));
-    UiManager::reset_cutin();
-    if smashball::is_training_mode(){
-        UiManager::add_tension_unscaled(get_ui_index_from_entry_id(entry_id),150.0);
-    }
-    WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_RUN);
-    WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_DASH_TO_RUN);
-    WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_TURN_DASH);
-    WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_DASH);
-
-    WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SWITCH_TO_FS_JUMP);
-    WorkModule::on_flag(module_accessor ,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_START);
-    WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_START);
-    WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_ATTACK_START);
-    WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_JUMP_START);
-
-
     let item_module = *(module_accessor as *const *const u64).add(0xc8 / 8);
     let mut item_hash_ptr = (item_module as u64 + 0x20) as *mut *mut u64 ;
     let mut item_hash_ptr_2 = (*item_hash_ptr as u64 + 0x8) as *mut u64;
@@ -221,7 +210,7 @@ pub unsafe extern "C" fn kamui_reset(vtable: u64, fighter: &mut Fighter) {
 
     
     if utility::get_kind(&mut *module_accessor) == *FIGHTER_KIND_KAMUI{
-        if is_potemkin(module_accessor){
+        if is_potemkin_svinfo(module_accessor){
             **commonhave_hash  = hash40("haver");
             **item_hash_ptr    = hash40("haver");
             *(item_hash_ptr_2) = hash40("haver");
@@ -233,9 +222,46 @@ pub unsafe extern "C" fn kamui_reset(vtable: u64, fighter: &mut Fighter) {
             *(genesis_bone)    = hash40("havel");
         }
     }
+
+
+    if is_potemkin_svinfo(module_accessor){
+        ShieldModule::set_target_property(fighter.battle_object.module_accessor, *COLLISION_PROPERTY_REFLECT,2);
+        let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
+        UiManager::reset_on_rebirth(get_ui_index_from_entry_id(entry_id));
+        UiManager::reset_cutin();
+        if smashball::is_training_mode(){
+            UiManager::add_tension_unscaled(get_ui_index_from_entry_id(entry_id),150.0);
+        }
+        WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_RUN);
+        WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_DASH_TO_RUN);
+        WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_TURN_DASH);
+        WorkModule::enable_transition_term_forbid(module_accessor,*FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_DASH);
+
+        WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SWITCH_TO_FS_JUMP);
+        WorkModule::on_flag(module_accessor ,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_START);
+        WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_START);
+        WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_ATTACK_START);
+        WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_JUMP_START);
+
+
+
+        let module_accessor_2 = fighter.battle_object.module_accessor;
+        let control_energy = KineticModule::get_energy(module_accessor_2, *FIGHTER_KINETIC_ENERGY_ID_CONTROL);
+        *(control_energy as *mut u8).add(0xa4) = 1;
+
+        //let kinetic_module = *(module_accessor_2 as *const *const u64).add(0x68 / 8);
+        //let func_addr1 = *((*(kinetic_module) + 0x60)as *mut u64);
+        //let get_kinetic_energy: extern "C" fn(*const u64, i32, ...) -> u64 = std::mem::transmute(func_addr1);
+        //let kinetic_energy = get_kinetic_energy(kinetic_module,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
+        //*(kinetic_energy as *mut u8).add(0xa4) = 1;
+
+    }
     kamui_reset_original(vtable,fighter);
 }
 
+#[skyline::from_offset(*KAMUI_ON_RESET_OFFSET)]
+pub unsafe extern "C" fn kamui_on_change_motion_og(vtable: u64, fighter: &mut Fighter);
 
 pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fighter) {
     let module_accessor = (*fighter).battle_object.module_accessor;
@@ -730,7 +756,7 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
             //hash40("ladder_catch_air_l"),
             //hash40("ladder_catch_end_r"),
             //hash40("ladder_catch_end_l"),
-            //hash40("jump_board_jump"),
+            hash40("jump_board_jump"),
             hash40("fill_blank"),
             hash40("fill_blank_damage"),
             hash40("fill_blank_finish"),
@@ -777,8 +803,11 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
                 ModelModule::set_mesh_visibility(module_accessor, Hash40::new("head_emi"),     false);
             }
         }
+    }else{
+        kamui_on_change_motion_og(vtable,fighter);
     }
 }
+
 
 
 #[skyline::from_offset(*KAMUI_INIT_OFFSET)]
@@ -855,8 +884,9 @@ pub unsafe extern "C" fn kamui_on_shield(vtable: u64, fighter: &mut Fighter, col
                 StatusModule::change_status_request(module_accessor, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_SHOOT ,false);
             }
         }
+    }else{
+        kamui_on_shield_original(vtable,fighter,collision_event);
     }
-    kamui_on_shield_original(vtable,fighter,collision_event);
 }
 
 
@@ -871,9 +901,13 @@ pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,dama
         let entry_id = WorkModule::get_int(module_accessor,*FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let dmg = *((*(((damage_log as u64) + 0x10) as *const u64) + 0x4) as *const f32);
         let status_kind =StatusModule::status_kind(fighter.battle_object.module_accessor);
+        //let collision_log = *((damage_log as *const u64).add(0x28 / 0x8)) as *const CollisionLog;
         let collision_log = *((damage_log as *const u64).add(0x28 / 0x8)) as *const CollisionLog;
         let opponent_id = *(*(damage_log as *mut u64).add(0x10 / 0x8) as *mut u32).add(0x44 / 0x4);
         let category = sv_battle_object::category(opponent_id);
+        //let collision_log : &mut CollisionLogScuffed = std::mem::transmute(damage_log);
+        println!("part_id = {}",(*collision_log).collider_part_id);
+        println!("col_kind = {}",(*collision_log).collision_kind);
 
         if *(*(damage_log as *const *const u64).offset(0x10 / 0x8) as *const u8).add(0xd0) == 0{
             WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RED_RC);
@@ -904,8 +938,9 @@ pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,dama
                 UiManager::add_tension(get_ui_index_from_entry_id(entry_id), dmg*0.2);
             //}
         }
+    }else{
+        kamui_on_damage_og(vtable,fighter,damage_log);
     }
-    kamui_on_damage_og(vtable,fighter,damage_log);
 }
 
 #[skyline::from_offset(*KAMUI_ON_ATTACK)]
@@ -918,7 +953,7 @@ pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,coll
         let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(module_accessor);
         let category = sv_battle_object::category(collision_log.opponent_object_id);
-
+        println!("part_id = {}",collision_log.collider_id);
         if category == *BATTLE_OBJECT_CATEGORY_FIGHTER
         && collision_log.collision_kind == *COLLISION_KIND_HIT as u8 {
             let opp_boma = sv_battle_object::module_accessor(collision_log.opponent_object_id as u32);
@@ -943,9 +978,12 @@ pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,coll
                         //let lr = PostureModule::lr(enemy);
                         //TurnModule::set_turn(enemy, Hash40::new("back_damage"), -lr, false, false, true);
                     }
+                    if collision_log.collider_id == 0{
+                        WorkModule::set_float(opp_boma, 0.47, *FIGHTER_STATUS_WORK_ID_FLOAT_REBOUND_MOTION_RATE);
+                    }else{
+                        WorkModule::set_float(opp_boma, 0.6, *FIGHTER_STATUS_WORK_ID_FLOAT_REBOUND_MOTION_RATE);
+                    }
 
-
-                    WorkModule::set_float(opp_boma, 0.42, *FIGHTER_STATUS_WORK_ID_FLOAT_REBOUND_MOTION_RATE);
                     if StatusModule::situation_kind(opp_boma) != *SITUATION_KIND_GROUND {
                         StatusModule::change_status_request_from_script(opp_boma, FIGHTER_STATUS_KIND_POT_REBOUND_JUMP, false);
                     }else{
@@ -967,7 +1005,7 @@ pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,coll
             *FIGHTER_STATUS_KIND_FINAL].contains(&status){
                 if HitModule::get_status(opp_boma, collision_log.receiver_id as i32, 0) == 0 {
                     let count = smash::app::lua_bind::FighterManager::entry_count(singletons::FighterManager() as _) as f32;
-                    let mult = 0.64 - 0.05 * count;
+                    let mult = 0.67 - 0.05 * (count-1.0);
                     UiManager::add_tension(get_ui_index_from_entry_id(entry_id), damage*mult);
                 }
             }
@@ -978,42 +1016,191 @@ pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,coll
 }
 
 
-pub unsafe extern "C" fn kamui_on_status_transition(vtable: u64, fighter: &mut Fighter, next_status:i32) {
+pub unsafe extern "C" fn kamui_on_status_change(vtable: u64, fighter: &mut Fighter, next_status:i32) {
     let module_accessor = fighter.battle_object.module_accessor;
     if is_potemkin(module_accessor){
-
+        let status = StatusModule::status_kind(module_accessor);
+        let force_reset;
+        let command_kind;
+        if [
+            *FIGHTER_STATUS_KIND_SPECIAL_N,
+            *FIGHTER_STATUS_KIND_SPECIAL_S,
+            *FIGHTER_STATUS_KIND_SPECIAL_HI,
+            *FIGHTER_STATUS_KIND_SPECIAL_LW,
+            *FIGHTER_STATUS_KIND_FINAL,
+            *FIGHTER_RYU_STATUS_KIND_FINAL2
+        ].contains(&status) {
+            force_reset = true;
+            command_kind = -1;
+        }
+        else if status == *FIGHTER_RYU_STATUS_KIND_SPECIAL_N_COMMAND {
+            force_reset = false;
+            command_kind = 0;
+        }
+        else if status == *FIGHTER_RYU_STATUS_KIND_SPECIAL_N2_COMMAND {
+            force_reset = false;
+            command_kind = 1;
+        }
+        else if status == *FIGHTER_RYU_STATUS_KIND_SPECIAL_S_COMMAND {
+            force_reset = false;
+            command_kind = 2;
+        }
+        else if status == *FIGHTER_RYU_STATUS_KIND_SPECIAL_HI_COMMAND {
+            force_reset = false;
+            command_kind = 3;
+        }
+        else {
+            force_reset = true;
+            command_kind = -1;
+        }
+        let opponent_lr = WorkModule::get_float(module_accessor, *FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLOAT_OPPONENT_LR_1ON1);
+        let lr = PostureModule::lr(module_accessor);
+        if opponent_lr != 0.0
+        && lr != opponent_lr {
+            return;
+        }
+    
+        if command_kind < 0 {
+            if !force_reset {
+                return;
+            }
+        }
+        else {
+            let special_command_lr = ControlModule::get_special_command_lr(module_accessor, command_kind);
+            if special_command_lr != 0.0 && special_command_lr != lr {
+                PostureModule::set_lr(module_accessor, special_command_lr);
+                PostureModule::update_rot_y_lr(module_accessor);
+            }
+        }
+        ControlModule::reset_special_command(module_accessor, false);
     }
 }
 
-fn patch_vtable_function(offset: usize, function: u64) {
-    // println!("function ptr: {:#x}", function as u64);
-    let low = (function as u64 & 0xFFFFFFFF) as u32;
-    // println!("Low to Big Endian: {:#x} > {:#?}", low, low.to_be_bytes());
-    let high = (function as u64 >> 32) as u32;
-    // println!("High to Big Endian: {:#x} > {:#?}", high, high.to_be_bytes());
-    let _ = skyline::patching::Patch::in_text(offset).data(low);
-    let _ = skyline::patching::Patch::in_text(offset + 0x4).data(high);
+#[skyline::from_offset(*KAMUI_ON_SITUATION_CHANGE_2)]
+pub unsafe extern "C" fn kamui_on_situation_change_og(vtable: *mut u64, fighter: &mut Fighter,something: u64);
+
+pub unsafe extern "C" fn kamui_on_situation_change(vtable: *mut u64, fighter: &mut Fighter, something: u64) {
+    let module_accessor = fighter.battle_object.module_accessor;
+    if is_potemkin(module_accessor){
+        let some_vtable_func: extern "C" fn(*mut u64, &mut Fighter, u64, ...) -> u64 = std::mem::transmute(*((*vtable+0xf8) as *mut u64));
+        some_vtable_func(vtable,fighter,something);
+        let kinetic_energy = KineticModule::get_energy(module_accessor, *FIGHTER_KINETIC_ENERGY_ID_CONTROL);
+        let situation_kind = *((something+0xc) as *const u32);
+
+        if situation_kind <  4
+        && situation_kind != 2
+        && *(kinetic_energy as *mut u8).add(0xa4) != 0{
+            *(kinetic_energy as *mut u8).add(0xa5) = 0;
+        }    
+    }else{
+        kamui_on_situation_change_og(vtable,fighter,something);
+    }
 }
+
+#[skyline::from_offset(*KAMUI_ON_STATUS_CHANGE_2)]
+pub unsafe extern "C" fn kamui_on_status_change_2_og(vtable: u64, fighter: &mut Fighter);
+
+pub unsafe extern "C" fn kamui_on_status_change_2(vtable: u64, fighter: &mut Fighter) {
+    let module_accessor = fighter.battle_object.module_accessor;
+    if is_potemkin(module_accessor){
+        let status = StatusModule::status_kind(module_accessor);
+        let kinetic_energy = KineticModule::get_energy(module_accessor, *FIGHTER_KINETIC_ENERGY_ID_CONTROL);
+        let is_jump = 
+        [
+            *FIGHTER_STATUS_KIND_CLIFF_JUMP1,
+            *FIGHTER_STATUS_KIND_WALL_JUMP,
+            *FIGHTER_STATUS_KIND_ITEM_SHOOT_JUMP,
+            *FIGHTER_STATUS_KIND_JUMP_AERIAL,
+            *FIGHTER_STATUS_KIND_JUMP,
+            *FIGHTER_STATUS_KIND_GIMMICK_SPRING_JUMP
+        ].contains(&status);
+
+        if status < *FIGHTER_STATUS_KIND_GIMMICK_BARREL{
+            if is_jump {
+                if *(kinetic_energy as *mut u8).add(0xa4) != 0{
+                    *(kinetic_energy as *mut u8).add(0xa5) = 1;
+                }
+            }
+            return;
+        }else{
+            if status == *FIGHTER_STATUS_KIND_GIMMICK_BARREL{
+                let kinetic_energy = KineticModule::get_energy(module_accessor, *FIGHTER_KINETIC_ENERGY_ID_CONTROL);
+                if *(kinetic_energy as *mut u8).add(0xa4) != 0{
+                    *(kinetic_energy as *mut u8).add(0xa5) = 0;
+                }
+                return;
+            }else if status != *FIGHTER_STATUS_KIND_GIMMICK_SPRING_JUMP{
+                return;
+            }
+        }
+        if *(kinetic_energy as *mut u8).add(0xa4) != 0{
+            *(kinetic_energy as *mut u8).add(0xa5) = 1;
+        }
+    }else{
+        kamui_on_status_change_2_og(vtable,fighter);
+    }
+    return;
+}
+
+
+#[skyline::from_offset(*KAMUI_ON_DEATH)]
+pub unsafe extern "C" fn kamui_on_death_og(vtable: u64, fighter: &mut Fighter);
+
+pub unsafe extern "C" fn kamui_on_death(vtable: u64, fighter: &mut Fighter) {
+    let module_accessor = fighter.battle_object.module_accessor;
+    println!("on_death");
+    if is_potemkin(module_accessor){
+        let kinetic_energy = KineticModule::get_energy(module_accessor, *FIGHTER_KINETIC_ENERGY_ID_CONTROL);
+        if *(kinetic_energy as *mut u8).add(0xa4) != 0{
+            *(kinetic_energy as *mut u8).add(0xa5) = 0;
+        }
+        //*(kinetic_energy as *mut u8).add(0x9c) = 0;
+    }else{
+        kamui_on_death(vtable,fighter);
+    }
+}
+
+
+
 
 
 
 pub fn install() {
     unsafe {
+        fn patch_vtable_function(offset: usize, function: u64) {
+            // println!("function ptr: {:#x}", function as u64);
+            let low = (function as u64 & 0xFFFFFFFF) as u32;
+            // println!("Low to Big Endian: {:#x} > {:#?}", low, low.to_be_bytes());
+            let high = (function as u64 >> 32) as u32;
+            // println!("High to Big Endian: {:#x} > {:#?}", high, high.to_be_bytes());
+            let _ = skyline::patching::Patch::in_text(offset).data(low);
+            let _ = skyline::patching::Patch::in_text(offset + 0x4).data(high);
+        }
+
+        
+
         LazyLock::force(&KAMUI_ON_RESET_OFFSET);
         LazyLock::force(&KAMUI_INIT_OFFSET);
         LazyLock::force(&KAMUI_ON_SHIELD);
         LazyLock::force(&KAMUI_ON_DAMAGE);
         LazyLock::force(&KAMUI_ON_ATTACK);
+        LazyLock::force(&KAMUI_ON_CHANGE_MOTION);
+        LazyLock::force(&KAMUI_ON_SITUATION_CHANGE_2);
+        LazyLock::force(&KAMUI_ON_STATUS_CHANGE_2);
+        LazyLock::force(&KAMUI_ON_DEATH);
 
-        patch_vtable_function(*OFFSET_ON_FRAME_3          , kamui_on_frame as u64);
-        patch_vtable_function(*OFFSET_ON_SEARCH           , kamui_on_search as u64);
-        patch_vtable_function(*OFFSET_RESET_1             , kamui_reset as u64);
-        patch_vtable_function(*OFFSET_INITIALIZE          , kamui_init as u64);
-        patch_vtable_function(*OFFSET_ON_SHIELD_COLLISION , kamui_on_shield as u64);
-        patch_vtable_function(*OFFSET_ON_DAMAGE           , kamui_on_damage as u64);
-        patch_vtable_function(*OFFSET_ON_ATTACK           , kamui_on_attack as u64);
-        patch_vtable_function(*OFFSET_ON_CHANGE_MOTION    , kamui_on_change_motion as u64);
-        patch_vtable_function(*OFFSET_ON_STATUS_TRANSITION, kamui_on_status_transition as u64);
+        patch_vtable_function(*OFFSET_ON_FRAME_4                , kamui_on_frame as u64);
+        patch_vtable_function(*OFFSET_ON_SEARCH                 , kamui_on_search as u64);
+        patch_vtable_function(*OFFSET_RESET_1                   , kamui_reset as u64);
+        patch_vtable_function(*OFFSET_INITIALIZE                , kamui_init as u64);
+        patch_vtable_function(*OFFSET_ON_SHIELD_COLLISION       , kamui_on_shield as u64);
+        patch_vtable_function(*OFFSET_ON_DAMAGE                 , kamui_on_damage as u64);
+        patch_vtable_function(*OFFSET_ON_ATTACK                 , kamui_on_attack as u64);
+        patch_vtable_function(*OFFSET_ON_CHANGE_MOTION          , kamui_on_change_motion as u64);
+        patch_vtable_function(*OFFSET_ON_STATUS_CHANGE          , kamui_on_status_change as u64);
+        patch_vtable_function(*OFFSET_ON_SITUATION_CHANGE_2     , kamui_on_situation_change as u64);
+        patch_vtable_function(*OFFSET_ON_STATUS_CHANGE_2        , kamui_on_status_change_2 as u64);
+        patch_vtable_function(*OFFSET_ON_DEATH                  , kamui_on_death as u64);
 
     }
 }

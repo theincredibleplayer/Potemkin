@@ -132,11 +132,11 @@ pub fn get_vtable_function_offset(kind: i32, entry: usize, is_weapon: bool, get_
     if (kind < 0) {std::process::abort()};
     unsafe{
         if is_weapon{
-            if (kind > 0x267) || (entry > 104){
+            if (kind >= 0x267) || (entry >= 104){
                 std::process::abort();
             }
         }else{
-            if (kind > 0x5E) || (entry > 146){
+            if (kind >= 0x5E) || (entry >= 146){
                 std::process::abort();
             }
         }

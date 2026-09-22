@@ -174,6 +174,7 @@ pub unsafe extern "C" fn grabbed_anim_selector(fighter: &mut L2CFighterCommon,an
 }
 
 pub unsafe extern "C" fn camera_checks(fighter: &mut L2CAgentBase) -> bool {
+    macros::CHECK_VALID_START_CAMERA(fighter, 0, 7, 0, 20, 30, 0, true);
     let ret = 
     !sv_information::is_flat_stage() 
     && FighterCutInManager__is_one_on_one() 
@@ -262,3 +263,28 @@ pub unsafe extern "C" fn rc_speed_float_setter(fighter: &mut L2CFighterCommon) {
     WorkModule::set_float(fighter.module_accessor, speed_y, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_PRE_RC_Y_SPEED);
 }
 
+
+pub unsafe extern "C" fn get_rc_direction(fighter: &mut L2CFighterCommon) -> i32{
+    let mut stick_x = fighter.global_table[STICK_X].get_f64();
+    let mut stick_y = fighter.global_table[STICK_Y].get_f64();
+    let range = 0.1;
+    let mut dir = 0;
+    if stick_y.abs() > stick_x.abs(){
+        if stick_y < -range {
+            dir = 2;
+        }else if stick_y > range{
+            dir = 8;
+        } else {
+            dir = 0;
+        }
+    } else if stick_y.abs() <= stick_x.abs(){
+        if stick_x < -range {
+            dir = 4;
+        } else if stick_x > range {
+            dir = 6;
+        } else {
+            dir = 0;
+        }
+    }
+    return dir;
+}

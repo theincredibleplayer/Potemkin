@@ -81,30 +81,32 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("param_private"), 0x19996b81b6, 1200.0));
     //aerials
     param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("landing_attack_air_frame_n"),0, 6));               
-    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("landing_attack_air_frame_f"),0, 10));
+    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("landing_attack_air_frame_f"),0, 8));
     param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("landing_attack_air_frame_b"),0, 12));
     param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("landing_attack_air_frame_lw"),0, 20));
-    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("landing_attack_air_frame_hi"),0, 12));
+    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("landing_attack_air_frame_hi"),0, 15));
 
 
 
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_lift_accel_mul"), 0, 1.0));
 	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_lift_accel_add"), 0, 1.0));
-	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_lift_speed_max"), 0, 0.73));
+	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_lift_speed_max"), 0, 0.76));
 
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("shoot_walk_accel_mul"), 0, 1.0));
 	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("shoot_walk_accel_add"), 0, 1.0));
-	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("shoot_walk_speed_max"), 0, 0.73));
+	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("shoot_walk_speed_max"), 0, 0.76));
 
     // fighter_param
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("walk_accel_mul"), 0, 1.0));
 	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("walk_accel_add"), 0, 1.0));
-	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("walk_speed_max"), 0, 0.73));
+	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("walk_speed_max"), 0, 0.76));
 	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("walk_slow_speed_mul"), 0, 0.18));
 	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("walk_fast_ratio"), 0, 0.7));
 	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("dash_speed"), 0, 1.0));
 	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("run_speed_max"), 0, 0.8));
 	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("weight"), 0, 145.0));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("jump_y"), 0, 28.0));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("jump_aerial_y"), 0, 26.0));
 	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("scale"), 0, 1.0));                          // doesnt work, compensated for it in opff
 	param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("shield_radius"), 0, 20.0));
     param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("attack_combo_max"), 0, 1));

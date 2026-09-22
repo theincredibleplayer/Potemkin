@@ -22,6 +22,7 @@ unsafe extern "C" fn potbusterwhiff(agent: &mut L2CAgentBase) {
         grab!(agent, *MA_MSC_CMD_GRAB_CLEAR_ALL);
         damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_NORMAL, 0);
         WorkModule::off_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
+        macros::FT_MOTION_RATE(agent, 1.2);
     }
 }
 
@@ -44,7 +45,7 @@ unsafe extern "C" fn game_potbuster(agent: &mut L2CAgentBase) {
         WorkModule::on_flag(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
         damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0); 
 
-        macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.0, 80, 140, 0, 80, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.0, 80, 130, 0, 80, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(agent, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 100, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         WorkModule::on_flag(agent.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
     }
@@ -99,7 +100,7 @@ unsafe extern "C" fn effect_potbuster(agent: &mut L2CAgentBase) {
     }
     frame(agent.lua_state_agent, 74.0);
     if macros::is_excute(agent) {
-        if camera_checks(agent){
+        if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ENABLE_CAMERA){
             let vec1 = simd::Vector2{vec: [0.0, 0.0]}; //
             let vec2 = simd::Vector2{vec: [0.0, 1.0]}; //both of these seem to be angle related but i cant put my finger on how exactly
             let vec3 = simd::Vector2{vec: [1.0 , 1.0]}; // effect width related
@@ -152,7 +153,7 @@ unsafe extern "C" fn sound_potbuster(agent: &mut L2CAgentBase) {
 unsafe extern "C" fn expression_potbuster(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 2.0);
     if macros::is_excute(agent) {
-        if camera_checks(agent){
+        if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ENABLE_CAMERA){
             macros::CAM_ZOOM_OUT(agent);
             let scale = PostureModule::scale(agent.module_accessor);
             let lr = PostureModule::lr(agent.module_accessor);
@@ -177,7 +178,7 @@ unsafe extern "C" fn expression_potbuster(agent: &mut L2CAgentBase) {
     }
     frame(agent.lua_state_agent, 9.0);
     if macros::is_excute(agent) {
-        if camera_checks(agent){
+        if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ENABLE_CAMERA){
             CameraModule::reset_all(agent.module_accessor);
             macros::CAM_ZOOM_OUT(agent);
             macros::REQ_MOTION_CAMERA(agent, Hash40::new("d04potemkinbuster.nuanmb"), false);

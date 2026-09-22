@@ -3,9 +3,10 @@ use super::*;
 unsafe fn special_air_hi_velocity_and_motion_handler(fighter: &mut L2CFighterCommon, speed_mul: f32, do_motion:bool) {
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
+    WorkModule::set_float(module_accessor,2.8, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_HEAT_TACKLE_SPEED);
     let stick_x = WorkModule::get_float(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_HEAT_TACKLE_STICK_X).abs();
     let stick_y = WorkModule::get_float(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_HEAT_TACKLE_STICK_Y);
-    let degree_range = 15.0;
+    let degree_range = 20.0;
     let mut speed_scale= 0.0;
     if !fighter.global_table[IS_STOP].get_bool() {
         speed_scale = WorkModule::get_float(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_HEAT_TACKLE_SPEED) * speed_mul;
@@ -14,18 +15,20 @@ unsafe fn special_air_hi_velocity_and_motion_handler(fighter: &mut L2CFighterCom
     }
     let mut speed_x = 0.0;
     let mut speed_y = 0.0;
+    let mut accel_x = -0.07;
+    let mut accel_y = -0.07;
+
     let mut angle = stick_y.atan2(stick_x).to_degrees();
     let lr = PostureModule::lr(module_accessor);
-    WorkModule::set_float(module_accessor,speed_scale, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_HEAT_TACKLE_SPEED);
-    println!("speed_Scale = {}",speed_scale);
-    if angle > degree_range {
-        speed_x = speed_scale * angle.to_radians().cos();
-        speed_y = speed_scale * angle.to_radians().sin();
-    }else{
+    if angle <= degree_range {
         angle = degree_range;
-        speed_x = speed_scale * angle.to_radians().cos();
-        speed_y = speed_scale * angle.to_radians().sin();
     }
+    speed_x = speed_scale * angle.to_radians().cos();
+    speed_y = speed_scale * angle.to_radians().sin();
+
+    accel_x = accel_x * angle.to_radians().cos();
+    accel_y = accel_y * angle.to_radians().sin();
+
     if do_motion{
         let frame = MotionModule::frame(module_accessor);
         let rate = MotionModule::rate(module_accessor);
@@ -38,34 +41,22 @@ unsafe fn special_air_hi_velocity_and_motion_handler(fighter: &mut L2CFighterCom
     KineticModule::enable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_MOTION);
     KineticModule::unable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
+    //speed_scale = 15.0;
 
-    fighter.clear_lua_stack();
-    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,speed_scale,0.0);
-    sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
-    fighter.clear_lua_stack();
-    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,speed_scale,0.0);
-    sv_kinetic_energy::set_limit_speed(fighter.lua_state_agent);
 
-    fighter.clear_lua_stack();
-    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,speed_scale,0.0);
-    sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
-    fighter.clear_lua_stack();
-    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,speed_scale,0.0);
-    sv_kinetic_energy::set_limit_speed(fighter.lua_state_agent);
+    sv_kinetic_energy!(set_stable_speed,fighter,FIGHTER_KINETIC_ENERGY_ID_STOP,speed_scale,0.0);
+    sv_kinetic_energy!(set_stable_speed,fighter,FIGHTER_KINETIC_ENERGY_ID_GRAVITY,speed_scale,0.0);
+    
+    sv_kinetic_energy!(set_limit_speed,fighter,FIGHTER_KINETIC_ENERGY_ID_STOP,speed_scale,0.0);
+    sv_kinetic_energy!(set_limit_speed,fighter,FIGHTER_KINETIC_ENERGY_ID_GRAVITY,speed_scale,0.0);
 
-    fighter.clear_lua_stack();
-    lua_args!(fighter, *FIGHTER_KINETIC_ENERGY_ID_GRAVITY, speed_y, 0.0);
-    sv_kinetic_energy::set_speed(fighter.lua_state_agent);
-    fighter.clear_lua_stack();
-    lua_args!(fighter, *FIGHTER_KINETIC_ENERGY_ID_STOP, speed_x * PostureModule::lr(module_accessor), 0.0);
-    sv_kinetic_energy::set_speed(fighter.lua_state_agent);
+    sv_kinetic_energy!(set_speed,fighter,FIGHTER_KINETIC_ENERGY_ID_STOP,speed_x * PostureModule::lr(module_accessor));
+    sv_kinetic_energy!(set_speed,fighter,FIGHTER_KINETIC_ENERGY_ID_GRAVITY,speed_y);
 
-    //fighter.clear_lua_stack();
-    //lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,*ENERGY_STOP_RESET_TYPE_AIR, 0.0,speed_y,0.0,0.0,0.0);
-    //sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
-    //fighter.clear_lua_stack();
-    //lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_AIR, speed_x * PostureModule::lr(module_accessor),0.0,0.0,0.0,0.0);
-    //sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
+    sv_kinetic_energy!(set_accel,fighter,FIGHTER_KINETIC_ENERGY_ID_STOP,accel_x * PostureModule::lr(module_accessor));
+    sv_kinetic_energy!(set_accel,fighter,FIGHTER_KINETIC_ENERGY_ID_GRAVITY,accel_y);
+
+
 }
 
 
@@ -174,7 +165,7 @@ unsafe extern "C" fn special_air_hi_pre(fighter: &mut L2CFighterCommon) -> L2CVa
         SituationKind(*SITUATION_KIND_AIR),
         *FIGHTER_KINETIC_TYPE_AIR_STOP,
         *GROUND_CORRECT_KIND_AIR as u32,
-        GroundCliffCheckKind(*GROUND_CLIFF_CHECK_KIND_ALWAYS),
+        GroundCliffCheckKind(*GROUND_CLIFF_CHECK_KIND_ALWAYS_BOTH_SIDES),
         true,
         *FIGHTER_STATUS_WORK_KEEP_FLAG_ALL_FLAG,
         *FIGHTER_STATUS_WORK_KEEP_FLAG_ALL_INT,
@@ -205,13 +196,17 @@ unsafe extern "C" fn special_air_hi_main(fighter: &mut L2CFighterCommon) -> L2CV
         PostureModule::reverse_lr(fighter.module_accessor);
         PostureModule::update_rot_y_lr(module_accessor);
     }
-    WorkModule::set_float(module_accessor,3.25, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_HEAT_TACKLE_SPEED);
     GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
     KineticModule::change_kinetic(module_accessor,*FIGHTER_KINETIC_TYPE_AIR_STOP);
     MotionModule::change_motion(module_accessor,Hash40::new("special_air_hi"),0.0,1.0,false,0.0,false,false);
     ArticleModule::generate_article(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
     ArticleModule::change_motion(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("special_air_hi"),false,-1.0);
+    
+    
+    
     special_air_hi_velocity_and_motion_handler(fighter,1.0,true);
+
+
     WorkModule::on_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ATTACH_WEAPON);
     potemkin_mirror_handler(module_accessor);
     potemkin_weapon_attach_handler(module_accessor);
@@ -224,11 +219,8 @@ unsafe fn special_air_hi_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
     let lr = PostureModule::lr(module_accessor);
 
-    special_air_hi_velocity_and_motion_handler(fighter,0.975,true);
-    WorkModule::on_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ATTACH_WEAPON);
-    if fighter.sub_transition_group_check_air_cliff().get_bool() {
-        return 1.into()
-    }
+    //special_air_hi_velocity_and_motion_handler(fighter,0.975,true);
+
 
     if fighter.sub_transition_group_check_air_cliff().get_bool() {
         return 1.into()
@@ -290,7 +282,7 @@ unsafe extern "C" fn special_air_hi_end_main(fighter: &mut L2CFighterCommon) -> 
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
     GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
     MotionModule::change_motion(module_accessor,Hash40::new("special_air_hi_end"),0.0,1.0,false,0.0,false,false);
-    special_air_hi_velocity_and_motion_handler(fighter,1.0,false);
+    //special_air_hi_velocity_and_motion_handler(fighter,1.0,false);
     fighter.sub_shift_status_main(L2CValue::Ptr(special_air_hi_end_main_loop as *const () as _))
 }
 

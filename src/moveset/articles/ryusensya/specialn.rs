@@ -11,7 +11,7 @@ pub unsafe extern "C" fn game_regular(agent: &mut L2CAgentBase) {
             damage = 7.0/1.4;
         }
         macros::ATTACK(agent, 0, 0, Hash40::new("top"),  damage * 1.4 ,
-         55, 90, 0, 70, 25.0, 0.0, 0.0, 0.0, None, None, None,
+         55, 53, 0, 70, 25.0, 0.0, 0.0, 0.0, None, None, None,
          2.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false,
          0, 0.0, 0, true, true
          , false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_BOMB, *ATTACK_REGION_NONE);

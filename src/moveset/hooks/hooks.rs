@@ -39,16 +39,15 @@ unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, event:
             if opponent_category == *BATTLE_OBJECT_CATEGORY_FIGHTER {
                 if StatusModule::status_kind(module_accessor) == FIGHTER_KAMUI_STATUS_KIND_FINAL_JUMP
                 || StatusModule::status_kind(module_accessor) == *FIGHTER_STATUS_KIND_FINAL {
-                    PostureModule::set_pos(module_accessor,&Vector3f{x: 0.0 , y: 0.0, z: 100.0});
                     WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_JUMP);
 
-                    WorkModule::off_flag(module_accessor ,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_START);
+                    WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_START);
                     WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_START);
                     WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_ATTACK_START);
                     WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_JUMP_START);
 
                     StatusModule::change_status_request(module_accessor, *FIGHTER_STATUS_KIND_FINAL, false);      
-
+                    PostureModule::set_pos(module_accessor,&Vector3f{x: 0.0 , y: 0.0, z: 20.0});
                     capture_event.result = true;
                     capture_event.node = smash_rs::phx::Hash40::new("throw");
                     return 0;
@@ -69,7 +68,6 @@ unsafe extern "C" fn pot_select_cliff_hangdata_hook(ground_module: u64, hang_int
     if is_potemkin(module_accessor) && (hang_int == 0){
         let agent = get_fighter_common_from_accessor((&mut*module_accessor));
         let something = *((ground_module+0xf0) as *mut f32);
-        println!("something:{}",something);
         let scale = PostureModule::scale(module_accessor);
         let p1_x = 19.0;
         let p1_y = 32.0;

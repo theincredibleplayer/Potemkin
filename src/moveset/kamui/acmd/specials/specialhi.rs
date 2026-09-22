@@ -12,9 +12,8 @@ unsafe extern "C" fn special_hi(agent: &mut L2CAgentBase) {
         macros::HIT_NODE(agent, Hash40::new("armr"), *HIT_STATUS_XLU);
         macros::HIT_NODE(agent, Hash40::new("shoulderr"), *HIT_STATUS_XLU);
 
-        macros::CATCH(agent, 0, Hash40::new("top"), 8.0 ,0.0,36.0,23.0, None, None, None, FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, *COLLISION_SITUATION_MASK_G);
-        macros::CATCH(agent, 1, Hash40::new("top"), 11.0,0.0,36.0,23.0, None, None, None, FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, *COLLISION_SITUATION_MASK_A);
-        macros::CATCH(agent, 2, Hash40::new("top"), 5.0 ,0.0,21.6,8.0, Some(0.0),Some(30.7),Some(17.0), FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, *COLLISION_SITUATION_MASK_A);
+        macros::CATCH(agent, 0, Hash40::new("top"), 10.0 ,0.0,36.0,23.0, None, None, None, FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, *COLLISION_SITUATION_MASK_GA);
+        macros::CATCH(agent, 2, Hash40::new("top"), 5.0 ,0.0,21.6,8.0, Some(0.0),Some(30.7),Some(17.0), FIGHTER_STATUS_KIND_POT_SPECIALHI_CAUGHT, *COLLISION_SITUATION_MASK_GA);
 
     }
     sv_animcmd::wait(agent.lua_state_agent, 6.0);
@@ -22,7 +21,7 @@ unsafe extern "C" fn special_hi(agent: &mut L2CAgentBase) {
         macros::HIT_NODE(agent, Hash40::new("armr"), *HIT_STATUS_NORMAL);
         macros::HIT_NODE(agent, Hash40::new("shoulderr"), *HIT_STATUS_NORMAL);
         grab!(agent, *MA_MSC_CMD_GRAB_CLEAR_ALL);
-        macros::FT_MOTION_RATE(agent, 1.6);
+        macros::FT_MOTION_RATE(agent, 1.75);
     }
 }
 
@@ -56,7 +55,7 @@ unsafe extern "C" fn sound_special_hi_start(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         //macros::PLAY_SE(agent, Hash40::new("se_btl_pot_02"));
         let handle = SoundModule::play_se(agent.module_accessor, Hash40::new("se_btl_pot_02"), true, false, false, false, enSEType(0));
-        if !camera_checks(agent){
+        if !WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ENABLE_CAMERA){
             SoundModule::set_se_speed(agent.module_accessor,handle as i32, 2.0)
         }
     }
@@ -68,7 +67,7 @@ unsafe extern "C" fn sound_special_hi_start(agent: &mut L2CAgentBase) {
 }
 
 unsafe extern "C" fn expression_special_hi_start(agent: &mut L2CAgentBase) {
-    if !camera_checks(agent){
+    if !WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ENABLE_CAMERA){
         if macros::is_excute(agent) {
             macros::FT_MOTION_RATE(agent, 0.5);
         }
@@ -78,7 +77,7 @@ unsafe extern "C" fn expression_special_hi_start(agent: &mut L2CAgentBase) {
 
 
 unsafe extern "C" fn special_hi_loop(agent: &mut L2CAgentBase) {
-    if !camera_checks(agent){
+    if !WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ENABLE_CAMERA){
         if macros::is_excute(agent) {
             macros::FT_MOTION_RATE(agent, 0.5);
         }
@@ -120,7 +119,7 @@ unsafe extern "C" fn effect_special_hi_loop(agent: &mut L2CAgentBase) {
 }
 
 unsafe extern "C" fn expression_special_hi_loop(agent: &mut L2CAgentBase) {
-    if camera_checks(agent){
+    if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ENABLE_CAMERA){
         sv_animcmd::frame(agent.lua_state_agent, 3.0);
         if macros::is_excute(agent) {
             macros::QUAKE(agent, *CAMERA_QUAKE_KIND_XL);
@@ -175,7 +174,7 @@ unsafe extern "C" fn special_hi_release(agent: &mut L2CAgentBase) {
     sv_animcmd::wait(agent.lua_state_agent, 1.0);
     if macros::is_excute(agent) {
         AttackModule::clear_all(agent.module_accessor);
-        if camera_checks(agent){
+        if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ENABLE_CAMERA){
             macros::FT_MOTION_RATE(agent, 2.0);
         }else{
             macros::FT_MOTION_RATE(agent, 1.0);
@@ -234,7 +233,7 @@ unsafe extern "C" fn sound_special_hi_release(agent: &mut L2CAgentBase) {
 }
 
 unsafe extern "C" fn expression_special_hi_release(agent: &mut L2CAgentBase) {
-    if camera_checks(agent){
+    if WorkModule::is_flag(agent.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ENABLE_CAMERA){
         sv_animcmd::frame(agent.lua_state_agent, 1.0);
         if macros::is_excute(agent) {
             CameraModule::stop_quake(agent.module_accessor, *CAMERA_QUAKE_KIND_XL);

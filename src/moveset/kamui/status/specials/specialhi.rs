@@ -114,6 +114,7 @@ unsafe extern "C" fn special_hi_start_main(fighter: &mut L2CFighterCommon) -> L2
     let lr = PostureModule::lr(fighter.module_accessor);
     JostleModule::set_status(fighter.module_accessor, false);
     if camera_checks(fighter){
+        WorkModule::on_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ENABLE_CAMERA);
         CameraModule::reset_all(fighter.module_accessor);            
         macros::CAM_ZOOM_IN_arg6(
             fighter,
@@ -214,7 +215,7 @@ unsafe extern "C" fn special_hi_loop_main(fighter: &mut L2CFighterCommon) -> L2C
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
     let scale = PostureModule::scale(fighter.module_accessor);
     JostleModule::set_status(fighter.module_accessor, false);
-    if camera_checks(fighter){
+    if WorkModule::is_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ENABLE_CAMERA){
         macros::CAM_ZOOM_OUT(fighter);
         let lr = PostureModule::lr(fighter.module_accessor);
         CameraModule::reset_all(fighter.module_accessor);            
@@ -278,7 +279,7 @@ unsafe fn special_hi_loop_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue 
     if MotionModule::is_end(fighter.module_accessor) {
 
         if WorkModule::get_int(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_LOOP_HITS_SPECIAL_HI) <= 0 {
-            if camera_checks(fighter){
+            if WorkModule::is_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ENABLE_CAMERA){
                 let scale = PostureModule::scale(fighter.module_accessor);
                 macros::CAM_ZOOM_OUT(fighter);
                 let lr = PostureModule::lr(fighter.module_accessor);
@@ -453,6 +454,7 @@ unsafe extern "C" fn special_hi_end(fighter: &mut L2CFighterCommon) -> L2CValue 
     if StatusModule::status_kind_next(module_accessor) != FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_LOOP
     && StatusModule::status_kind_next(module_accessor) != FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START
     && StatusModule::status_kind_next(module_accessor) != FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE{
+        WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ENABLE_CAMERA);
         ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
         CameraModule::reset_main_camera_fov(module_accessor);
         CameraModule::zoom_out(module_accessor, 0);

@@ -13,7 +13,7 @@ pub unsafe extern "C" fn game_attackhi3(agent: &mut L2CAgentBase) {
         macros::HIT_NODE(agent, Hash40::new("shoulderr"), *HIT_STATUS_XLU);
         macros::HIT_NODE(agent, Hash40::new("bust"), *HIT_STATUS_XLU);
         macros::HIT_NODE(agent, Hash40::new("waist"), *HIT_STATUS_XLU);
-        macros::HIT_NODE(agent, Hash40::new("hip"), *HIT_STATUS_XLU);
+        //macros::HIT_NODE(agent, Hash40::new("hip"), *HIT_STATUS_XLU);
         macros::HIT_NODE(agent, Hash40::new("head"), *HIT_STATUS_XLU);
     }
     sv_animcmd::frame(agent.lua_state_agent, 7.0);
@@ -21,14 +21,16 @@ pub unsafe extern "C" fn game_attackhi3(agent: &mut L2CAgentBase) {
         macros::FT_MOTION_RATE(agent, 1.0);
         macros::SET_SPEED_EX(agent, 1.6, 0.0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
     }
-    sv_animcmd::frame(agent.lua_state_agent, 10.0);
+    sv_animcmd::frame(agent.lua_state_agent, 11.0);
     if macros::is_excute(agent) {
         macros::ATTACK(agent,0,0,Hash40::new("handr"),8.0,90,95,0,35,9.0,3.0,0.0,0.0,None,None,None,1.5,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,true,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_PUNCH,*ATTACK_REGION_NONE);
+        AttackModule::set_attack_height_all(agent.module_accessor, AttackHeight(*ATTACK_HEIGHT_HIGH), false);
     }
     sv_animcmd::wait(agent.lua_state_agent, 5.0);
     if macros::is_excute(agent) {
         HitModule::set_status_all(agent.module_accessor, HitStatus(*HIT_STATUS_NORMAL), 0);
         macros::ATTACK(agent,0,0,Hash40::new("handr"),4.0,90,70,0,35,9.0,3.0,0.0,0.0,None,None,None,1.5,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,0.0,0.0,0.0,false,false,false,false,true,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_PUNCH,*ATTACK_REGION_NONE);
+        AttackModule::set_attack_height_all(agent.module_accessor, AttackHeight(*ATTACK_HEIGHT_HIGH), false);
     }
     sv_animcmd::wait(agent.lua_state_agent, 7.0);
     if macros::is_excute(agent) {

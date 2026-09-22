@@ -251,8 +251,11 @@ pub unsafe extern "C" fn caught_buster_main(fighter: &mut L2CFighterCommon) -> L
         z_offset = 0.0;
         x_offset = 0.5;
     }
+    //if WorkModule::is_flag(parent_boma,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ENABLE_CAMERA){
+    //    z_offset = 0.0;
+    //}
     let constraint_flags = LinkModule::get_model_constraint_flag(fighter.module_accessor);
-    LinkModule::set_model_constraint_flag(fighter.module_accessor,(*CONSTRAINT_FLAG_DISABLE_RESTRICT_Z | *CONSTRAINT_FLAG_POSITION | *CONSTRAINT_FLAG_ORIENTATION | *CONSTRAINT_FLAG_OFFSET_TRANSLATE) as u32);
+    LinkModule::set_model_constraint_flag(fighter.module_accessor,(*CONSTRAINT_FLAG_POSITION | *CONSTRAINT_FLAG_ORIENTATION | *CONSTRAINT_FLAG_OFFSET_TRANSLATE) as u32);
     MotionModule::change_motion(fighter.module_accessor, Hash40::new_raw(motion), 0.0, 1.0, false, 0.0, false, false);
     LinkModule::set_constraint_translate_offset(fighter.module_accessor, &Vector3f{ x: x_offset, y: y_offset, z: z_offset });
     //fighter.flip_have_item_capture();
@@ -335,7 +338,7 @@ pub unsafe extern "C" fn caught_pre(fighter: &mut L2CFighterCommon) -> L2CValue 
 }
 
 pub unsafe extern "C" fn caught_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
-    println!("frame/4 = {}",MotionModule::frame(fighter.module_accessor).rem(4.0) as i32);
+    //println!("frame/4 = {}",MotionModule::frame(fighter.module_accessor).rem(4.0) as i32);
     if MotionModule::frame(fighter.module_accessor).rem(4.0) == 0.0{
         //physics!(fighter,*MA_MSC_CMD_PHYSICS_PH_SWING_STOP, false);
         PhysicsModule::set_swing_rate(fighter.module_accessor, 1.0);

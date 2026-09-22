@@ -10,7 +10,7 @@ pub unsafe extern "C" fn should_not_reverse_lr(status_kind: i32) -> bool {
         *FIGHTER_STATUS_KIND_TURN_RUN_BRAKE,
         *FIGHTER_STATUS_KIND_LANDING_FALL_SPECIAL,
         *FIGHTER_STATUS_KIND_SQUAT_RV,
-        //*FIGHTER_STATUS_KIND_SQUAT_WAIT,
+        *FIGHTER_STATUS_KIND_SQUAT_WAIT,
         *FIGHTER_STATUS_KIND_TREAD_DAMAGE_RV,
         *FIGHTER_STATUS_KIND_GUARD_OFF,
         *FIGHTER_STATUS_KIND_GUARD_DAMAGE,
@@ -73,6 +73,7 @@ pub unsafe extern "C" fn auto_turn(fighter: &mut L2CFighterCommon) -> L2CValue {
     unsafe fn update_lr(fighter: &mut L2CFighterCommon, lr: f32) {
         PostureModule::set_lr(fighter.module_accessor, lr);
         PostureModule::update_rot_y_lr(fighter.module_accessor);
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLAG_AUTO_TURN_END_STATUS);
     }
     WorkModule::off_flag(fighter.module_accessor, *FIGHTER_SPECIAL_COMMAND_USER_INSTANCE_WORK_ID_FLAG_AUTO_TURN_END_STATUS);
 
@@ -108,7 +109,7 @@ pub unsafe extern "C" fn auto_turn(fighter: &mut L2CFighterCommon) -> L2CValue {
         *FIGHTER_STATUS_KIND_SPECIAL_LW,
         *FIGHTER_STATUS_KIND_SPECIAL_HI,
         *FIGHTER_STATUS_KIND_FINAL,
-        *FIGHTER_RYU_STATUS_KIND_WALK_BACK,
+        FIGHTER_KAMUI_STATUS_KIND_WALK_BACK,
     ].contains(&next_status) {
         return false.into();
     }
