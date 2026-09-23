@@ -1144,19 +1144,20 @@ pub unsafe extern "C" fn kamui_on_status_change_2(vtable: u64, fighter: &mut Fig
 
 
 #[skyline::from_offset(*KAMUI_ON_DEATH)]
-pub unsafe extern "C" fn kamui_on_death_og(vtable: u64, fighter: &mut Fighter);
+pub unsafe extern "C" fn kamui_on_death_og(vtable: u64, fighter: &mut Fighter, something: u32);
 
-pub unsafe extern "C" fn kamui_on_death(vtable: u64, fighter: &mut Fighter) {
+pub unsafe extern "C" fn kamui_on_death(vtable: u64, fighter: &mut Fighter, something: u32) {
     let module_accessor = fighter.battle_object.module_accessor;
     println!("on_death");
     if is_potemkin(module_accessor){
+        println!("is_pot");
         let kinetic_energy = KineticModule::get_energy(module_accessor, *FIGHTER_KINETIC_ENERGY_ID_CONTROL);
         if *(kinetic_energy as *mut u8).add(0xa4) != 0{
             *(kinetic_energy as *mut u8).add(0xa5) = 0;
         }
         //*(kinetic_energy as *mut u8).add(0x9c) = 0;
     }else{
-        kamui_on_death(vtable,fighter);
+        kamui_on_death_og(vtable,fighter,something);
     }
 }
 
