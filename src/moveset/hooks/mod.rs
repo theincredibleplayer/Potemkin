@@ -2,8 +2,10 @@ use super::*;
 
 
 
-pub mod hooks_vtable;
+mod hooks_vtable;
 use hooks_vtable::*;
+mod hooks_vtable_weapon;
+use hooks_vtable_weapon::*;
 
 mod hooks;
 use hooks::*;
@@ -28,4 +30,5 @@ fn patch_vtable_function(offset: usize, function: u64) {
 pub fn install() {
     hooks::install();
     hooks_vtable::install();
+    hooks_vtable_weapon::install();
 }

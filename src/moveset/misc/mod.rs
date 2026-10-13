@@ -5,7 +5,6 @@ pub mod command_input;
 pub mod command_structs;
 pub mod extra_functions;
 pub mod helper_functions;
-pub mod lowercase_letters;
 pub mod misc;
 
 pub use event_structs::*;
@@ -13,5 +12,4 @@ pub use command_input::*;
 pub use command_structs::*;
 pub use extra_functions::*;
 pub use helper_functions::*;
-pub use lowercase_letters::*;
 pub use misc::*;

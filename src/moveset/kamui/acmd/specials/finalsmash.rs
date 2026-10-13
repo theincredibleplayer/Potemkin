@@ -596,20 +596,9 @@ unsafe extern "C" fn sound_finalvisualscene02(agent: &mut L2CAgentBase) {
     let enemy_id = LinkModule::get_node_object_id(agent.module_accessor, *LINK_NO_CAPTURE);
     let enemy = sv_battle_object::module_accessor(enemy_id as u32);
     let enemy_kind = sv_battle_object::kind(enemy_id as u32);
-    //let name = LOWERCASE_FIGHTER_NAMES.get(enemy_kind as usize).unwrap();
-    //let result = ["vc_",name,"_damage_twinkle"].join("");
     let result = SoundModule::get_common_sound_label(enemy,*FIGHTER_COMMONSND_HOSHIKIE as u32);
     let scream_handle = SoundModule::play_se(enemy, Hash40::new_raw(result), true, false, false, false, enSEType(0));
     SoundModule::set_se_vol(enemy, scream_handle as i32, 2.0, 0);
-    //for zarek's pacman mod
-    let name = LOWERCASE_FIGHTER_NAMES.get(enemy_kind as usize).unwrap();
-    let result = ["se_",name,"_damage_twinkle"].join("");
-    let pac_handle = SoundModule::play_se(enemy, Hash40::new(result.as_str()), true, false, false, false, enSEType(0));
-    SoundModule::set_se_vol(enemy, pac_handle as i32, 2.0, 0);
-
-
-
-
     }
 
     frame(agent.lua_state_agent, 77.0);

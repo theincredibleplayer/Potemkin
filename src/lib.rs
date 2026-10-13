@@ -8,7 +8,7 @@ use motion_lib::{self, mlist::{Animation, Extra}, hash40::WriteHash40};
 use arcropolis_api::arc_callback;
 use motion_lib::{hash40, mlist::Flags};
 use arcropolis_api::hash40;
-
+use skyline::nn;
 
 mod moveset;
 
@@ -408,6 +408,7 @@ extern "C" fn install_motion_patch(){
     const MAX_FILE_SIZE: usize = 0xe000;
     const MAX_FILE_SIZE_KIRBY: usize = 0x20000;
     const MAX_FILE_SIZE_TANTAN: usize = 0x10000;
+    println!("install motion patch");
 
     let mut fighter_slots: [Vec<i32>; 97] = std::array::from_fn(|_| Vec::new());    
 
@@ -424,6 +425,7 @@ extern "C" fn install_motion_patch(){
                 }
             }
         }
+        println!("vanilla is done");
         for slot in 8..256 {
             let path = format!("mods:/fighter/{}/model/body/c{:02}/", fighters[index], slot);
 
@@ -511,6 +513,7 @@ fn potemkin_motion_patch_callback(hash: u64, data: &mut [u8]) -> Option<usize> {
             let vec_res = writer.into_inner();
             let slice = vec_res.as_slice();
             data[..slice.len()].copy_from_slice(slice);
+            println!("potemkin motion patch successful {:#x}", hash);
             Some(data.len())
         }
         Err(_) => {
@@ -522,12 +525,12 @@ fn potemkin_motion_patch_callback(hash: u64, data: &mut [u8]) -> Option<usize> {
 
 
 
-
 #[skyline::main(name = "hotpot")]
 pub fn main() {
     if !check_deps() {
         return;
     }
+    crate::moveset::consts::install();
     unsafe {
         extern "C" {
             fn arcrop_register_event_callback(

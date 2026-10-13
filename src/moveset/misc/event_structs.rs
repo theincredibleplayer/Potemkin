@@ -509,20 +509,20 @@ impl VtableEntry {
 pub struct WeaponVtableEntry(usize);
 
 impl WeaponVtableEntry {
-    pub const INITIALIZATION: usize = 0;        //looks like initializing the projectile
-    pub const UNK1: usize = 1;
+    pub const INITIALIZATION : usize = 0;        //looks like initializing the projectile
+    pub const UNK1 : usize = 1;
     pub const UNK2: usize = 2;
     pub const UNK3: usize = 3;
     pub const UNK4: usize = 4;
     pub const UNK5: usize = 5;
-    pub const UNK6: usize = 6;
-    pub const UNK7: usize = 7;
-    pub const UNK8: usize = 8;
-    pub const UNK9: usize = 9;
+    pub const WEAPON_GENERATE_1: usize = 6;
+    pub const WEAPON_GENERATE_2: usize = 7;
+    pub const WEAPON_GENERATE_3: usize = 8;
+    pub const ON_WEAPON_REMOVE: usize = 9;
     pub const UNK10: usize = 10;
     pub const UNK11: usize = 11;
-    pub const UNK12: usize = 12;
-    pub const UNK13: usize = 13;
+    pub const WEAPON_NOTIFY_EVENT_MSC_CMD: usize = 12;
+    pub const WEAPON_LINK_EVENT: usize = 13;
     pub const UNK14: usize = 14;
     pub const UNK15: usize = 15;
     pub const UNK16: usize = 16;
@@ -531,20 +531,20 @@ impl WeaponVtableEntry {
     pub const UNK19: usize = 19;
     pub const UNK20: usize = 20;
     pub const UNK21: usize = 21;
-    pub const UNK22: usize = 22;
+    pub const WEAPON_ON_STAGE_COLLISION: usize = 22;
     pub const UNK23: usize = 23;
-    pub const UNK24: usize = 24;
+    pub const UNK24 : usize = 24;
     pub const UNK25: usize = 25;
     pub const UNK26: usize = 26;
     pub const UNK27: usize = 27;
-    pub const UNK28: usize = 28;
-    pub const UNK29: usize = 29;
-    pub const UNK30: usize = 30;
-    pub const UNK31: usize = 31;
-    pub const UNK32: usize = 32;
-    pub const UNK33: usize = 33;
-    pub const UNK34: usize = 34;
-    pub const UNK35: usize = 35;
+    pub const UNK28 : usize = 28;
+    pub const ON_ATTACK: usize = 29;
+    pub const UNK30 : usize = 30;
+    pub const ON_WEAPON_REFLECT : usize = 31;
+    pub const UNK32 : usize = 32;
+    pub const UNK33 : usize = 33;
+    pub const UNK34 : usize = 34;
+    pub const ON_SEARCH: usize = 35;
     pub const UNK36: usize = 36;
     pub const UNK37: usize = 37;
     pub const UNK38: usize = 38;
@@ -552,19 +552,19 @@ impl WeaponVtableEntry {
     pub const UNK40: usize = 40;
     pub const UNK41: usize = 41;
     pub const UNK42: usize = 42;
-    pub const UNK43: usize = 43;
-    pub const UNK44: usize = 44;
-    pub const UNK45: usize = 45;
-    pub const UNK46: usize = 46;
+    pub const ON_SHIELD_COLLISION_1 : usize = 43;
+    pub const ON_SHIELD_COLLISION_2 : usize = 44;
+    pub const ON_REFLECTOR_COLLISION_1 : usize = 45;
+    pub const ON_REFLECTOR_COLLISION_2: usize = 46;
     pub const UNK47: usize = 47;
     pub const UNK48: usize = 48;
-    pub const UNK49: usize = 49;
+    pub const UNK49 : usize = 49;
     pub const UNK50: usize = 50;
-    pub const UNK51: usize = 51;
+    pub const UNK51 : usize = 51;
     pub const UNK52: usize = 52;
     pub const UNK53: usize = 53;
-    pub const UNK54: usize = 54;
-    pub const UNK55: usize = 55;                         
+    pub const UNK54 : usize = 54;
+    pub const UNK55                 : usize = 55;                         
     pub const UNK56: usize = 56;
     pub const UNK57: usize = 57;
     pub const UNK58: usize = 58;
@@ -585,14 +585,14 @@ impl WeaponVtableEntry {
     pub const UNK73: usize = 73;
     pub const UNK74: usize = 74;
     pub const UNK75: usize = 75;
-    pub const UNK76: usize = 76;
+    pub const UNK76 : usize = 76;
     pub const UNK77: usize = 77;
     pub const UNK78: usize = 78;
     pub const UNK79: usize = 79;
     pub const UNK80: usize = 80;
     pub const UNK81: usize = 81;
     pub const UNK82: usize = 82;
-    pub const UNK83: usize = 83;
+    pub const UNK83 : usize = 83;
     pub const UNK84: usize = 84;
     pub const UNK85: usize = 85;
     pub const UNK86: usize = 86;
@@ -608,13 +608,10 @@ impl WeaponVtableEntry {
     pub const UNK96: usize = 96;
     pub const UNK97: usize = 97;
     pub const UNK98: usize = 98;
-    pub const UNK99: usize = 99;
+    pub const UNK99 : usize = 99;
     pub const UNK100: usize = 100;
     pub const UNK101: usize = 101;
+    pub const UNK102 : usize = 102;
+    pub const UNK103: usize = 103;
+
 }
-
-
-
-
-
-

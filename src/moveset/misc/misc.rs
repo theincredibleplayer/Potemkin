@@ -81,7 +81,7 @@ pub mod MiscModule {
     }
 
 
-    #[skyline::from_offset(GET_BATTLE_OBJECT_FROM_ID_OFFSET)]
+    #[skyline::from_offset(GET_BATTLE_OBJECT_FROM_ID_OFFSET.load(Ordering::Relaxed))]
     pub fn get_battle_object_from_id(id: u32) -> *mut BattleObject;
 }
 
@@ -122,10 +122,10 @@ pub fn get_ui_index_from_entry_id(entry_id: usize) -> usize {
     return index;
 }
 
-#[skyline::from_offset(GET_FIGHTER_VTABLE_OFFSET)]
+#[skyline::from_offset(GET_FIGHTER_VTABLE_OFFSET.load(Ordering::Relaxed))]
 fn get_fighter_vtable(id: u32) -> *const usize;
 
-#[skyline::from_offset(GET_WEAPON_VTABLE_OFFSET)]
+#[skyline::from_offset(GET_WEAPON_VTABLE_OFFSET.load(Ordering::Relaxed))]
 fn get_weapon_vtable(id: u32) -> *const usize;
 
 pub fn get_vtable_function_offset(kind: i32, entry: usize, is_weapon: bool, get_ptr: bool) -> usize {

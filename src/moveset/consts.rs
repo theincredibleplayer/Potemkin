@@ -1,5 +1,7 @@
 use super::*;
-
+use skyline::hooks::{Region,getRegionAddress};
+use skyline::nn::ro::LookupSymbol;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_CHECK_ENEMY: i32 = 0x200000ec;
 pub const FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_GRABBED_ENEMY: i32 = 0x200000ed;
@@ -203,47 +205,114 @@ pub const STATUS_END_CONTROL:               i32 = 0x3E;
 pub const CHECK_SPECIAL_S_UNIQ:             i32 = 0x39;
 
 
-// hooks
-pub const KAMUI_LINK_EVENT_OFFSET               : usize = 0xb5f380 ;
-pub const RESET_CLIFF_HANGDATA_HOOK_OFFSET      : usize = 0x6ca070 ;
-pub const AUTOTURN_SITUATION_CHECK_HOOK_OFFSET  : usize = 0x69a728 ;
-pub const CAPTURE_2_HOOK_OFFSET                 : usize = 0x3ede68 ;
-pub const WATERBALL_EFFECT_HANDELER_OFFSET      : usize = 0x3414310;
-pub const KAMUI_SWORD_EFFECT_HANDELER_OFFSET    : usize = 0xb5cbf0 ;
-pub const WATERBALL_ON_HIT_HOOK_OFFSET          : usize = 0x34146c0;
+macro_rules! offset_statics {
+    ($($name:ident),* $(,)?) => { $(pub static $name: AtomicUsize = AtomicUsize::new(0);)* };
+}
+offset_statics!(
+    RESET_CLIFF_HANGDATA_HOOK_OFFSET     ,
+    AUTOTURN_SITUATION_CHECK_HOOK_OFFSET ,
+    CAPTURE_2_HOOK_OFFSET                ,
+    WATERBALL_EFFECT_HANDELER_OFFSET     ,
+    KAMUI_SWORD_EFFECT_HANDELER_OFFSET   ,
+    GET_FIGHTER_VTABLE_OFFSET            ,
+    GET_WEAPON_VTABLE_OFFSET             ,
+    GET_BATTLE_OBJECT_FROM_ID_OFFSET     ,
+    SET_STAGE_VISIBILITY_FUNCTION_OFFSET ,
+    GET_OPPONENT_LR_FUNCTION_OFFSET      ,
+    SET_LR_FLOAT_FUNCTION_OFFSET         ,
+    FINAL_SMASH_CHECKS_FUNCTION_OFFSET   ,
+    UI_DRAW_HOOK                         ,
+);
 
+struct InstructionSearchItem {
+    name: &'static str,
+    pattern: &'static [u8],
+    adjust: isize,
+    out: &'static AtomicUsize,
+}
 
-// function offsets
-pub const GET_FIGHTER_VTABLE_OFFSET             : usize = 0x68d530 ;
-pub const GET_WEAPON_VTABLE_OFFSET              : usize = 0x33be790;
-pub const GET_BATTLE_OBJECT_FROM_ID_OFFSET      : usize = 0x3ac540 ;
+static OFFSET_SEARCH_RESET_CLIFF_HANGDATA: &[u8] = &[
+    0xff, 0x03, 0x02, 0xd1, 0xe9, 0x23, 0x04, 0x6d, 0xf6, 0x57, 0x05, 0xa9, 0xf4, 0x4f, 0x06, 0xa9, 0xfd, 0x7b, 0x07, 0xa9, 0xfd, 0xc3, 0x01, 0x91, 0x08, 0xa0, 0x40, 0xf9, 0x48, 0x09, 0x00, 0xb4
+];
 
-pub const SET_STAGE_VISIBILITY_FUNCTION_OFFSET  : usize = 0x159fb20;
-pub const GET_OPPONENT_LR_FUNCTION_OFFSET       : usize = 0x69a6e0 ;
-pub const SET_LR_FLOAT_FUNCTION_OFFSET          : usize = 0x69ad00 ;
-pub const FINAL_SMASH_CHECKS_FUNCTION_OFFSET    : usize = 0x695c80 ;
+static OFFSET_SEARCH_AUTOTURN_SITUATION_HOOK: &[u8] = &[
+    0xe0, 0x02, 0x00, 0x34, 0xe8, 0x03, 0x27, 0x1e, 0x0a, 0x00, 0x00, 0x14, 0x48, 0x70, 0x00, 0x51, 0x1f, 0x29, 0x02, 0x71, 0xc8, 0xfe, 0xff, 0x54
+];
 
-/*
+static OFFSET_SEARCH_CAPTURE_2_HOOK: &[u8] = &[
+    0xe0, 0x03, 0x19, 0x2a, 0xbf, 0xf9, 0xfe, 0x97, 0xa0, 0x00, 0x00, 0xb4, 0x08, 0xe8, 0x40, 0x39, 0xf5, 0x03, 0x00, 0xaa, 0x1f, 0x0d, 0x00, 0x71, 0xe8, 0x00, 0x00, 0x54
+]; // this is 2 instructions up
 
-13.0.4
+static OFFSET_SEARCH_WATERBALL_EFFECT_HANDELER: &[u8] = &[
+    0xff, 0xc3, 0x02, 0xd1, 0xe8, 0x3b, 0x00, 0xfd, 0xf6, 0x57, 0x08, 0xa9, 0xf4, 0x4f, 0x09, 0xa9, 0xfd, 0x7b, 0x0a, 0xa9, 0xfd, 0x83, 0x02, 0x91, 0x36, 0x10, 0x40, 0xf9, 0xa1, 0x00, 0x80, 0x52, 0xf4, 0x03, 0x02, 0xaa
+];
 
-// hooks
-pub const KAMUI_LINK_EVENT_OFFSET               : usize = 0xb5f380 ;
-pub const RESET_CLIFF_HANGDATA_HOOK_OFFSET      : usize = 0x6ca070 ;
-pub const AUTOTURN_SITUATION_CHECK_HOOK_OFFSET  : usize = 0x69a728 ;
-pub const CAPTURE_2_HOOK_OFFSET                 : usize = 0x3ede68 ;
-pub const WATERBALL_EFFECT_HANDELER_OFFSET      : usize = 0x3414310;
-pub const KAMUI_SWORD_EFFECT_HANDELER_OFFSET    : usize = 0xb5cbf0 ;
-pub const WATERBALL_ON_HIT_HOOK_OFFSET          : usize = 0x34146c0;
+static OFFSET_SEARCH_SWORD_EFFECT_HANDELER: &[u8] = &[
+    0xff, 0x03, 0x02, 0xd1, 0xf5, 0x2b, 0x00, 0xf9, 0xf4, 0x4f, 0x06, 0xa9, 0xfd, 0x7b, 0x07, 0xa9, 0xfd, 0xc3, 0x01, 0x91, 0x15, 0x10, 0x40, 0xf9, 0xf4, 0x03, 0x00, 0xaa, 0xa0, 0x2a, 0x40, 0xf9, 0x08, 0x00, 0x40, 0xf9, 0x08, 0x51, 0x40, 0xf9, 0xb3, 0x17, 0x80, 0x52, 0x13, 0x00, 0xa2, 0x72, 0xe1, 0x03, 0x1f, 0x2a, 0xe2, 0x03, 0x13, 0x2a
+];
 
+static OFFSET_SEARCH_GET_FIGHTER_VTABLE_OFFSET: &[u8] = &[
+    0xc0, 0x03, 0x5f, 0xd6, 0x00, 0x00, 0x00, 0x00, 0x1f, 0x78, 0x01, 0x71, 0xa2, 0x00, 0x00, 0x54
+]; // this is 2 instructions up from the target
 
-// function offsets
-pub const GET_FIGHTER_VTABLE_OFFSET             : usize = 0x68d530 ;
-pub const GET_WEAPON_VTABLE_OFFSET              : usize = 0x33be790;
-pub const GET_BATTLE_OBJECT_FROM_ID_OFFSET      : usize = 0x3ac540 ;
+static OFFSET_SEARCH_GET_WEAPON_VTABLE_OFFSET: &[u8] = &[
+    0xe0, 0x03, 0x00, 0x32, 0xc0, 0x03, 0x5f, 0xd6, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1f, 0x9c, 0x09, 0x71, 0xa2, 0x00, 0x00, 0x54
+]; // this is 4 instructions up from the target
 
-pub const SET_STAGE_VISIBILITY_FUNCTION_OFFSET  : usize = 0x159fb20;
-pub const GET_OPPONENT_LR_FUNCTION_OFFSET       : usize = 0x69a6e0 ;
-pub const SET_LR_FLOAT_FUNCTION_OFFSET          : usize = 0x69ad00 ;
-pub const FINAL_SMASH_CHECKS_FUNCTION_OFFSET    : usize = 0x695c80 ;
-*/
+static OFFSET_SEARCH_GET_BATTLE_OBJECT_FROM_ID_OFFSET: &[u8] = &[
+    0x1f, 0x60, 0x02, 0x39, 0xc0, 0x03, 0x5f, 0xd6, 0x00, 0x00, 0x00, 0x00, 0x08, 0x7c, 0x1c, 0x53, 0x1f, 0x11, 0x00, 0x71, 0x68, 0x07, 0x00, 0x54
+]; // this is 3 instructions up from the target
+
+static OFFSET_SEARCH_SET_STAGE_VISIBILITY_FUNCTION_OFFSET: &[u8] = &[
+    0x0b, 0xf9, 0x02, 0x39, 0xfd, 0x7b, 0x45, 0xa9, 0xf4, 0x4f, 0x44, 0xa9, 0xf6, 0x57, 0x43, 0xa9, 0xf8, 0x5f, 0x42, 0xa9, 0xff, 0x83, 0x01, 0x91, 0xc0, 0x03, 0x5f, 0xd6, 0xf6, 0x57, 0xbd, 0xa9, 0xf4, 0x4f, 0x01, 0xa9, 0xfd, 0x7b, 0x02, 0xa9, 0xfd, 0x83, 0x00, 0x91
+]; // this is 7 instructions up from the target
+
+static OFFSET_SEARCH_GET_OPPONENT_LR_FUNCTION_OFFSET: &[u8] = &[
+    0xff, 0x03, 0x03, 0xd1, 0xeb, 0x2b, 0x04, 0x6d, 0xe9, 0x23, 0x05, 0x6d, 0xfc, 0x6f, 0x06, 0xa9, 0xfa, 0x67, 0x07, 0xa9, 0xf8, 0x5f, 0x08, 0xa9, 0xf6, 0x57, 0x09, 0xa9, 0xf4, 0x4f, 0x0a, 0xa9, 0xfd, 0x7b, 0x0b, 0xa9, 0xfd, 0xc3, 0x02, 0x91, 0xf3, 0x03, 0x01, 0x2a, 0xf5, 0x03, 0x00, 0xaa, 0x23, 0x01, 0x00, 0x36, 0xd3, 0x00, 0x00, 0x37
+];
+
+static OFFSET_SEARCH_SET_LR_FLOAT_FUNCTION_OFFSET: &[u8] = &[
+    0xe9, 0x23, 0xbb, 0x6d, 0xf7, 0x0b, 0x00, 0xf9, 0xf6, 0x57, 0x02, 0xa9, 0xf4, 0x4f, 0x03, 0xa9, 0xfd, 0x7b, 0x04, 0xa9, 0xfd, 0x03, 0x01, 0x91, 0x13, 0xd0, 0x44, 0xa9, 0x88, 0x02, 0x40, 0xf9, 0x08, 0x2d, 0x40, 0xf9, 0xf6, 0x03, 0x01, 0x2a
+];
+
+static OFFSET_SEARCH_FINAL_SMASH_CHECKS_FUNCTION_OFFSET: &[u8] = &[
+    0xf4, 0x4f, 0xbe, 0xa9, 0xfd, 0x7b, 0x01, 0xa9, 0xfd, 0x43, 0x00, 0x91, 0x08, 0x00, 0x40, 0xf9, 0x08, 0x85, 0x40, 0xf9, 0x34, 0x01, 0x80, 0x52, 0x14, 0x00, 0xa4, 0x72, 0x81, 0x06, 0x00, 0x11, 0xf3, 0x03, 0x00, 0xaa, 0x00, 0x01, 0x3f, 0xd6
+];
+
+static OFFSET_SEARCH_UI_DRAW_HOOK: &[u8] = &[
+    0xfd, 0x43, 0x01, 0x91, 0xf4, 0x03, 0x00, 0xaa, 0xf5, 0x03, 0x02, 0x2a, 0xe0, 0x23, 0x00, 0x91, 0xe2, 0x03, 0x14, 0xaa, 0xf3, 0x03, 0x01, 0xaa, 0x50, 0x3a, 0x00, 0x94, 0x74, 0x62, 0x00, 0xf9, 0x80, 0x0e, 0x40, 0xf9
+];
+
+fn find_subsequence(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+    haystack.windows(needle.len()).position(|window| window == needle)
+}
+pub fn install() {
+    unsafe {
+        static INST_SEARCH_ARRAY: &[InstructionSearchItem] = &[
+            // hooks
+            InstructionSearchItem { name: "reset_cliff_hangdata_hook"   , pattern: OFFSET_SEARCH_RESET_CLIFF_HANGDATA                   , adjust: 0, out: &RESET_CLIFF_HANGDATA_HOOK_OFFSET     },
+            InstructionSearchItem { name: "autoturn_situation_hook"     , pattern: OFFSET_SEARCH_AUTOTURN_SITUATION_HOOK                , adjust: 0, out: &AUTOTURN_SITUATION_CHECK_HOOK_OFFSET },
+            InstructionSearchItem { name: "capture_2_hook"              , pattern: OFFSET_SEARCH_CAPTURE_2_HOOK                         , adjust: 2, out: &CAPTURE_2_HOOK_OFFSET                },
+            InstructionSearchItem { name: "waterball_effect_hook"       , pattern: OFFSET_SEARCH_WATERBALL_EFFECT_HANDELER              , adjust: 0, out: &WATERBALL_EFFECT_HANDELER_OFFSET     },
+            InstructionSearchItem { name: "sword_effect_hook"           , pattern: OFFSET_SEARCH_SWORD_EFFECT_HANDELER                  , adjust: 0, out: &KAMUI_SWORD_EFFECT_HANDELER_OFFSET   },
+            InstructionSearchItem { name: "ui_draw_hook"                , pattern: OFFSET_SEARCH_UI_DRAW_HOOK                           , adjust: 0, out: &UI_DRAW_HOOK                         },
+            // non hooks
+            InstructionSearchItem { name: "get_fighter_vtable"          , pattern: OFFSET_SEARCH_GET_FIGHTER_VTABLE_OFFSET              , adjust: 2, out: &GET_FIGHTER_VTABLE_OFFSET            },
+            InstructionSearchItem { name: "get_weapon_vtable"           , pattern: OFFSET_SEARCH_GET_WEAPON_VTABLE_OFFSET               , adjust: 4, out: &GET_WEAPON_VTABLE_OFFSET             },
+            InstructionSearchItem { name: "get_battle_object_from_id"   , pattern: OFFSET_SEARCH_GET_BATTLE_OBJECT_FROM_ID_OFFSET       , adjust: 3, out: &GET_BATTLE_OBJECT_FROM_ID_OFFSET     },
+            InstructionSearchItem { name: "set_stage_visibility"        , pattern: OFFSET_SEARCH_SET_STAGE_VISIBILITY_FUNCTION_OFFSET   , adjust: 7, out: &SET_STAGE_VISIBILITY_FUNCTION_OFFSET },
+            InstructionSearchItem { name: "get_opponent_lr"             , pattern: OFFSET_SEARCH_GET_OPPONENT_LR_FUNCTION_OFFSET        , adjust: 0, out: &GET_OPPONENT_LR_FUNCTION_OFFSET      },
+            InstructionSearchItem { name: "set_lr_float"                , pattern: OFFSET_SEARCH_SET_LR_FLOAT_FUNCTION_OFFSET           , adjust: 0, out: &SET_LR_FLOAT_FUNCTION_OFFSET         },
+            InstructionSearchItem { name: "final_smash_checks"          , pattern: OFFSET_SEARCH_FINAL_SMASH_CHECKS_FUNCTION_OFFSET     , adjust: 0, out: &FINAL_SMASH_CHECKS_FUNCTION_OFFSET   },
+        ];
+        let text_ptr = getRegionAddress(Region::Text) as *const u8;
+        let text_size = (getRegionAddress(Region::Rodata) as usize) - (text_ptr as usize);
+        let text = std::slice::from_raw_parts(text_ptr, text_size);
+        for item in INST_SEARCH_ARRAY{
+            if let Some(offset) = find_subsequence(text, item.pattern) {
+                item.out.store((offset as isize + item.adjust * 4)as usize, Ordering::Relaxed);
+                println!("{}: {:x}",item.name,item.out.load(Ordering::Relaxed));
+            }
+        }
+    }
+}

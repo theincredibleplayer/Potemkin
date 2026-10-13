@@ -1,16 +1,16 @@
 use super::*;
 
 // arg 2 as 0 hides the stage and as 1 unhides it
-#[skyline::from_offset(SET_STAGE_VISIBILITY_FUNCTION_OFFSET)]
+#[skyline::from_offset(SET_STAGE_VISIBILITY_FUNCTION_OFFSET.load(Ordering::Relaxed))]
 pub unsafe extern "C" fn set_stage_visibility(module_accessor: *mut smash::app::BattleObjectModuleAccessor, param_2: bool);
 
-#[skyline::from_offset(GET_OPPONENT_LR_FUNCTION_OFFSET)]
+#[skyline::from_offset(GET_OPPONENT_LR_FUNCTION_OFFSET.load(Ordering::Relaxed))]
 pub unsafe extern "C" fn get_opponent_lr(module_accessor: *mut smash::app::BattleObjectModuleAccessor, is_damage: bool, status_kind: i32, param_always_0: i32) -> f32;
 
-#[skyline::from_offset(SET_LR_FLOAT_FUNCTION_OFFSET)]
+#[skyline::from_offset(SET_LR_FLOAT_FUNCTION_OFFSET.load(Ordering::Relaxed))]
 pub unsafe extern "C" fn set_lr_float(lr_float: f32, module_accessor: *mut smash::app::BattleObjectModuleAccessor, status_kind: i32, param_always_0: i32) -> u64;
 
-#[skyline::from_offset(FINAL_SMASH_CHECKS_FUNCTION_OFFSET)]
+#[skyline::from_offset(FINAL_SMASH_CHECKS_FUNCTION_OFFSET.load(Ordering::Relaxed))]
 pub unsafe extern "C" fn final_smash_checks(work_module: *const u64) -> bool;
 
 

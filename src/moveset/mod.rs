@@ -3,6 +3,7 @@ use smash_script::macros::*;
 use skyline::nn::ro::LookupSymbol;
 use std::arch::asm;
 use skyline::hooks::{Region,getRegionAddress};
+use std::sync::atomic::{AtomicUsize, Ordering};
 use {
     smash::{
         lua2cpp::*,
@@ -605,7 +606,6 @@ pub fn install() {
             }
         }
     }
-    
     let agent_kamui = &mut Agent::new("kamui");
     let agent_kamui = agent_kamui.set_costume(costume.to_vec());
 
