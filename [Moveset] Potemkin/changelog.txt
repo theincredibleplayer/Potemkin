@@ -1,0 +1,178 @@
+V1.1:
+- Fixed a bug where kirby crashes the game if selected.
+- Fixed the missing lose animation.
+- Added some missing effects from smash attacks.
+
+V2.0:
+- When landing Potemkin used to double turn around before starting to walk backwards causing an awkward pause, this has been fixed.
+- Potemkin couldn't turn around during the ledge teeter animation in 1v1s, this has been fixed.
+- Inputting Potemkin buster is now possible on platforms.
+- Fixed a bug where final smash would be "stored" if performed using the input, which would give you infinite final smashes.
+- Fixed a bug where grabbing assist trophies caused the game to crash (they are no longer grabbable till i find out why this happens).
+- Fixed a bug where deleting Potemkin slots didn't reflect on the CSS, you can now remove the model folder from the slots to remove them from the CSS.
+- Characall by JD has been added.
+- Victory theme added.
+- Custom characters will no longer T-pose when grabbed.
+- Fixed a bug where sliding on a low traction stage (ice floor) caused T-posing.
+- Adjusted the position for the enemy Potemkin if grabbed by heavenly Potemkin buster.
+- Potemkin can no longer be pushed during Heat Knuckle.
+- Added smoke effects on some attacks.
+- Added a phoenix wright compatible layout.arc, instructions on how to use will be in the README.
+- textures have been optimized.
+- model slightly optimized.
+- jab is no longer cancellable on shield
+
+
+V2.1:
+- fixed an issue where the merged layout.arc caused the game to crash.
+- fixed an issue where selecting minmin crashed the game.
+- fixed an issue where if the red kill screen triggered on Potemkin buster the camera would be offset
+
+V2.2:
+- increased stability (maybe).
+- fixed an issue where Heat knuckle (grounded upb) sometimes would drop the opponent on the last hit.
+- fixed an issue where the final smash could be spammed infinitely under some conditions (again).
+- Potemkin can no longer cancel normal on shield hit, it has to connect now.
+- Hammerfall (sideb) detection range has been pushed back a little, meaning the opponent can now punish with a grab after shielding.
+- Hammerfall (sideb) armor reworked:
+	during the dash, the armor changed from 1 hit superamor to 1 hit 17% heavy armor.
+	braking still has superarmor.
+	attack armor changed from superarmor to 17% heavy armor.
+- Heat knuckle (grounded upb) has more lag on whiff.
+- Heat knuckle's (grounded upb) final hit can now hit opponents who aren't grabbed.
+- Heat tackle (air upb) armor has a smaller duration, Potemkin now loses armor before the move ends.
+- Heat tackle's (air upb) hitboxes no longer have priority.
+- Garuda impact (downb) can no longer be blocked, has a faster startup but more endlag.
+- When Garuda impact (downb) hits aerial opponents, the opponent is no longer grab invulnerable, meaning you can now combo it into Heat knuckle (grounded upb).
+- Adjusted ftilt timing.
+- Adjusted the final smash effects to account for stages that were broken before.
+
+V2.3:
+- downsmash endlag increased, turned super armor to 13% heavy armor
+- downsmash trip hitbox now only trips on the same level that Potemkin is standing on (hitbox changed from a large sphere to a line on the ground)
+- sideb armor changed from 17% to 10%
+- fair has less KBG, less damage and can no longer cancel into itself (can still be jump cancelled tho)
+- Bair has a little more damage and now sends more forward
+- ftilt angle slightly increased
+- buffed Nair (reduced kb and adjusted angle) so its a better combo tool since it was useless
+- grounded upB grab box size reduced
+- downB can no longer clank
+- special air hi minimum angle changed from 30 degrees to 15 degrees
+- added a lot of end lag on neutral special
+- tension meter charge rate changed from 0.75 points per 1% damage to 0.6 points per 1% damage (one RC is 50 points)
+- endlag on sideB brake changed from 23 frames to 30 frames, still has 7 frames of super armor
+- Ftilt can no longer hit on ledge
+- decreased pot buster damage and slightly increased KBG
+- slightly decreased armor duration on air up b
+- increased stun time on downB hit
+
+V2.4:
+- Hammerfall's speed now decays over time then stops after a certain distance
+- added late hit on Bair and Bair
+- added more endlag on Bair and fair
+- Nair buffed, now sends essentially nowhere, to avoid being looped SDI out of it
+- shrank the vertical size of down smash a little
+- added some endlag on Ftilt and uptilt
+- increased endlag on upB whiff
+- Hammerfall can no longer detect nor hit fighters on platforms
+- readded the endlag on megafist landing since it got accidentally removed last patch
+
+- jump cancel has been restricted to aerials, down tilt and uptilt
+- roman cancel will no longer clear the slowdown of the timer item
+- slightly expanded the Bair hitbox
+- adjusted Nair hitbox
+- slightly decreased the endlag of Ftilt
+- increased kill power of ftilt
+- slightly decreased endlag of neutral b
+- adjusted sideB searchbox so it should no longer detect fighters that are behind him
+
+- animations added to all aerial landing lag
+- landing lag for all aerials adjusted
+- added quake on all landings and adjusted effects of landing animations
+- decreased KBG on the spike hitbox on megafist
+
+
+V2.5:
+- you can now Potemkin shimmy by holding taunt during idle or walking back
+- previously reflecting luma caused him to get permanently deleted, now luma no longer gets deleted (but the FDB projectile spawns)
+- grounded upB can now be B-reversed
+- added animations for sleep and dizzy
+- animation interpolation disabled, the animations now no longer interpolate weirdly when the game is slowed
+- final smash jump hitbox can now grab grounded opponents but in a smaller radius
+- ik.prc and scharge.prc adjusted
+- grounded upB catch box for grounded opponents size increased
+- up air can now grab grounded opponents
+- fixed the ground IK on all moves
+- neutral b's attack hitbox no longer comes out if the reflector is triggered
+- slightly increased active frames on Down Smash
+- red kill screen on final smash will now only appear if the opponent is on the last stock, and not appear at all in timed battle
+- down air spike hitbox duration extended from 5 frames to 8 frames
+- fixed broken transitions between damage anims
+- down b now stuns aerial opponents for the same time as grounded opponents
+- fixed bug where getting frozen disables side b until you jump
+- added some remaining misc anims
+- fixed ice effect size, egg size, item grab range, jostle weight.
+- fixed his size and position on the lose window
+- previously command grabs (up air, heat knuckle and Potemkin buster) could not grab assist trophies, this has now been fixed
+- fixed a bug where DI out during forward throw would sometimes result in abnormally high knockback
+- fixed a bug where final smash did not stop the game during it's full duration
+- garuda impact can no longer stun if the opponent is in capture cut, thus preventing the Potemkin buster > roman cancel > garuda impact > Potemkin buster loop
+- uptilt upper body invincibility should now work correctly
+- heat knuckle camera animation adjusted
+
+V2.6:
+- heat knuckle's endlag timing and i frames have been adjusted in free for alls
+- heat tackle hitbox now gets a little weaker after the armor duration ends (10 frames)
+- back air hitbox slightly shrunk
+- you can now cancel attacks into final smash (previously you would do neutral b instead)
+- fixed some auto turn issues such as rolling into the incorrect direction sometimes
+- squat auto turn added
+- extra startup added to back air and down b
+
+V2.7
+- added some air control on megafist
+- fixed the spike hitbox on megafist not working
+- added kara cancels
+- side b changed to start at max speed instead of building up to it
+- removed jump cancels off of uptilt and downtilt
+- uptilt kbg decreased (buff)
+- down throw is now a combo throw (low knockback fast cancel out of)
+- fixed issue where hammerfall sometimes sent behind
+- doing input moves now gives the following buffs:
+	input heat tackle -> 5 extra frames of armor and strong hit
+	input megafist -> higher jump, slightly better air control
+- decreased kill power of Fsmash
+- back air can no longer be cancelled into itself or other aerials
+- upsmash active frames changed from 7 frames of strong hitbox to 3 frames of strong hitbox and 4 frames of a weaker hitbox
+- increased endlag on neutral b
+- fixed bug where entry animation's hair was not animated
+- added a bunch of item anims
+- adjusted ledge getup as to make pot buster on ledge not slip as easily
+- fixed Potemkin buster slipping at ledge sometimes
+- made the trip on down smash more consistent (sometimes it whiffed because of z axis stuff)
+- adjusted downsmash hitbox sizes
+- uptilt now sends at a more vertical angles
+- when doing final smash via input potemkin no longer falls during the super freeze
+- added an arm grab box on heat knuckle
+- Potemkin buster from frame 5 to frame 8
+- Potemkin buster can no longer trade, it armors through trades now
+
+V2.8
+- fixed some auto turn issues such as rolling into the incorrect direction sometimes (again but this time for real)
+- heat tackle range reduced, it also no longer slows down when hitting opponents
+- back air kbg reduced
+- you can no longer roman cancel while an opponent is grabbed, but you can red roman cancel at the moment of throwing
+- down smash trip box range reduced
+- added more endlag onto up air
+- fair angle raised slightly 
+- down smash armor only activates on release
+- down b now has a sweet spot up close and a sour spot further out, the sweet spot stuns for longer, both still pierce shield
+- reflector projectile is no longer THAT nuclear (reduced kbg)
+- heat knuckle whiff has more endlag
+- Potemkin buster whiff has more endlag
+- added a buffer system for red roman cancel's direction, so it should feel easier to input a direction now
+- 
+
+
+
+
