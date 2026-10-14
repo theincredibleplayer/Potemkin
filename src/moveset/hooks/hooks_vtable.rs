@@ -40,7 +40,7 @@ pub unsafe extern "C" fn kamui_on_search(_vtable: u64, fighter: &mut Fighter, lo
         let collision_log = collision_log as *const CollisionLogScuffed;
         let opp_boma = sv_battle_object::module_accessor((*collision_log).opponent_object_id);
         let clear_time = WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_SLOW_CLEAR_TIME);
-        let slow_mul = WorkModule::get_float(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_SLOW_MUL) as i32;    
+        let slow_mul = WorkModule::get_float(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_SLOW_MUL) as i32;
         let stop_time = WorkModule::get_int(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_RC_FREEZE_DURATION);
 
 
@@ -143,14 +143,14 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
     }else{
         UiManager::enable_ui(get_ui_index_from_entry_id(entry_id));
     }
-    UiManager::set_game_speed(sv_information::slow_rate()); 
+    UiManager::set_game_speed(sv_information::slow_rate());
 
     //post_effect line
     if WorkModule::is_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_SET_ADJUST_POST_CIRCLE){
         let agent = get_fighter_common_from_accessor((&mut*module_accessor));
         let radius = 20.0;
-        let vec1 = simd::Vector2{vec: [radius /* radius x */, radius /* radius y */]}; 
-        let vec2 = simd::Vector3{vec: [0.0 /* y offset */, 0.0 /* x offset */, 0.0 /* z offset */]}; 
+        let vec1 = simd::Vector2{vec: [radius /* radius x */, radius /* radius y */]};
+        let vec2 = simd::Vector3{vec: [0.0 /* y offset */, 0.0 /* x offset */, 0.0 /* z offset */]};
         EffectModule::set_post_effect_line_circle_target(module_accessor,Hash40::new("hip"),vec1,vec2,true);
     }
 
@@ -828,7 +828,7 @@ pub unsafe extern "C" fn kamui_init(vtable: u64, fighter: &mut Fighter) {
             false,
             true
         );
-        
+
         MiscModule::add_shield_group(module_accessor, resource, 2);
     }
     kamui_init_og(vtable,fighter);
@@ -883,7 +883,7 @@ pub unsafe extern "C" fn kamui_on_damage_og(vtable: u64, fighter: &mut Fighter,d
 pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,damage_log:u64) {
     let module_accessor = fighter.battle_object.module_accessor;
 
-    
+
     let entry_id = WorkModule::get_int(module_accessor,*FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     let dmg = *((*(((damage_log as u64) + 0x10) as *const u64) + 0x4) as *const f32);
     let status_kind =StatusModule::status_kind(fighter.battle_object.module_accessor);
@@ -913,8 +913,8 @@ pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,dama
             WorkModule::set_float(module_accessor, time_base, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_FIRE_TIME_BASE);
             WorkModule::set_int(module_accessor, time_base as i32, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_FIRE_TIMER);
             let agent = get_fighter_common_from_accessor((&mut*module_accessor));
-            damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_NORMAL, 0); 
-            
+            damage!(agent, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_NORMAL, 0);
+
             macros::BURN_COLOR(agent, 24,  1,  1, 0.5);
             WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
         }
@@ -973,7 +973,7 @@ pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,coll
                 }
             }
         }
-        if 
+        if
         ![FIGHTER_KAMUI_STATUS_KIND_ROMAN_CANCEL,
         FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_ATTACK,
         FIGHTER_KAMUI_STATUS_KIND_FINAL_DASH_LOOP,
@@ -1077,7 +1077,7 @@ pub unsafe extern "C" fn kamui_on_status_change_2(vtable: u64, fighter: &mut Fig
     let module_accessor = fighter.battle_object.module_accessor;
     let status = StatusModule::status_kind(module_accessor);
     let kinetic_energy = KineticModule::get_energy(module_accessor, *FIGHTER_KINETIC_ENERGY_ID_CONTROL);
-    let is_jump = 
+    let is_jump =
     [
         *FIGHTER_STATUS_KIND_CLIFF_JUMP1,
         *FIGHTER_STATUS_KIND_WALL_JUMP,
@@ -1172,7 +1172,7 @@ unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, event:
                 WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DASH_ATTACK_START);
                 WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_JUMP_START);
 
-                StatusModule::change_status_request(module_accessor, *FIGHTER_STATUS_KIND_FINAL, false);      
+                StatusModule::change_status_request(module_accessor, *FIGHTER_STATUS_KIND_FINAL, false);
                 PostureModule::set_pos(module_accessor,&Vector3f{x: 0.0 , y: 0.0, z: 20.0});
                 capture_event.result = true;
                 capture_event.node = smash_rs::phx::Hash40::new("throw");
@@ -1204,20 +1204,20 @@ pub fn install() {
 
         let mut costume = &mut get_costume_vector();
         println!("started replacing shit");
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),VtableEntry::ON_FRAME_4              , kamui_on_frame            as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnFrame4              , kamui_on_frame            as *const () as usize);
         println!("replaced shit number 1");
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),VtableEntry::ON_SEARCH               , kamui_on_search           as *const () as usize);
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),VtableEntry::RESET_1                 , kamui_reset               as *const () as usize);
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),VtableEntry::INITIALIZE              , kamui_init                as *const () as usize);
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),VtableEntry::ON_SHIELD_COLLISION     , kamui_on_shield           as *const () as usize);
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),VtableEntry::ON_DAMAGE               , kamui_on_damage           as *const () as usize);
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),VtableEntry::ON_ATTACK               , kamui_on_attack           as *const () as usize);
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),VtableEntry::ON_CHANGE_MOTION        , kamui_on_change_motion    as *const () as usize);
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),VtableEntry::ON_STATUS_CHANGE        , kamui_on_status_change    as *const () as usize);
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),VtableEntry::ON_SITUATION_CHANGE_2   , kamui_on_situation_change as *const () as usize);
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),VtableEntry::ON_STATUS_CHANGE_2      , kamui_on_status_change_2  as *const () as usize);
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),VtableEntry::ON_DEATH                , kamui_on_death            as *const () as usize);
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),VtableEntry::ON_LINK_EVENT           , kamui_link_event          as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnSearch               , kamui_on_search           as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::Reset1                 , kamui_reset               as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::Initialize              , kamui_init                as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnShieldCollision     , kamui_on_shield           as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnDamage               , kamui_on_damage           as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnAttack               , kamui_on_attack           as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnChangeMotion        , kamui_on_change_motion    as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnStatusChange        , kamui_on_status_change    as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnSituationChange   , kamui_on_situation_change as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::Unk43      , kamui_on_status_change_2  as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnDeath                , kamui_on_death            as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnLinkEvent           , kamui_link_event          as *const () as usize);
 
     }
 }

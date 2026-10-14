@@ -25,7 +25,7 @@ pub fn install() {
         LazyLock::force(&WATERBALL_ON_HIT);
         replace_weapon_vtable(
             WEAPON_KIND_KAMUI_FDB, // weapon kind
-            WeaponVtableEntry::ON_ATTACK, // vtable slot
+            WeaponVtableSlot::WeaponOnAttackMask, // vtable slot
             waterball_on_hit as *const () as usize // replacement vtable function
         );
 

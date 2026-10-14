@@ -39,6 +39,7 @@ pub fn check_deps() -> bool {
 }
 
 extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
+    println!("[POTEMPKIN] mounted mods");
     const FIGHTER_NAME: &str = "kamui";
     const MARKER_FILE: &str = "potemkin.marker";
     let mut lowest_color: i32 = -1;
@@ -80,7 +81,7 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
 
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("param_private"), 0x19996b81b6, 1200.0));
     //aerials
-    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("landing_attack_air_frame_n"),0, 6));               
+    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("landing_attack_air_frame_n"),0, 6));
     param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("landing_attack_air_frame_f"),0, 8));
     param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("landing_attack_air_frame_b"),0, 12));
     param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("landing_attack_air_frame_lw"),0, 20));
@@ -114,30 +115,30 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("height"), 0, 24.0));                        // no idea
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("jack_final_target_scale"), 0, 0.8));        // no idea
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("effect_scale"), 0, 2.0));                   // no idea
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("jostle_weight"), 0, 12.0));                   
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("jostle_front"), 0, 4.2));                   
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("jostle_back"), 0, 2.0));                   
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("entry_stand_scale"), 0, 2.0));                   
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("slope_top_angle_max"), 0, 60.0));                   
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("egg_scale"), 0, 3.0));                   
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("egg_collision_offset_1_y"), 0, 10.0));                   
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("egg_collision_offset_2_y"), 0, 13.0));                   
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("egg_collision_size"), 0, 15.0));                   
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("zelda_triforce_offset_y"), 0, 0.0));                   
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("edge_flare_offset_x"), 0, 4.0));                   
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("edge_flare_offset_y"), 0, 3.0));                   
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("edge_flare_radius"), 0, 17.5));                   
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_range_front"), 0, 19.0));                   
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_range_front_max"), 0, 27.0));                   
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_range_back"), 0, 10.0));                   
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_range_h"), 0, 14.0));                   
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_range_air_front"), 0, 14.25));                   
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_range_air_back"), 0, 10.0));                   
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_range_air_h"), 0, 21.0));                   
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("ice_offset_y"), 0, 4.5));                   
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("ice_offset_z"), 0, -3.0));                   
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("ice_radius"), 0, 16.0));                   
-    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("dead_up_camera_hit_distance"), 0, 27.5));                   
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("jostle_weight"), 0, 12.0));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("jostle_front"), 0, 4.2));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("jostle_back"), 0, 2.0));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("entry_stand_scale"), 0, 2.0));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("slope_top_angle_max"), 0, 60.0));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("egg_scale"), 0, 3.0));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("egg_collision_offset_1_y"), 0, 10.0));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("egg_collision_offset_2_y"), 0, 13.0));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("egg_collision_size"), 0, 15.0));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("zelda_triforce_offset_y"), 0, 0.0));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("edge_flare_offset_x"), 0, 4.0));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("edge_flare_offset_y"), 0, 3.0));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("edge_flare_radius"), 0, 17.5));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_range_front"), 0, 19.0));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_range_front_max"), 0, 27.0));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_range_back"), 0, 10.0));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_range_h"), 0, 14.0));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_range_air_front"), 0, 14.25));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_range_air_back"), 0, 10.0));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("item_range_air_h"), 0, 21.0));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("ice_offset_y"), 0, 4.5));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("ice_offset_z"), 0, -3.0));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("ice_radius"), 0, 16.0));
+    param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("dead_up_camera_hit_distance"), 0, 27.5));
 
     //compensation multiplier added to avoid the side effects that these have on camera_zoom_in
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("camera_range_center_y"), 0, 12.0));         // all of these dont work
@@ -146,7 +147,7 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("camera_range_2nd_center_y"), 0, 12.0));     // all of these dont work
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("camera_range_2nd_up"), 0, 16.0));           // all of these dont work
     param_config::update_float_2(*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("camera_range_2nd_down"), 0, -12.0));        // all of these dont work
-    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("size"),0, *FIGHTER_SIZE_LL));               
+    param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("size"),0, *FIGHTER_SIZE_LL));
     param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("bury_motion_height"),0, *HIT_HEIGHT_HIGH));
     param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("bury_r_motion_height"),0, *HIT_HEIGHT_HIGH));
     param_config::update_int_2  (*FIGHTER_KIND_KAMUI, marked_slots.clone(), (smash::hash40("attack_combo_type"),0, *FIGHTER_COMBO_TYPE_NONE));
@@ -162,200 +163,200 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
 
 
     // Preform csk collection calls here (allow online, narration characall entry, add chara db, add layout db, w/e)
-    the_csk_collection_api::add_series_db_entry_info(the_csk_collection_api::SeriesDatabaseEntry { 
-        ui_series_id: smash::hash40("ui_series_guiltygear"), 
-        name_id: the_csk_collection_api::StringType::Overwrite(the_csk_collection_api::CStrCSK::new("guiltygear")), 
-        disp_order: the_csk_collection_api::SignedByteType::Overwrite(40), 
-        disp_order_sound: the_csk_collection_api::SignedByteType::Overwrite(40), 
-        save_no: the_csk_collection_api::SignedByteType::Optional(Some(55)), 
-        shown_as_series_in_directory: the_csk_collection_api::BoolType::Optional(Some(true)), 
-        is_dlc: the_csk_collection_api::BoolType::Optional(Some(false)), 
-        is_patch: the_csk_collection_api::BoolType::Optional(Some(false)), 
-        dlc_chara_id: the_csk_collection_api::Hash40Type::Optional(Some(0x0)), 
-        is_use_amiibo_bg: the_csk_collection_api::BoolType::Optional(Some(true)), 
+    the_csk_collection_api::add_series_db_entry_info(the_csk_collection_api::SeriesDatabaseEntry {
+        ui_series_id: smash::hash40("ui_series_guiltygear"),
+        name_id: the_csk_collection_api::StringType::Overwrite(the_csk_collection_api::CStrCSK::new("guiltygear")),
+        disp_order: the_csk_collection_api::SignedByteType::Overwrite(40),
+        disp_order_sound: the_csk_collection_api::SignedByteType::Overwrite(40),
+        save_no: the_csk_collection_api::SignedByteType::Optional(Some(55)),
+        shown_as_series_in_directory: the_csk_collection_api::BoolType::Optional(Some(true)),
+        is_dlc: the_csk_collection_api::BoolType::Optional(Some(false)),
+        is_patch: the_csk_collection_api::BoolType::Optional(Some(false)),
+        dlc_chara_id: the_csk_collection_api::Hash40Type::Optional(Some(0x0)),
+        is_use_amiibo_bg: the_csk_collection_api::BoolType::Optional(Some(true)),
         ..Default::default()
     });
 
     the_csk_collection_api::add_chara_db_entry_info(the_csk_collection_api::CharacterDatabaseEntry {
         ui_chara_id: smash::hash40("ui_chara_potemkin"),
-        name_id: the_csk_collection_api::StringType::Overwrite(the_csk_collection_api::CStrCSK::new("potemkin")), 
-        fighter_kind: the_csk_collection_api::Hash40Type::Overwrite(0x12C30E8564 /* Hash40 of fighter_kind_kamui */), 
-        fighter_kind_corps: the_csk_collection_api::Hash40Type::Overwrite(0x12C30E8564 /* Hash40 of fighter_kind_kamui */), 
-        ui_series_id: the_csk_collection_api::Hash40Type::Overwrite(0x142be617be), 
-        fighter_type: the_csk_collection_api::Hash40Type::Overwrite(0x10e2915152 /* Hash40 of fighter_type_big */), 
-        alt_chara_id: the_csk_collection_api::Hash40Type::Overwrite(0x0), 
-        exhibit_year: the_csk_collection_api::ShortType::Overwrite(2015), 
-        exhibit_day_order: the_csk_collection_api::IntType::Overwrite(62501), 
-        ext_skill_page_num: the_csk_collection_api::SignedByteType::Overwrite(4), 
+        name_id: the_csk_collection_api::StringType::Overwrite(the_csk_collection_api::CStrCSK::new("potemkin")),
+        fighter_kind: the_csk_collection_api::Hash40Type::Overwrite(0x12C30E8564 /* Hash40 of fighter_kind_kamui */),
+        fighter_kind_corps: the_csk_collection_api::Hash40Type::Overwrite(0x12C30E8564 /* Hash40 of fighter_kind_kamui */),
+        ui_series_id: the_csk_collection_api::Hash40Type::Overwrite(0x142be617be),
+        fighter_type: the_csk_collection_api::Hash40Type::Overwrite(0x10e2915152 /* Hash40 of fighter_type_big */),
+        alt_chara_id: the_csk_collection_api::Hash40Type::Overwrite(0x0),
+        exhibit_year: the_csk_collection_api::ShortType::Overwrite(2015),
+        exhibit_day_order: the_csk_collection_api::IntType::Overwrite(62501),
+        ext_skill_page_num: the_csk_collection_api::SignedByteType::Overwrite(4),
         is_img_ext_skill_page0: the_csk_collection_api::BoolType::Overwrite(true), // command inputs
         is_img_ext_skill_page1: the_csk_collection_api::BoolType::Overwrite(false),
         is_img_ext_skill_page2: the_csk_collection_api::BoolType::Overwrite(true), // roman cancel
-        skill_list_order: the_csk_collection_api::SignedByteType::Optional(Some(83)), 
-        disp_order: the_csk_collection_api::SignedByteType::Optional(Some(83)), 
-        save_no: the_csk_collection_api::SignedByteType::Optional(Some(62)), 
-        chara_count: the_csk_collection_api::SignedByteType::Optional(Some(1)), 
-        can_select: the_csk_collection_api::BoolType::Overwrite(true), 
-        is_usable_soundtest: the_csk_collection_api::BoolType::Optional(Some(true)), 
-        is_called_pokemon: the_csk_collection_api::BoolType::Optional(Some(false)), 
-        is_mii: the_csk_collection_api::BoolType::Optional(Some(false)), 
-        is_boss: the_csk_collection_api::BoolType::Optional(Some(false)), 
-        is_hidden_boss: the_csk_collection_api::BoolType::Optional(Some(false)), 
-        is_dlc: the_csk_collection_api::BoolType::Optional(Some(false)), 
-        is_patch: the_csk_collection_api::BoolType::Optional(Some(false)), 
-        is_plural_message: the_csk_collection_api::BoolType::Optional(Some(false)), 
-        is_plural_narration: the_csk_collection_api::BoolType::Optional(Some(false)), 
-        is_article: the_csk_collection_api::BoolType::Optional(Some(false)), 
-        extra_flags: the_csk_collection_api::IntType::Optional(Some(0)), 
-        result_pf0: the_csk_collection_api::BoolType::Optional(Some(true)), 
-        result_pf1: the_csk_collection_api::BoolType::Optional(Some(true)), 
-        result_pf2: the_csk_collection_api::BoolType::Optional(Some(true)), 
-        color_num: the_csk_collection_api::UnsignedByteType::Overwrite(color_num as _), 
-        shop_item_tag: the_csk_collection_api::Hash40Type::Optional(Some(0x0)), 
+        skill_list_order: the_csk_collection_api::SignedByteType::Optional(Some(83)),
+        disp_order: the_csk_collection_api::SignedByteType::Optional(Some(83)),
+        save_no: the_csk_collection_api::SignedByteType::Optional(Some(62)),
+        chara_count: the_csk_collection_api::SignedByteType::Optional(Some(1)),
+        can_select: the_csk_collection_api::BoolType::Overwrite(true),
+        is_usable_soundtest: the_csk_collection_api::BoolType::Optional(Some(true)),
+        is_called_pokemon: the_csk_collection_api::BoolType::Optional(Some(false)),
+        is_mii: the_csk_collection_api::BoolType::Optional(Some(false)),
+        is_boss: the_csk_collection_api::BoolType::Optional(Some(false)),
+        is_hidden_boss: the_csk_collection_api::BoolType::Optional(Some(false)),
+        is_dlc: the_csk_collection_api::BoolType::Optional(Some(false)),
+        is_patch: the_csk_collection_api::BoolType::Optional(Some(false)),
+        is_plural_message: the_csk_collection_api::BoolType::Optional(Some(false)),
+        is_plural_narration: the_csk_collection_api::BoolType::Optional(Some(false)),
+        is_article: the_csk_collection_api::BoolType::Optional(Some(false)),
+        extra_flags: the_csk_collection_api::IntType::Optional(Some(0)),
+        result_pf0: the_csk_collection_api::BoolType::Optional(Some(true)),
+        result_pf1: the_csk_collection_api::BoolType::Optional(Some(true)),
+        result_pf2: the_csk_collection_api::BoolType::Optional(Some(true)),
+        color_num: the_csk_collection_api::UnsignedByteType::Overwrite(color_num as _),
+        shop_item_tag: the_csk_collection_api::Hash40Type::Optional(Some(0x0)),
         extra_hash_maps: the_csk_collection_api::Hash40Map::Overwrite(HashMap::from([
-            (0x1337FC912E /* Hash40 of characall_label_c00 */, the_csk_collection_api::Hash40Type::Overwrite(smash::hash40("vc_narration_characall_potemkin"))), 
-            (0x1340FBA1B8 /* Hash40 of characall_label_c01 */, the_csk_collection_api::Hash40Type::Overwrite(0x0)), 
-            (0x13D9F2F002 /* Hash40 of characall_label_c02 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))), 
-            (0x13AEF5C094 /* Hash40 of characall_label_c03 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))), 
-            (0x1330915537 /* Hash40 of characall_label_c04 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))), 
-            (0x13479665A1 /* Hash40 of characall_label_c05 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))), 
-            (0x13DE9F341B /* Hash40 of characall_label_c06 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))), 
-            (0x13A998048D /* Hash40 of characall_label_c07 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))), 
-            (0x1B8B13E500 /* Hash40 of characall_label_article_c00 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))), 
-            (0x1BFC14D596 /* Hash40 of characall_label_article_c01 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))), 
-            (0x1B651D842C /* Hash40 of characall_label_article_c02 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))), 
-            (0x1B121AB4BA /* Hash40 of characall_label_article_c03 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))), 
-            (0x1B8C7E2119 /* Hash40 of characall_label_article_c04 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))), 
-            (0x1BFB79118F /* Hash40 of characall_label_article_c05 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))), 
-            (0x1B62704035 /* Hash40 of characall_label_article_c06 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))), 
-            (0x1B157770A3 /* Hash40 of characall_label_article_c07 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))), 
+            (0x1337FC912E /* Hash40 of characall_label_c00 */, the_csk_collection_api::Hash40Type::Overwrite(smash::hash40("vc_narration_characall_potemkin"))),
+            (0x1340FBA1B8 /* Hash40 of characall_label_c01 */, the_csk_collection_api::Hash40Type::Overwrite(0x0)),
+            (0x13D9F2F002 /* Hash40 of characall_label_c02 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))),
+            (0x13AEF5C094 /* Hash40 of characall_label_c03 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))),
+            (0x1330915537 /* Hash40 of characall_label_c04 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))),
+            (0x13479665A1 /* Hash40 of characall_label_c05 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))),
+            (0x13DE9F341B /* Hash40 of characall_label_c06 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))),
+            (0x13A998048D /* Hash40 of characall_label_c07 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))),
+            (0x1B8B13E500 /* Hash40 of characall_label_article_c00 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))),
+            (0x1BFC14D596 /* Hash40 of characall_label_article_c01 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))),
+            (0x1B651D842C /* Hash40 of characall_label_article_c02 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))),
+            (0x1B121AB4BA /* Hash40 of characall_label_article_c03 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))),
+            (0x1B8C7E2119 /* Hash40 of characall_label_article_c04 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))),
+            (0x1BFB79118F /* Hash40 of characall_label_article_c05 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))),
+            (0x1B62704035 /* Hash40 of characall_label_article_c06 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))),
+            (0x1B157770A3 /* Hash40 of characall_label_article_c07 */, the_csk_collection_api::Hash40Type::Optional(Some(0x0))),
             (0x160ab9eb98, the_csk_collection_api::Hash40Type::Overwrite(0xE4DDD21E6 /* Hash40 of ui_chara_kamui */)),
-        ])), 
+        ])),
         extra_index_maps: the_csk_collection_api::UnsignedByteMap::Overwrite(HashMap::from([
-            (0x915C075DE /* Hash40 of c00_index */, the_csk_collection_api::UnsignedByteType::Overwrite(0)), 
-            (0x9B3B77E6A /* Hash40 of c01_index */, the_csk_collection_api::UnsignedByteType::Overwrite(0)), 
-            (0x9825F64F7 /* Hash40 of c02_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
-            (0x924286F43 /* Hash40 of c03_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
-            (0x9E18F51CD /* Hash40 of c04_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
-            (0x947F85A79 /* Hash40 of c05_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
-            (0x9761040E4 /* Hash40 of c06_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
-            (0x9D0674B50 /* Hash40 of c07_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
-            (0x9E48F9289 /* Hash40 of n00_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
-            (0x942F8993D /* Hash40 of n01_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
-            (0x9731083A0 /* Hash40 of n02_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
-            (0x9D5678814 /* Hash40 of n03_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
-            (0x910C0B69A /* Hash40 of n04_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
-            (0x9B6B7BD2E /* Hash40 of n05_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
-            (0x9875FA7B3 /* Hash40 of n06_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
-            (0x92128AC07 /* Hash40 of n07_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
-            (0x9F873561A /* Hash40 of c00_group */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
-            (0x95E045DAE /* Hash40 of c01_group */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
-            (0x96FEC4733 /* Hash40 of c02_group */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
-            (0x9C99B4C87 /* Hash40 of c03_group */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
-            (0x90C3C7209 /* Hash40 of c04_group */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
-            (0x9AA4B79BD /* Hash40 of c05_group */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
-            (0x99BA36320 /* Hash40 of c06_group */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
-            (0x93DD46894 /* Hash40 of c07_group */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))), 
+            (0x915C075DE /* Hash40 of c00_index */, the_csk_collection_api::UnsignedByteType::Overwrite(0)),
+            (0x9B3B77E6A /* Hash40 of c01_index */, the_csk_collection_api::UnsignedByteType::Overwrite(0)),
+            (0x9825F64F7 /* Hash40 of c02_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))),
+            (0x924286F43 /* Hash40 of c03_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))),
+            (0x9E18F51CD /* Hash40 of c04_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))),
+            (0x947F85A79 /* Hash40 of c05_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))),
+            (0x9761040E4 /* Hash40 of c06_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))),
+            (0x9D0674B50 /* Hash40 of c07_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))),
+            (0x9E48F9289 /* Hash40 of n00_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))),
+            (0x942F8993D /* Hash40 of n01_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))),
+            (0x9731083A0 /* Hash40 of n02_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))),
+            (0x9D5678814 /* Hash40 of n03_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))),
+            (0x910C0B69A /* Hash40 of n04_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))),
+            (0x9B6B7BD2E /* Hash40 of n05_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))),
+            (0x9875FA7B3 /* Hash40 of n06_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))),
+            (0x92128AC07 /* Hash40 of n07_index */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))),
+            (0x9F873561A /* Hash40 of c00_group */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))),
+            (0x95E045DAE /* Hash40 of c01_group */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))),
+            (0x96FEC4733 /* Hash40 of c02_group */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))),
+            (0x9C99B4C87 /* Hash40 of c03_group */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))),
+            (0x90C3C7209 /* Hash40 of c04_group */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))),
+            (0x9AA4B79BD /* Hash40 of c05_group */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))),
+            (0x99BA36320 /* Hash40 of c06_group */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))),
+            (0x93DD46894 /* Hash40 of c07_group */, the_csk_collection_api::UnsignedByteType::Optional(Some(0))),
             (0x11895f00fc, the_csk_collection_api::UnsignedByteType::Overwrite(lowest_color as _)),
-        ])), 
+        ])),
         ..Default::default()
     });
     the_csk_collection_api::add_chara_layout_db_entry_info(the_csk_collection_api::CharacterLayoutDatabaseEntry {
-        ui_layout_id: smash::hash40("ui_chara_potemkin_00"), 
-        ui_chara_id: the_csk_collection_api::Hash40Type::Overwrite(smash::hash40("ui_chara_potemkin")), 
-        chara_color: the_csk_collection_api::UnsignedByteType::Optional(Some(0)), 
-        eye_0_flash_count: the_csk_collection_api::UnsignedByteType::Overwrite(2), 
-        eye_0_flash0_pos_x: the_csk_collection_api::FloatType::Overwrite(-7.0), 
-        eye_0_flash0_pos_y: the_csk_collection_api::FloatType::Overwrite(219.0), 
-        eye_0_flash1_pos_x: the_csk_collection_api::FloatType::Overwrite(72.0), 
-        eye_0_flash1_pos_y: the_csk_collection_api::FloatType::Overwrite(220.0), 
-        eye_0_flash2_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        eye_0_flash2_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        eye_0_flash3_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        eye_0_flash3_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        eye_0_flash4_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        eye_0_flash4_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
+        ui_layout_id: smash::hash40("ui_chara_potemkin_00"),
+        ui_chara_id: the_csk_collection_api::Hash40Type::Overwrite(smash::hash40("ui_chara_potemkin")),
+        chara_color: the_csk_collection_api::UnsignedByteType::Optional(Some(0)),
+        eye_0_flash_count: the_csk_collection_api::UnsignedByteType::Overwrite(2),
+        eye_0_flash0_pos_x: the_csk_collection_api::FloatType::Overwrite(-7.0),
+        eye_0_flash0_pos_y: the_csk_collection_api::FloatType::Overwrite(219.0),
+        eye_0_flash1_pos_x: the_csk_collection_api::FloatType::Overwrite(72.0),
+        eye_0_flash1_pos_y: the_csk_collection_api::FloatType::Overwrite(220.0),
+        eye_0_flash2_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        eye_0_flash2_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        eye_0_flash3_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        eye_0_flash3_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        eye_0_flash4_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        eye_0_flash4_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)),
         eye_1_flash_count: the_csk_collection_api::UnsignedByteType::Overwrite(2),
-        eye_1_flash0_pos_x: the_csk_collection_api::FloatType::Overwrite(0.0), 
-        eye_1_flash0_pos_y: the_csk_collection_api::FloatType::Overwrite(197.0), 
-        eye_1_flash1_pos_x: the_csk_collection_api::FloatType::Overwrite(75.0), 
-        eye_1_flash1_pos_y: the_csk_collection_api::FloatType::Overwrite(198.0), 
-        eye_1_flash2_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        eye_1_flash2_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        eye_1_flash3_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        eye_1_flash3_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        eye_1_flash4_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        eye_1_flash4_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        eye_2_flash_count: the_csk_collection_api::UnsignedByteType::Overwrite(2), 
-        eye_2_flash0_pos_x: the_csk_collection_api::FloatType::Overwrite(-27.0), 
-        eye_2_flash0_pos_y: the_csk_collection_api::FloatType::Overwrite(93.0), 
-        eye_2_flash1_pos_x: the_csk_collection_api::FloatType::Overwrite(69.0), 
-        eye_2_flash1_pos_y: the_csk_collection_api::FloatType::Overwrite(85.0), 
-        eye_2_flash2_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        eye_2_flash2_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        eye_2_flash3_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        eye_2_flash3_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        eye_2_flash4_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        eye_2_flash4_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        eye_flash_info_pos_x: the_csk_collection_api::FloatType::Overwrite(-7.5), 
-        eye_flash_info_pos_y: the_csk_collection_api::FloatType::Overwrite(11.5), 
-        spirits_eye_visible: the_csk_collection_api::BoolType::Optional(Some(true)), 
-        chara_1_offset_x: the_csk_collection_api::FloatType::Optional(Some(-6.0)), 
-        chara_1_offset_y: the_csk_collection_api::FloatType::Optional(Some(-62.0)), 
-        chara_1_scale: the_csk_collection_api::FloatType::Optional(Some(1.02)), 
-        chara_1_1_offset_x: the_csk_collection_api::FloatType::Optional(Some(-9.0)), 
-        chara_1_1_offset_y: the_csk_collection_api::FloatType::Optional(Some(-66.0)), 
-        chara_1_1_scale: the_csk_collection_api::FloatType::Optional(Some(1.39)), 
-        chara_1_2_offset_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        chara_1_2_offset_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        chara_1_2_scale: the_csk_collection_api::FloatType::Optional(Some(1.0)), 
-        chara_1_3_offset_x: the_csk_collection_api::FloatType::Optional(Some(-9.0)), 
-        chara_1_3_offset_y: the_csk_collection_api::FloatType::Optional(Some(-40.0)), 
-        chara_1_3_scale: the_csk_collection_api::FloatType::Optional(Some(1.39)), 
-        chara_1_4_offset_x: the_csk_collection_api::FloatType::Optional(Some(-9.0)), 
-        chara_1_4_offset_y: the_csk_collection_api::FloatType::Optional(Some(-40.0)), 
-        chara_1_4_scale: the_csk_collection_api::FloatType::Optional(Some(1.39)), 
-        chara_1_5_offset_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        chara_1_5_offset_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        chara_1_5_scale: the_csk_collection_api::FloatType::Optional(Some(1.0)), 
-        chara_3_0_offset_x: the_csk_collection_api::FloatType::Optional(Some(-499.0)), 
-        chara_3_0_offset_y: the_csk_collection_api::FloatType::Optional(Some(-153.0)), 
-        chara_3_0_scale: the_csk_collection_api::FloatType::Optional(Some(1.0)), 
-        chara_3_1_offset_x: the_csk_collection_api::FloatType::Optional(Some(-450.0)), 
-        chara_3_1_offset_y: the_csk_collection_api::FloatType::Optional(Some(-133.0)), 
-        chara_3_1_scale: the_csk_collection_api::FloatType::Optional(Some(0.9)), 
-        chara_3_2_offset_x: the_csk_collection_api::FloatType::Optional(Some(-260.0)), 
-        chara_3_2_offset_y: the_csk_collection_api::FloatType::Optional(Some(-60.0)), 
-        chara_3_2_scale: the_csk_collection_api::FloatType::Optional(Some(0.76)), 
-        chara_3_3_offset_x: the_csk_collection_api::FloatType::Optional(Some(-600.0)), 
-        chara_3_3_offset_y: the_csk_collection_api::FloatType::Optional(Some(-153.0)), 
-        chara_3_3_scale: the_csk_collection_api::FloatType::Optional(Some(1.0)), 
-        chara_3_4_offset_x: the_csk_collection_api::FloatType::Optional(Some(-499.0)), 
-        chara_3_4_offset_y: the_csk_collection_api::FloatType::Optional(Some(-153.0)), 
-        chara_3_4_scale: the_csk_collection_api::FloatType::Optional(Some(1.0)), 
-        chara_3_5_offset_x: the_csk_collection_api::FloatType::Optional(Some(-465.0)), 
-        chara_3_5_offset_y: the_csk_collection_api::FloatType::Optional(Some(-183.0)), 
-        chara_3_5_scale: the_csk_collection_api::FloatType::Optional(Some(0.96)), 
-        chara_3_6_offset_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        chara_3_6_offset_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        chara_3_6_scale: the_csk_collection_api::FloatType::Optional(Some(1.0)), 
-        chara_3_7_offset_x: the_csk_collection_api::FloatType::Optional(Some(-499.0)), 
-        chara_3_7_offset_y: the_csk_collection_api::FloatType::Optional(Some(-153.0)), 
-        chara_3_7_scale: the_csk_collection_api::FloatType::Optional(Some(1.0)), 
-        chara_5_offset_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        chara_5_offset_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        chara_5_scale: the_csk_collection_api::FloatType::Optional(Some(1.0)), 
-        chara_select_icon_list_offset_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        chara_select_icon_list_offset_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        chara_select_icon_list_scale: the_csk_collection_api::FloatType::Optional(Some(1.0)), 
-        chara_7_0_offset_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        chara_7_0_offset_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        chara_7_0_scale: the_csk_collection_api::FloatType::Optional(Some(0.94)), 
-        chara_7_1_offset_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        chara_7_1_offset_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        chara_7_1_scale: the_csk_collection_api::FloatType::Optional(Some(0.94)), 
-        chara_0_offset_x: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        chara_0_offset_y: the_csk_collection_api::FloatType::Optional(Some(0.0)), 
-        chara_0_scale: the_csk_collection_api::FloatType::Optional(Some(1.0)), 
+        eye_1_flash0_pos_x: the_csk_collection_api::FloatType::Overwrite(0.0),
+        eye_1_flash0_pos_y: the_csk_collection_api::FloatType::Overwrite(197.0),
+        eye_1_flash1_pos_x: the_csk_collection_api::FloatType::Overwrite(75.0),
+        eye_1_flash1_pos_y: the_csk_collection_api::FloatType::Overwrite(198.0),
+        eye_1_flash2_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        eye_1_flash2_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        eye_1_flash3_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        eye_1_flash3_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        eye_1_flash4_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        eye_1_flash4_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        eye_2_flash_count: the_csk_collection_api::UnsignedByteType::Overwrite(2),
+        eye_2_flash0_pos_x: the_csk_collection_api::FloatType::Overwrite(-27.0),
+        eye_2_flash0_pos_y: the_csk_collection_api::FloatType::Overwrite(93.0),
+        eye_2_flash1_pos_x: the_csk_collection_api::FloatType::Overwrite(69.0),
+        eye_2_flash1_pos_y: the_csk_collection_api::FloatType::Overwrite(85.0),
+        eye_2_flash2_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        eye_2_flash2_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        eye_2_flash3_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        eye_2_flash3_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        eye_2_flash4_pos_x: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        eye_2_flash4_pos_y: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        eye_flash_info_pos_x: the_csk_collection_api::FloatType::Overwrite(-7.5),
+        eye_flash_info_pos_y: the_csk_collection_api::FloatType::Overwrite(11.5),
+        spirits_eye_visible: the_csk_collection_api::BoolType::Optional(Some(true)),
+        chara_1_offset_x: the_csk_collection_api::FloatType::Optional(Some(-6.0)),
+        chara_1_offset_y: the_csk_collection_api::FloatType::Optional(Some(-62.0)),
+        chara_1_scale: the_csk_collection_api::FloatType::Optional(Some(1.02)),
+        chara_1_1_offset_x: the_csk_collection_api::FloatType::Optional(Some(-9.0)),
+        chara_1_1_offset_y: the_csk_collection_api::FloatType::Optional(Some(-66.0)),
+        chara_1_1_scale: the_csk_collection_api::FloatType::Optional(Some(1.39)),
+        chara_1_2_offset_x: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        chara_1_2_offset_y: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        chara_1_2_scale: the_csk_collection_api::FloatType::Optional(Some(1.0)),
+        chara_1_3_offset_x: the_csk_collection_api::FloatType::Optional(Some(-9.0)),
+        chara_1_3_offset_y: the_csk_collection_api::FloatType::Optional(Some(-40.0)),
+        chara_1_3_scale: the_csk_collection_api::FloatType::Optional(Some(1.39)),
+        chara_1_4_offset_x: the_csk_collection_api::FloatType::Optional(Some(-9.0)),
+        chara_1_4_offset_y: the_csk_collection_api::FloatType::Optional(Some(-40.0)),
+        chara_1_4_scale: the_csk_collection_api::FloatType::Optional(Some(1.39)),
+        chara_1_5_offset_x: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        chara_1_5_offset_y: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        chara_1_5_scale: the_csk_collection_api::FloatType::Optional(Some(1.0)),
+        chara_3_0_offset_x: the_csk_collection_api::FloatType::Optional(Some(-499.0)),
+        chara_3_0_offset_y: the_csk_collection_api::FloatType::Optional(Some(-153.0)),
+        chara_3_0_scale: the_csk_collection_api::FloatType::Optional(Some(1.0)),
+        chara_3_1_offset_x: the_csk_collection_api::FloatType::Optional(Some(-450.0)),
+        chara_3_1_offset_y: the_csk_collection_api::FloatType::Optional(Some(-133.0)),
+        chara_3_1_scale: the_csk_collection_api::FloatType::Optional(Some(0.9)),
+        chara_3_2_offset_x: the_csk_collection_api::FloatType::Optional(Some(-260.0)),
+        chara_3_2_offset_y: the_csk_collection_api::FloatType::Optional(Some(-60.0)),
+        chara_3_2_scale: the_csk_collection_api::FloatType::Optional(Some(0.76)),
+        chara_3_3_offset_x: the_csk_collection_api::FloatType::Optional(Some(-600.0)),
+        chara_3_3_offset_y: the_csk_collection_api::FloatType::Optional(Some(-153.0)),
+        chara_3_3_scale: the_csk_collection_api::FloatType::Optional(Some(1.0)),
+        chara_3_4_offset_x: the_csk_collection_api::FloatType::Optional(Some(-499.0)),
+        chara_3_4_offset_y: the_csk_collection_api::FloatType::Optional(Some(-153.0)),
+        chara_3_4_scale: the_csk_collection_api::FloatType::Optional(Some(1.0)),
+        chara_3_5_offset_x: the_csk_collection_api::FloatType::Optional(Some(-465.0)),
+        chara_3_5_offset_y: the_csk_collection_api::FloatType::Optional(Some(-183.0)),
+        chara_3_5_scale: the_csk_collection_api::FloatType::Optional(Some(0.96)),
+        chara_3_6_offset_x: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        chara_3_6_offset_y: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        chara_3_6_scale: the_csk_collection_api::FloatType::Optional(Some(1.0)),
+        chara_3_7_offset_x: the_csk_collection_api::FloatType::Optional(Some(-499.0)),
+        chara_3_7_offset_y: the_csk_collection_api::FloatType::Optional(Some(-153.0)),
+        chara_3_7_scale: the_csk_collection_api::FloatType::Optional(Some(1.0)),
+        chara_5_offset_x: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        chara_5_offset_y: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        chara_5_scale: the_csk_collection_api::FloatType::Optional(Some(1.0)),
+        chara_select_icon_list_offset_x: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        chara_select_icon_list_offset_y: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        chara_select_icon_list_scale: the_csk_collection_api::FloatType::Optional(Some(1.0)),
+        chara_7_0_offset_x: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        chara_7_0_offset_y: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        chara_7_0_scale: the_csk_collection_api::FloatType::Optional(Some(0.94)),
+        chara_7_1_offset_x: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        chara_7_1_offset_y: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        chara_7_1_scale: the_csk_collection_api::FloatType::Optional(Some(0.94)),
+        chara_0_offset_x: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        chara_0_offset_y: the_csk_collection_api::FloatType::Optional(Some(0.0)),
+        chara_0_scale: the_csk_collection_api::FloatType::Optional(Some(1.0)),
         ..Default::default()
     });
     the_csk_collection_api::add_narration_characall_entry("vc_narration_characall_potemkin");
@@ -366,13 +367,13 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
         ..Default::default()
     });
 
-    the_csk_collection_api::add_stream_set_entry_info(&the_csk_collection_api::StreamSetEntry { 
+    the_csk_collection_api::add_stream_set_entry_info(&the_csk_collection_api::StreamSetEntry {
         stream_set_id: smash::hash40("set_z17_f_potemkin"),
         info0: the_csk_collection_api::Hash40Type::Overwrite(smash::hash40("info_z17_f_potemkin")),
         ..Default::default()
     });
 
-    the_csk_collection_api::add_assigned_info_entry_info(&the_csk_collection_api::AssignedInfoEntry { 
+    the_csk_collection_api::add_assigned_info_entry_info(&the_csk_collection_api::AssignedInfoEntry {
         info_id: smash::hash40("info_z17_f_potemkin"),
         stream_id: the_csk_collection_api::Hash40Type::Overwrite(smash::hash40("stream_z17_f_potemkin")),
         condition: the_csk_collection_api::Hash40Type::Overwrite(smash::hash40("sound_condition_none")),
@@ -394,11 +395,12 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
         loop_end_ms: 191726,
         loop_end_sample: 8455205,
         duration_ms: 197056,
-        duration_sample: 8697160 
+        duration_sample: 8697160
     });
 
-    the_csk_collection_api::set_fighter_jingle(smash::hash40("ui_chara_potemkin"), "z17_f_potemkin");  
+    the_csk_collection_api::set_fighter_jingle(smash::hash40("ui_chara_potemkin"), "z17_f_potemkin");
     the_csk_collection_api::allow_ui_chara_hash_online(smash::hash40("ui_chara_potemkin"));
+    println!("[POTEMPKIN] Installing Moveset");
     moveset::install();
     install_motion_patch();
 }
@@ -410,7 +412,7 @@ extern "C" fn install_motion_patch(){
     const MAX_FILE_SIZE_TANTAN: usize = 0x10000;
     println!("install motion patch");
 
-    let mut fighter_slots: [Vec<i32>; 97] = std::array::from_fn(|_| Vec::new());    
+    let mut fighter_slots: [Vec<i32>; 97] = std::array::from_fn(|_| Vec::new());
 
     pub const fighters: [&str; 97] = ["bayonetta", "brave", "buddy", "captain", "chrom", "cloud", "daisy", "dedede", "demon", "diddy", "dolly", "donkey", "duckhunt", "edge", "eflame", "element", "elight", "falco", "fox", "gamewatch", "ganon", "gaogaen", "gekkouga", "ike", "inkling", "jack", "kamui", "ken", "kirby", "koopa", "koopag", "koopajr", "krool", "link", "littlemac", "lucario", "lucas", "lucina", "luigi", "mario", "mariod", "marth", "master", "metaknight", "mewtwo", "miienemyf", "miienemyg", "miienemys", "miifighter", "miigunner", "miiswordsman", "murabito", "nana", "ness", "packun", "pacman", "palutena", "peach", "pfushigisou", "pichu", "pickel", "pikachu", "pikmin", "pit", "pitb", "plizardon", "popo", "ptrainer", "ptrainer_low", "purin", "pzenigame", "reflet", "richter", "ridley", "robot", "rockman", "rosetta", "roy", "ryu", "samus", "samusd", "sheik", "shizue", "shulk", "simon", "snake", "sonic", "szerosuit", "tantan", "toonlink", "trail", "wario", "wiifit", "wolf", "yoshi", "younglink", "zelda"];
     for (index, &fighter) in fighters.iter().enumerate() {
