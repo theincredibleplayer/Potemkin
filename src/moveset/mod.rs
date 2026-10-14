@@ -597,15 +597,46 @@ pub unsafe extern "C" fn is_potemkin_svinfo(module_accessor: *mut BattleObjectMo
     }
 }
 
-pub fn install() {
+pub extern "C" fn get_costume_vector() -> Vec<usize> {
     let mut costume = &mut Vec::new();
-    unsafe {
+    unsafe{
         for i in 0..crate::MARKED_COLORS.len() {
             if crate::MARKED_COLORS[i] {
                 costume.push(i);
             }
         }
     }
+    return costume.to_vec();
+}
+
+pub fn install() {
+
+    let mut costume = &mut get_costume_vector();
+
+    unsafe {
+        // these crash the game on boot for some reason so i have them commented for now
+        //let fdb = smashline::clone_weapon(
+        //    "kamui", // Fighter Name
+        //    "ryusensya", // Cloned Article Name
+        //    *WEAPON_KIND_KAMUI_RYUSENSYA, // Base Article Kind
+        //    true // Use Original Code
+        //);
+
+        //FIGHTER_KAMUI_GENERATE_ARTICLE_FDB = fdb.generate_id;
+        //WEAPON_KIND_KAMUI_FDB = fdb.weapon_id;
+
+        //smashline::update_weapon_count(
+        //    *FIGHTER_KIND_KAMUI, // Fighter Kind
+        //    FIGHTER_KAMUI_GENERATE_ARTICLE_FDB, // Generate Article ID
+        //    2 // New Max Spawn Count
+        //);
+
+    }
+
+
+
+    println!("this prints");
+
     let agent_kamui = &mut Agent::new("kamui");
     let agent_kamui = agent_kamui.set_costume(costume.to_vec());
 
@@ -615,6 +646,7 @@ pub fn install() {
     kamui::install(agent_kamui);
     agent_kamui.install();
 
+    println!("this should print");
 
     let agent_waterdragon = &mut Agent::new("kamui_waterdragon");
     let agent_waterdragon = agent_waterdragon.set_costume(costume.to_vec());
@@ -623,6 +655,7 @@ pub fn install() {
     agent_waterdragon.install();
     
   
+    println!("this should also print");
 
     let agent_dragonhand= &mut Agent::new("kamui_dragonhand");
     let agent_dragonhand = agent_dragonhand.set_costume(costume.to_vec());
@@ -630,6 +663,7 @@ pub fn install() {
     agent_dragonhand.install();
 
 
+    println!("this should also also print");
 
     let agent_ryusensya = &mut Agent::new("kamui_ryusensya");
     let agent_ryusensya = agent_ryusensya.set_costume(costume.to_vec());
@@ -637,6 +671,7 @@ pub fn install() {
     agent_ryusensya.install();
 
 
+    println!("this should also print, but if not crash out");
 
     let mut all = &mut Vec::new();
     for k in 8..256{
@@ -647,6 +682,7 @@ pub fn install() {
     global::install(agent_global_all);
     agent_global_all.install();
 
+    println!("this should also print, but if not crash out again");
 
 
     let agent_global = &mut Agent::new("fighter");
@@ -655,5 +691,6 @@ pub fn install() {
 
 
     ui::install();
+    println!("if this prints, crash out");
     hooks::install();
 }
