@@ -39,7 +39,6 @@ pub fn check_deps() -> bool {
 }
 
 extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
-    println!("[POTEMPKIN] mounted mods");
     const FIGHTER_NAME: &str = "kamui";
     const MARKER_FILE: &str = "potemkin.marker";
     let mut lowest_color: i32 = -1;
@@ -400,7 +399,6 @@ extern "C" fn mods_mounted(_ev: arcropolis_api::Event) {
 
     the_csk_collection_api::set_fighter_jingle(smash::hash40("ui_chara_potemkin"), "z17_f_potemkin");
     the_csk_collection_api::allow_ui_chara_hash_online(smash::hash40("ui_chara_potemkin"));
-    println!("[POTEMPKIN] Installing Moveset");
     moveset::install();
     install_motion_patch();
 }
@@ -410,7 +408,6 @@ extern "C" fn install_motion_patch(){
     const MAX_FILE_SIZE: usize = 0xe000;
     const MAX_FILE_SIZE_KIRBY: usize = 0x20000;
     const MAX_FILE_SIZE_TANTAN: usize = 0x10000;
-    println!("install motion patch");
 
     let mut fighter_slots: [Vec<i32>; 97] = std::array::from_fn(|_| Vec::new());
 
@@ -427,7 +424,6 @@ extern "C" fn install_motion_patch(){
                 }
             }
         }
-        println!("vanilla is done");
         for slot in 8..256 {
             let path = format!("mods:/fighter/{}/model/body/c{:02}/", fighters[index], slot);
 
@@ -515,11 +511,9 @@ fn potemkin_motion_patch_callback(hash: u64, data: &mut [u8]) -> Option<usize> {
             let vec_res = writer.into_inner();
             let slice = vec_res.as_slice();
             data[..slice.len()].copy_from_slice(slice);
-            println!("potemkin motion patch successful {:#x}", hash);
             Some(data.len())
         }
         Err(_) => {
-            println!("Failed to patch {:#x}", hash);
             None
         },
     }

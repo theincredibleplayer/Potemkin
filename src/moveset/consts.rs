@@ -214,8 +214,6 @@ offset_statics!(
     CAPTURE_2_HOOK_OFFSET                ,
     WATERBALL_EFFECT_HANDELER_OFFSET     ,
     KAMUI_SWORD_EFFECT_HANDELER_OFFSET   ,
-    GET_FIGHTER_VTABLE_OFFSET            ,
-    GET_WEAPON_VTABLE_OFFSET             ,
     GET_BATTLE_OBJECT_FROM_ID_OFFSET     ,
     SET_STAGE_VISIBILITY_FUNCTION_OFFSET ,
     GET_OPPONENT_LR_FUNCTION_OFFSET      ,
@@ -250,14 +248,6 @@ static OFFSET_SEARCH_WATERBALL_EFFECT_HANDELER: &[u8] = &[
 static OFFSET_SEARCH_SWORD_EFFECT_HANDELER: &[u8] = &[
     0xff, 0x03, 0x02, 0xd1, 0xf5, 0x2b, 0x00, 0xf9, 0xf4, 0x4f, 0x06, 0xa9, 0xfd, 0x7b, 0x07, 0xa9, 0xfd, 0xc3, 0x01, 0x91, 0x15, 0x10, 0x40, 0xf9, 0xf4, 0x03, 0x00, 0xaa, 0xa0, 0x2a, 0x40, 0xf9, 0x08, 0x00, 0x40, 0xf9, 0x08, 0x51, 0x40, 0xf9, 0xb3, 0x17, 0x80, 0x52, 0x13, 0x00, 0xa2, 0x72, 0xe1, 0x03, 0x1f, 0x2a, 0xe2, 0x03, 0x13, 0x2a
 ];
-
-static OFFSET_SEARCH_GET_FIGHTER_VTABLE_OFFSET: &[u8] = &[
-    0xc0, 0x03, 0x5f, 0xd6, 0x00, 0x00, 0x00, 0x00, 0x1f, 0x78, 0x01, 0x71, 0xa2, 0x00, 0x00, 0x54
-]; // this is 2 instructions down from the target
-
-static OFFSET_SEARCH_GET_WEAPON_VTABLE_OFFSET: &[u8] = &[
-    0xe0, 0x03, 0x00, 0x32, 0xc0, 0x03, 0x5f, 0xd6, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1f, 0x9c, 0x09, 0x71, 0xa2, 0x00, 0x00, 0x54
-]; // this is 4 instructions down from the target
 
 static OFFSET_SEARCH_GET_BATTLE_OBJECT_FROM_ID_OFFSET: &[u8] = &[
     0x1f, 0x60, 0x02, 0x39, 0xc0, 0x03, 0x5f, 0xd6, 0x00, 0x00, 0x00, 0x00, 0x08, 0x7c, 0x1c, 0x53, 0x1f, 0x11, 0x00, 0x71, 0x68, 0x07, 0x00, 0x54
@@ -297,8 +287,6 @@ pub fn install() {
             InstructionSearchItem { name: "sword_effect_hook"           , pattern: OFFSET_SEARCH_SWORD_EFFECT_HANDELER                  , adjust: 0, out: &KAMUI_SWORD_EFFECT_HANDELER_OFFSET   },
             InstructionSearchItem { name: "ui_draw_hook"                , pattern: OFFSET_SEARCH_UI_DRAW_HOOK                           , adjust: 0, out: &UI_DRAW_HOOK                         },
             // non hooks
-            InstructionSearchItem { name: "get_fighter_vtable"          , pattern: OFFSET_SEARCH_GET_FIGHTER_VTABLE_OFFSET              , adjust: 2, out: &GET_FIGHTER_VTABLE_OFFSET            },
-            InstructionSearchItem { name: "get_weapon_vtable"           , pattern: OFFSET_SEARCH_GET_WEAPON_VTABLE_OFFSET               , adjust: 4, out: &GET_WEAPON_VTABLE_OFFSET             },
             InstructionSearchItem { name: "get_battle_object_from_id"   , pattern: OFFSET_SEARCH_GET_BATTLE_OBJECT_FROM_ID_OFFSET       , adjust: 3, out: &GET_BATTLE_OBJECT_FROM_ID_OFFSET     },
             InstructionSearchItem { name: "set_stage_visibility"        , pattern: OFFSET_SEARCH_SET_STAGE_VISIBILITY_FUNCTION_OFFSET   , adjust: 7, out: &SET_STAGE_VISIBILITY_FUNCTION_OFFSET },
             InstructionSearchItem { name: "get_opponent_lr"             , pattern: OFFSET_SEARCH_GET_OPPONENT_LR_FUNCTION_OFFSET        , adjust: 0, out: &GET_OPPONENT_LR_FUNCTION_OFFSET      },
@@ -309,15 +297,9 @@ pub fn install() {
         let text_size = (getRegionAddress(Region::Rodata) as usize) - (text_ptr as usize);
         let text = std::slice::from_raw_parts(text_ptr, text_size);
         for item in INST_SEARCH_ARRAY{
-            //if item.name == "get_fighter_vtable"{
-            //    item.out.store(0x68d530, Ordering::Relaxed);
-            //}else if item.name == "get_weapon_vtable"{
-            //    item.out.store(0x33bed40, Ordering::Relaxed);
-            //}else{
-                if let Some(offset) = find_subsequence(text, item.pattern) {
-                    item.out.store((offset as isize + item.adjust * 4)as usize, Ordering::Relaxed);
-                }
-            //}
+            if let Some(offset) = find_subsequence(text, item.pattern) {
+                item.out.store((offset as isize + item.adjust * 4)as usize, Ordering::Relaxed);
+            }
             println!("{}: {:x}",item.name,item.out.load(Ordering::Relaxed));
         }
     }

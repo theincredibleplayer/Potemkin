@@ -18,9 +18,7 @@ pub static mut KAMUI_WEAPON_VTABLE_ENTRIES: [usize; 102] = [0; 102];
 
 
 pub fn install() {
-    println!("if this prints, crash out harder");
     hooks::install();
-    println!("if this prints, crash out hardest");
     hooks_vtable::install();
-    //hooks_vtable_weapon::install();
+    hooks_vtable_weapon::install();
 }

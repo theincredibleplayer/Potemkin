@@ -1,31 +1,6 @@
 use super::*;
 use std::sync::LazyLock;
 
-static KAMUI_ON_RESET_OFFSET            : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::RESET_1                   , false, false));
-static KAMUI_INIT_OFFSET                : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::INITIALIZE                , false, false));
-static KAMUI_ON_SHIELD                  : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_SHIELD_COLLISION       , false, false));
-static KAMUI_ON_DAMAGE                  : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_DAMAGE                 , false, false));
-static KAMUI_ON_ATTACK                  : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_ATTACK                 , false, false));
-static KAMUI_ON_CHANGE_MOTION           : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_CHANGE_MOTION          , false, false));
-static KAMUI_ON_SITUATION_CHANGE_2      : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_SITUATION_CHANGE_2     , false, false));
-static KAMUI_ON_STATUS_CHANGE_2         : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_STATUS_CHANGE_2        , false, false));
-static KAMUI_ON_DEATH                   : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_DEATH                  , false, false));
-static KAMUI_ON_LINK_EVENT              : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_LINK_EVENT             , false, false));
-
-static OFFSET_ON_FRAME_4                : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_FRAME_4                , false, true));
-static OFFSET_ON_SEARCH                 : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_SEARCH                 , false, true));
-static OFFSET_RESET_1                   : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::RESET_1                   , false, true));
-static OFFSET_INITIALIZE                : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::INITIALIZE                , false, true));
-static OFFSET_ON_SHIELD_COLLISION       : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_SHIELD_COLLISION       , false, true));
-static OFFSET_ON_DAMAGE                 : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_DAMAGE                 , false, true));
-static OFFSET_ON_ATTACK                 : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_ATTACK                 , false, true));
-static OFFSET_ON_CHANGE_MOTION          : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_CHANGE_MOTION          , false, true));
-static OFFSET_ON_STATUS_CHANGE          : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_STATUS_CHANGE          , false, true));
-static OFFSET_ON_SITUATION_CHANGE_2     : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_SITUATION_CHANGE_2     , false, true));
-static OFFSET_ON_STATUS_CHANGE_2        : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_STATUS_CHANGE_2        , false, true));
-static OFFSET_ON_DEATH                  : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_DEATH                  , false, true));
-static OFFSET_ON_LINK_EVENT             : LazyLock<usize> = LazyLock::new(|| get_vtable_function_offset(*FIGHTER_KIND_KAMUI, VtableEntry::ON_LINK_EVENT             , false, true));
-
 //searchbox implementations
 pub unsafe extern "C" fn kamui_on_search(_vtable: u64, fighter: &mut Fighter, log: u64, _some_float: f32) {
     let module_accessor = fighter.battle_object.module_accessor;
@@ -192,8 +167,6 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
 
 
 // initialization vtable hook (using it as agent init since i cant use workmodule in agent init) (thanks wuboy)
-#[skyline::from_offset(*KAMUI_ON_RESET_OFFSET)]
-pub unsafe extern "C" fn kamui_reset_original(vtable: u64, fighter: &mut Fighter);
 
 pub unsafe extern "C" fn kamui_reset(vtable: u64, fighter: &mut Fighter) {
     let module_accessor = (*fighter).battle_object.module_accessor;
@@ -250,12 +223,9 @@ pub unsafe extern "C" fn kamui_reset(vtable: u64, fighter: &mut Fighter) {
     //let get_kinetic_energy: extern "C" fn(*const u64, i32, ...) -> u64 = std::mem::transmute(func_addr1);
     //let kinetic_energy = get_kinetic_energy(kinetic_module,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
     //*(kinetic_energy as *mut u8).add(0xa4) = 1;
-
-    kamui_reset_original(vtable,fighter);
+    get_original_fighter_vtable(*FIGHTER_KIND_KAMUI,FighterVtableSlot::Reset1);
 }
 
-#[skyline::from_offset(*KAMUI_ON_RESET_OFFSET)]
-pub unsafe extern "C" fn kamui_on_change_motion_og(vtable: u64, fighter: &mut Fighter);
 
 pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fighter) {
     let module_accessor = (*fighter).battle_object.module_accessor;
@@ -801,8 +771,6 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
 
 
 
-#[skyline::from_offset(*KAMUI_INIT_OFFSET)]
-pub unsafe extern "C" fn kamui_init_og(vtable: u64, fighter: &mut Fighter);
 
 pub unsafe extern "C" fn kamui_init(vtable: u64, fighter: &mut Fighter) {
     let module_accessor = (*fighter).battle_object.module_accessor;
@@ -831,15 +799,13 @@ pub unsafe extern "C" fn kamui_init(vtable: u64, fighter: &mut Fighter) {
 
         MiscModule::add_shield_group(module_accessor, resource, 2);
     }
-    kamui_init_og(vtable,fighter);
+    get_original_fighter_vtable(*FIGHTER_KIND_KAMUI,FighterVtableSlot::Initialize);
 }
 
 
 
 
 
-#[skyline::from_offset(*KAMUI_ON_SHIELD)]
-pub unsafe extern "C" fn kamui_on_shield_original(vtable: u64, fighter: &mut Fighter, collision_event: &mut ShieldAttackCollisionEvent);
 
 pub unsafe extern "C" fn kamui_on_shield(vtable: u64, fighter: &mut Fighter, collision_event: &mut ShieldAttackCollisionEvent ) {
 
@@ -870,15 +836,13 @@ pub unsafe extern "C" fn kamui_on_shield(vtable: u64, fighter: &mut Fighter, col
             }
             ShieldModule::clear_all(module_accessor);
             WorkModule::set_float(module_accessor, opponent_real_power, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLOAT_REAL_POWER_REFLECT);
-            ArticleModule::generate_article(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_RYUSENSYA, false, -1);
+            ArticleModule::generate_article(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_FDB, false, -1);
             StatusModule::change_status_request(module_accessor, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_SHOOT ,false);
         }
     }
 }
 
 
-#[skyline::from_offset(*KAMUI_ON_DAMAGE)]
-pub unsafe extern "C" fn kamui_on_damage_og(vtable: u64, fighter: &mut Fighter,damage_log:u64);
 
 pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,damage_log:u64) {
     let module_accessor = fighter.battle_object.module_accessor;
@@ -926,8 +890,6 @@ pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,dama
     }
 }
 
-#[skyline::from_offset(*KAMUI_ON_ATTACK)]
-pub unsafe extern "C" fn kamui_on_attack_og(vtable: u64, fighter: &mut Fighter,collision_log:CollisionLogScuffed, damage: f32);
 
 pub unsafe extern "C" fn kamui_on_attack(vtable: u64, fighter: &mut Fighter,collision_log:CollisionLogScuffed, damage:f32) {
     let module_accessor = (*fighter).battle_object.module_accessor;
@@ -1053,13 +1015,12 @@ pub unsafe extern "C" fn kamui_on_status_change(vtable: u64, fighter: &mut Fight
     ControlModule::reset_special_command(module_accessor, false);
 }
 
-#[skyline::from_offset(*KAMUI_ON_SITUATION_CHANGE_2)]
-pub unsafe extern "C" fn kamui_on_situation_change_og(vtable: *mut u64, fighter: &mut Fighter,something: u64);
 
 pub unsafe extern "C" fn kamui_on_situation_change(vtable: *mut u64, fighter: &mut Fighter, something: u64) {
     let module_accessor = fighter.battle_object.module_accessor;
     let some_vtable_func: extern "C" fn(*mut u64, &mut Fighter, u64, ...) -> u64 = std::mem::transmute(*((*vtable+0xf8) as *mut u64));
     some_vtable_func(vtable,fighter,something);
+    
     let kinetic_energy = KineticModule::get_energy(module_accessor, *FIGHTER_KINETIC_ENERGY_ID_CONTROL);
     let situation_kind = *((something+0xc) as *const u32);
 
@@ -1070,8 +1031,6 @@ pub unsafe extern "C" fn kamui_on_situation_change(vtable: *mut u64, fighter: &m
     }
 }
 
-#[skyline::from_offset(*KAMUI_ON_STATUS_CHANGE_2)]
-pub unsafe extern "C" fn kamui_on_status_change_2_og(vtable: u64, fighter: &mut Fighter);
 
 pub unsafe extern "C" fn kamui_on_status_change_2(vtable: u64, fighter: &mut Fighter) {
     let module_accessor = fighter.battle_object.module_accessor;
@@ -1113,8 +1072,6 @@ pub unsafe extern "C" fn kamui_on_status_change_2(vtable: u64, fighter: &mut Fig
 }
 
 
-#[skyline::from_offset(*KAMUI_ON_DEATH)]
-pub unsafe extern "C" fn kamui_on_death_og(vtable: u64, fighter: &mut Fighter, something: u32);
 
 pub unsafe extern "C" fn kamui_on_death(vtable: u64, fighter: &mut Fighter, something: u32) {
     let module_accessor = fighter.battle_object.module_accessor;
@@ -1127,10 +1084,15 @@ pub unsafe extern "C" fn kamui_on_death(vtable: u64, fighter: &mut Fighter, some
 
 }
 
-#[skyline::from_offset(*KAMUI_ON_LINK_EVENT)]
-unsafe extern "C" fn kamui_link_event_og(vtable: u64, fighter: &mut Fighter, event: &mut smash_rs::app::LinkEvent) -> u64;
 
-unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, event: &mut smash_rs::app::LinkEvent) -> u64 {
+unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, event: &mut smash_rs::app::LinkEvent) -> usize {
+    println!("{:x}",*(vtable as *mut u64));
+    println!("{:x}",**(vtable as *mut *mut u64));
+    println!("{:x}",*(vtable as *mut u64) - skyline::hooks::getRegionAddress(skyline::hooks::Region::Text) as u64);
+    println!("{:x}",*(*(vtable as *mut u64)as *mut u64) - skyline::hooks::getRegionAddress(skyline::hooks::Region::Text) as u64);
+    println!("{:x}",**(*(vtable as *mut u64)as *mut *mut u64) - skyline::hooks::getRegionAddress(skyline::hooks::Region::Text) as u64);
+    println!("");
+
     if event.link_event_kind.0 == hash40("capture") {
         let capture_event : &mut smash_rs::app::LinkEventCapture = std::mem::transmute(event);
         let module_accessor = fighter.battle_object.module_accessor;
@@ -1181,43 +1143,26 @@ unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, event:
         }
         return 1;
     }
-    kamui_link_event_og(vtable, fighter, event)
+    return get_original_fighter_vtable(*FIGHTER_KIND_KAMUI,FighterVtableSlot::OnLinkEvent);
+    //kamui_link_event_og(vtable, fighter, event)
 }
-
-
-
 
 
 pub fn install() {
     unsafe {
-        println!("started doing shit before replacing shit");
-        LazyLock::force(&KAMUI_ON_RESET_OFFSET);
-        LazyLock::force(&KAMUI_INIT_OFFSET);
-        LazyLock::force(&KAMUI_ON_SHIELD);
-        LazyLock::force(&KAMUI_ON_DAMAGE);
-        LazyLock::force(&KAMUI_ON_ATTACK);
-        LazyLock::force(&KAMUI_ON_CHANGE_MOTION);
-        LazyLock::force(&KAMUI_ON_SITUATION_CHANGE_2);
-        LazyLock::force(&KAMUI_ON_STATUS_CHANGE_2);
-        LazyLock::force(&KAMUI_ON_DEATH);
-        LazyLock::force(&KAMUI_ON_LINK_EVENT);
-
         let mut costume = &mut get_costume_vector();
-        println!("started replacing shit");
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnFrame4              , kamui_on_frame            as *const () as usize);
-        println!("replaced shit number 1");
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnSearch               , kamui_on_search           as *const () as usize);
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::Reset1                 , kamui_reset               as *const () as usize);
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::Initialize              , kamui_init                as *const () as usize);
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnShieldCollision     , kamui_on_shield           as *const () as usize);
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnDamage               , kamui_on_damage           as *const () as usize);
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnAttack               , kamui_on_attack           as *const () as usize);
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnChangeMotion        , kamui_on_change_motion    as *const () as usize);
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnStatusChange        , kamui_on_status_change    as *const () as usize);
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnSituationChange   , kamui_on_situation_change as *const () as usize);
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::Unk43      , kamui_on_status_change_2  as *const () as usize);
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnDeath                , kamui_on_death            as *const () as usize);
-        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnLinkEvent           , kamui_link_event          as *const () as usize);
-
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnFrame4                     , kamui_on_frame            as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnSearch                     , kamui_on_search           as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::Reset1                       , kamui_reset               as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::Initialize                   , kamui_init                as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnShieldCollision            , kamui_on_shield           as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnDamage                     , kamui_on_damage           as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnAttack                     , kamui_on_attack           as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnChangeMotion               , kamui_on_change_motion    as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnStatusChange               , kamui_on_status_change    as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::SecondSituationCallback      , kamui_on_situation_change as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::Unk43                        , kamui_on_status_change_2  as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnDeath                      , kamui_on_death            as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnLinkEvent                  , kamui_link_event          as *const () as usize);
     }
 }
