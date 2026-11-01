@@ -617,7 +617,7 @@ pub fn install() {
         let fdb = smashline::clone_weapon(
             "kamui", // Fighter Name
             "fdb", // Cloned Article Name
-            *WEAPON_KIND_KAMUI_RYUSENSYA, // Base Article Kind
+            *WEAPON_KIND_CLOUD_WAVE, // Base Article Kind
             true // Use Original Code
         );
 

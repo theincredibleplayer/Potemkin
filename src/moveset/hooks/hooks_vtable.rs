@@ -1086,13 +1086,6 @@ pub unsafe extern "C" fn kamui_on_death(vtable: u64, fighter: &mut Fighter, some
 
 
 unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, event: &mut smash_rs::app::LinkEvent) -> usize {
-    println!("{:x}",*(vtable as *mut u64));
-    println!("{:x}",**(vtable as *mut *mut u64));
-    println!("{:x}",*(vtable as *mut u64) - skyline::hooks::getRegionAddress(skyline::hooks::Region::Text) as u64);
-    println!("{:x}",*(*(vtable as *mut u64)as *mut u64) - skyline::hooks::getRegionAddress(skyline::hooks::Region::Text) as u64);
-    println!("{:x}",**(*(vtable as *mut u64)as *mut *mut u64) - skyline::hooks::getRegionAddress(skyline::hooks::Region::Text) as u64);
-    println!("");
-
     if event.link_event_kind.0 == hash40("capture") {
         let capture_event : &mut smash_rs::app::LinkEventCapture = std::mem::transmute(event);
         let module_accessor = fighter.battle_object.module_accessor;
