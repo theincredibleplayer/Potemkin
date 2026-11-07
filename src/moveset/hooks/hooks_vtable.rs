@@ -223,7 +223,10 @@ pub unsafe extern "C" fn kamui_reset(vtable: u64, fighter: &mut Fighter) {
     //let get_kinetic_energy: extern "C" fn(*const u64, i32, ...) -> u64 = std::mem::transmute(func_addr1);
     //let kinetic_energy = get_kinetic_energy(kinetic_module,*FIGHTER_KINETIC_ENERGY_ID_CONTROL);
     //*(kinetic_energy as *mut u8).add(0xa4) = 1;
-    get_original_fighter_vtable(*FIGHTER_KIND_KAMUI,FighterVtableSlot::Reset1);
+
+    let func = get_original_fighter_vtable(*FIGHTER_KIND_KAMUI, FighterVtableSlot::Reset1);
+    let kamui_reset_og: fn(u64, &mut Fighter) = std::mem::transmute(func);
+    kamui_reset_og(vtable, fighter);
 }
 
 
@@ -799,7 +802,6 @@ pub unsafe extern "C" fn kamui_init(vtable: u64, fighter: &mut Fighter) {
 
         MiscModule::add_shield_group(module_accessor, resource, 2);
     }
-    get_original_fighter_vtable(*FIGHTER_KIND_KAMUI,FighterVtableSlot::Initialize);
 }
 
 
@@ -1081,6 +1083,10 @@ pub unsafe extern "C" fn kamui_on_death(vtable: u64, fighter: &mut Fighter, some
         *(kinetic_energy as *mut u8).add(0xa5) = 0;
     }
     //*(kinetic_energy as *mut u8).add(0x9c) = 0;
+    let damage_module = *(module_accessor as *const *const u64).add(0xa8 / 8);
+    let func_addr1 = *((*(damage_module) + 0xf0)as *mut u64);
+    let set_tough_guy: extern "C" fn(damagemodule: *const u64, kind: u32, something: u32, reaction_value: f32, something_2: f32) = std::mem::transmute(func_addr1);
+    set_tough_guy(damage_module, *DAMAGE_NO_REACTION_MODE_REACTION_VALUE as u32, 0xffffffff, 22.0, -1.0); 
 
 }
 
@@ -1136,8 +1142,7 @@ unsafe extern "C" fn kamui_link_event(vtable: u64, fighter: &mut Fighter, event:
         }
         return 1;
     }
-    return get_original_fighter_vtable(*FIGHTER_KIND_KAMUI,FighterVtableSlot::OnLinkEvent);
-    //kamui_link_event_og(vtable, fighter, event)
+    return 1;
 }
 
 

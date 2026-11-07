@@ -69,33 +69,78 @@ unsafe extern "C" fn potemkin_item_grab_hook(ctx: &mut skyline::hooks::InlineCtx
     }
 }
 
+// makes it so fighters cant be hit out of my grabs
+#[skyline::hook(offset = 0x3ee63c, inline)]
+unsafe extern "C" fn supergrip_hook_damage(ctx: &mut skyline::hooks::InlineCtx) {
+    let damage_module = ctx.registers[19].x();
+    let module_accessor = *((damage_module + 0x8) as *mut *mut BattleObjectModuleAccessor);
 
+    let damage_limit = ctx.registers_f[0].s() as f32 ;
+    let damage_accumulated_during_status = ctx.registers_f[8].s() as f32 ;
 
-#[skyline::hook(offset = WATERBALL_EFFECT_HANDELER_OFFSET.load(Ordering::Relaxed))]
-unsafe extern "C" fn noping_the_waterball_eff(unk0:u64, weapon: *mut smash::app::Weapon, unk2: u64) -> u64 {
-    let module_accessor = (*weapon).battle_object.module_accessor;
-    let owner_id = WorkModule::get_int((*weapon).battle_object.module_accessor,*WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER);
-    let owner_accessor = sv_battle_object::module_accessor(owner_id as u32);
-    if is_potemkin(owner_accessor){
-        GroundModule::set_correct(module_accessor, GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
-        GroundModule::set_cliff_check(module_accessor,GroundCliffCheckKind(*GROUND_CLIFF_CHECK_KIND_NONE));
-        GroundModule::set_attach_ground(module_accessor, false);
-        PostureModule::set_scale(module_accessor, 0.45, false);
-        return 0;
-    }else{
-        call_original!(unk0, weapon, unk2)
+    let parent_id = LinkModule::get_parent_id(module_accessor,*LINK_NO_CAPTURE,true);
+    let parent_category = sv_battle_object::category(parent_id as u32);
+
+    if parent_category == *BATTLE_OBJECT_CATEGORY_FIGHTER {
+        let parent_boma = sv_battle_object::module_accessor(parent_id as u32);
+        let parent_fighter_kind = utility::get_kind(&mut *(parent_boma));
+        let parent_status_kind = StatusModule::status_kind(parent_boma);
+    
+        if parent_fighter_kind == *FIGHTER_KIND_KAMUI {
+            if is_potemkin(parent_boma){
+                if [
+                    FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER,
+                    FIGHTER_KAMUI_STATUS_KIND_AIR_THROW,
+                    FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START,
+                    FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_LOOP,
+                    FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE,
+                    *FIGHTER_STATUS_KIND_FINAL,
+                    *FIGHTER_KAMUI_STATUS_KIND_FINAL_END,
+                    *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ENTRY,
+                    *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK,
+                    *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK_WAIT
+                ].contains(&parent_status_kind){
+                    ctx.registers_f[8].set_s(0.0);
+                }
+            }
+        }
     }
 }
 
-#[skyline::hook(offset = KAMUI_SWORD_EFFECT_HANDELER_OFFSET.load(Ordering::Relaxed))]
-unsafe extern "C" fn potemkin_noping_the_sword_eff(fighter: &mut Fighter) -> u64 {
-    if is_potemkin(fighter.battle_object.module_accessor){
-        return 0;
-    }else{
-        call_original!(fighter)
+#[skyline::hook(offset = 0x3ee65c, inline)]
+unsafe extern "C" fn supergrip_hook_kb(ctx: &mut skyline::hooks::InlineCtx) {
+    let damage_module = ctx.registers[19].x();
+    let module_accessor = *((damage_module + 0x8) as *mut *mut BattleObjectModuleAccessor);
+
+    let kb_limit = ctx.registers_f[0].s() as f32;
+
+    let parent_id = LinkModule::get_parent_id(module_accessor,*LINK_NO_CAPTURE,true);
+    let parent_category = sv_battle_object::category(parent_id as u32);
+
+    if parent_category == *BATTLE_OBJECT_CATEGORY_FIGHTER {
+        let parent_boma = sv_battle_object::module_accessor(parent_id as u32);
+        let parent_fighter_kind = utility::get_kind(&mut *(parent_boma));
+        let parent_status_kind = StatusModule::status_kind(parent_boma);
+        if parent_fighter_kind == *FIGHTER_KIND_KAMUI {
+            if is_potemkin(parent_boma){
+                if [
+                    FIGHTER_KAMUI_STATUS_KIND_POTEMKIN_BUSTER,
+                    FIGHTER_KAMUI_STATUS_KIND_AIR_THROW,
+                    FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START,
+                    FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_LOOP,
+                    FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE,
+                    *FIGHTER_STATUS_KIND_FINAL,
+                    *FIGHTER_KAMUI_STATUS_KIND_FINAL_END,
+                    *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ENTRY,
+                    *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK,
+                    *FIGHTER_KAMUI_STATUS_KIND_FINAL_SCENE_ATTACK_WAIT
+                ].contains(&parent_status_kind){
+                    ctx.registers_f[0].set_s(2501.0);
+                }
+            }
+        }
     }
 }
-
 
 
 
@@ -103,10 +148,10 @@ unsafe extern "C" fn potemkin_noping_the_sword_eff(fighter: &mut Fighter) -> u64
 
 pub fn install() {
     skyline::install_hooks!(
-        noping_the_waterball_eff,
-        potemkin_noping_the_sword_eff,
         autoturn_situation_check_hook,
         potemkin_item_grab_hook,
-        pot_select_cliff_hangdata_hook
+        pot_select_cliff_hangdata_hook,
+        supergrip_hook_damage,
+        supergrip_hook_kb
     );
 }

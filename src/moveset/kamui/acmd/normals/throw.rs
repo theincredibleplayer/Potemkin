@@ -181,7 +181,7 @@ unsafe extern "C" fn effect_throwhi(agent: &mut L2CAgentBase) {
         //effect_id_because_im_lazy = macros::EFFECT(agent, Hash40::new("eflame_promrevolt_firepillar_ground"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 3.4, 0, 0, 0, 0, 0, 0, true);
         macros::LAST_EFFECT_SET_RATE(agent, 0.04);
     }
-    frame(agent.lua_state_agent, 14.0);
+    frame(agent.lua_state_agent, 15.0);
     if macros::is_excute(agent) {
         macros::EFFECT(agent, Hash40::new("kamui_floor_crack_buster"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 3.4, 0, 0, 0, 0, 0, 0, true);
         macros::EFFECT(agent, Hash40::new("kamui_trishula_firepillar"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 3.7, 0, 0, 0, 0, 0, 0, true);
