@@ -12,15 +12,15 @@ unsafe extern "C" fn special_lw(agent: &mut L2CAgentBase) {
             macros::SET_SPEED_EX(agent, -0.6, 0.25, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
         }
 
-        ArticleModule::generate_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND,false,-1);
+        ArticleModule::generate_article(agent.module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT,false,-1);
         potemkin_mirror_handler(agent.module_accessor);
-        ArticleModule::set_visibility_whole(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
-        ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, Hash40::new("special_n_end_max"), false, -1.0);
-        let plane = ArticleModule::get_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND);
+        ArticleModule::set_visibility_whole(agent.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+        ArticleModule::change_motion(agent.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT, Hash40::new("special_n_end_max"), false, -1.0);
+        let plane = ArticleModule::get_article(agent.module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT);
         let plane_boma = *(plane as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
         LinkModule::remove_model_constraint(plane_boma,true);
         LinkModule::set_model_constraint_pos_ort(plane_boma,*WEAPON_LINK_NO_CONSTRAINT,Hash40::new("attach"),Hash40::new("top"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_OFFSET_TRANSLATE as u32 | *CONSTRAINT_FLAG_OFFSET_ROT as u32,true);
-        ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, Hash40::new("special_n_end_max"), false, -1.0);
+        ArticleModule::change_motion(agent.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT, Hash40::new("special_n_end_max"), false, -1.0);
         
         macros::ATTACK(agent,0,0,Hash40::new("top"),10.0,60,100,0,0,5.0, 0.0, 7.0, 20.0, Some(0.0), Some(7.0), Some(20.0),3.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,f32::NAN,0.0,0.0,false,false,false,false,true,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_FIRE,*ATTACK_REGION_NONE);
         macros::ATTACK(agent,1,0,Hash40::new("top"),10.0,60,100,0,0,6.0, 0.0, 7.0, 20.0, Some(0.0), Some(7.0), Some(26.0),3.0,1.0,*ATTACK_SETOFF_KIND_OFF,*ATTACK_LR_CHECK_F,false,f32::NAN,0.0,0.0,false,false,false,false,true,*COLLISION_SITUATION_MASK_GA,*COLLISION_CATEGORY_MASK_ALL,*COLLISION_PART_MASK_ALL,false,Hash40::new("collision_attr_normal"),*ATTACK_SOUND_LEVEL_M,*COLLISION_SOUND_ATTR_FIRE,*ATTACK_REGION_NONE);
@@ -35,7 +35,7 @@ unsafe extern "C" fn special_lw(agent: &mut L2CAgentBase) {
     sv_animcmd::wait(agent.lua_state_agent, 8.0);
     if macros::is_excute(agent) {
         AttackModule::clear_all(agent.module_accessor);
-        ArticleModule::remove_exist(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+        ArticleModule::remove_exist(agent.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
         macros::FT_MOTION_RATE(agent, 1.0);
     }
 }

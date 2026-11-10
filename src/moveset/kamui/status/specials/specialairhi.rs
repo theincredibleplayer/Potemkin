@@ -32,8 +32,8 @@ unsafe fn special_air_hi_velocity_and_motion_handler(fighter: &mut L2CFighterCom
     if do_motion{
         let frame = MotionModule::frame(module_accessor);
         let rate = MotionModule::rate(module_accessor);
-        ArticleModule::add_motion_2nd(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("special_air_hi_up"),frame,rate,true,(angle - 45.0)/45.0);
-        ArticleModule::set_weight(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,1.0-(angle - 45.0)/45.0,true);
+        ArticleModule::add_motion_2nd(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,Hash40::new("special_air_hi_up"),frame,rate,true,(angle - 45.0)/45.0);
+        ArticleModule::set_weight(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,1.0-(angle - 45.0)/45.0,true);
         MotionModule::add_motion_2nd(module_accessor, Hash40::new("special_air_hi_up"), frame, rate, true, (angle - 45.0)/45.0);
         MotionModule::set_weight(module_accessor,1.0-(angle - 45.0)/45.0 , true);
     }
@@ -199,8 +199,8 @@ unsafe extern "C" fn special_air_hi_main(fighter: &mut L2CFighterCommon) -> L2CV
     GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
     KineticModule::change_kinetic(module_accessor,*FIGHTER_KINETIC_TYPE_AIR_STOP);
     MotionModule::change_motion(module_accessor,Hash40::new("special_air_hi"),0.0,1.0,false,0.0,false,false);
-    ArticleModule::generate_article(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
-    ArticleModule::change_motion(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("special_air_hi"),false,-1.0);
+    ArticleModule::generate_article(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,false,-1);
+    ArticleModule::change_motion(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,Hash40::new("special_air_hi"),false,-1.0);
     
     
     
@@ -246,7 +246,7 @@ unsafe fn special_air_hi_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
 unsafe extern "C" fn special_air_hi_end(fighter: &mut L2CFighterCommon) -> L2CValue {
     WorkModule::off_flag(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ATTACH_WEAPON);
     WorkModule::off_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_INPUT);
-    ArticleModule::remove_exist(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
+    ArticleModule::remove_exist(fighter.module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,ArticleOperationTarget(0));
     JostleModule::set_status(fighter.module_accessor, true);
     return L2CValue::I32(0)
 }

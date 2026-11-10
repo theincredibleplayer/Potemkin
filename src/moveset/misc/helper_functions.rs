@@ -35,18 +35,18 @@ pub unsafe extern "C" fn potemkin_mirror_handler(module_accessor: *mut BattleObj
             //ModelModule::set_joint_rotate(boma, Hash40::new("waist"), &rotation, MotionNodeRotateCompose{_address: *MOTION_NODE_ROTATE_COMPOSE_AFTER as u8}, MotionNodeRotateOrder{_address: *MOTION_NODE_ROTATE_ORDER_XYZ as u8})
 
             //ModelModule::set_joint_scale(module_accessor, Hash40::new("throw") , &Vector3f{x:-scale,y:-scale,z:scale});
-            if ArticleModule::is_exist(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND){
-                let article = ArticleModule::get_article(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND);
+            if ArticleModule::is_exist(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT){
+                let article = ArticleModule::get_article(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT);
                 let article_boma = *(article as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
                 ModelModule::set_joint_scale(article_boma, Hash40::new("hand1") , &Vector3f{x:-1.0,y:1.0,z:1.0});
             }
-            if ArticleModule::is_exist(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON){
-                let article2 = ArticleModule::get_article(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON);
+            if ArticleModule::is_exist(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON){
+                let article2 = ArticleModule::get_article(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON);
                 let article_boma2 = *(article2 as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
                 ModelModule::set_joint_scale(article_boma2, Hash40::new("trans") , &Vector3f{x:-1.0,y:1.0,z:1.0});
             }
-            if ArticleModule::is_exist(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_SPEARHAND){
-                let article3 = ArticleModule::get_article(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_SPEARHAND);
+            if ArticleModule::is_exist(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_HEAVENLY){
+                let article3 = ArticleModule::get_article(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_HEAVENLY);
                 let article_boma3 = *(article3 as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
                 ModelModule::set_joint_scale(article_boma3, Hash40::new("trans") , &Vector3f{x:-1.0,y:1.0,z:1.0});
             }
@@ -59,18 +59,18 @@ pub unsafe extern "C" fn potemkin_mirror_handler(module_accessor: *mut BattleObj
 
         //ModelModule::set_joint_scale(module_accessor, Hash40::new("throw") , &Vector3f{x:scale,y:scale,z:scale});
 
-        if ArticleModule::is_exist(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND){
-            let article = ArticleModule::get_article(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND);
+        if ArticleModule::is_exist(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT){
+            let article = ArticleModule::get_article(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT);
             let article_boma = *(article as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
             ModelModule::set_joint_scale(article_boma, Hash40::new("hand1") , &Vector3f{x:1.0,y:1.0,z:1.0});
         }
-        if ArticleModule::is_exist(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON){
-            let article2 = ArticleModule::get_article(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON);
+        if ArticleModule::is_exist(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON){
+            let article2 = ArticleModule::get_article(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON);
             let article_boma2 = *(article2 as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
             ModelModule::set_joint_scale(article_boma2, Hash40::new("trans") , &Vector3f{x:1.0,y:1.0,z:1.0});
         }
-        if ArticleModule::is_exist(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_SPEARHAND){
-            let article3 = ArticleModule::get_article(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_SPEARHAND);
+        if ArticleModule::is_exist(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_HEAVENLY){
+            let article3 = ArticleModule::get_article(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_HEAVENLY);
             let article_boma3 = *(article3 as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
             ModelModule::set_joint_scale(article_boma3, Hash40::new("trans") , &Vector3f{x:1.0,y:1.0,z:1.0});
         }
@@ -84,7 +84,7 @@ pub unsafe extern "C" fn potemkin_weapon_attach_handler(module_accessor: *mut Ba
     //let motion_kind =MotionModule::motion_kind(module_accessor);
     //if WorkModule::is_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ATTACH_WEAPON){
     //    let lr = PostureModule::lr(module_accessor);
-    //    let dragon = ArticleModule::get_article(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON);
+    //    let dragon = ArticleModule::get_article(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON);
     //    let dragon_boma = *(dragon as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
     //    let pot_bone_names     = &["g_lowarm_weapon_r_attach", "g_lowarm_weapon_l_attach","g_hand_weapon_r_attach", "g_hand_weapon_l_attach", "g_back_gear_r", "g_back_gear_l", "g_chest_gear_r", "g_chest_gear_l"];
     //    let article_bone_names = &["g_coverbase_r" , "g_coverbase_l" ,"g_hand_wephigh_r_base" ,  "g_hand_wephigh_l_base", "g_back_gear_r", "g_back_gear_l", "g_chest_gear_r", "g_chest_gear_l"];

@@ -192,8 +192,8 @@ unsafe fn special_n_shoot_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue 
 unsafe extern "C" fn special_n_end(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
-    //if ArticleModule::is_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON) {
-    //    ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
+    //if ArticleModule::is_exist(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON) {
+    //    ArticleModule::remove_exist(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,ArticleOperationTarget(0));
     //}
     //WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_N_HAS_REFLECTED);
     ShieldModule::clear_all(module_accessor);
@@ -207,8 +207,8 @@ unsafe extern "C" fn special_n_end(fighter: &mut L2CFighterCommon) -> L2CValue {
 unsafe extern "C" fn special_n_hold_end(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
-    //if ArticleModule::is_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON) {
-    //    ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
+    //if ArticleModule::is_exist(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON) {
+    //    ArticleModule::remove_exist(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,ArticleOperationTarget(0));
     //}
     ShieldModule::clear_all(module_accessor);
 
@@ -222,12 +222,12 @@ unsafe extern "C" fn special_n_hold_end(fighter: &mut L2CFighterCommon) -> L2CVa
 unsafe extern "C" fn special_n_shoot_end(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
-    //if ArticleModule::is_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON) {
-    //    ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
+    //if ArticleModule::is_exist(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON) {
+    //    ArticleModule::remove_exist(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,ArticleOperationTarget(0));
     //}
     ShieldModule::clear_all(module_accessor);
 
-    ArticleModule::remove_exist(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+    ArticleModule::remove_exist(fighter.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
     //ShieldModule::clear_all_2
     //WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_N_HAS_REFLECTED);
     //smashline::original_status(End, fighter, *FIGHTER_KAMUI_STATUS_KIND_SPECIAL_N_HOLD)(fighter)

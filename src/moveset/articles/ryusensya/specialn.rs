@@ -99,7 +99,11 @@ pub unsafe extern "C" fn fly_main(weapon: &mut L2CWeaponCommon) -> L2CValue {
     WorkModule::on_flag(weapon.module_accessor,WEAPON_KAMUI_RYUSENSYA_INSTANCE_WORK_ID_FLAG_DID_IT_HIT);
     WorkModule::set_int(weapon.module_accessor,90,*WEAPON_INSTANCE_WORK_ID_INT_INIT_LIFE);
     WorkModule::set_int(weapon.module_accessor,90,*WEAPON_INSTANCE_WORK_ID_INT_LIFE);
-    
+    PostureModule::set_scale(weapon.module_accessor, 0.45, false);
+    let lr = PostureModule::lr(weapon.module_accessor);
+    let pos = *PostureModule::pos(weapon.module_accessor);
+    PostureModule::set_pos(weapon.module_accessor,&Vector3f{x:pos.x + (20.0*lr),y:pos.y + 17.0,z:pos.z + 0.0});
+
     MotionModule::change_motion(weapon.module_accessor,Hash40::new("regular"),0.0,1.0,false,0.0,false,false);
   
     let posture = PostureModule::lr(weapon.module_accessor);

@@ -61,7 +61,7 @@ unsafe extern "C" fn game_finaldash(agent: &mut L2CAgentBase) {
         //EffectModule::req_screen(agent.module_accessor, Hash40::new("sys_genesis_bg_criticalhit"), false, false, false);
         JostleModule::set_status(agent.module_accessor, false);
         HitModule::set_whole(agent.module_accessor, smash::app::HitStatus(*HIT_STATUS_INVINCIBLE), 0);
-        ArticleModule::remove_exist(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+        ArticleModule::remove_exist(agent.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
         macros::ATTACK(agent, 0, 0, Hash40::new("top"), 0.0, 0, 0, 0, 0, 17.0, 13.0, 8.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_none"), *ATTACK_SOUND_LEVEL_LL, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
         AttackModule::set_no_dead_all(agent.module_accessor, true, false);
         AttackModule::set_force_reaction(agent.module_accessor, 0, true, false);
@@ -113,7 +113,7 @@ unsafe extern "C" fn game_finalend(agent: &mut L2CAgentBase) {
         //set_stage_visibility(agent.module_accessor, false);
         HitModule::set_whole(module_accessor, smash::app::HitStatus(*HIT_STATUS_INVINCIBLE), 0);
         WorkModule::on_flag(agent.module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
-        ArticleModule::remove_exist(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+        ArticleModule::remove_exist(agent.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
         let capture_id = LinkModule::get_node_object_id(agent.module_accessor, *LINK_NO_CAPTURE);
         let enemy = sv_battle_object::module_accessor(capture_id as u32);
         let lr = LinkModule::get_parent_lr(enemy,*LINK_NO_CAPTURE);
@@ -321,7 +321,7 @@ unsafe extern "C" fn game_heavenlystart(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         HitModule::set_whole(agent.module_accessor, smash::app::HitStatus(*HIT_STATUS_XLU), 0);
         JostleModule::set_status(agent.module_accessor, false);
-        ArticleModule::remove_exist(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+        ArticleModule::remove_exist(agent.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
 
     }
     frame(agent.lua_state_agent, 7.0);
@@ -485,10 +485,10 @@ unsafe extern "C" fn game_fakefinalvisualscene01(agent: &mut L2CAgentBase) {
         macros::FILL_SCREEN_MODEL_COLOR(agent, 0, 10, 0.3, 0.3, 0.3, 0, 0, 0, 1, 1, *smash::lib::lua_const::EffectScreenLayer::GROUND, *EFFECT_SCREEN_PRIO_FINAL);
         set_vis_hud(false);
         UiManager::set_bar_on();
-        ArticleModule::generate_article(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, false, -1);
+        ArticleModule::generate_article(agent.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON, false, -1);
         potemkin_mirror_handler(agent.module_accessor);
-        ArticleModule::set_visibility_whole(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
-        ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, Hash40::new("final_visual_scene_01"), false, -1.0);
+        ArticleModule::set_visibility_whole(agent.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+        ArticleModule::change_motion(agent.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON, Hash40::new("final_visual_scene_01"), false, -1.0);
         
         let enemy_id = LinkModule::get_node_object_id(agent.module_accessor, *LINK_NO_CAPTURE);
         let enemy = sv_battle_object::module_accessor(enemy_id as u32);
@@ -565,15 +565,15 @@ unsafe extern "C" fn game_finalvisualscene02(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
         EffectModule::remove_post_effect_line(agent.module_accessor, 6, true);
         //JostleModule::set_status(agent.module_accessor, false);
-        ArticleModule::generate_article(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, false, -1);
+        ArticleModule::generate_article(agent.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON, false, -1);
         potemkin_mirror_handler(agent.module_accessor);
-        ArticleModule::set_visibility_whole(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
-        ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, Hash40::new("final_visual_scene_02"), false, -1.0);
-        ArticleModule::generate_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND,false,-1);
+        ArticleModule::set_visibility_whole(agent.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+        ArticleModule::change_motion(agent.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON, Hash40::new("final_visual_scene_02"), false, -1.0);
+        ArticleModule::generate_article(agent.module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT,false,-1);
         potemkin_mirror_handler(agent.module_accessor);
-        ArticleModule::set_visibility_whole(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
-        ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, Hash40::new("final_visual_scene_02"), false, -1.0);
-        let plane = ArticleModule::get_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND);
+        ArticleModule::set_visibility_whole(agent.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+        ArticleModule::change_motion(agent.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT, Hash40::new("final_visual_scene_02"), false, -1.0);
+        let plane = ArticleModule::get_article(agent.module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT);
         let plane_boma = *(plane as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
         LinkModule::remove_model_constraint(plane_boma,true);
         LinkModule::set_model_constraint_pos_ort(plane_boma,*WEAPON_LINK_NO_CONSTRAINT,Hash40::new("attach"),Hash40::new("top"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_OFFSET_TRANSLATE as u32 | *CONSTRAINT_FLAG_OFFSET_ROT as u32,true); 

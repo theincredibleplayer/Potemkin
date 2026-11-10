@@ -134,9 +134,9 @@ unsafe extern "C" fn special_hi_start_main(fighter: &mut L2CFighterCommon) -> L2
         smash::app::sv_module_access::camera(fighter.lua_state_agent);
     }
 
-    ArticleModule::generate_article(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
+    ArticleModule::generate_article(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,false,-1);
     potemkin_mirror_handler(module_accessor);
-    ArticleModule::change_motion(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("entry_l"),false,-1.0);
+    ArticleModule::change_motion(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,Hash40::new("entry_l"),false,-1.0);
 
     if fighter.global_table[SITUATION_KIND].get_i32() != *SITUATION_KIND_GROUND {
         fighter.change_status(FIGHTER_STATUS_KIND_FALL.into(),false.into());
@@ -236,9 +236,9 @@ unsafe extern "C" fn special_hi_loop_main(fighter: &mut L2CFighterCommon) -> L2C
         /*z*/0.0);
         smash::app::sv_module_access::camera(fighter.lua_state_agent);
     }
-    ArticleModule::generate_article(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
+    ArticleModule::generate_article(fighter.module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,false,-1);
     potemkin_mirror_handler(module_accessor);
-    ArticleModule::change_motion(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("entry_r"),false,-1.0);
+    ArticleModule::change_motion(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,Hash40::new("entry_r"),false,-1.0);
 
     if fighter.global_table[SITUATION_KIND].get_i32() != *SITUATION_KIND_GROUND {
         fighter.change_status(FIGHTER_STATUS_KIND_FALL.into(),false.into());
@@ -308,7 +308,7 @@ unsafe fn special_hi_loop_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue 
             }
             WorkModule::dec_int(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_LOOP_HITS_SPECIAL_HI);
 
-            ArticleModule::change_motion(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("entry_r"),false,-1.0);
+            ArticleModule::change_motion(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,Hash40::new("entry_r"),false,-1.0);
 
             if fighter.global_table[SITUATION_KIND].get_i32() != *SITUATION_KIND_GROUND {
                 fighter.change_status(FIGHTER_STATUS_KIND_FALL.into(),false.into());
@@ -364,9 +364,9 @@ unsafe extern "C" fn special_hi_release_main(fighter: &mut L2CFighterCommon) -> 
 
 
 
-    ArticleModule::generate_article(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
+    ArticleModule::generate_article(fighter.module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,false,-1);
     potemkin_mirror_handler(module_accessor);
-    ArticleModule::change_motion(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("win_3"),false,0.0);
+    ArticleModule::change_motion(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,Hash40::new("win_3"),false,0.0);
 
     if fighter.global_table[SITUATION_KIND].get_i32() != *SITUATION_KIND_GROUND {
         fighter.change_status(FIGHTER_STATUS_KIND_FALL.into(),false.into());
@@ -385,7 +385,7 @@ unsafe fn special_hi_release_main_loop(fighter: &mut L2CFighterCommon) -> L2CVal
     let frame = MotionModule::frame(module_accessor);
 
 
-    ArticleModule::set_frame(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, frame);
+    ArticleModule::set_frame(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON, frame);
 
 
     if WorkModule::is_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_SPECIAL_HI_FLAG_FINAL_JAB_HIT_MOTION_PLAY){
@@ -455,7 +455,7 @@ unsafe extern "C" fn special_hi_end(fighter: &mut L2CFighterCommon) -> L2CValue 
     && StatusModule::status_kind_next(module_accessor) != FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_START
     && StatusModule::status_kind_next(module_accessor) != FIGHTER_KAMUI_STATUS_KIND_SPECIAL_HI_RELEASE{
         WorkModule::off_flag(module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_ENABLE_CAMERA);
-        ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
+        ArticleModule::remove_exist(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,ArticleOperationTarget(0));
         CameraModule::reset_main_camera_fov(module_accessor);
         CameraModule::zoom_out(module_accessor, 0);
         if CatchModule::is_catch(module_accessor) {

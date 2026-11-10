@@ -3,9 +3,9 @@ use super::*;
 
 unsafe extern "C" fn special_hi(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        ArticleModule::generate_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
+        ArticleModule::generate_article(agent.module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,false,-1);
         potemkin_mirror_handler(agent.module_accessor);
-        ArticleModule::change_motion(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("special_hi"),false,-1.0);    
+        ArticleModule::change_motion(agent.module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,Hash40::new("special_hi"),false,-1.0);    
     }
     sv_animcmd::frame(agent.lua_state_agent, 12.0);
     if macros::is_excute(agent) {

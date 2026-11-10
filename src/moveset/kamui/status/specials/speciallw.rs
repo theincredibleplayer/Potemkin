@@ -33,12 +33,12 @@ unsafe extern "C" fn special_lw_init(fighter: &mut L2CFighterCommon) -> L2CValue
 unsafe extern "C" fn special_lw_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
-    ArticleModule::generate_article(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
+    ArticleModule::generate_article(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,false,-1);
     potemkin_mirror_handler(module_accessor);
     if StatusModule::situation_kind(module_accessor) == *SITUATION_KIND_GROUND {
-        ArticleModule::change_motion(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("special_lw_hit"),false,0.0);
+        ArticleModule::change_motion(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,Hash40::new("special_lw_hit"),false,0.0);
     }else{
-        ArticleModule::change_motion(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("special_air_lw"),false,0.0);
+        ArticleModule::change_motion(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,Hash40::new("special_air_lw"),false,0.0);
     }
     fighter.sub_set_special_start_common_kinetic_setting(hash40("param_special_lw").into());
 
@@ -71,7 +71,7 @@ unsafe fn special_lw_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     let frame = MotionModule::frame(module_accessor);
 
     
-    ArticleModule::set_frame(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, frame);
+    ArticleModule::set_frame(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON, frame);
 
 
 
@@ -84,7 +84,7 @@ unsafe fn special_lw_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     if fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND
     && fighter.global_table[PREV_SITUATION_KIND].get_i32() == *SITUATION_KIND_AIR {
         let frame = MotionModule::frame(fighter.module_accessor);
-        ArticleModule::change_motion(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("special_lw_hit"),false,frame);
+        ArticleModule::change_motion(fighter.module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,Hash40::new("special_lw_hit"),false,frame);
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND_CLIFF_STOP));
         MotionModule::change_motion_inherit_frame(fighter.module_accessor,Hash40::new("special_lw"),-1.0,1.0,0.0,false,false);
         KineticModule::change_kinetic(module_accessor,*FIGHTER_KINETIC_TYPE_GROUND_STOP);
@@ -92,7 +92,7 @@ unsafe fn special_lw_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
     else if fighter.global_table[PREV_SITUATION_KIND].get_i32() == *SITUATION_KIND_GROUND
     && fighter.global_table[SITUATION_KIND].get_i32() == *SITUATION_KIND_AIR {
         let frame = MotionModule::frame(fighter.module_accessor);
-        ArticleModule::change_motion(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("special_air_lw"),false,frame);
+        ArticleModule::change_motion(fighter.module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,Hash40::new("special_air_lw"),false,frame);
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_AIR));
         MotionModule::change_motion_inherit_frame(fighter.module_accessor,Hash40::new("special_air_lw"),-1.0,1.0,0.0,false,false);
         KineticModule::change_kinetic(module_accessor,*FIGHTER_KINETIC_TYPE_AIR_STOP);
@@ -111,11 +111,11 @@ unsafe fn special_lw_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
 unsafe extern "C" fn special_lw_end(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
-    if ArticleModule::is_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON) {
-        ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+    if ArticleModule::is_exist(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON) {
+        ArticleModule::remove_exist(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
     }
-    if ArticleModule::is_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND) {
-        ArticleModule::remove_exist(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+    if ArticleModule::is_exist(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT) {
+        ArticleModule::remove_exist(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
     }
     smashline::original_status(End, fighter, *FIGHTER_STATUS_KIND_SPECIAL_LW)(fighter)
 }

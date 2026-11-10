@@ -297,3 +297,10 @@ pub fn install() {
 }
 pub static mut FIGHTER_KAMUI_GENERATE_ARTICLE_FDB : i32 = 0;
 pub static mut WEAPON_KIND_KAMUI_FDB : i32 = 0;
+pub static mut FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON : i32 = 0;
+pub static mut WEAPON_KIND_KAMUI_WEAPON : i32 = 0;
+pub static mut FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT : i32 = 0;
+pub static mut WEAPON_KIND_KAMUI_EFFECT : i32 = 0;
+pub static mut FIGHTER_KAMUI_GENERATE_ARTICLE_HEAVENLY : i32 = 0;
+pub static mut WEAPON_KIND_KAMUI_HEAVENLY : i32 = 0;
+

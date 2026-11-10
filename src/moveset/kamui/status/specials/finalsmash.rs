@@ -32,9 +32,9 @@ unsafe fn motion_setup(fighter: &mut L2CFighterCommon, situation_change: bool) {
 
 unsafe extern "C" fn final_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     if WorkModule::is_flag(fighter.module_accessor,FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_START) {
-        ArticleModule::generate_article(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
+        ArticleModule::generate_article(fighter.module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,false,-1);
         potemkin_mirror_handler(fighter.module_accessor);
-        ArticleModule::change_motion(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("final"),false,-1.0);
+        ArticleModule::change_motion(fighter.module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,Hash40::new("final"),false,-1.0);
 
 
 
@@ -103,21 +103,21 @@ unsafe extern "C" fn final_main(fighter: &mut L2CFighterCommon) -> L2CValue {
         macros::REQ_FINAL_START_CAMERA_arg3(fighter,Hash40::new("d04finalvisualscene01.nuanmb"), false, false);
         MotionModule::change_motion(fighter.module_accessor,Hash40::new("fake_final_visual_scene_01"),0.0,1.0,false,0.0,false,false);
 
-        ArticleModule::generate_article(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND,false,-1);
+        ArticleModule::generate_article(fighter.module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT,false,-1);
         potemkin_mirror_handler(fighter.module_accessor);
-        ArticleModule::set_visibility_whole(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
-        ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, Hash40::new("fake_final_visual_scene_01"), false, -1.0);
-        let plane = ArticleModule::get_article(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND);
+        ArticleModule::set_visibility_whole(fighter.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+        ArticleModule::change_motion(fighter.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT, Hash40::new("fake_final_visual_scene_01"), false, -1.0);
+        let plane = ArticleModule::get_article(fighter.module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT);
         let plane_boma = *(plane as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
         LinkModule::remove_model_constraint(plane_boma,true);
         LinkModule::set_model_constraint_pos_ort(plane_boma,*WEAPON_LINK_NO_CONSTRAINT,Hash40::new("attach"),Hash40::new("top"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_OFFSET_TRANSLATE as u32 | *CONSTRAINT_FLAG_OFFSET_ROT as u32,true);
         ModelModule::set_scale_z(plane_boma,1.0);
 
-        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, false, -1);
+        ArticleModule::generate_article(fighter.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON, false, -1);
         potemkin_mirror_handler(fighter.module_accessor);
-        ArticleModule::set_visibility_whole(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
-        ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, Hash40::new("final_visual_scene_01"), false, -1.0);
-        let article = ArticleModule::get_article(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON);
+        ArticleModule::set_visibility_whole(fighter.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+        ArticleModule::change_motion(fighter.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON, Hash40::new("final_visual_scene_01"), false, -1.0);
+        let article = ArticleModule::get_article(fighter.module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON);
         let article_boma = *(article as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
         ModelModule::set_scale_z(article_boma,1.0);
 
@@ -300,7 +300,7 @@ unsafe extern "C" fn final_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue
 
         if MotionModule::is_end(fighter.module_accessor) {
             WorkModule::on_flag(fighter.module_accessor,*FIGHTER_KAMUI_STATUS_WORK_ID_FLAG_FINAL_SUCCESS);
-            ArticleModule::remove_exist(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+            ArticleModule::remove_exist(fighter.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
             fighter.change_status(FIGHTER_KAMUI_STATUS_KIND_FINAL_READY.into(),false.into());
         }
         return L2CValue::I32(0)
@@ -310,7 +310,7 @@ unsafe extern "C" fn final_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue
 
 unsafe extern "C" fn final_exit(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
-    ArticleModule::remove_exist(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+    ArticleModule::remove_exist(fighter.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
 
     if StatusModule::status_kind_next(module_accessor) != FIGHTER_STATUS_KIND_FINAL {
         println!("final exit og was ran");
@@ -337,7 +337,7 @@ unsafe extern "C" fn final_exit(fighter: &mut L2CFighterCommon) -> L2CValue {
 unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let module_accessor = fighter.module_accessor;
     ModelModule::set_scale_z(fighter.module_accessor,1.0);
-    ArticleModule::remove_exist(module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_SPEARHAND, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+    ArticleModule::remove_exist(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_HEAVENLY, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
     fighter.set_situation(SITUATION_KIND_GROUND.into());
     GroundModule::correct(module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND_CLIFF_STOP));
     grabbed_anim_selector(fighter,"catched_pot_final_scene_03", 1.0);
@@ -401,11 +401,11 @@ unsafe extern "C" fn finalsceneenter_main(fighter: &mut L2CFighterCommon) -> L2C
     WorkModule::set_float(fighter.module_accessor, check_distance, 0x1000008);
     WorkModule::set_float(fighter.module_accessor, 0.0, 0x1000007);
     FighterManager::exit_finalbg(singletons::FighterManager());
-    ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_SPEARHAND, false, -1);
+    ArticleModule::generate_article(fighter.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_HEAVENLY, false, -1);
     potemkin_mirror_handler(fighter.module_accessor);
-    ArticleModule::set_visibility_whole(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_SPEARHAND, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
-    ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_SPEARHAND, Hash40::new("final_visual_scene_01"), false, -1.0);
-    let article = ArticleModule::get_article(fighter.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_SPEARHAND);
+    ArticleModule::set_visibility_whole(fighter.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_HEAVENLY, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+    ArticleModule::change_motion(fighter.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_HEAVENLY, Hash40::new("final_visual_scene_01"), false, -1.0);
+    let article = ArticleModule::get_article(fighter.module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_HEAVENLY);
     let article_boma = *(article as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
     LinkModule::remove_model_constraint(article_boma,true);
     LinkModule::set_model_constraint_pos_ort(article_boma,*WEAPON_LINK_NO_CONSTRAINT,Hash40::new("top"),Hash40::new("top"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_OFFSET_TRANSLATE as u32 | *CONSTRAINT_FLAG_OFFSET_ROT as u32,true);

@@ -3,8 +3,8 @@ use super::*;
 pub unsafe extern "C" fn appeal_end(fighter: &mut L2CFighterCommon) -> L2CValue {
     let lua_state = fighter.lua_state_agent;
     let module_accessor = smash::app::sv_system::battle_object_module_accessor(lua_state);
-    ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,ArticleOperationTarget(0));
-    ArticleModule::remove_exist(module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND,ArticleOperationTarget(0));
+    ArticleModule::remove_exist(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,ArticleOperationTarget(0));
+    ArticleModule::remove_exist(module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT,ArticleOperationTarget(0));
     if smashball::is_training_mode(){
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         UiManager::add_tension_unscaled(get_ui_index_from_entry_id(entry_id),150.0);
@@ -36,9 +36,9 @@ pub unsafe extern "C" fn appeal_s(agent: &mut L2CAgentBase) {
         *stock_ref = *stock_ref - 1;
         *number3_ref = *number3_ref - 1;
         */
-        ArticleModule::generate_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
+        ArticleModule::generate_article(agent.module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,false,-1);
         potemkin_mirror_handler(agent.module_accessor);
-        ArticleModule::change_motion(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("appeal_s"),false,-1.0);
+        ArticleModule::change_motion(agent.module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,Hash40::new("appeal_s"),false,-1.0);
         /*
         let fighter_manager = *(FIGHTER_MANAGER as *mut *mut smash::app::FighterManager);
         let entry_id = WorkModule::get_int(agent.module_accessor,*FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID);
@@ -53,15 +53,15 @@ pub unsafe extern "C" fn appeal_s(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 46.0);
     if macros::is_excute(agent) {
 
-        ArticleModule::generate_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND,false,-1);
+        ArticleModule::generate_article(agent.module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT,false,-1);
         potemkin_mirror_handler(agent.module_accessor);
-        ArticleModule::set_visibility_whole(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
-        ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, Hash40::new("special_air_n_hold"), false, -1.0);
-        let plane = ArticleModule::get_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND);
+        ArticleModule::set_visibility_whole(agent.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+        ArticleModule::change_motion(agent.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT, Hash40::new("special_air_n_hold"), false, -1.0);
+        let plane = ArticleModule::get_article(agent.module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT);
         let plane_boma = *(plane as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
         LinkModule::remove_model_constraint(plane_boma,true);
         LinkModule::set_model_constraint_pos_ort(plane_boma,*WEAPON_LINK_NO_CONSTRAINT,Hash40::new("attach"),Hash40::new("top"),*CONSTRAINT_FLAG_ORIENTATION as u32 | *CONSTRAINT_FLAG_POSITION as u32 | *CONSTRAINT_FLAG_OFFSET_TRANSLATE as u32 | *CONSTRAINT_FLAG_OFFSET_ROT as u32,true);
-        ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_DRAGONHAND, Hash40::new("special_air_n_hold"), false, -1.0);
+        ArticleModule::change_motion(agent.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT, Hash40::new("special_air_n_hold"), false, -1.0);
     }
     frame(agent.lua_state_agent, 101.0);
     if macros::is_excute(agent) {

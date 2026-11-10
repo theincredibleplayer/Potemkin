@@ -94,8 +94,8 @@ unsafe extern "C" fn game_catchattack(agent: &mut L2CAgentBase) {
 
 unsafe extern "C" fn game_entryl(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        ArticleModule::generate_article(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, false, -1);
-        ArticleModule::change_motion(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, Hash40::new("actual_entry"), false, -1.0);
+        ArticleModule::generate_article(agent.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON, false, -1);
+        ArticleModule::change_motion(agent.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON, Hash40::new("actual_entry"), false, -1.0);
     }
     frame(agent.lua_state_agent, 7.0);
     if macros::is_excute(agent) {
@@ -107,7 +107,7 @@ unsafe extern "C" fn game_entryl(agent: &mut L2CAgentBase) {
     }
     frame(agent.lua_state_agent, 100.0);
     if macros::is_excute(agent) {
-        ArticleModule::remove(agent.module_accessor, *FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+        ArticleModule::remove(agent.module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
     }
 }
 
@@ -361,8 +361,8 @@ unsafe extern "C" fn sound_wait2(agent: &mut L2CAgentBase) {
 
 pub unsafe extern "C" fn game_win1a(agent: &mut L2CAgentBase) {
     if macros::is_excute(agent) {
-        ArticleModule::generate_article(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,false,-1);
-        ArticleModule::change_motion(agent.module_accessor,*FIGHTER_KAMUI_GENERATE_ARTICLE_WATERDRAGON,Hash40::new("win_1"),false,-1.0);
+        ArticleModule::generate_article(agent.module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,false,-1);
+        ArticleModule::change_motion(agent.module_accessor,FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON,Hash40::new("win_1"),false,-1.0);
     }
 }
 

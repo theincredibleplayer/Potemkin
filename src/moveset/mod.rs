@@ -614,22 +614,35 @@ pub fn install() {
     let mut costume = &mut get_costume_vector();
 
     unsafe {
-        let fdb = smashline::clone_weapon(
-            "kamui", // Fighter Name
-            "fdb", // Cloned Article Name
-            *WEAPON_KIND_CLOUD_WAVE, // Base Article Kind
-            true // Use Original Code
-        );
-
+        // reflector projectile
+        let fdb = smashline::clone_weapon("kamui", "fdb", *WEAPON_KIND_CLOUD_WAVE, false);
         FIGHTER_KAMUI_GENERATE_ARTICLE_FDB = fdb.generate_id;
         WEAPON_KIND_KAMUI_FDB = fdb.weapon_id;
+        smashline::update_weapon_count(*FIGHTER_KIND_KAMUI, FIGHTER_KAMUI_GENERATE_ARTICLE_FDB, 2);
 
-        smashline::update_weapon_count(
-            *FIGHTER_KIND_KAMUI, // Fighter Kind
-            FIGHTER_KAMUI_GENERATE_ARTICLE_FDB, // Generate Article ID
-            2 // New Max Spawn Count
-        );
 
+
+        // extra weapon article
+        let weapon = smashline::clone_weapon("kamui", "weapon", *WEAPON_KIND_KAMUI_WATERDRAGON, false);
+        FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON = weapon.generate_id;
+        WEAPON_KIND_KAMUI_WEAPON = weapon.weapon_id;
+        smashline::update_weapon_count(*FIGHTER_KIND_KAMUI, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON, 1);
+
+
+
+        // the effects article
+        let effect = smashline::clone_weapon("kamui", "effect", *WEAPON_KIND_KAMUI_DRAGONHAND, false);
+        FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT = effect.generate_id;
+        WEAPON_KIND_KAMUI_EFFECT = effect.weapon_id;
+        smashline::update_weapon_count(*FIGHTER_KIND_KAMUI, FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT, 1);
+
+
+
+        // heavenly BG
+        let heavenly = smashline::clone_weapon("kamui", "heavenly",*WEAPON_KIND_KAMUI_SPEARHAND, false);
+        FIGHTER_KAMUI_GENERATE_ARTICLE_HEAVENLY = heavenly.generate_id;
+        WEAPON_KIND_KAMUI_HEAVENLY = heavenly.weapon_id;
+        smashline::update_weapon_count(*FIGHTER_KIND_KAMUI,FIGHTER_KAMUI_GENERATE_ARTICLE_HEAVENLY, 1);
     }
 
 
@@ -645,7 +658,7 @@ pub fn install() {
     agent_kamui.install();
 
 
-    let agent_waterdragon = &mut Agent::new("kamui_waterdragon");
+    let agent_waterdragon = &mut Agent::new("kamui_weapon");
     let agent_waterdragon = agent_waterdragon.set_costume(costume.to_vec());
 
     articles::waterdragon::install(agent_waterdragon);
@@ -653,7 +666,7 @@ pub fn install() {
     
   
 
-    let agent_dragonhand= &mut Agent::new("kamui_dragonhand");
+    let agent_dragonhand= &mut Agent::new("kamui_effect");
     let agent_dragonhand = agent_dragonhand.set_costume(costume.to_vec());
     articles::dragonhand::install(agent_dragonhand);
     agent_dragonhand.install();
