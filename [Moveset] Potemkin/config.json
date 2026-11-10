@@ -11623,26 +11623,7 @@
       "fighter/kamui/motion/effect/c143/flip.prc",
       "fighter/kamui/motion/effect/c144/flip.prc"
     ],
-    "fighter/kamui/motion/finalbg/c00/motion_list.bin": [
-      "fighter/kamui/motion/finalbg/c128/motion_list.bin",
-      "fighter/kamui/motion/finalbg/c129/motion_list.bin",
-      "fighter/kamui/motion/finalbg/c130/motion_list.bin",
-      "fighter/kamui/motion/finalbg/c131/motion_list.bin",
-      "fighter/kamui/motion/finalbg/c132/motion_list.bin",
-      "fighter/kamui/motion/finalbg/c133/motion_list.bin",
-      "fighter/kamui/motion/finalbg/c134/motion_list.bin",
-      "fighter/kamui/motion/finalbg/c135/motion_list.bin",
-      "fighter/kamui/motion/finalbg/c136/motion_list.bin",
-      "fighter/kamui/motion/finalbg/c137/motion_list.bin",
-      "fighter/kamui/motion/finalbg/c138/motion_list.bin",
-      "fighter/kamui/motion/finalbg/c139/motion_list.bin",
-      "fighter/kamui/motion/finalbg/c140/motion_list.bin",
-      "fighter/kamui/motion/finalbg/c141/motion_list.bin",
-      "fighter/kamui/motion/finalbg/c142/motion_list.bin",
-      "fighter/kamui/motion/finalbg/c143/motion_list.bin",
-      "fighter/kamui/motion/finalbg/c144/motion_list.bin"
-    ],
-    "fighter/kamui/motion/ryusensya/c00/motion_list.bin": [
+    "fighter/kamui/motion/fdb/c128/motion_list.bin": [
       "fighter/kamui/motion/fdb/c128/motion_list.bin",
       "fighter/kamui/motion/fdb/c129/motion_list.bin",
       "fighter/kamui/motion/fdb/c130/motion_list.bin",
@@ -11660,25 +11641,6 @@
       "fighter/kamui/motion/fdb/c142/motion_list.bin",
       "fighter/kamui/motion/fdb/c143/motion_list.bin",
       "fighter/kamui/motion/fdb/c144/motion_list.bin"
-    ],
-    "fighter/kamui/motion/heavenly/c00/update.prc": [
-      "fighter/kamui/motion/heavenly/c128/update.prc",
-      "fighter/kamui/motion/heavenly/c129/update.prc",
-      "fighter/kamui/motion/heavenly/c130/update.prc",
-      "fighter/kamui/motion/heavenly/c131/update.prc",
-      "fighter/kamui/motion/heavenly/c132/update.prc",
-      "fighter/kamui/motion/heavenly/c133/update.prc",
-      "fighter/kamui/motion/heavenly/c134/update.prc",
-      "fighter/kamui/motion/heavenly/c135/update.prc",
-      "fighter/kamui/motion/heavenly/c136/update.prc",
-      "fighter/kamui/motion/heavenly/c137/update.prc",
-      "fighter/kamui/motion/heavenly/c138/update.prc",
-      "fighter/kamui/motion/heavenly/c139/update.prc",
-      "fighter/kamui/motion/heavenly/c140/update.prc",
-      "fighter/kamui/motion/heavenly/c141/update.prc",
-      "fighter/kamui/motion/heavenly/c142/update.prc",
-      "fighter/kamui/motion/heavenly/c143/update.prc",
-      "fighter/kamui/motion/heavenly/c144/update.prc"
     ],
     "sound/bank/fighter/se_kamui_c128.nus3audio": [
       "sound/bank/fighter/se_kamui_c129.nus3audio",
