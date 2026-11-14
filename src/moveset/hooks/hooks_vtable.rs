@@ -83,8 +83,6 @@ pub unsafe extern "C" fn kamui_on_search(_vtable: u64, fighter: &mut Fighter, lo
 }
 
 
-#[skyline::from_offset(0x69ae40)]
-extern "C" fn ryu_ken_autoturn_handler(module_accessor: *mut BattleObjectModuleAccessor, param_1: u32, param_2: u32);
 
 pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
     let scale = PostureModule::scale(fighter.battle_object.module_accessor); //gets the model's scale
@@ -94,8 +92,6 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
     let motion_kind =MotionModule::motion_kind(module_accessor);
 
 
-    //let prevent_turn = StopModule::is_damage(module_accessor) as u32;
-    //ryu_ken_autoturn_handler(module_accessor,prevent_turn,0);
     potemkin_mirror_handler(module_accessor);
     //weapon attaching code
     potemkin_weapon_attach_handler(module_accessor);
@@ -174,7 +170,7 @@ pub unsafe extern "C" fn kamui_reset(vtable: u64, fighter: &mut Fighter) {
     let mut item_hash_ptr = (item_module as u64 + 0x20) as *mut *mut u64 ;
     let mut item_hash_ptr_2 = (*item_hash_ptr as u64 + 0x8) as *mut u64;
     let mut genesis_bone = (*item_hash_ptr as u64 + 0x18) as *mut u64;
-    let dat = (skyline::hooks::getRegionAddress(skyline::hooks::Region::Text) as u64 + 0x4fc8fe0) as u64;
+    let dat = (skyline::hooks::getRegionAddress(skyline::hooks::Region::Text) as u64 + KAMUI_COMMONHAVE_OFFSET as u64) as u64;
     let mut commonhave_hash = (dat + 0x20) as  *mut *mut u64;
 
     // this will probably break with the new smashline stuff

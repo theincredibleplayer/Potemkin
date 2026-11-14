@@ -173,15 +173,14 @@ unsafe extern "C" fn game_throwhi(agent: &mut L2CAgentBase) {
 }
 
 unsafe extern "C" fn effect_throwhi(agent: &mut L2CAgentBase) {
-    let mut effect_id_because_im_lazy = 0;
     frame(agent.lua_state_agent, 6.0);
     if macros::is_excute(agent) {
         let zeros = Vector3f {x: 0.0,y: 0.0,z: 0.0};
-        effect_id_because_im_lazy = EffectModule::req_on_joint(agent.module_accessor,Hash40::new("kamui_floor_crack_buster"), Hash40::new("top"), &zeros,&zeros,3.4,&zeros,&zeros,false, 0, 0, 0) as u32;
-        //effect_id_because_im_lazy = macros::EFFECT(agent, Hash40::new("eflame_promrevolt_firepillar_ground"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 3.4, 0, 0, 0, 0, 0, 0, true);
+        let effect_id = EffectModule::req_on_joint(agent.module_accessor,Hash40::new("kamui_floor_crack_buster"), Hash40::new("top"), &zeros,&zeros,3.4,&zeros,&zeros,false, 0, 0, 0) as u32;
+        WorkModule::set_int(agent.module_accessor, effect_id as i32, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_TRISHULA_EFFECT_ID);
         macros::LAST_EFFECT_SET_RATE(agent, 0.04);
     }
-    frame(agent.lua_state_agent, 15.0);
+    frame(agent.lua_state_agent, 16.0);
     if macros::is_excute(agent) {
         macros::EFFECT(agent, Hash40::new("kamui_floor_crack_buster"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 3.4, 0, 0, 0, 0, 0, 0, true);
         macros::EFFECT(agent, Hash40::new("kamui_trishula_firepillar"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 3.7, 0, 0, 0, 0, 0, 0, true);
@@ -189,9 +188,10 @@ unsafe extern "C" fn effect_throwhi(agent: &mut L2CAgentBase) {
         macros::EFFECT(agent, Hash40::new("kamui_trishula_firepillar_impact"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 3.7, 0, 0, 0, 0, 0, 0, true);
         macros::LAST_EFFECT_SET_RATE(agent, 1.0);
     }
-    wait(agent.lua_state_agent, 1.0);
+    wait(agent.lua_state_agent, 3.0);
     if macros::is_excute(agent){
-        EffectModule::kill(agent.module_accessor, effect_id_because_im_lazy, true, true);
+        let effect_id = WorkModule::get_int(agent.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_TRISHULA_EFFECT_ID);
+        EffectModule::kill(agent.module_accessor, effect_id as u32, true, true);
     }
 }
 

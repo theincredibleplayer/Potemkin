@@ -3,7 +3,7 @@ use super::*;
 
 
 
-#[skyline::hook(offset = RESET_CLIFF_HANGDATA_HOOK_OFFSET.load(Ordering::Relaxed))]
+#[skyline::hook(offset = RESET_CLIFF_HANGDATA_HOOK_OFFSET)]
 unsafe extern "C" fn pot_select_cliff_hangdata_hook(ground_module: u64, hang_int: u32) -> f32 {
     let module_accessor = *((ground_module + 0x20) as *mut *mut BattleObjectModuleAccessor);
     //let battle_object = MiscModule::get_battle_object_from_id(boma.battle_object_id);
@@ -34,7 +34,7 @@ unsafe extern "C" fn pot_select_cliff_hangdata_hook(ground_module: u64, hang_int
 }
 
 
-#[skyline::hook(offset = AUTOTURN_SITUATION_CHECK_HOOK_OFFSET.load(Ordering::Relaxed), inline)]
+#[skyline::hook(offset = AUTOTURN_SITUATION_CHECK_HOOK_OFFSET, inline)]
 unsafe extern "C" fn autoturn_situation_check_hook(ctx: &mut skyline::hooks::InlineCtx) {
     let module_accessor = ctx.registers[21].x() as *mut BattleObjectModuleAccessor;
     let fighter_kind = utility::get_kind(&mut *(module_accessor));
@@ -45,7 +45,7 @@ unsafe extern "C" fn autoturn_situation_check_hook(ctx: &mut skyline::hooks::Inl
     }
 }
 
-#[skyline::hook(offset = CAPTURE_2_HOOK_OFFSET.load(Ordering::Relaxed), inline)]
+#[skyline::hook(offset = CAPTURE_2_HOOK_OFFSET, inline)]
 unsafe extern "C" fn potemkin_item_grab_hook(ctx: &mut skyline::hooks::InlineCtx) {
     let grabber_battle_object = ctx.registers[0].x() as *mut BattleObject;
     let grabber_module_accessor = (*grabber_battle_object).module_accessor;
@@ -70,7 +70,7 @@ unsafe extern "C" fn potemkin_item_grab_hook(ctx: &mut skyline::hooks::InlineCtx
 }
 
 // makes it so fighters cant be hit out of my grabs
-#[skyline::hook(offset = 0x3ee63c, inline)]
+#[skyline::hook(offset = SUPERGRIP_HOOK_DAMAGE_OFFSET, inline)]
 unsafe extern "C" fn supergrip_hook_damage(ctx: &mut skyline::hooks::InlineCtx) {
     let damage_module = ctx.registers[19].x();
     let module_accessor = *((damage_module + 0x8) as *mut *mut BattleObjectModuleAccessor);
@@ -107,7 +107,7 @@ unsafe extern "C" fn supergrip_hook_damage(ctx: &mut skyline::hooks::InlineCtx) 
     }
 }
 
-#[skyline::hook(offset = 0x3ee65c, inline)]
+#[skyline::hook(offset = SUPERGRIP_HOOK_KB_OFFSET, inline)]
 unsafe extern "C" fn supergrip_hook_kb(ctx: &mut skyline::hooks::InlineCtx) {
     let damage_module = ctx.registers[19].x();
     let module_accessor = *((damage_module + 0x8) as *mut *mut BattleObjectModuleAccessor);

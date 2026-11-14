@@ -526,7 +526,6 @@ pub fn main() {
     if !check_deps() {
         return;
     }
-    crate::moveset::consts::install();
     unsafe {
         extern "C" {
             fn arcrop_register_event_callback(

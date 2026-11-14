@@ -7,7 +7,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 
 use crate::moveset::ui::dual_meter::TensionMeter;
 use crate::moveset::ui::dual_meter::CutInUI;
-use crate::moveset::consts::UI_DRAW_HOOK;
+use crate::moveset::consts::UI_DRAW_HOOK_OFFSET;
 
 use once_cell::sync::Lazy;
 pub static UI_MANAGER: Lazy<RwLock<UiManager>> = Lazy::new(|| RwLock::new(UiManager { 
@@ -253,7 +253,7 @@ pub fn get_usd(usd: [skyline::libc::c_char; 9]) -> String {
         .collect::<String>()
 }*/
 
-#[skyline::hook(offset = UI_DRAW_HOOK.load(Ordering::Relaxed), inline)]
+#[skyline::hook(offset = UI_DRAW_HOOK_OFFSET, inline)]
 pub unsafe fn handle_draw_potemkin(ctx: &mut skyline::hooks::InlineCtx) {
     let layout = ctx.registers[0].x() as *mut Layout;
     ctx.registers[0].set_x(handle_layout_potemkin(layout) as u64);    

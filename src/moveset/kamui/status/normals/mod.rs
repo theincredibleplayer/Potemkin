@@ -6,6 +6,7 @@ mod air_throw;
 mod tilts;
 mod lose;
 mod item_heavy;
+mod throw;
 
 
 pub fn install(agent: &mut Agent) {
@@ -13,4 +14,5 @@ pub fn install(agent: &mut Agent) {
     tilts::install(agent);
     lose::install(agent);
     item_heavy::install(agent);
+    throw::install(agent);
 }

@@ -281,7 +281,7 @@ unsafe extern "C" fn expression_special_hi_release(agent: &mut L2CAgentBase) {
         for n in 0..3{
             sv_animcmd::wait(agent.lua_state_agent, 1.0);
             if macros::is_excute(agent) {
-                let dat = (skyline::hooks::getRegionAddress(skyline::hooks::Region::Text) as u64 + 0x52b7f00) as *const *const u64;
+                let dat = (skyline::hooks::getRegionAddress(skyline::hooks::Region::Text) as u64 + CAMERA_FOV_POINTER_OFFSET as u64) as *const *const u64;
                 let mut fov_ptr = (**dat + 0xdac) as *mut f32;
                 let fov_ratio = *(fov_ptr);
                 let fov = (fov_ratio * 180.0) / 3.1415927;

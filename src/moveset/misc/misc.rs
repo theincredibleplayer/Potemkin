@@ -81,7 +81,7 @@ pub mod MiscModule {
     }
 
 
-    #[skyline::from_offset(GET_BATTLE_OBJECT_FROM_ID_OFFSET.load(Ordering::Relaxed))]
+    #[skyline::from_offset(GET_BATTLE_OBJECT_FROM_ID_OFFSET)]
     pub fn get_battle_object_from_id(id: u32) -> *mut BattleObject;
 }
 
