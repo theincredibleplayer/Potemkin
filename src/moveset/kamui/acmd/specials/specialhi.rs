@@ -248,23 +248,14 @@ unsafe extern "C" fn expression_special_hi_release(agent: &mut L2CAgentBase) {
             let scale = PostureModule::scale(agent.module_accessor);
             let lr = PostureModule::lr(agent.module_accessor);
             CameraModule::reset_all(agent.module_accessor);            
-            //macros::CAM_ZOOM_IN_arg6(
-            //    agent,
-            //    /*frames to zoom in totally*/3.0,
-            //    /*according to claude1308 the object id?*/0.0,
-            //    /*the amt of zoom needed, higher the number lower the zoom*/2.5*scale*1.3,
-            //    /*y_rot*/0.35, // up and down
-            //    /*x_rot*/-0.6 * lr, //left and right
-            //    true
-            //);
             macros::CAM_ZOOM_IN_arg6(
                 agent,
                 /*frames to zoom in totally*/3.0,
-                /*according to claude1308 the object id?*/0.0,
-                /*the amt of zoom needed, higher the number lower the zoom*/3.5*scale*1.3,
-                /*y_rot*/0.13, // up and down
-                /*x_rot*/-0.7 * lr, //left and right
-                /*this seems to be a quake multiplier*/ true,
+                /*according to calude the object id?*/0.0,
+                /*the amt of zoom needed, higher the number lower the zoom*/1.3*scale*1.3,
+                /*y_rot*/0.3, // up and down
+                /*x_rot*/-0.6 * lr, //left and right
+                true
             );
             CameraModule::stop_quake(agent.module_accessor, *CAMERA_QUAKE_KIND_XL);
             macros::QUAKE(agent, *CAMERA_QUAKE_KIND_XL);
@@ -275,49 +266,15 @@ unsafe extern "C" fn expression_special_hi_release(agent: &mut L2CAgentBase) {
             /*y*/17.0,
             /*z*/0);
             smash::app::sv_module_access::camera(agent.lua_state_agent);
-
         }
-        let og_fov = sv_camera_manager::get_fov();
-        for n in 0..3{
-            sv_animcmd::wait(agent.lua_state_agent, 1.0);
-            if macros::is_excute(agent) {
-                let dat = (skyline::hooks::getRegionAddress(skyline::hooks::Region::Text) as u64 + CAMERA_FOV_POINTER_OFFSET as u64) as *const *const u64;
-                let mut fov_ptr = (**dat + 0xdac) as *mut f32;
-                let fov_ratio = *(fov_ptr);
-                let fov = (fov_ratio * 180.0) / 3.1415927;
-                
-                let adjusted_fov = og_fov + (80.0-og_fov)/3.0 * (n+1) as f32;
-
-                *fov_ptr = adjusted_fov/180.0 * 3.1415927;
-            }    
-        }
-        sv_animcmd::wait(agent.lua_state_agent, 8.0);
-        if macros::is_excute(agent) {
-            macros::CAM_ZOOM_OUT(agent);
-            let scale = PostureModule::scale(agent.module_accessor);
-            let lr = PostureModule::lr(agent.module_accessor);
-            CameraModule::reset_all(agent.module_accessor);            
-            macros::CAM_ZOOM_IN_arg6(
-                agent,
-                /*frames to zoom in totally*/3.0,
-                /*according to claude1308 the object id?*/0.0,
-                /*the amt of zoom needed, higher the number lower the zoom*/3.5*scale*1.3,
-                /*y_rot*/0.0, // up and down
-                /*x_rot*/0.0, //left and right
-                /*this seems to be a quake multiplier*/ true,
-            );
-            agent.clear_lua_stack();
-            lua_args!(agent,
-            *MA_MSC_CMD_CAMERA_CAM_OFFSET,
-            /*x*/12.0 * lr,
-            /*y*/17.0,
-            /*z*/0);
-            smash::app::sv_module_access::camera(agent.lua_state_agent);
-        }
-        sv_animcmd::wait(agent.lua_state_agent, 1.0);
+        sv_animcmd::wait(agent.lua_state_agent, 10.0);
         if macros::is_excute(agent) {
             macros::CAM_ZOOM_OUT(agent);
         }
+        //sv_animcmd::wait(agent.lua_state_agent, 1.0);
+        //if macros::is_excute(agent) {
+        //    macros::CAM_ZOOM_OUT(agent);
+        //}
     }else{
         if macros::is_excute(agent) {
             macros::FT_MOTION_RATE(agent, 0.5);

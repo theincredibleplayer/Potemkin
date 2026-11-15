@@ -12,19 +12,15 @@ pub unsafe extern "C" fn potemkin_mirror_handler(module_accessor: *mut BattleObj
         hash40("ladder_wait"),
         hash40("ladder_up"),
         hash40("ladder_down"),
-        hash40("ladder_catch_r"),
-        hash40("ladder_catch_l"),
-        hash40("ladder_catch_air_r"),
-        hash40("ladder_catch_air_l"),
-        hash40("ladder_catch_end_r"),
-        hash40("ladder_catch_end_l"),
     ].contains(&motion_kind){
         can_mirror = false;
     }
     // scales the models of both pot and his articles by -1 on the x axis to mirror (accurate to strive)
-    if (((lr < 0.0) && (![*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN].contains(&status_kind) && !((motion_kind == hash40("air_turn")) || (motion_kind == hash40("turn")) || (motion_kind == hash40("squat_turn"))) ) )
-    || (((lr > 0.0) && ( [*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN].contains(&status_kind) || ((motion_kind == hash40("air_turn")) || (motion_kind == hash40("turn")) || (motion_kind == hash40("squat_turn"))) ) ) )
-    && can_mirror)
+    if (
+       ((lr < 0.0) && (![*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN].contains(&status_kind) && !((motion_kind == hash40("air_turn")) || (motion_kind == hash40("turn")) || (motion_kind == hash40("squat_turn"))) ) )
+    || ((lr > 0.0) && ( [*FIGHTER_STATUS_KIND_TURN,FIGHTER_KAMUI_STATUS_KIND_AUTO_TURN].contains(&status_kind) ||  ((motion_kind == hash40("air_turn")) || (motion_kind == hash40("turn")) || (motion_kind == hash40("squat_turn"))) ) )
+       )
+    && can_mirror
     {
             ModelModule::set_joint_scale(module_accessor, Hash40::new("top")   , &Vector3f{x:-scale,y:scale,z:scale});
             ModelModule::set_joint_scale(module_accessor, Hash40::new("havel") , &Vector3f{x:-scale,y:scale,z:-scale});
@@ -50,30 +46,6 @@ pub unsafe extern "C" fn potemkin_mirror_handler(module_accessor: *mut BattleObj
                 let article_boma3 = *(article3 as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
                 ModelModule::set_joint_scale(article_boma3, Hash40::new("trans") , &Vector3f{x:-1.0,y:1.0,z:1.0});
             }
-    } else { 
-        // reverses the -ve scale (i am not sure if its actually needed but we ball ig)
-        ModelModule::set_joint_scale(module_accessor, Hash40::new("top")   , &Vector3f{x:scale,y:scale,z:scale});
-        //ModelModule::set_joint_scale(module_accessor, Hash40::new("havel") , &Vector3f{x:scale,y:scale,z:scale});
-        //ModelModule::set_joint_scale(module_accessor, Hash40::new("haver") , &Vector3f{x:scale,y:scale,z:scale});
-        //ModelModule::set_joint_scale(module_accessor, Hash40::new("throw") , &Vector3f{x:scale,y:scale,z:scale});
-
-        //ModelModule::set_joint_scale(module_accessor, Hash40::new("throw") , &Vector3f{x:scale,y:scale,z:scale});
-
-        if ArticleModule::is_exist(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT){
-            let article = ArticleModule::get_article(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_EFFECT);
-            let article_boma = *(article as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
-            ModelModule::set_joint_scale(article_boma, Hash40::new("hand1") , &Vector3f{x:1.0,y:1.0,z:1.0});
-        }
-        if ArticleModule::is_exist(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON){
-            let article2 = ArticleModule::get_article(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON);
-            let article_boma2 = *(article2 as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
-            ModelModule::set_joint_scale(article_boma2, Hash40::new("trans") , &Vector3f{x:1.0,y:1.0,z:1.0});
-        }
-        if ArticleModule::is_exist(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_HEAVENLY){
-            let article3 = ArticleModule::get_article(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_HEAVENLY);
-            let article_boma3 = *(article3 as *mut smash::app::Article as *mut u64).add(0x8/8) as *mut BattleObjectModuleAccessor;
-            ModelModule::set_joint_scale(article_boma3, Hash40::new("trans") , &Vector3f{x:1.0,y:1.0,z:1.0});
-        }
     }
 }
 

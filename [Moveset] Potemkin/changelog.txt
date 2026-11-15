@@ -172,9 +172,10 @@ V2.8
 - Potemkin buster whiff has more endlag
 - added a buffer system for red roman cancel's direction, so it should feel easier to input a direction now
 - decreased the kill power and damage on weak spot megafist but buffed the spike hitbox on it
-- mod should work on 13.0.4 and 13.0.5 now.
 - so apparently the arm invincibility was on the wrong arm on up smash, fixed that
-
-
+- mod updated to smashline 2 2.0, and to 13.0.5
+- increased kill power of up air
+- added tough guy (tough man)
+- you can no longer be hit out of Potemkin's grabs
 
 

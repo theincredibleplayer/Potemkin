@@ -227,7 +227,6 @@ pub const FINAL_SMASH_CHECKS_FUNCTION_OFFSET    : usize = 0x695c80 ;
 
 // DATs
 pub const KAMUI_COMMONHAVE_OFFSET               : usize = 0x4fc9fe0;
-pub const CAMERA_FOV_POINTER_OFFSET             : usize = 0x52b8f00;
 
 
 
