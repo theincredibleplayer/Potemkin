@@ -1,0 +1,7 @@
+display_name = "Potemkin"
+authors = "IncrediblePlays"
+version = "3.0.0"
+description = """
+Potemkin Joins the Battle!
+"""
+category = "Fighter"

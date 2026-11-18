@@ -1,8 +1,5 @@
 use smash::hash40;
 use smash_script::macros::*;
-use skyline::nn::ro::LookupSymbol;
-use std::arch::asm;
-use skyline::hooks::{Region,getRegionAddress};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use {
     smash::{

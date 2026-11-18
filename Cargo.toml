@@ -1,6 +1,6 @@
 [package]
 name = "hotpot"
-version = "2.8.0"
+version = "3.0.0"
 authors = ["incredibleplays"]
 edition = "2018"
 

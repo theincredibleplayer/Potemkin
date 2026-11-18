@@ -411,8 +411,8 @@ extern "C" fn install_motion_patch(){
 
     let mut fighter_slots: [Vec<i32>; 97] = std::array::from_fn(|_| Vec::new());
 
-    pub const fighters: [&str; 97] = ["bayonetta", "brave", "buddy", "captain", "chrom", "cloud", "daisy", "dedede", "demon", "diddy", "dolly", "donkey", "duckhunt", "edge", "eflame", "element", "elight", "falco", "fox", "gamewatch", "ganon", "gaogaen", "gekkouga", "ike", "inkling", "jack", "kamui", "ken", "kirby", "koopa", "koopag", "koopajr", "krool", "link", "littlemac", "lucario", "lucas", "lucina", "luigi", "mario", "mariod", "marth", "master", "metaknight", "mewtwo", "miienemyf", "miienemyg", "miienemys", "miifighter", "miigunner", "miiswordsman", "murabito", "nana", "ness", "packun", "pacman", "palutena", "peach", "pfushigisou", "pichu", "pickel", "pikachu", "pikmin", "pit", "pitb", "plizardon", "popo", "ptrainer", "ptrainer_low", "purin", "pzenigame", "reflet", "richter", "ridley", "robot", "rockman", "rosetta", "roy", "ryu", "samus", "samusd", "sheik", "shizue", "shulk", "simon", "snake", "sonic", "szerosuit", "tantan", "toonlink", "trail", "wario", "wiifit", "wolf", "yoshi", "younglink", "zelda"];
-    for (index, &fighter) in fighters.iter().enumerate() {
+    const FIGHTERS: [&str; 97] = ["bayonetta", "brave", "buddy", "captain", "chrom", "cloud", "daisy", "dedede", "demon", "diddy", "dolly", "donkey", "duckhunt", "edge", "eflame", "element", "elight", "falco", "fox", "gamewatch", "ganon", "gaogaen", "gekkouga", "ike", "inkling", "jack", "kamui", "ken", "kirby", "koopa", "koopag", "koopajr", "krool", "link", "littlemac", "lucario", "lucas", "lucina", "luigi", "mario", "mariod", "marth", "master", "metaknight", "mewtwo", "miienemyf", "miienemyg", "miienemys", "miifighter", "miigunner", "miiswordsman", "murabito", "nana", "ness", "packun", "pacman", "palutena", "peach", "pfushigisou", "pichu", "pickel", "pikachu", "pikmin", "pit", "pitb", "plizardon", "popo", "ptrainer", "ptrainer_low", "purin", "pzenigame", "reflet", "richter", "ridley", "robot", "rockman", "rosetta", "roy", "ryu", "samus", "samusd", "sheik", "shizue", "shulk", "simon", "snake", "sonic", "szerosuit", "tantan", "toonlink", "trail", "wario", "wiifit", "wolf", "yoshi", "younglink", "zelda"];
+    for (index, &fighter) in FIGHTERS.iter().enumerate() {
         for color in 0..8 {
             unsafe{
                 if fighter == "kirby"{
@@ -425,7 +425,7 @@ extern "C" fn install_motion_patch(){
             }
         }
         for slot in 8..256 {
-            let path = format!("mods:/fighter/{}/model/body/c{:02}/", fighters[index], slot);
+            let path = format!("mods:/fighter/{}/model/body/c{:02}/", FIGHTERS[index], slot);
 
             if let Ok(meta) = std::fs::metadata(&path) {
                 if meta.is_dir() {
@@ -435,11 +435,11 @@ extern "C" fn install_motion_patch(){
         }
         for color in &fighter_slots[index] {
             unsafe{
-                if fighters[index] == "kirby"{
+                if FIGHTERS[index] == "kirby"{
                     potemkin_motion_patch_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE_KIRBY);
-                }else if fighters[index] == "tantan"{
+                }else if FIGHTERS[index] == "tantan"{
                     potemkin_motion_patch_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE_TANTAN);
-                }else if !(fighters[index] == "kamui" && MARKED_COLORS[*color as usize]){
+                }else if !(FIGHTERS[index] == "kamui" && MARKED_COLORS[*color as usize]){
                     potemkin_motion_patch_callback::install(arcropolis_api::hash40(&format!("fighter/{}/motion/body/c{:02}/motion_list.bin", fighter, color)), MAX_FILE_SIZE);
                 }
             }

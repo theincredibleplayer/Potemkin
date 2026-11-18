@@ -342,7 +342,7 @@ unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> L2CV
     GroundModule::correct(module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND_CLIFF_STOP));
     grabbed_anim_selector(fighter,"catched_pot_final_scene_03", 1.0);
     WorkModule::on_flag(module_accessor,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
-    CAM_ZOOM_OUT_FINAL(fighter);
+    macros::CAM_ZOOM_OUT_FINAL(fighter);
     let capture_id = LinkModule::get_node_object_id(fighter.module_accessor, *LINK_NO_CAPTURE);
     let enemy = sv_battle_object::module_accessor(capture_id as u32);
     WorkModule::off_flag(enemy,*FIGHTER_INSTANCE_WORK_ID_FLAG_NO_DEAD);
@@ -352,12 +352,10 @@ unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> L2CV
 
 
     KineticModule::enable_energy(module_accessor,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY);
-    fighter.clear_lua_stack();
-    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,15.0);
-    sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
-    sv_kinetic_energy::set_limit_speed(fighter.lua_state_agent);
-    lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY, -0.25, -0.25);
-    sv_kinetic_energy::set_accel(fighter.lua_state_agent);
+    sv_kinetic_energy!(set_stable_speed,fighter,FIGHTER_KINETIC_ENERGY_ID_GRAVITY, 15.0, 0.0 );
+    sv_kinetic_energy!(set_limit_speed ,fighter,FIGHTER_KINETIC_ENERGY_ID_GRAVITY, 15.0, 0.0 );
+    sv_kinetic_energy!(set_accel       ,fighter,FIGHTER_KINETIC_ENERGY_ID_GRAVITY,-0.25,-0.25);
+
     WorkModule::set_float(module_accessor, 3.0, *FIGHTER_INSTANCE_WORK_ID_FLOAT_CHECK_DEAD_OFFSET_Y);
     let check_distance:f32 = 500.0;
     WorkModule::set_float(module_accessor, check_distance, 0x1000008);
