@@ -54,9 +54,9 @@ unsafe extern "C" fn special_lw_main(fighter: &mut L2CFighterCommon) -> L2CValue
         fighter.clear_lua_stack();
         lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,0.8);
         sv_kinetic_energy::set_stable_speed(fighter.lua_state_agent);
-        //fighter.clear_lua_stack();
-        //lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_STOP,*ENERGY_STOP_RESET_TYPE_GROUND,0.0,0.0,0.0,0.0,0.0);
-        //sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
+        fighter.clear_lua_stack();
+        lua_args!(fighter,*FIGHTER_KINETIC_ENERGY_ID_GRAVITY,*ENERGY_STOP_RESET_TYPE_AIR,0.0,0.0,0.0,0.0,0.0);
+        sv_kinetic_energy::reset_energy(fighter.lua_state_agent);
     }
     else {
         GroundModule::correct(fighter.module_accessor,GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));

@@ -156,10 +156,11 @@ pub unsafe extern "C" fn camera_checks(fighter: &mut L2CAgentBase) -> bool {
 }
 
 pub unsafe extern "C" fn attack_sound_randomizer(fighter: &mut L2CAgentBase, mut attack_type: &str) -> u64 {
-    let mut random = smash::app::sv_math::rand(hash40("fighter"), 6);
+    let mut random = smash::app::sv_math::rand(hash40("fighter"), 8);
     let mut sound_name = ["vc_pot_attack_".to_string(),attack_type.to_string()].join("");
+    let mut enable_voiceline = true;
     if WorkModule::get_int(fighter.module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_LAST_ATTACK_SOUND_ID) == random {
-        random = (random + 1)%6;
+        random = (random + 1)%8;
     }
     match random{
         0 => sound_name = [sound_name,"_a".to_string()].join(""),
@@ -168,10 +169,13 @@ pub unsafe extern "C" fn attack_sound_randomizer(fighter: &mut L2CAgentBase, mut
         3 => sound_name = [sound_name,"_d".to_string()].join(""),
         4 => sound_name = [sound_name,"_e".to_string()].join(""),
         5 => sound_name = [sound_name,"_f".to_string()].join(""),
-        _ => (),
+        _ => (enable_voiceline = false),
     }
-    WorkModule::set_int(fighter.module_accessor, random, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_LAST_ATTACK_SOUND_ID);
-    return SoundModule::play_se(fighter.module_accessor, Hash40::new(sound_name.as_str()), true, false, false, false, enSEType(0));
+    if enable_voiceline {
+        WorkModule::set_int(fighter.module_accessor, random, FIGHTER_KAMUI_INSTANCE_WORK_ID_INT_LAST_ATTACK_SOUND_ID);
+        return SoundModule::play_se(fighter.module_accessor, Hash40::new(sound_name.as_str()), true, false, false, false, enSEType(0));    
+    }
+    return 0;
 }
 
 // used for sound randomization

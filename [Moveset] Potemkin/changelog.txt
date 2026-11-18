@@ -177,5 +177,5 @@ V2.8
 - increased kill power of up air
 - added tough guy (tough man)
 - you can no longer be hit out of Potemkin's grabs
-
+- added team win
 

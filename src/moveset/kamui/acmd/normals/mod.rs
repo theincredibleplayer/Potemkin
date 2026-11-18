@@ -9,6 +9,7 @@ mod smash_attacks;
 mod taunt;
 mod throw;
 mod tilts;
+mod win;
 
 
 
@@ -22,4 +23,5 @@ pub fn install(agent: &mut Agent) {
     throw::install(agent);
     tilts::install(agent);
     landing::install(agent);
+    win::install(agent);
 }

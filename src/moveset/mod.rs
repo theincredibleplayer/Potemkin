@@ -615,7 +615,7 @@ pub fn install() {
 
     unsafe {
         // reflector projectile
-        let fdb = smashline::clone_weapon("kamui", "fdb", *WEAPON_KIND_CLOUD_WAVE, false);
+        let fdb = smashline::clone_weapon("kamui", "fdb", *WEAPON_KIND_CLOUD_WAVE, true);
         FIGHTER_KAMUI_GENERATE_ARTICLE_FDB = fdb.generate_id;
         WEAPON_KIND_KAMUI_FDB = fdb.weapon_id;
         smashline::update_weapon_count(*FIGHTER_KIND_KAMUI, FIGHTER_KAMUI_GENERATE_ARTICLE_FDB, 2);

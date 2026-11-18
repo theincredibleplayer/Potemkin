@@ -168,30 +168,34 @@ unsafe extern "C" fn expression_landingheavy(agent: &mut L2CAgentBase) {
 
 
 pub fn install(agent: &mut Agent) {
-    agent.game_acmd          ("game_landingairlw",        game_landingairlw,        Priority::Low);
-    agent.sound_acmd         ("sound_landingairlw",       sound_landingairlw,       Priority::Low);
-    agent.effect_acmd        ("effect_landingairlw",      effect_landingairlw,      Priority::Low);
-    agent.expression_acmd    ("expression_landingairlw",  expression_landingairlw,  Priority::Low);
+    agent.game_acmd          ("game_landingairlw",              game_landingairlw,              Priority::Low);
+    agent.sound_acmd         ("sound_landingairlw",             sound_landingairlw,             Priority::Low);
+    agent.effect_acmd        ("effect_landingairlw",            effect_landingairlw,            Priority::Low);
+    agent.expression_acmd    ("expression_landingairlw",        expression_landingairlw,        Priority::Low);
 
-    agent.sound_acmd         ("sound_landingairhi",       sound_landingairhi,       Priority::Low);
-    agent.effect_acmd        ("effect_landingairhi",      effect_landingairhi,      Priority::Low);
-    agent.expression_acmd    ("expression_landingairhi",  expression_landingairhi,  Priority::Low);
+    agent.sound_acmd         ("sound_landingairhi",             sound_landingairhi,             Priority::Low);
+    agent.effect_acmd        ("effect_landingairhi",            effect_landingairhi,            Priority::Low);
+    agent.expression_acmd    ("expression_landingairhi",        expression_landingairhi,        Priority::Low);
     
-    agent.sound_acmd         ("sound_landingairf",       sound_landingairf,       Priority::Low);
-    agent.effect_acmd        ("effect_landingairf",      effect_landingairf,      Priority::Low);
-    agent.expression_acmd    ("expression_landingairf",  expression_landingairf,  Priority::Low);
+    agent.sound_acmd         ("sound_landingairf",              sound_landingairf,              Priority::Low);
+    agent.effect_acmd        ("effect_landingairf",             effect_landingairf,             Priority::Low);
+    agent.expression_acmd    ("expression_landingairf",         expression_landingairf,         Priority::Low);
 
-    agent.sound_acmd         ("sound_landingairb",       sound_landingairb,       Priority::Low);
-    agent.effect_acmd        ("effect_landingairb",      effect_landingairb,      Priority::Low);
-    agent.expression_acmd    ("expression_landingairb",  expression_landingairb,  Priority::Low);
+    agent.sound_acmd         ("sound_landingairb",              sound_landingairb,              Priority::Low);
+    agent.effect_acmd        ("effect_landingairb",             effect_landingairb,             Priority::Low);
+    agent.expression_acmd    ("expression_landingairb",         expression_landingairb,         Priority::Low);
 
-    agent.sound_acmd         ("sound_landingairn",       sound_landingairn,       Priority::Low);
-    agent.effect_acmd        ("effect_landingairn",      effect_landingairn,      Priority::Low);
-    agent.expression_acmd    ("expression_landingairn",  expression_landingairn,  Priority::Low);
+    agent.sound_acmd         ("sound_landingairn",              sound_landingairn,              Priority::Low);
+    agent.effect_acmd        ("effect_landingairn",             effect_landingairn,             Priority::Low);
+    agent.expression_acmd    ("expression_landingairn",         expression_landingairn,         Priority::Low);
 
+
+    agent.sound_acmd         ("game_landingfallspecial",        sound_landingheavy,             Priority::Low);
+    agent.expression_acmd    ("expression_landingfallspecial",  expression_landingheavy,        Priority::Low);
 
     agent.sound_acmd         ("sound_landingheavy",             sound_landingheavy,             Priority::Low);
     agent.expression_acmd    ("expression_landingheavy",        expression_landingheavy,        Priority::Low);
+
 
     agent.sound_acmd         ("sound_landinglight",             sound_landinglight,             Priority::Low);
     agent.expression_acmd    ("expression_landinglight",        expression_landinglight,        Priority::Low);

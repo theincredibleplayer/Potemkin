@@ -90,6 +90,8 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
     let status_kind =StatusModule::status_kind(fighter.battle_object.module_accessor) ;
     let situation_kind = StatusModule::situation_kind(module_accessor);
     let motion_kind =MotionModule::motion_kind(module_accessor);
+    let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+    let fighter_manager = singletons::FighterManager();
 
 
     potemkin_mirror_handler(module_accessor);
@@ -107,8 +109,6 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
     }
 
     // ui stuff
-    let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
-    let fighter_manager = singletons::FighterManager();
     if smash::app::lua_bind::FighterManager::is_result_mode(fighter_manager) {
         UiManager::disable_ui(get_ui_index_from_entry_id(entry_id));
     }else{
@@ -157,6 +157,48 @@ pub unsafe extern "C" fn kamui_on_frame(_vtable: u64, fighter: &mut Fighter) {
             *FIGHTER_STATUS_KIND_CLIFF_JUMP3,
         ].contains(&status_kind){
             StatusModule::change_status_request(module_accessor, FIGHTER_KAMUI_STATUS_KIND_AIR_AUTO_TURN ,false);
+        }
+    }
+
+
+
+    // teamwin
+    if FighterManager::is_result_mode(fighter_manager){
+        let mut swap_motion;
+
+        let fighter_entry_pot = FighterManager::get_fighter_entry(fighter_manager,FighterEntryID(entry_id as i32));
+        let pot_team  =  *((*((fighter_entry_pot + 0xf8) as *const usize) + 0x84) as *const i32);
+
+        let top_rank_player = FighterManager::get_top_rank_player(fighter_manager,0);
+        let fighter_entry_top_rank = FighterManager::get_fighter_entry(fighter_manager,FighterEntryID(top_rank_player as i32));
+        let top_rank_team  =  *((*((fighter_entry_top_rank + 0xf8) as *const usize) + 0x84) as *const i32);
+
+        if pot_team == top_rank_team {
+            if [hash40("win_1"),hash40("win_2"),hash40("win_3")].contains(&motion_kind) {
+                swap_motion = hash40("win_4");
+            }else if [hash40("win_1_wait"),hash40("win_2_wait"),hash40("win_3_wait")].contains(&motion_kind){
+                swap_motion = hash40("win_4_wait");
+            }else if [hash40("win_4_wait"),hash40("win_4")].contains(&motion_kind){
+                if MotionModule::frame(module_accessor) >= 160.0{
+                    MotionModule::change_motion(module_accessor,Hash40::new("win_4_wait"),143.0,1.0,false,0.0,false,false);
+                    ArticleModule::set_frame(module_accessor, FIGHTER_KAMUI_GENERATE_ARTICLE_WEAPON, 143.0);
+                }
+                return;
+            }else{
+                return;
+            }
+
+            for entry_id_selected in 0..8{
+                if entry_id_selected == entry_id {continue;}
+                if let Some(object) = get_battle_object_from_entry_id(entry_id_selected as u32) {
+                    let fighter_entry = FighterManager::get_fighter_entry(fighter_manager,FighterEntryID(entry_id_selected as i32));
+                    let team  =  *((*((fighter_entry + 0xf8) as *const usize) + 0x84) as *const i32);
+                    if team == top_rank_team{
+                        MotionModule::change_motion(module_accessor,Hash40::new_raw(swap_motion),0.0,1.0,false,0.0,false,false);
+                        break;
+                    }
+                }
+            }
         }
     }
 }
@@ -444,6 +486,8 @@ pub unsafe extern "C" fn kamui_on_change_motion(vtable: u64, fighter: &mut Fight
         hash40("win_2_wait"),
         hash40("win_3"),
         hash40("win_3_wait"),
+        hash40("win_4"),
+        hash40("win_4_wait"),
         hash40("lose"),
         hash40("damage_hi_1"),
         hash40("damage_hi_2"),

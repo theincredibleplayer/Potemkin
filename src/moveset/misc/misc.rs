@@ -121,3 +121,15 @@ pub fn get_ui_index_from_entry_id(entry_id: usize) -> usize {
     }
     return index;
 }
+
+
+pub fn get_battle_object_from_entry_id(entry_id: u32) -> Option<*mut BattleObject> {
+    unsafe {
+        let entry = FighterManager::get_fighter_entry(singletons::FighterManager(), FighterEntryID(entry_id as i32)) as *mut u8;
+        if entry.is_null() {
+            None
+        } else {
+            Some(*(entry.add(0x4160) as *mut *mut BattleObject))
+        }
+    }
+}
