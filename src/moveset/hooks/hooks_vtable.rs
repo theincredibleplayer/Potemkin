@@ -888,18 +888,9 @@ pub unsafe extern "C" fn kamui_on_shield(vtable: u64, fighter: &mut Fighter, col
 
 pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,damage_log:u64) {
     let module_accessor = fighter.battle_object.module_accessor;
-
-
     let entry_id = WorkModule::get_int(module_accessor,*FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     let dmg = *((*(((damage_log as u64) + 0x10) as *const u64) + 0x4) as *const f32);
     let status_kind =StatusModule::status_kind(fighter.battle_object.module_accessor);
-    //let collision_log = *((damage_log as *const u64).add(0x28 / 0x8)) as *const CollisionLog;
-    let collision_log = *((damage_log as *const u64).add(0x28 / 0x8)) as *const CollisionLog;
-    let opponent_id = *(*(damage_log as *mut u64).add(0x10 / 0x8) as *mut u32).add(0x44 / 0x4);
-    let category = sv_battle_object::category(opponent_id);
-    //let collision_log : &mut CollisionLogScuffed = std::mem::transmute(damage_log);
-    println!("part_id = {}",(*collision_log).collider_part_id);
-    println!("col_kind = {}",(*collision_log).collision_kind);
 
     if *(*(damage_log as *const *const u64).offset(0x10 / 0x8) as *const u8).add(0xd0) == 0{
         WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_RED_RC);
@@ -925,11 +916,7 @@ pub unsafe extern "C" fn kamui_on_damage(vtable: u64, fighter: &mut Fighter,dama
             WorkModule::off_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_IS_ARMOR_ON);
         }
     }
-    if (*collision_log).collision_kind == *COLLISION_KIND_HIT as u8 {
-        //if HitModule::get_status(module_accessor, fighter.battle_object.battle_object_id as i32, 0) == 0{
-            UiManager::add_tension(get_ui_index_from_entry_id(entry_id), dmg*0.2);
-        //}
-    }
+    UiManager::add_tension(get_ui_index_from_entry_id(entry_id), dmg*0.15);
 }
 
 

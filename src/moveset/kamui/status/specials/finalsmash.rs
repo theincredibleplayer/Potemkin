@@ -379,10 +379,6 @@ unsafe extern "C" fn finalsceneexit_main(fighter: &mut L2CFighterCommon) -> L2CV
         WorkModule::on_flag(module_accessor, FIGHTER_KAMUI_INSTANCE_WORK_ID_FLAG_FINAL_DEATH_IMMINENT);
     }
     let pos = Vector3f{x: PostureModule::pos_x(fighter.module_accessor), y: PostureModule::pos_y(fighter.module_accessor), z: PostureModule::pos_z(fighter.module_accessor)};
-    //let checkbool = GroundModule::ray_check_hit_pos(fighter.module_accessor,&pos2f,&check_pos,&mut hit_pos,true);
-    println!("distance to ground: {}\nlast pos x: {}\nlast pos y: {}\nnow pos x: {}\nnow pos y:{}\ncliff pos x: {}\ncliff pos y:{}", distance_to_ground, pos2f.x, pos2f.y, pos.x, pos.y, cliff_pos.x,cliff_pos.y);
-
-    //println!("hit_pos_x: {}\nhit_pos_y: {}\ncheckbool: {}", hit_pos.x, hit_pos.y, checkbool);
 
     return smashline::original_status(Main, fighter, *FIGHTER_KAMUI_STATUS_KIND_FINAL_END)(fighter);
 }

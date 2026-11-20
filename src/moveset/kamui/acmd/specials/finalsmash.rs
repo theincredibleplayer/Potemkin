@@ -1,3 +1,5 @@
+use skyline_smash::phx::simd::Vector2;
+
 use super::*;
 
 
@@ -7,7 +9,7 @@ unsafe extern "C" fn fake_kill_screen(agent: &mut L2CAgentBase,enemy: *mut Battl
         set_stage_visibility(agent.module_accessor, false);
         macros::QUAKE(common, *CAMERA_QUAKE_KIND_XL);
         SlowModule::clear_whole(agent.module_accessor);
-        let vector = simd::Vector2{vec: [1.0, 1.0]};
+        let vector = &simd::Vector2{vec: [1.0, 1.0]} as *const simd::Vector2;
         StopModule::set_hit_stop_frame(enemy, 20, true);
         ShakeModule::req_time_scale(enemy, Hash40::new("damage_ground_finish"), 60, false, vector, 1.0, 0.0, false, false,-1,1.0);
         ShakeModule::set_ignore_slow(enemy, true);

@@ -181,5 +181,12 @@ V2.8
 
 
 
-V3.0
+VR1.0
 - mod has been released to gamebanana
+
+
+VR1.1
+- fixed an issue where corrin's sword effects would appear after final smash
+- fixed an issue where the game crashed if Potemkin was grabbed by incineroar side b
+- fixed an issue where the game crashed if Potemkin's final smash killed
+
