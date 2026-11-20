@@ -1074,6 +1074,11 @@ pub unsafe extern "C" fn kamui_on_situation_change(vtable: *mut u64, fighter: &m
 }
 
 
+pub unsafe extern "C" fn kamui_on_frame_5(vtable: *mut u64, fighter: &mut Fighter, something: u64) {
+
+}
+
+
 pub unsafe extern "C" fn kamui_on_status_change_2(vtable: u64, fighter: &mut Fighter) {
     let module_accessor = fighter.battle_object.module_accessor;
     let status = StatusModule::status_kind(module_accessor);
@@ -1202,5 +1207,6 @@ pub fn install() {
         replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::Unk43                        , kamui_on_status_change_2  as *const () as usize);
         replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnDeath                      , kamui_on_death            as *const () as usize);
         replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnLinkEvent                  , kamui_link_event          as *const () as usize);
+        replace_fighter_vtable_costume(*FIGHTER_KIND_KAMUI, Costume::from_vec(costume.to_vec()),FighterVtableSlot::OnFrame5                     , kamui_on_frame_5          as *const () as usize);
     }
 }
